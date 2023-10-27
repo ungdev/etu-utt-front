@@ -1,3 +1,4 @@
+import '@/global.scss';
 import Providers from '../lib/Providers';
 import React from 'react';
 

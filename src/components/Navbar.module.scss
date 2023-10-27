@@ -1,16 +1,40 @@
 .navbar {
-  .submenusCollapse {
+  .menuing {
     position: relative;
+    height: 100px;
+    background-color: red;
     overflow-y: hidden;
-    transition: height 0.3s linear;
-    height: 0;
+    font-size: 3rem;
 
-    &.selected {
-      height: var(--submenus-height);
+    .menus {
+      height: 100%;
+      display: flex;
+      overflow-x: hidden;
+
+      .menuButton {
+        transition: transform 0.3s ease-in-out;
+
+        &.right {
+          transform: translateX(var(--selected-button-right));
+        }
+
+        &.left,
+        &.selected {
+          transform: translateX(calc(-1 * var(--selected-button-left)));
+        }
+      }
     }
-
-    .submenusContainer {
+    .submenus {
       position: absolute;
+      bottom: 100%;
+      display: flex;
+      transition: all 0.3s ease-in-out;
+      left: var(--left);
+      height: 100%;
+
+      &.visible {
+        bottom: 0;
+      }
     }
   }
 }
