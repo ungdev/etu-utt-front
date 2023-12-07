@@ -1,0 +1,35 @@
+.loginForm {
+  justify-content: center;
+  padding: 150px 50px 30px;
+  background-color: #2E3442;
+  border-radius: 20px;
+
+  > * {
+    display: block;
+  }
+
+  .title {
+    margin-bottom: 40px;
+    font-size: 3rem;
+    color: white;
+
+    .bluePart {
+      color: #2D8FCE;
+    }
+  }
+
+  .passwordField {
+    margin-top: 25px;
+    margin-bottom: 5px;
+  }
+
+  .registerLink {
+    margin-top: 10px;
+    margin-left: 13px;
+  }
+
+  .connectButton {
+    width: 100%;
+    margin-top: 45px;
+  }
+}
