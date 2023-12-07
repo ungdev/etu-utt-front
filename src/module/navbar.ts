@@ -74,8 +74,12 @@ export const userSlice = createSlice({
     moveSeparator: (state, action: PayloadAction<number>) => {
       if (action.payload >= 0 && action.payload <= state.items.length) state.seperator = action.payload;
     },
+    setCollapse: (state, action: PayloadAction<boolean>) => {
+      localStorage.setItem('navbarCollapsed', `${action.payload}`);
+      state.collapsed = action.payload;
+    },
   },
-  initialState: <{ items: MenuItem<boolean>[]; seperator: number }>{
+  initialState: <{ items: MenuItem<boolean>[]; seperator: number; collapsed: boolean }>{
     items: [
       {
         icon: Home,
@@ -139,10 +143,13 @@ export const userSlice = createSlice({
       },
     ],
     seperator: 4,
+    // Throws a nextjs error because next is trying to interpret localStorage server-side (the error has no effect and can be ignored)
+    // If you are willing to kick this error out, do not use a useState as the delay will display the close animation to the user.
+    collapsed: localStorage.getItem('navbarCollapsed') === 'true',
   },
 });
 
-const { addItem, replaceItem, removeItem, moveSeparator } = userSlice.actions;
+const { addItem, replaceItem, removeItem, moveSeparator, setCollapse } = userSlice.actions;
 
 export const addMenuItem = (
   item: MenuItem,
@@ -179,5 +186,8 @@ export const setAlwaysVisibleCount = (count: number) =>
   }) as unknown as Action;
 
 export const getMenu = (state: RootState) => state.navbar;
+
+export const setCollapsed = (collapse: boolean) =>
+  ((dispatch: AppDispatch) => dispatch(setCollapse(collapse))) as unknown as Action;
 
 export default userSlice.reducer;

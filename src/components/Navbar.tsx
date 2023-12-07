@@ -1,8 +1,8 @@
 'use client';
-import { useAppSelector } from '@/lib/hooks';
+import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import styles from './Navbar.module.scss';
 import { useState } from 'react';
-import { getMenu } from '@/module/navbar';
+import { getMenu, setCollapsed } from '@/module/navbar';
 import Link from 'next/link';
 import User from '@/icons/User';
 import Menu from '@/icons/Menu';
@@ -30,8 +30,8 @@ type MenuItemProperties = {
 export type MenuItem<IncludeIcons extends boolean = boolean> = (IncludeIcons extends true
   ? Pick<MenuItemProperties, 'icon'>
   : IncludeIcons extends false
-    ? {}
-    : Partial<Pick<MenuItemProperties, 'icon'>>) &
+  ? {}
+  : Partial<Pick<MenuItemProperties, 'icon'>>) &
   (
     | (Omit<MenuItemProperties, 'path' | 'icon'> & Partial<Record<'path', never>>)
     | (Omit<MenuItemProperties, 'submenus' | 'icon'> & Partial<Record<'submenus', never>>)
@@ -47,9 +47,6 @@ export type MenuItem<IncludeIcons extends boolean = boolean> = (IncludeIcons ext
  * not work as intended, especially when talking about displaying submenus contents.
  */
 export default function Navbar() {
-  // Throws a nextjs error because next is trying to interpret localStorage server-side (the error has no effect and can be ignored)
-  // If you are willing to kick this error out, do not use a useState as the delay will display the close animation to the user.
-  const [isCollapsed, setCollapsed] = useState(localStorage.getItem('navbarCollapsed') === 'true');
   // The selected menu name. This names includes the one of all of its ancestors, separated with commas.
   // For example the name "Menu2,Menu4" matches "Menu4" in the following hierarchy (> means a closed menu, - means an open menu):
   // > Menu1
@@ -58,6 +55,7 @@ export default function Navbar() {
   //   - Menu4
   const [selectedMenuName, setSelectedMenuName] = useState<string>('');
   const menuItems = useAppSelector(getMenu);
+  const dispatch = useAppDispatch();
 
   /**
    * Switches the selected menu. If the menu (or one of its children) is already selected, the menu will close.
@@ -70,8 +68,7 @@ export default function Navbar() {
 
   /** Toggles the collapse mode */
   const toggleCollapsed = () => {
-    localStorage.setItem('navbarCollapsed', `${!isCollapsed}`);
-    setCollapsed(!isCollapsed);
+    dispatch(setCollapsed(!menuItems.collapsed));
   };
 
   /**
@@ -109,9 +106,9 @@ export default function Navbar() {
   };
 
   return (
-    <div className={`${styles.navbar} ${isCollapsed ? styles.collapsed : ''}`}>
+    <div className={`${styles.navbar} ${menuItems.collapsed ? styles.collapsed : ''}`}>
       <div className={styles.collapseIcon} onClick={toggleCollapsed}>
-        {isCollapsed ? Menu() : Collapse()}
+        {menuItems.collapsed ? Menu() : Collapse()}
       </div>
       <div className={styles.menuing}>
         {menuItems.items.slice(0, menuItems.seperator).map((item) => inflateButton(item))}
