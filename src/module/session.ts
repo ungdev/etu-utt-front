@@ -1,6 +1,6 @@
 import { type Action, createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import { AppDispatch } from '@/lib/store';
-import { API } from '@/api/api';
+import { API, handleAPIResponse } from '@/api/api';
 import { LoginRequestDto, LoginResponseDto } from '@/api/auth/login';
 import { StatusCodes } from 'http-status-codes';
 import { RegisterRequestDto, RegisterResponseDto } from '@/api/auth/register';
@@ -25,18 +25,9 @@ const { setLoggedIn, setToken } = sessionSlice.actions;
 export const login = (login: string, password: string) =>
   (async (dispatch: AppDispatch) => {
     const res = await API.post<LoginRequestDto, LoginResponseDto>('/auth/signin', { login, password });
-    if (res.error !== 'no-error') {
-      console.log('oupsy, une erreur');
-      console.log(res.error);
-      return;
-    }
-    switch (res.code) {
-      case StatusCodes.OK:
-        dispatch(setLoggedIn(true));
-        break;
-      default:
-        console.error('Unknown status code : ' + res.code);
-    }
+    handleAPIResponse(res, {
+      [StatusCodes.OK]: () => dispatch(setLoggedIn(true)),
+    });
   }) as unknown as Action;
 
 export const register = (lastName: string, firstName: string, login: string, password: string) =>
@@ -49,17 +40,12 @@ export const register = (lastName: string, firstName: string, login: string, pas
       sex: 'OTHER',
       birthday: new Date(2003, 1, 28),
     });
-    if (res.error !== 'no-error') {
-      return;
-    }
-    switch (res.code) {
-      case StatusCodes.OK:
+    handleAPIResponse(res, {
+      [StatusCodes.OK]: (body) => {
         dispatch(setLoggedIn(true));
-        dispatch(setToken(res.body.access_token));
-        break;
-      default:
-        console.error('Unknown status code : ' + res.code);
-    }
+        dispatch(setToken(body.access_token));
+      },
+    });
   }) as unknown as Action;
 
 export const autoLogin = () =>
@@ -69,19 +55,14 @@ export const autoLogin = () =>
       return;
     }
     const res = await API.get<IsLoggedInResponseDto>('/auth/signin');
-    if (res.error !== 'no-error') {
-      return;
-    }
-    switch (res.code) {
-      case StatusCodes.OK:
-        if (res.body.valid) {
+    handleAPIResponse(res, {
+      [StatusCodes.OK]: (body) => {
+        if (body.valid) {
           dispatch(setLoggedIn(true));
           dispatch(setToken(token));
         }
-        break;
-      default:
-        console.error('Unknown status code : ' + res.code);
-    }
+      },
+    });
   }) as unknown as Action;
 
 export default sessionSlice.reducer;

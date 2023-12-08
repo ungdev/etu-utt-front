@@ -1,4 +1,4 @@
-import { RequestDto, ResponseDto } from '@/api/api';
+import { ResponseDto } from '@/api/api';
 
 export interface IsLoggedInResponseDto extends ResponseDto {
   valid: boolean;

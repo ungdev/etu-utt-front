@@ -3,13 +3,38 @@ import { apiUrl } from '@/utils/environment';
 export interface RequestDto {}
 export interface ResponseDto {}
 
+export enum ResponseError {
+  'not_json',
+  'timeout',
+  'unknown',
+}
+
 export type APIResponse<ResponseType extends ResponseDto> =
   | {
-      error: 'no-error';
+      error: 'no_error';
       code: number;
       body: ResponseType;
     }
-  | { error: 'not-json' | 'timeout' | 'unknown' };
+  | { error: ResponseError };
+
+export function handleAPIResponse<T extends ResponseDto>(
+  response: APIResponse<T>,
+  handlers: { [status: number]: (body: T) => void } & Partial<{ [status in ResponseError]: () => void }>,
+) {
+  if (response.error === 'no_error') {
+    if (handlers[response.code]) {
+      handlers[response.code](response.body);
+    } else {
+      console.error(`Unsupported error code : ${response.code}`);
+    }
+  } else {
+    if (handlers[response.error]) {
+      handlers[response.error]!();
+    } else {
+      console.error(`Unsupported error type : ${response.error}`);
+    }
+  }
+}
 
 // Send request to API and handle errors
 async function requestAPI<RequestType extends RequestDto, ResponseType extends ResponseDto>(
@@ -48,9 +73,9 @@ async function requestAPI<RequestType extends RequestDto, ResponseType extends R
     clearTimeout(timeout);
 
     if (!response.headers.get('content-type')?.includes('application/json')) {
-      return { error: 'not-json' };
+      return { error: ResponseError.not_json };
     }
-    return { error: 'no-error', code: response.status, body: (await response.json()) as ResponseType };
+    return { error: 'no_error', code: response.status, body: (await response.json()) as ResponseType };
   } catch (
     /* eslint-disable @typescript-eslint/no-explicit-any */
     error: any
@@ -61,8 +86,8 @@ async function requestAPI<RequestType extends RequestDto, ResponseType extends R
       console.error('An error occurred when making a request to the API');
     }
 
-    if (didTimeOut) return { error: 'timeout' };
-    return { error: 'unknown' };
+    if (didTimeOut) return { error: ResponseError.timeout };
+    return { error: ResponseError.unknown };
   }
 }
 
