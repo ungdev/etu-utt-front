@@ -1,41 +1,59 @@
 'use client';
+import { useAppSelector } from '@/lib/hooks';
 import styles from './Navbar.module.scss';
-import Link from 'next/link';
-import { CSSProperties, useRef, useState } from 'react';
+import { CSSProperties, useEffect, useRef, useState } from 'react';
+import { getMenu } from '@/module/navbar';
 
-const menus: Array<
-  | { name: string; redirect?: undefined; submenus: { name: string; redirect: string }[] }
-  | { name: string; redirect: string; submenus?: undefined }
-> = [
-  {
-    name: 'Menu 1',
-    submenus: [
-      { name: 'Sous menu 1', redirect: '/test1' },
-      { name: 'Sous menu 2', redirect: '/test2' },
-      { name: 'Sous menu 3', redirect: '/test3' },
-    ],
-  },
-  {
-    name: 'Menu 2',
-    submenus: [
-      { name: 'Sous menu 4', redirect: '/test4' },
-      { name: 'Sous menu 5', redirect: '/test5' },
-      { name: 'Sous menu 6', redirect: '/test6' },
-    ],
-  },
-  {
-    name: 'Menu 3',
-    redirect: '/test7',
-  },
-];
+/**
+ * The type defining all possible properties for a menu item
+ * This is an internal type that should not be used when developping features.
+ * */
+type MenuItemProperties = {
+  icon: (...params: any) => JSX.Element;
+  name: string;
+  path: `/${string}`;
+  submenus: MenuItem<false>[];
+};
 
+/**
+ * An item displayed in the menu.
+ * Requires one property in the followings (cannot be used together):
+ * - {@link MenuItemProperties.path} the path the MenuItem will redirect on click
+ * - {@link MenuItemProperties.submenus} a list of {@link MenuItem} describing all the items of the submenu.
+ *
+ * Can have an icon using {@link MenuItemProperties.icon}. By default an icon can be used and is optional. Use the paramater {@link IncludeIcons} to require or forbid icons
+ */
+export type MenuItem<IncludeIcons extends boolean = boolean> = (IncludeIcons extends true
+  ? Pick<MenuItemProperties, 'icon'>
+  : IncludeIcons extends false
+    ? {}
+    : Partial<Pick<MenuItemProperties, 'icon'>>) &
+  (
+    | (Omit<MenuItemProperties, 'path' | 'icon'> & Partial<Record<'path', never>>)
+    | (Omit<MenuItemProperties, 'submenus' | 'icon'> & Partial<Record<'submenus', never>>)
+  );
+
+/**
+ * Le menu d'EtuUTT. Il s'agit du panneau rétractable qui apparait sur la gauche de ton écran !
+ * Il supporte également le fait d'être modifié pendant que l'utilisateur est sur la page.
+ * */
 export default function Navbar() {
-  const [selectedMenu, setSelectedMenu] = useState(0);
-  const [mainMenuVisible, setMainMenuVisible] = useState(true);
-  const buttonRefs = menus.map(() => useRef<HTMLDivElement>(null));
+  const [selectedMenu, setSelectedMenu] = useState(-1);
+  const menuItems = useAppSelector(getMenu);
+  const menuItemsRef = menuItems.map(() => useRef<HTMLDivElement>(null));
 
-  const selectedButtonRef = buttonRefs[selectedMenu];
+  useEffect(() => {
+    if (menuItems.length < menuItemsRef.length) {
+      // An item was removed
+    } else if (menuItems.length === menuItemsRef.length) {
+      // An item was modified
+    } else {
+      // An item was added
+    }
+  }, [menuItems]);
 
+  /*
+  
   const selectedButtonTransform = selectedButtonRef.current
     ? window.getComputedStyle(selectedButtonRef.current!).transform
     : 'none';
@@ -55,15 +73,15 @@ export default function Navbar() {
       } as CSSProperties)
     : {};
 
-  const menusComponent = menus.map((menu, i) =>
-    menu.redirect ? (
+  const menusComponent = menu.map((menu, i) =>
+    menu.path ? (
       <div
         className={`${styles.menuButton} ${
           mainMenuVisible ? '' : selectedMenu < i ? styles.right : selectedMenu > i ? styles.left : styles.selected
         }`}
         style={cssVariables}
         key={`menu-${i}`}>
-        <Link href={menu.redirect}>{menu.name}</Link>
+        <Link href={menu.path}>{menu.name}</Link>
       </div>
     ) : (
       <div
@@ -79,22 +97,22 @@ export default function Navbar() {
     ),
   );
 
-  const submenusComponent = menus[selectedMenu].submenus?.map((submenu, i) => (
+  const submenusComponent = menu[selectedMenu].submenus?.map((submenu, i) => (
     <div key={`submenu-${i}`}>
-      <Link href={submenu.redirect}>{submenu.name}</Link>
+      <Link href={submenu.path!}>{submenu.name}</Link>
     </div>
   ));
 
+  */
   return (
     <div className={styles.navbar}>
-      <button onClick={() => setMainMenuVisible(!mainMenuVisible)}>back</button>
       <div className={styles.menuing}>
-        <div className={`${styles.menus}`}>{menusComponent}</div>
+        {/* <div className={`${styles.menus}`}>{menusComponent}</div>
         <div
           className={`${styles.submenus} ${!mainMenuVisible ? styles.visible : ''}`}
           style={{ '--left': `${selectedButtonRef.current?.clientWidth}px` } as CSSProperties}>
           {submenusComponent}
-        </div>
+        </div> */}
       </div>
     </div>
   );
