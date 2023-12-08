@@ -1,8 +1,9 @@
 'use client';
 import { useAppSelector } from '@/lib/hooks';
 import styles from './Navbar.module.scss';
-import { CSSProperties, useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { getMenu } from '@/module/navbar';
+import Link from 'next/link';
 
 /**
  * The type defining all possible properties for a menu item
@@ -38,81 +39,46 @@ export type MenuItem<IncludeIcons extends boolean = boolean> = (IncludeIcons ext
  * Il supporte également le fait d'être modifié pendant que l'utilisateur est sur la page.
  * */
 export default function Navbar() {
-  const [selectedMenu, setSelectedMenu] = useState(-1);
+  const [selectedMenuName, setSelectedMenuName] = useState<string>('');
   const menuItems = useAppSelector(getMenu);
-  const menuItemsRef = menuItems.map(() => useRef<HTMLDivElement>(null));
 
-  useEffect(() => {
-    if (menuItems.length < menuItemsRef.length) {
-      // An item was removed
-    } else if (menuItems.length === menuItemsRef.length) {
-      // An item was modified
-    } else {
-      // An item was added
-    }
-  }, [menuItems]);
+  const toggleSelected = (itemName: string) => {
+    if (selectedMenuName.startsWith(itemName)) setSelectedMenuName(itemName.split(',').slice(0, -1).join());
+    else setSelectedMenuName(itemName);
+  };
 
-  /*
-  
-  const selectedButtonTransform = selectedButtonRef.current
-    ? window.getComputedStyle(selectedButtonRef.current!).transform
-    : 'none';
-  const selectedButtonLeft = selectedButtonRef.current
-    ? selectedButtonRef.current?.getBoundingClientRect().left -
-      (selectedButtonTransform === 'none'
-        ? 0
-        : parseInt(selectedButtonTransform.match(/matrix.*\((.+)\)/)![1].split(', ')[4]))
-    : undefined;
-
-  const cssVariables = selectedButtonRef.current
-    ? ({
-        '--selected-button-left': `${selectedButtonLeft}px`,
-        '--selected-button-right': `${
-          window.innerWidth - (selectedButtonLeft! + selectedButtonRef.current?.clientWidth)
-        }px`,
-      } as CSSProperties)
-    : {};
-
-  const menusComponent = menu.map((menu, i) =>
-    menu.path ? (
-      <div
-        className={`${styles.menuButton} ${
-          mainMenuVisible ? '' : selectedMenu < i ? styles.right : selectedMenu > i ? styles.left : styles.selected
-        }`}
-        style={cssVariables}
-        key={`menu-${i}`}>
-        <Link href={menu.path}>{menu.name}</Link>
-      </div>
+  const inflateButton = (item: MenuItem, after: string = '') => {
+    return 'path' in item ? (
+      <Link href={item.path as string} className={`${styles.button} ${styles.link}`}>
+        <div className={`${styles.buttonContent} ${styles['indent-' + after.split(',').length]}`}>
+          {'icon' in item ? item.icon() : ''}
+          <div className={styles.name}>{item.name}</div>
+        </div>
+      </Link>
     ) : (
       <div
-        className={`${styles.menuButton} ${
-          mainMenuVisible ? '' : selectedMenu < i ? styles.right : selectedMenu > i ? styles.left : styles.selected
-        }`}
-        style={cssVariables}
-        onClick={() => mainMenuVisible && [setSelectedMenu(i)] && setMainMenuVisible(false)}
-        ref={buttonRefs[i]}
-        key={`menu-${i}`}>
-        {menu.name}
+        className={`${styles.button} ${styles.category} ${
+          selectedMenuName.startsWith([after, item.name].join()) ? styles.containerOpen : styles.containerClose
+        }`}>
+        <div
+          className={`${styles.buttonContent} ${styles['indent-' + after.split(',').length]}`}
+          onClick={() => toggleSelected([after, item.name].join())}>
+          {'icon' in item ? item.icon() : ''}
+          <div className={styles.name}>{item.name}</div>
+        </div>
+        <div className={styles.buttonChildrenContainer}>
+          {item.submenus.map((item) => inflateButton(item, [after, item.name].join()))}
+        </div>
       </div>
-    ),
-  );
+    );
+  };
 
-  const submenusComponent = menu[selectedMenu].submenus?.map((submenu, i) => (
-    <div key={`submenu-${i}`}>
-      <Link href={submenu.path!}>{submenu.name}</Link>
-    </div>
-  ));
-
-  */
   return (
     <div className={styles.navbar}>
       <div className={styles.menuing}>
-        {/* <div className={`${styles.menus}`}>{menusComponent}</div>
-        <div
-          className={`${styles.submenus} ${!mainMenuVisible ? styles.visible : ''}`}
-          style={{ '--left': `${selectedButtonRef.current?.clientWidth}px` } as CSSProperties}>
-          {submenusComponent}
-        </div> */}
+        {menuItems.items.slice(0, menuItems.seperator).map((item) => inflateButton(item))}
+        <div className={styles.separator} />
+        {menuItems.items.slice(menuItems.seperator).map((item) => inflateButton(item))}
       </div>
     </div>
   );

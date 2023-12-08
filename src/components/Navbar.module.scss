@@ -1,39 +1,88 @@
+@import '@/variables.scss';
+
 .navbar {
   .menuing {
     position: relative;
-    height: 100px;
-    background-color: red;
-    overflow-y: hidden;
-    font-size: 3rem;
+    display: flex;
+    flex-flow: column wrap;
+    justify-content: center;
+    align-items: start;
+    height: 100vh;
+    width: 28%;
+    max-width: 450px;
+    background-color: $ung-dark-grey;
+    overflow-x: hidden;
+    font-size: 2rem;
+    color: white;
+    border-right: 10px solid $ung-light-blue;
 
-    .menus {
-      height: 100%;
+    a {
+      color: white;
+      text-decoration: none;
+    }
+
+    .button {
       display: flex;
-      overflow-x: hidden;
+      flex-flow: column nowrap;
+      width: 100%;
+      padding: 15px 20px;
+      box-sizing: border-box;
 
-      .menuButton {
-        transition: transform 0.3s ease-in-out;
+      &.link {
+      }
 
-        &.right {
-          transform: translateX(var(--selected-button-right));
+      &.category {
+        user-select: none;
+        cursor: pointer;
+        transition: all 0.25s ease-in-out;
+        max-height: 100%;
+        will-change: max-height;
+        overflow: hidden;
+        position: relative;
+        justify-content: start;
+
+        &.containerOpen .buttonContent svg {
+          transform: rotate(90deg);
         }
 
-        &.left,
-        &.selected {
-          transform: translateX(calc(-1 * var(--selected-button-left)));
+        &.containerClose {
+          max-height: calc(2rem + 30px);
         }
       }
-    }
-    .submenus {
-      position: absolute;
-      bottom: 100%;
-      display: flex;
-      transition: all 0.3s ease-in-out;
-      left: var(--left);
-      height: 100%;
 
-      &.visible {
-        bottom: 0;
+      .buttonContent {
+        display: flex;
+        flex-flow: row nowrap;
+        overflow-x: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        align-items: center;
+        gap: 15px;
+        flex: 1 0 auto;
+
+        svg {
+          height: 2rem;
+          transition: transform 0.25s ease-in-out;
+        }
+        .name {
+          text-transform: uppercase;
+        }
+      }
+      .indent-2 {
+        padding-left: 25px;
+      }
+    }
+
+    .separator {
+      margin: 35px 0;
+      background-color: $ung-light-blue;
+      width: 80%;
+      align-self: center;
+      box-sizing: border-box;
+      height: 3px;
+
+      & ~ .button .name {
+        text-transform: unset;
       }
     }
   }
