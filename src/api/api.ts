@@ -71,7 +71,7 @@ const getAuthorizationToken = () => localStorage.getItem('etuutt-token');
 
 // Access the API through different HTTP methods
 export const API = {
-  get: (route: string) => requestAPI('GET', route, {}),
+  get: <ResponseType extends ResponseDto>(route: string) => requestAPI<never, ResponseType>('GET', route),
 
   post: <RequestType extends RequestDto, ResponseType extends ResponseDto>(route: string, body: RequestType) =>
     requestAPI<RequestType, ResponseType>('POST', route, body),
@@ -82,5 +82,5 @@ export const API = {
   patch: <RequestType extends RequestDto, ResponseType extends ResponseDto>(route: string, body: RequestType) =>
     requestAPI<RequestType, ResponseType>('PATCH', route, body),
 
-  delete: (route: string) => requestAPI('DELETE', route, {}),
+  delete: <ResponseType extends ResponseDto>(route: string) => requestAPI<never, ResponseType>('DELETE', route),
 };

@@ -6,5 +6,5 @@ export interface LoginRequestDto extends RequestDto {
 }
 
 export interface LoginResponseDto extends ResponseDto {
-  token: string;
+  access_token: string;
 }

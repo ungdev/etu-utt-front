@@ -8,6 +8,5 @@ export interface RegisterRequestDto {
 }
 
 export interface RegisterResponseDto {
-  firstName: string;
-  lastName: string;
+  access_token: string;
 }
