@@ -34,7 +34,7 @@
     display: flex;
     flex-flow: column wrap;
     justify-content: center;
-    align-items: start;
+    align-items: flex-start;
 
     .button {
       display: flex;
@@ -50,7 +50,7 @@
         transition: all 0.25s ease-in-out;
         overflow: hidden;
         position: relative;
-        justify-content: start;
+        justify-content: flex-start;
 
         &.containerOpen .buttonContent svg {
           transform: rotate(90deg);

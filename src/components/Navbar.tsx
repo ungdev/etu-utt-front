@@ -47,6 +47,8 @@ export type MenuItem<IncludeIcons extends boolean = boolean> = (IncludeIcons ext
  * not work as intended, especially when talking about displaying submenus contents.
  */
 export default function Navbar() {
+  // Throws a nextjs error because next is trying to interpret localStorage server-side (the error has no effect and can be ignored)
+  // If you are willing to kick this error out, do not use a useState as the delay will display the close animation to the user.
   const [isCollapsed, setCollapsed] = useState(localStorage.getItem('navbarCollapsed') === 'true');
   // The selected menu name. This names includes the one of all of its ancestors, separated with commas.
   // For example the name "Menu2,Menu4" matches "Menu4" in the following hierarchy (> means a closed menu, - means an open menu):

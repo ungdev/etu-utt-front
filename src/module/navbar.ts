@@ -30,7 +30,7 @@ export const userSlice = createSlice({
     },
     removeItem: (state, action: PayloadAction<string>) => {
       let index = state.items.findIndex(({ name }) => name === action.payload);
-      state.items.splice(index, 1);
+      if (index >= 0) state.items.splice(index, 1);
     },
     moveSeparator: (state, action: PayloadAction<number>) => {
       state.seperator = action.payload;
