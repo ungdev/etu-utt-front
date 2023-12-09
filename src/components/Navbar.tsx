@@ -50,7 +50,7 @@ export default function Navbar() {
   const inflateButton = (item: MenuItem, after: string = '') => {
     return 'path' in item ? (
       <Link href={item.path as string} className={`${styles.button} ${styles.link}`}>
-        <div className={`${styles.buttonContent} ${styles['indent-' + after.split(',').length]}`}>
+        <div className={`${styles.buttonContent} ${styles['indent-' + (after.split(',').length - 1)]}`}>
           {'icon' in item ? item.icon() : ''}
           <div className={styles.name}>{item.name}</div>
         </div>
@@ -59,9 +59,10 @@ export default function Navbar() {
       <div
         className={`${styles.button} ${styles.category} ${
           selectedMenuName.startsWith([after, item.name].join()) ? styles.containerOpen : styles.containerClose
-        }`}>
+        }`}
+        style={{ maxHeight: `calc(${1 + item.submenus.length} * (2.5rem + 30px))` }}>
         <div
-          className={`${styles.buttonContent} ${styles['indent-' + after.split(',').length]}`}
+          className={`${styles.buttonContent} ${styles['indent-' + (after.split(',').length - 1)]}`}
           onClick={() => toggleSelected([after, item.name].join())}>
           {'icon' in item ? item.icon() : ''}
           <div className={styles.name}>{item.name}</div>

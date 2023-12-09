@@ -16,27 +16,18 @@
     color: white;
     border-right: 10px solid $ung-light-blue;
 
-    a {
-      color: white;
-      text-decoration: none;
-    }
-
     .button {
       display: flex;
       flex-flow: column nowrap;
       width: 100%;
-      padding: 15px 20px;
-      box-sizing: border-box;
 
       &.link {
+        color: white;
+        text-decoration: none;
       }
 
       &.category {
-        user-select: none;
-        cursor: pointer;
         transition: all 0.25s ease-in-out;
-        max-height: 100%;
-        will-change: max-height;
         overflow: hidden;
         position: relative;
         justify-content: start;
@@ -46,7 +37,7 @@
         }
 
         &.containerClose {
-          max-height: calc(2rem + 30px);
+          max-height: calc(2.5rem + 30px) !important;
         }
       }
 
@@ -59,6 +50,9 @@
         align-items: center;
         gap: 15px;
         flex: 1 0 auto;
+        padding: 15px 20px;
+        box-sizing: border-box;
+        cursor: pointer;
 
         svg {
           height: 2rem;
@@ -68,8 +62,14 @@
           text-transform: uppercase;
         }
       }
-      .indent-2 {
-        padding-left: 25px;
+
+      .indent-0 {
+        padding-left: 20px;
+      }
+      @for $i from 1 through 8 {
+        .indent-#{$i} {
+          padding-left: calc($i * 2rem + 35px);
+        }
       }
     }
 
