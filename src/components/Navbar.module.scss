@@ -1,20 +1,40 @@
 @import '@/variables.scss';
 
 .navbar {
+  display: flex;
+  flex-flow: column nowrap;
+  height: 100vh;
+  background-color: $ung-dark-grey;
+  width: 28%;
+  max-width: 450px;
+  overflow-x: hidden;
+  font-size: 2rem;
+  color: white;
+  border-right: 10px solid $ung-light-blue;
+  transition: max-width 0.2s ease-in-out;
+
+  .collapseIcon {
+    display: block;
+    height: 2rem;
+    width: 2rem;
+    position: relative;
+    padding: 20px 20px 15px;
+    cursor: pointer;
+    color: $ung-light-blue;
+
+    svg {
+      display: inline-block;
+      height: 100%;
+    }
+  }
+
   .menuing {
     position: relative;
+    flex: 1 0 auto;
     display: flex;
     flex-flow: column wrap;
     justify-content: center;
     align-items: start;
-    height: 100vh;
-    width: 28%;
-    max-width: 450px;
-    background-color: $ung-dark-grey;
-    overflow-x: hidden;
-    font-size: 2rem;
-    color: white;
-    border-right: 10px solid $ung-light-blue;
 
     .button {
       display: flex;
@@ -55,6 +75,7 @@
         cursor: pointer;
 
         svg {
+          flex: 0 0 auto;
           height: 2rem;
           transition: transform 0.25s ease-in-out;
         }
@@ -84,6 +105,49 @@
       & ~ .button .name {
         text-transform: unset;
       }
+    }
+  }
+
+  .profile {
+    flex: 0 0 auto;
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    gap: 20px;
+    padding: 30px;
+    transition: padding 0.15s ease-in-out;
+
+    .roundIcon {
+      flex: 0 0 auto;
+      width: 3.15rem;
+      height: 3.15rem;
+      overflow: hidden;
+      border-radius: 1.64rem;
+      background-color: $ung-light-grey;
+    }
+
+    .name {
+      display: block;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+  }
+
+  &.collapsed {
+    max-width: calc(2rem + 40px);
+
+    .collapseIcon {
+      color: white;
+    }
+
+    .name,
+    .separator,
+    .separator ~ .button {
+      display: none;
+    }
+
+    .profile {
+      padding: 10px 10px 20px;
     }
   }
 }

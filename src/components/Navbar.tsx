@@ -4,6 +4,9 @@ import styles from './Navbar.module.scss';
 import { useState } from 'react';
 import { getMenu } from '@/module/navbar';
 import Link from 'next/link';
+import User from '@/icons/User';
+import Menu from '@/icons/Menu';
+import Collapse from '@/icons/Collapse';
 
 /**
  * The type defining all possible properties for a menu item
@@ -35,21 +38,49 @@ export type MenuItem<IncludeIcons extends boolean = boolean> = (IncludeIcons ext
   );
 
 /**
- * Le menu d'EtuUTT. Il s'agit du panneau rétractable qui apparait sur la gauche de ton écran !
- * Il supporte également le fait d'être modifié pendant que l'utilisateur est sur la page.
- * */
+ * EtuUTT's main menu. It is the sidebar on the left of the screen.
+ * The "collapsed/uncollapsed" state est saved in the browser's localStorage and will be kept the next time the user will use the browser.
+ *
+ * The menu supports hot modifications with using methods defined in {@link @/module/navbar}
+ *
+ * At the point, the navbar officially only supports 2 depth levels. Other levels are possible but may
+ * not work as intended, especially when talking about displaying submenus contents.
+ */
 export default function Navbar() {
+  const [isCollapsed, setCollapsed] = useState(localStorage.getItem('navbarCollapsed') === 'true');
+  // The selected menu name. This names includes the one of all of its ancestors, separated with commas.
+  // For example the name "Menu2,Menu4" matches "Menu4" in the following hierarchy (> means a closed menu, - means an open menu):
+  // > Menu1
+  // - Menu2
+  //   > Menu3
+  //   - Menu4
   const [selectedMenuName, setSelectedMenuName] = useState<string>('');
   const menuItems = useAppSelector(getMenu);
 
+  /**
+   * Switches the selected menu. If the menu (or one of its children) is already selected, the menu will close.
+   * Otherwise, we open the menu.
+   * */
   const toggleSelected = (itemName: string) => {
     if (selectedMenuName.startsWith(itemName)) setSelectedMenuName(itemName.split(',').slice(0, -1).join());
     else setSelectedMenuName(itemName);
   };
 
+  /** Toggles the collapse mode */
+  const toggleCollapsed = () => {
+    localStorage.setItem('navbarCollapsed', `${!isCollapsed}`);
+    setCollapsed(!isCollapsed);
+  };
+
+  /**
+   * Creates a button as an {@link HTMLDivElement} using data from the provided {@link MenuItem}.
+   *
+   * The {@link after} property contains the name of all ancestors, separated with commas. Keep the default
+   * value if the item is in the root menu.
+   */
   const inflateButton = (item: MenuItem, after: string = '') => {
     return 'path' in item ? (
-      <Link href={item.path as string} className={`${styles.button} ${styles.link}`}>
+      <Link href={item.path as string} className={`${styles.button} ${styles.link}`} key={item.name}>
         <div className={`${styles.buttonContent} ${styles['indent-' + (after.split(',').length - 1)]}`}>
           {'icon' in item ? item.icon() : ''}
           <div className={styles.name}>{item.name}</div>
@@ -60,7 +91,8 @@ export default function Navbar() {
         className={`${styles.button} ${styles.category} ${
           selectedMenuName.startsWith([after, item.name].join()) ? styles.containerOpen : styles.containerClose
         }`}
-        style={{ maxHeight: `calc(${1 + item.submenus.length} * (2.5rem + 30px))` }}>
+        style={{ maxHeight: `calc(${1 + item.submenus.length} * (2.5rem + 30px))` }}
+        key={item.name}>
         <div
           className={`${styles.buttonContent} ${styles['indent-' + (after.split(',').length - 1)]}`}
           onClick={() => toggleSelected([after, item.name].join())}>
@@ -75,11 +107,20 @@ export default function Navbar() {
   };
 
   return (
-    <div className={styles.navbar}>
+    <div className={`${styles.navbar} ${isCollapsed ? styles.collapsed : ''}`}>
+      <div className={styles.collapseIcon} onClick={toggleCollapsed}>
+        {isCollapsed ? Menu() : Collapse()}
+      </div>
       <div className={styles.menuing}>
         {menuItems.items.slice(0, menuItems.seperator).map((item) => inflateButton(item))}
         <div className={styles.separator} />
         {menuItems.items.slice(menuItems.seperator).map((item) => inflateButton(item))}
+      </div>
+      <div className={styles.profile}>
+        <div className={styles.roundIcon}>
+          <User />
+        </div>
+        <div className={styles.name}>Mon Profil</div>
       </div>
     </div>
   );

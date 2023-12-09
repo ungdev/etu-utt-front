@@ -70,6 +70,14 @@ export const userSlice = createSlice({
             name: 'SY04',
             path: '/ue/sy04',
           },
+          {
+            name: 'RE14',
+            path: '/ue/re14',
+          },
+          {
+            name: 'LO14',
+            path: '/ue/lo14',
+          },
         ],
       },
       {
