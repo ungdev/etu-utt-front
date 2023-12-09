@@ -10,30 +10,69 @@ import { AppDispatch, RootState } from 'src/lib/store';
 export const userSlice = createSlice({
   name: 'navbar',
   reducers: {
-    addItem: (state, action: PayloadAction<MenuItem>) => {
-      state.items = [...state.items, action.payload];
-    },
-    addItemBefore: (state, action: PayloadAction<{ item: MenuItem; before: string }>) => {
-      let index = state.items.findIndex(({ name }) => name === action.payload.before);
-      if (index < 0) index = state.items.length;
-      state.items.splice(index, 0, action.payload.item);
-    },
-    addItemAfter: (state, action: PayloadAction<{ item: MenuItem; after: string }>) => {
-      let index = state.items.findIndex(({ name }) => name === action.payload.after);
-      if (index < 0) index = state.items.length;
-      state.items.splice(index + 1, 0, action.payload.item);
+    addItem: (
+      state,
+      action: PayloadAction<{ item: MenuItem; parents: string; before: string | null; after: string | null }>,
+    ) => {
+      const location = action.payload.parents.split(',');
+      let list: MenuItem<boolean>[] | null = state.items;
+      for (let i = 0; i < (action.payload.parents.length > 0 ? location.length : 0); i++) {
+        const index: number = list.findIndex(({ name, submenus }) => name === location[i] && submenus != null);
+        if (index < 0) {
+          list = null;
+          break;
+        }
+        list = list[index].submenus!;
+      }
+      if (list != null) {
+        if (list.findIndex(({ name }) => name === action.payload.item.name) >= 0) return; // an item already has this name
+        if (action.payload.before != null) {
+          let index = list.findIndex(({ name }) => name === action.payload.before);
+          if (index < 0) index = list.length;
+          list.splice(index, 0, action.payload.item);
+        } else if (action.payload.after != null) {
+          let index = list.findIndex(({ name }) => name === action.payload.after);
+          if (index < 0) index = list.length - 1;
+          list.splice(index + 1, 0, action.payload.item);
+        } else list.push(action.payload.item);
+      }
     },
     replaceItem: (state, action: PayloadAction<{ item: MenuItem; search: string }>) => {
-      let index = state.items.findIndex(({ name }) => name === action.payload.search);
-      if (index < 0) index = state.items.length;
-      state.items.splice(index, 1, action.payload.item);
+      const location = action.payload.search.split(',');
+      let list: MenuItem<boolean>[] | null = state.items;
+      for (let i = 0; i < location.length - 1; i++) {
+        const index: number = list.findIndex(({ name, submenus }) => name === location[i] && submenus != null);
+        if (index < 0) {
+          list = null;
+          break;
+        }
+        list = list[index].submenus!;
+      }
+      if (list != null) {
+        let index = list.findIndex(({ name }) => name === location[location.length - 1]);
+        const dupplicateCheckIndex = list.findIndex(({ name }) => name === action.payload.item.name);
+        if (dupplicateCheckIndex >= 0 && dupplicateCheckIndex != index) return; // an other item already has this name
+        if (index >= 0) list.splice(index, 1, action.payload.item);
+      }
     },
     removeItem: (state, action: PayloadAction<string>) => {
-      let index = state.items.findIndex(({ name }) => name === action.payload);
-      if (index >= 0) state.items.splice(index, 1);
+      const location = action.payload.split(',');
+      let list: MenuItem<boolean>[] | null = state.items;
+      for (let i = 0; i < location.length - 1; i++) {
+        const index: number = list.findIndex(({ name, submenus }) => name === location[i] && submenus != null);
+        if (index < 0) {
+          list = null;
+          break;
+        }
+        list = list[index].submenus!;
+      }
+      if (list != null) {
+        let index = list.findIndex(({ name }) => name === location[location.length - 1]);
+        if (index >= 0) list.splice(index, 1);
+      }
     },
     moveSeparator: (state, action: PayloadAction<number>) => {
-      state.seperator = action.payload;
+      if (action.payload >= 0 && action.payload <= state.items.length) state.seperator = action.payload;
     },
   },
   initialState: <{ items: MenuItem<boolean>[]; seperator: number }>{
@@ -103,21 +142,25 @@ export const userSlice = createSlice({
   },
 });
 
-const { addItem, addItemAfter, addItemBefore, replaceItem, removeItem, moveSeparator } = userSlice.actions;
+const { addItem, replaceItem, removeItem, moveSeparator } = userSlice.actions;
 
-export const addMenuItem = (item: MenuItem) =>
+export const addMenuItem = (
+  item: MenuItem,
+  options?: {
+    parents?: string;
+    before?: string;
+    after?: string;
+  },
+) =>
   ((dispatch: AppDispatch) => {
-    dispatch(addItem(item));
-  }) as unknown as Action;
-
-export const addMenuItemBefore = (item: MenuItem, itemBeforeName: string) =>
-  ((dispatch: AppDispatch) => {
-    dispatch(addItemBefore({ item, before: itemBeforeName }));
-  }) as unknown as Action;
-
-export const addMenuItemAfter = (item: MenuItem, itemAfterName: string) =>
-  ((dispatch: AppDispatch) => {
-    dispatch(addItemAfter({ item, after: itemAfterName }));
+    dispatch(
+      addItem({
+        item,
+        parents: options?.parents ?? '',
+        before: options?.before || null,
+        after: options?.after || null,
+      }),
+    );
   }) as unknown as Action;
 
 export const replaceMenuItem = (item: MenuItem, replacedItemName: string) =>
