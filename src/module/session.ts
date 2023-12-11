@@ -14,19 +14,21 @@ interface SessionSlice {
 export const sessionSlice = createSlice({
   name: 'session',
   reducers: {
-    setLoggedIn: (state, action: PayloadAction<boolean>) => ({ ...state, logged: action.payload }),
-    setToken: (state, action: PayloadAction<string>) => ({ ...state, token: action.payload }),
+    setToken: (state, action: PayloadAction<string>) => {
+      localStorage.setItem('etuutt-token', action.payload);
+      return { ...state, token: action.payload, logged: !!action.payload };
+    },
   },
   initialState: { logged: false } as SessionSlice,
 });
 
-const { setLoggedIn, setToken } = sessionSlice.actions;
+const { setToken } = sessionSlice.actions;
 
 export const login = (login: string, password: string) =>
   (async (dispatch: AppDispatch) => {
     const res = await API.post<LoginRequestDto, LoginResponseDto>('/auth/signin', { login, password });
     handleAPIResponse(res, {
-      [StatusCodes.OK]: () => dispatch(setLoggedIn(true)),
+      [StatusCodes.OK]: (body) => dispatch(setToken(body.access_token)),
     });
   }) as unknown as Action;
 
@@ -41,10 +43,7 @@ export const register = (lastName: string, firstName: string, login: string, pas
       birthday: new Date(2003, 1, 28),
     });
     handleAPIResponse(res, {
-      [StatusCodes.OK]: (body) => {
-        dispatch(setLoggedIn(true));
-        dispatch(setToken(body.access_token));
-      },
+      [StatusCodes.OK]: (body) => dispatch(setToken(body.access_token)),
     });
   }) as unknown as Action;
 
@@ -58,7 +57,6 @@ export const autoLogin = () =>
     handleAPIResponse(res, {
       [StatusCodes.OK]: (body) => {
         if (body.valid) {
-          dispatch(setLoggedIn(true));
           dispatch(setToken(token));
         }
       },
