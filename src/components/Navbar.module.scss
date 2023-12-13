@@ -5,12 +5,12 @@
   flex-flow: column nowrap;
   height: 100vh;
   background-color: $ung-dark-grey;
-  width: 28%;
-  max-width: 450px;
+  width: 30%;
+  max-width: 350px;
   overflow-x: hidden;
-  font-size: 2rem;
+  font-size: 1.5rem;
   color: white;
-  border-right: 10px solid $ung-light-blue;
+  border-right: 8px solid $ung-light-blue;
   transition: max-width 0.2s ease-in-out;
 
   .collapseIcon {
@@ -18,7 +18,7 @@
     height: 2rem;
     width: 2rem;
     position: relative;
-    padding: 20px 20px 15px;
+    padding: 11px 11px 10px;
     cursor: pointer;
     color: $ung-light-blue;
 
@@ -57,7 +57,7 @@
         }
 
         &.containerClose {
-          max-height: calc(2.5rem + 30px) !important;
+          max-height: calc(2rem + 20px) !important;
         }
       }
 
@@ -68,15 +68,15 @@
         text-overflow: ellipsis;
         white-space: nowrap;
         align-items: center;
-        gap: 15px;
+        gap: 10px;
         flex: 1 0 auto;
-        padding: 15px 20px;
+        padding: 10px 15px;
         box-sizing: border-box;
         cursor: pointer;
 
         svg {
           flex: 0 0 auto;
-          height: 2rem;
+          height: 1.5rem;
           transition: transform 0.25s ease-in-out;
         }
         .name {
@@ -85,17 +85,17 @@
       }
 
       .indent-0 {
-        padding-left: 20px;
+        padding-left: 15px;
       }
       @for $i from 1 through 8 {
         .indent-#{$i} {
-          padding-left: calc($i * 2rem + 35px);
+          padding-left: calc($i * 1.5rem + 30px);
         }
       }
     }
 
     .separator {
-      margin: 35px 0;
+      margin: 25px 0;
       background-color: $ung-light-blue;
       width: 80%;
       align-self: center;
@@ -113,16 +113,16 @@
     display: flex;
     flex-flow: row nowrap;
     align-items: center;
-    gap: 20px;
-    padding: 30px;
+    gap: 10px;
+    padding: 15px;
     transition: padding 0.15s ease-in-out;
 
     .roundIcon {
       flex: 0 0 auto;
-      width: 3.15rem;
-      height: 3.15rem;
+      width: 2.5rem;
+      height: 2.5rem;
       overflow: hidden;
-      border-radius: 1.64rem;
+      border-radius: 1.25rem;
       background-color: $ung-light-grey;
     }
 
@@ -134,7 +134,7 @@
   }
 
   &.collapsed {
-    max-width: calc(2rem + 40px);
+    max-width: calc(1.5rem + 30px);
 
     .collapseIcon {
       color: white;
@@ -147,7 +147,7 @@
     }
 
     .profile {
-      padding: 10px 10px 20px;
+      padding: 8px 6px 10px;
     }
   }
 }

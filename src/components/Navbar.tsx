@@ -90,7 +90,7 @@ export default function Navbar() {
         className={`${styles.button} ${styles.category} ${
           selectedMenuName.startsWith([after, item.name].join()) ? styles.containerOpen : styles.containerClose
         }`}
-        style={{ maxHeight: `calc(${1 + item.submenus.length} * (2.5rem + 30px))` }}
+        style={{ maxHeight: `calc(${1 + item.submenus.length} * (2rem + 20px))` }}
         key={item.name}>
         <div
           className={`${styles.buttonContent} ${styles['indent-' + (after.split(',').length - 1)]}`}
