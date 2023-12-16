@@ -39,7 +39,7 @@ export type MenuItem<IncludeIcons extends boolean = boolean> = (IncludeIcons ext
 
 /**
  * EtuUTT's main menu. It is the sidebar on the left of the screen.
- * The "collapsed/uncollapsed" state est saved in the browser's localStorage and will be kept the next time the user will use the browser.
+ * The "collapsed/uncollapsed" state is saved in the browser's localStorage and will be kept the next time the user will use the browser.
  *
  * The menu supports hot modifications with using methods defined in {@link @/module/navbar}
  *
@@ -62,7 +62,7 @@ export default function Navbar() {
    * Otherwise, we open the menu.
    * */
   const toggleSelected = (itemName: string) => {
-    if (selectedMenuName.startsWith(itemName)) setSelectedMenuName(itemName.split(',').slice(0, -1).join());
+    if (selectedMenuName.startsWith(itemName)) setSelectedMenuName(itemName.split(',').slice(0, -1).join(','));
     else setSelectedMenuName(itemName);
   };
 
@@ -88,18 +88,18 @@ export default function Navbar() {
     ) : (
       <div
         className={`${styles.button} ${styles.category} ${
-          selectedMenuName.startsWith([after, item.name].join()) ? styles.containerOpen : styles.containerClose
+          selectedMenuName.startsWith([after, item.name].join(',')) ? styles.containerOpen : styles.containerClose
         }`}
         style={{ maxHeight: `calc(${1 + item.submenus.length} * (2rem + 20px))` }}
         key={item.name}>
         <div
           className={`${styles.buttonContent} ${styles['indent-' + (after.split(',').length - 1)]}`}
-          onClick={() => toggleSelected([after, item.name].join())}>
+          onClick={() => toggleSelected([after, item.name].join(','))}>
           {'icon' in item ? item.icon() : ''}
           <div className={styles.name}>{item.name}</div>
         </div>
         <div className={styles.buttonChildrenContainer}>
-          {item.submenus.map((item) => inflateButton(item, [after, item.name].join()))}
+          {item.submenus.map((item) => inflateButton(item, [after, item.name].join(',')))}
         </div>
       </div>
     );

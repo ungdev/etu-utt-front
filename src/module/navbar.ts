@@ -49,9 +49,9 @@ export const userSlice = createSlice({
         list = list[index].submenus!;
       }
       if (list != null) {
-        let index = list.findIndex(({ name }) => name === location[location.length - 1]);
-        const dupplicateCheckIndex = list.findIndex(({ name }) => name === action.payload.item.name);
-        if (dupplicateCheckIndex >= 0 && dupplicateCheckIndex != index) return; // an other item already has this name
+        const index = list.findIndex(({ name }) => name === location[location.length - 1]);
+        const duplicateCheckIndex = list.findIndex(({ name }) => name === action.payload.item.name);
+        if (duplicateCheckIndex >= 0 && duplicateCheckIndex != index) return; // an other item already has this name
         if (index >= 0) list.splice(index, 1, action.payload.item);
       }
     },
@@ -67,7 +67,7 @@ export const userSlice = createSlice({
         list = list[index].submenus!;
       }
       if (list != null) {
-        let index = list.findIndex(({ name }) => name === location[location.length - 1]);
+        const index = list.findIndex(({ name }) => name === location[location.length - 1]);
         if (index >= 0) list.splice(index, 1);
       }
     },
