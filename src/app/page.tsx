@@ -1,6 +1,9 @@
-import Navbar from '@/components/Navbar';
-import { nodeEnv } from '@/utils/environment';
+import NavbarTest from '@/components/NavbarTest';
 
 export default function HomePage() {
-  return <Navbar />;
+  return (
+    <>
+      <NavbarTest />
+    </>
+  );
 }

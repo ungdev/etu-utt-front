@@ -1,40 +1,153 @@
+@import '@/variables.scss';
+
 .navbar {
+  display: flex;
+  flex-flow: column nowrap;
+  height: 100vh;
+  background-color: $ung-dark-grey;
+  width: 30%;
+  max-width: 350px;
+  overflow-x: hidden;
+  font-size: 1.5rem;
+  color: white;
+  border-right: 8px solid $ung-light-blue;
+  transition: max-width 0.2s ease-in-out;
+
+  .collapseIcon {
+    display: block;
+    height: 2rem;
+    width: 2rem;
+    position: relative;
+    padding: 11px 11px 10px;
+    cursor: pointer;
+    color: $ung-light-blue;
+
+    svg {
+      display: inline-block;
+      height: 100%;
+    }
+  }
+
   .menuing {
     position: relative;
-    height: 100px;
-    background-color: red;
-    overflow-y: hidden;
-    font-size: 3rem;
+    flex: 1 0 auto;
+    display: flex;
+    flex-flow: column wrap;
+    justify-content: center;
+    align-items: flex-start;
 
-    .menus {
-      height: 100%;
+    .button {
       display: flex;
-      overflow-x: hidden;
+      flex-flow: column nowrap;
+      width: 100%;
 
-      .menuButton {
-        transition: transform 0.3s ease-in-out;
+      &.link {
+        color: white;
+        text-decoration: none;
+      }
 
-        &.right {
-          transform: translateX(var(--selected-button-right));
+      &.category {
+        transition: all 0.25s ease-in-out;
+        overflow: hidden;
+        position: relative;
+        justify-content: flex-start;
+
+        &.containerOpen .buttonContent svg {
+          transform: rotate(90deg);
         }
 
-        &.left,
-        &.selected {
-          transform: translateX(calc(-1 * var(--selected-button-left)));
+        &.containerClose {
+          max-height: calc(2rem + 20px) !important;
+        }
+      }
+
+      .buttonContent {
+        display: flex;
+        flex-flow: row nowrap;
+        overflow-x: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        align-items: center;
+        gap: 10px;
+        flex: 1 0 auto;
+        padding: 10px 15px;
+        box-sizing: border-box;
+        cursor: pointer;
+
+        svg {
+          flex: 0 0 auto;
+          height: 1.5rem;
+          transition: transform 0.25s ease-in-out;
+        }
+        .name {
+          text-transform: uppercase;
+        }
+      }
+
+      .indent-0 {
+        padding-left: 15px;
+      }
+      @for $i from 1 through 8 {
+        .indent-#{$i} {
+          padding-left: calc($i * 1.5rem + 30px);
         }
       }
     }
-    .submenus {
-      position: absolute;
-      bottom: 100%;
-      display: flex;
-      transition: all 0.3s ease-in-out;
-      left: var(--left);
-      height: 100%;
 
-      &.visible {
-        bottom: 0;
+    .separator {
+      margin: 25px 0;
+      background-color: $ung-light-blue;
+      width: 80%;
+      align-self: center;
+      box-sizing: border-box;
+      height: 3px;
+
+      & ~ .button .name {
+        text-transform: unset;
       }
+    }
+  }
+
+  .profile {
+    flex: 0 0 auto;
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    gap: 10px;
+    padding: 15px;
+    transition: padding 0.15s ease-in-out;
+
+    .roundIcon {
+      flex: 0 0 auto;
+      width: 2.5rem;
+      height: 2.5rem;
+      overflow: hidden;
+      border-radius: 1.25rem;
+      background-color: $ung-light-grey;
+    }
+
+    .name {
+      display: block;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+  }
+
+  &.collapsed {
+    max-width: calc(1.5rem + 30px);
+
+    .collapseIcon {
+      color: white;
+    }
+
+    .name,
+    .separator,
+    .separator ~ .button {
+      display: none;
+    }
+
+    .profile {
+      padding: 8px 6px 10px;
     }
   }
 }
