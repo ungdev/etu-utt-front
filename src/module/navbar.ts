@@ -40,17 +40,14 @@ export const userSlice = createSlice({
       for (let i = 0; i < location.length - 1; i++) {
         const index: number = list.findIndex(({ name, submenus }) => name === location[i] && submenus != null);
         if (index < 0) {
-          list = null;
-          break;
+          return;
         }
         list = list[index].submenus!;
       }
-      if (list != null) {
-        const index = list.findIndex(({ name }) => name === location[location.length - 1]);
-        const duplicateCheckIndex = list.findIndex(({ name }) => name === action.payload.item.name);
-        if (duplicateCheckIndex >= 0 && duplicateCheckIndex != index) return; // an other item already has this name
-        if (index >= 0) list.splice(index, 1, action.payload.item);
-      }
+      const index = list.findIndex(({ name }) => name === location[location.length - 1]);
+      const duplicateCheckIndex = list.findIndex(({ name }) => name === action.payload.item.name);
+      if (duplicateCheckIndex >= 0 && duplicateCheckIndex != index) return; // an other item already has this name
+      if (index >= 0) list.splice(index, 1, action.payload.item);
     },
     removeItem: (state, action: PayloadAction<string>) => {
       const location = action.payload.split(',');
@@ -58,15 +55,12 @@ export const userSlice = createSlice({
       for (let i = 0; i < location.length - 1; i++) {
         const index: number = list.findIndex(({ name, submenus }) => name === location[i] && submenus != null);
         if (index < 0) {
-          list = null;
-          break;
+          return;
         }
         list = list[index].submenus!;
       }
-      if (list != null) {
-        const index = list.findIndex(({ name }) => name === location[location.length - 1]);
-        if (index >= 0) list.splice(index, 1);
-      }
+      const index = list.findIndex(({ name }) => name === location[location.length - 1]);
+      if (index >= 0) list.splice(index, 1);
     },
     moveSeparator: (state, action: PayloadAction<number>) => {
       if (action.payload >= 0 && action.payload <= state.items.length) state.seperator = action.payload;
