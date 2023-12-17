@@ -16,7 +16,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <Providers>
         <Redirecter />
         <AutoLogin />
-        <body><Navbar />{children}</body>
+        <body>
+          <Navbar />
+          {children}
+        </body>
       </Providers>
     </html>
   );
