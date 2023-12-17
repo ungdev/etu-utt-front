@@ -1,0 +1,28 @@
+.dailyTimetable {
+  display: flex;
+  flex-direction: column;
+  width: 30%;
+
+  .chooseDay {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    white-space: nowrap;
+
+    button {
+      width: 1.5rem;
+      height: 1.5rem;
+    }
+  }
+
+  .timetable {
+    flex-grow: 1;
+    position: relative;
+
+    .event {
+      position: absolute;
+      background-color: red;
+      width: 100%;
+    }
+  }
+}

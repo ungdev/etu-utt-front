@@ -1,10 +1,8 @@
-import { RequestDto, ResponseDto } from '@/api/api';
-
-export interface LoginRequestDto extends RequestDto {
+export interface LoginRequestDto {
   login: string;
   password: string;
 }
 
-export interface LoginResponseDto extends ResponseDto {
+export interface LoginResponseDto {
   access_token: string;
 }

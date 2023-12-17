@@ -1,5 +1,3 @@
-import { ResponseDto } from '@/api/api';
-
-export interface IsLoggedInResponseDto extends ResponseDto {
+export interface IsLoggedInResponseDto {
   valid: boolean;
 }

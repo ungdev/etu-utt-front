@@ -132,7 +132,7 @@ export const userSlice = createSlice({
     seperator: 4,
     // Throws a nextjs error because next is trying to interpret localStorage server-side (the error has no effect and can be ignored)
     // If you are willing to kick this error out, do not use a useState as the delay will display the close animation to the user.
-    collapsed: localStorage.getItem('navbarCollapsed') === 'true',
+    collapsed: typeof localStorage !== 'undefined' ? localStorage.getItem('navbarCollapsed') === 'true' : false,
   },
 });
 
