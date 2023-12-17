@@ -1,11 +1,7 @@
 import { MenuItem } from '@/components/Navbar';
-import Book from '@/icons/Book';
-import Caret from '@/icons/Caret';
-import Home from '@/icons/Home';
-import User from '@/icons/User';
-import Users from '@/icons/Users';
 import { type Action, createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import { AppDispatch, RootState } from 'src/lib/store';
+import Icons from '@/icons';
 
 export const userSlice = createSlice({
   name: 'navbar',
@@ -73,27 +69,27 @@ export const userSlice = createSlice({
   initialState: <{ items: MenuItem<boolean>[]; seperator: number; collapsed: boolean }>{
     items: [
       {
-        icon: Home,
+        icon: Icons.Home,
         name: 'Accueil',
         path: '/',
       },
       {
-        icon: User,
+        icon: Icons.User,
         name: 'Trombinoscope',
         path: '/users',
       },
       {
-        icon: Book,
+        icon: Icons.Book,
         name: 'Guide des ues',
         path: '/ues',
       },
       {
-        icon: Users,
+        icon: Icons.Users,
         name: 'Associations',
         path: '/assos',
       },
       {
-        icon: Caret,
+        icon: Icons.Caret,
         name: 'Mes Matières',
         submenus: [
           {
@@ -115,7 +111,7 @@ export const userSlice = createSlice({
         ],
       },
       {
-        icon: Caret,
+        icon: Icons.Caret,
         name: 'Mes Assos',
         submenus: [
           {
