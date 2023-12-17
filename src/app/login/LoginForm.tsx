@@ -21,7 +21,7 @@ export default function LoginForm() {
         CONNEX<span className={styles.bluePart}>ION</span>
       </div>
       <Input value={username} onChange={(v) => setUsername(v)} placeholder="Adresse mail" />
-      <Input value={password} onChange={(v) => setPassword(v)} placeholder="Mot de passe" />
+      <Input value={password} onChange={(v) => setPassword(v)} placeholder="Mot de passe" type="password" />
       <Link href={'/register'} className={styles.registerLink}>
         Pas encore de compte ? Inscrivez-vous !
       </Link>

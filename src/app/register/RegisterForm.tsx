@@ -26,11 +26,12 @@ export default function RegisterForm() {
       <Input value={lastname} onChange={setLastname} placeholder="Nom" />
       <Input value={firstname} onChange={setFirstname} placeholder="Prénom" />
       <Input value={username} onChange={setUsername} placeholder="Nom d'utilisateur" />
-      <Input value={password} onChange={setPassword} placeholder="Mot de passe" />
+      <Input value={password} onChange={setPassword} placeholder="Mot de passe" type="password" />
       <Input
         value={passwordConfirmation}
         onChange={setPasswordConfirmation}
         placeholder="Confirmation de mot de passe"
+        type="password"
       />
       <Link href={'/login'} className={styles.registerLink}>
         Vous avez déjà un compte ? Connectez-vous !
