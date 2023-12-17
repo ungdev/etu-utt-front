@@ -1,8 +1,9 @@
 import '@/global.scss';
-import Providers from '../lib/Providers';
+import Providers from '@/lib/Providers';
 import React from 'react';
 import Redirecter from '@/components/utilities/Redirecter';
 import AutoLogin from '@/components/utilities/AutoLogin';
+import Navbar from '@/components/Navbar';
 
 export const metadata = {
   title: 'Next.js',
@@ -15,7 +16,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <Providers>
         <Redirecter />
         <AutoLogin />
-        <body>{children}</body>
+        <body><Navbar />{children}</body>
       </Providers>
     </html>
   );
