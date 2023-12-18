@@ -35,7 +35,7 @@ export default function DailyTimetable() {
   useEffect(() => {
     if (selectedDate.getTime() === 0) return;
     API.get<GetDailyTimetableResponseDto>(
-      `/timetable/current/daily/${selectedDate.getDay()}/${selectedDate.getMonth() + 1}/${selectedDate.getFullYear()}`,
+      `/timetable/current/daily/${selectedDate.getDate()}/${selectedDate.getMonth() + 1}/${selectedDate.getFullYear()}`,
     ).then((res) =>
       handleAPIResponse(res, {
         [StatusCodes.OK]: (body) => {
@@ -82,23 +82,41 @@ export default function DailyTimetable() {
         <Button noStyle onClick={() => setSelectedDate(new Date(selectedDate.getTime() - DAY_LENGTH))}>
           <Icons.LeftArrow />
         </Button>
-        {format(selectedDate, 'cccc d MMMM', { locale: locale.fr })}
+        {format(selectedDate, `cccc d MMMM${selectedDate.getFullYear() === new Date().getFullYear() ? '' : ' yyyy'}`, {
+          locale: locale.fr,
+        })}
         <Button noStyle onClick={() => setSelectedDate(new Date(selectedDate.getTime() + DAY_LENGTH))}>
           <Icons.RightArrow />
         </Button>
       </div>
       <div className={styles.timetable}>
-        {timetable.map((event) => (
-          <div
-            key={event.id}
-            className={styles.event}
-            style={{
-              top: `${((event.start.getTime() - selectedDate.getTime()) / DAY_LENGTH) * 100}%`,
-              height: `${((event.end.getTime() - event.start.getTime()) / DAY_LENGTH) * 100}%`,
-              left: `${(event.column! / columnsCount) * 100}%`,
-              width: `${100 / columnsCount}%`,
-            }}></div>
-        ))}
+        <div className={styles.hours}>
+          {Array(12)
+            .fill(0)
+            .map((_, i) => (
+              <div key={i}>
+                <span>{i * 2}h</span>
+              </div>
+            ))}
+        </div>
+        <div className={styles.events}>
+          {Array(12)
+            .fill(0)
+            .map((_, i) => (
+              <div key={i} className={styles.timeSeparator} />
+            ))}
+          {timetable.map((event) => (
+            <div
+              key={event.id}
+              className={styles.event}
+              style={{
+                top: `${((event.start.getTime() - selectedDate.getTime()) / DAY_LENGTH) * 100}%`,
+                height: `${((event.end.getTime() - event.start.getTime()) / DAY_LENGTH) * 100}%`,
+                left: `${(event.column! / columnsCount) * 100}%`,
+                width: `${100 / columnsCount}%`,
+              }}></div>
+          ))}
+        </div>
       </div>
     </div>
   );

@@ -72,7 +72,10 @@ async function requestAPI<RequestType extends object, ResponseType extends objec
     if (!response.headers.get('content-type')?.includes('application/json')) {
       return { error: ResponseError.not_json };
     }
-    return { error: 'no_error', code: response.status, body: (await response.json()) as ResponseType };
+    /* eslint-disable @typescript-eslint/no-explicit-any */
+    const res: any = await response.json();
+    replaceStringByDate(res);
+    return { error: 'no_error', code: response.status, body: res as ResponseType };
   } catch (
     /* eslint-disable @typescript-eslint/no-explicit-any */
     error: any
@@ -84,6 +87,7 @@ async function requestAPI<RequestType extends object, ResponseType extends objec
     }
 
     if (didTimeOut) return { error: ResponseError.timeout };
+    console.log(error);
     return { error: ResponseError.unknown };
   }
 }
@@ -106,3 +110,15 @@ export const API = {
 
   delete: <ResponseType extends object>(route: string) => requestAPI<never, ResponseType>('DELETE', route),
 };
+
+function replaceStringByDate(obj: any) {
+  for (const [key, value] of Object.entries(obj)) {
+    if (typeof value === 'object') replaceStringByDate(value);
+    if (typeof value === 'string') {
+      const timestamp = Date.parse(value);
+      if (!isNaN(timestamp)) {
+        obj[key] = new Date(timestamp);
+      }
+    }
+  }
+}
