@@ -16,6 +16,10 @@ export default function RegisterForm() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [passwordConfirmation, setPasswordConfirmation] = useState('');
+  const submit = () => {
+    if (password === passwordConfirmation && password)
+      dispatch(sessionModule.register(lastname, firstname, username, password));
+  };
 
   return (
     <div className={styles.registerForm}>
@@ -23,22 +27,21 @@ export default function RegisterForm() {
       <div className={styles.title}>
         INSCRIPT<span className={styles.bluePart}>ION</span>
       </div>
-      <Input value={lastname} onChange={setLastname} placeholder="Nom" />
-      <Input value={firstname} onChange={setFirstname} placeholder="Prénom" />
-      <Input value={username} onChange={setUsername} placeholder="Nom d'utilisateur" />
-      <Input value={password} onChange={setPassword} placeholder="Mot de passe" type="password" />
+      <Input value={lastname} onChange={setLastname} onEnter={submit} placeholder="Nom" />
+      <Input value={firstname} onChange={setFirstname} onEnter={submit} placeholder="Prénom" />
+      <Input value={username} onChange={setUsername} onEnter={submit} placeholder="Nom d'utilisateur" />
+      <Input value={password} onChange={setPassword} onEnter={submit} placeholder="Mot de passe" type="password" />
       <Input
         value={passwordConfirmation}
         onChange={setPasswordConfirmation}
+        onEnter={submit}
         placeholder="Confirmation de mot de passe"
         type="password"
       />
       <Link href={'/login'} className={styles.registerLink}>
         Vous avez déjà un compte ? Connectez-vous !
       </Link>
-      <Button
-        onClick={() => dispatch(sessionModule.register(lastname, firstname, username, password))}
-        className={styles.registerButton}>
+      <Button onClick={submit} className={styles.registerButton}>
         Créer un compte
       </Button>
     </div>

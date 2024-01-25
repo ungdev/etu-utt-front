@@ -29,6 +29,8 @@ export const login = (login: string, password: string) =>
     const res = await API.post<LoginRequestDto, LoginResponseDto>('/auth/signin', { login, password });
     handleAPIResponse(res, {
       [StatusCodes.OK]: (body) => dispatch(setToken(body.access_token)),
+      [StatusCodes.UNAUTHORIZED]: (body) => console.error('Wrong credentials', body),
+      [StatusCodes.BAD_REQUEST]: (body) => console.error('Bad request', body),
     });
   }) as unknown as Action;
 
@@ -40,10 +42,13 @@ export const register = (lastName: string, firstName: string, login: string, pas
       login,
       password,
       sex: 'OTHER',
+      role: 'STUDENT',
       birthday: new Date(2003, 1, 28),
     });
     handleAPIResponse(res, {
-      [StatusCodes.OK]: (body) => dispatch(setToken(body.access_token)),
+      [StatusCodes.CREATED]: (body) => dispatch(setToken(body.access_token)),
+      [StatusCodes.CONFLICT]: (body) => console.error('User already exists', body),
+      [StatusCodes.BAD_REQUEST]: (body) => console.error('Bad request', body),
     });
   }) as unknown as Action;
 

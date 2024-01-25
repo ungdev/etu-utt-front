@@ -13,6 +13,7 @@ export default function LoginForm() {
   const dispatch = useAppDispatch();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const submit = () => dispatch(sessionModule.login(username, password));
 
   return (
     <div className={styles.loginForm}>
@@ -20,12 +21,18 @@ export default function LoginForm() {
       <div className={styles.title}>
         CONNEX<span className={styles.bluePart}>ION</span>
       </div>
-      <Input value={username} onChange={(v) => setUsername(v)} placeholder="Adresse mail" />
-      <Input value={password} onChange={(v) => setPassword(v)} placeholder="Mot de passe" type="password" />
+      <Input value={username} onChange={(v) => setUsername(v)} onEnter={submit} placeholder="Adresse mail" />
+      <Input
+        value={password}
+        onChange={(v) => setPassword(v)}
+        onEnter={submit}
+        placeholder="Mot de passe"
+        type="password"
+      />
       <Link href={'/register'} className={styles.registerLink}>
         Pas encore de compte ? Inscrivez-vous !
       </Link>
-      <Button onClick={() => dispatch(sessionModule.login(username, password))} className={styles.connectButton}>
+      <Button onClick={submit} className={styles.connectButton}>
         Se connecter
       </Button>
     </div>
