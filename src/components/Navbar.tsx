@@ -2,36 +2,39 @@
 import styles from './Navbar.module.scss';
 import Link from 'next/link';
 import { CSSProperties, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const menus: Array<
   | { name: string; redirect?: undefined; submenus: { name: string; redirect: string }[] }
   | { name: string; redirect: string; submenus?: undefined }
 > = [
   {
-    name: 'Menu 1',
+    name: 'common:navbar.menu.1',
     submenus: [
-      { name: 'Sous menu 1', redirect: '/test1' },
-      { name: 'Sous menu 2', redirect: '/test2' },
-      { name: 'Sous menu 3', redirect: '/test3' },
+      { name: 'common:navbar.menu.1.submenus.1', redirect: '/test1' },
+      { name: 'common:navbar.menu.1.submenus.2', redirect: '/test2' },
+      { name: 'common:navbar.menu.1.submenus.3', redirect: '/test3' },
     ],
   },
   {
-    name: 'Menu 2',
+    name: 'common:navbar.menu.2',
     submenus: [
-      { name: 'Sous menu 4', redirect: '/test4' },
-      { name: 'Sous menu 5', redirect: '/test5' },
-      { name: 'Sous menu 6', redirect: '/test6' },
+      { name: 'common:navbar.menu.2.submenus.1', redirect: '/test4' },
+      { name: 'common:navbar.menu.2.submenus.1', redirect: '/test5' },
+      { name: 'common:navbar.menu.2.submenus.1', redirect: '/test6' },
     ],
   },
   {
-    name: 'Menu 3',
+    name: 'common:navbar.menu.3',
     redirect: '/test7',
   },
 ];
 
 export default function Navbar() {
+  const { t } = useTranslation();
   const [selectedMenu, setSelectedMenu] = useState(0);
   const [mainMenuVisible, setMainMenuVisible] = useState(true);
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const buttonRefs = menus.map(() => useRef<HTMLDivElement>(null));
 
   const selectedButtonRef = buttonRefs[selectedMenu];
@@ -63,7 +66,7 @@ export default function Navbar() {
         }`}
         style={cssVariables}
         key={`menu-${i}`}>
-        <Link href={menu.redirect}>{menu.name}</Link>
+        <Link href={menu.redirect}>{t(menu.name)}</Link>
       </div>
     ) : (
       <div
@@ -74,14 +77,14 @@ export default function Navbar() {
         onClick={() => mainMenuVisible && [setSelectedMenu(i)] && setMainMenuVisible(false)}
         ref={buttonRefs[i]}
         key={`menu-${i}`}>
-        {menu.name}
+        {t(menu.name)}
       </div>
     ),
   );
 
   const submenusComponent = menus[selectedMenu].submenus?.map((submenu, i) => (
     <div key={`submenu-${i}`}>
-      <Link href={submenu.redirect}>{submenu.name}</Link>
+      <Link href={submenu.redirect}>{t(submenu.name)}</Link>
     </div>
   ));
 
