@@ -19,13 +19,13 @@ i18n
     load: 'languageOnly',
     lng: 'fr',
     fallbackLng: 'fr',
-    debug: true,
     react: {
       useSuspense: true,
     },
     supportedLngs,
     ns: ['common'],
     preload: ['fr'],
+    // debug: true,  // Uncomment to let i18next log to the console
   });
 
 export default i18n;
