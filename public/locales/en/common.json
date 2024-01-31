@@ -1,11 +1,11 @@
 {
   "navbar.menu.1": "Menu 1",
-  "navbar.menu.1.submenus.1": "Sous menu 1",
-  "navbar.menu.1.submenus.2": "Sous menu 2",
-  "navbar.menu.1.submenus.3": "Sous menu 3",
+  "navbar.menu.1.submenus.1": "Sub menu 1",
+  "navbar.menu.1.submenus.2": "Sub menu 2",
+  "navbar.menu.1.submenus.3": "Sub menu 3",
   "navbar.menu.2": "Menu 2",
-  "navbar.menu.2.submenus.1": "Sous menu 4",
-  "navbar.menu.2.submenus.2": "Sous menu 5",
-  "navbar.menu.2.submenus.3": "Sous menu 6",
+  "navbar.menu.2.submenus.1": "Sub menu 4",
+  "navbar.menu.2.submenus.2": "Sub menu 5",
+  "navbar.menu.2.submenus.3": "Sub menu 6",
   "navbar.menu.3": "Menu 3"
 }

@@ -2,7 +2,7 @@
 import styles from './Navbar.module.scss';
 import Link from 'next/link';
 import { CSSProperties, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from 'next-i18next';
 
 const menus: Array<
   | { name: string; redirect?: undefined; submenus: { name: string; redirect: string }[] }
@@ -31,7 +31,7 @@ const menus: Array<
 ];
 
 export default function Navbar() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [selectedMenu, setSelectedMenu] = useState(0);
   const [mainMenuVisible, setMainMenuVisible] = useState(true);
   // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -99,6 +99,10 @@ export default function Navbar() {
           {submenusComponent}
         </div>
       </div>
+      <select value={i18n.language} onChange={(e) => i18n.changeLanguage(e.target.value)}>
+        <option value="fr">Français</option>
+        <option value="en">English</option>
+      </select>
     </div>
   );
 }
