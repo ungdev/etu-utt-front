@@ -3,13 +3,18 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
-import { supportedLngs } from '@/lib/i18n-server';
-import Backend from 'i18next-http-backend';
+import resourcesToBackend from 'i18next-resources-to-backend';
+
+export const supportedLngs = ['fr', 'en'];
 
 i18n
-  .use(Backend)
   .use(LanguageDetector)
   .use(initReactI18next)
+  .use(
+    resourcesToBackend(
+      (language: string, namespace: string) => import(`../../public/locales/${language}/${namespace}.json`),
+    ),
+  )
   .init({
     load: 'languageOnly',
     lng: 'fr',
@@ -20,9 +25,6 @@ i18n
     },
     supportedLngs,
     ns: ['common'],
-    backend: {
-      loadPath: './locales/{{lng}}/{{ns}}.json',
-    },
     preload: ['fr'],
   });
 

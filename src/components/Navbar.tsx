@@ -99,7 +99,12 @@ export default function Navbar() {
           {submenusComponent}
         </div>
       </div>
-      <select value={i18n.language} onChange={(e) => i18n.changeLanguage(e.target.value)}>
+      <select
+        value={i18n.language}
+        onChange={(e) => {
+          i18n.changeLanguage(e.target.value);
+          localStorage.setItem('etu-utt-lang', e.target.value);
+        }}>
         <option value="fr">Français</option>
         <option value="en">English</option>
       </select>
