@@ -19,7 +19,6 @@
     "i18next-resources-to-backend": "^1.2.0",
     "next": "^13.5.2",
     "next-client-cookies": "^1.1.0",
-    "next-i18next": "^15.2.0",
     "react": "^18.2.0",
     "react-i18next": "^14.0.1",
     "react-redux": "^8.1.2",

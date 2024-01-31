@@ -2,7 +2,7 @@
 import styles from './Navbar.module.scss';
 import Link from 'next/link';
 import { CSSProperties, useRef, useState } from 'react';
-import { useTranslation } from 'next-i18next';
+import { useTranslation } from 'react-i18next';
 
 const menus: Array<
   | { name: string; redirect?: undefined; submenus: { name: string; redirect: string }[] }
