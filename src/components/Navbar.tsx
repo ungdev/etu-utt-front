@@ -1,4 +1,5 @@
 'use client';
+
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import styles from './Navbar.module.scss';
 import { useState } from 'react';
@@ -8,7 +9,7 @@ import User from '@/icons/User';
 import Menu from '@/icons/Menu';
 import Collapse from '@/icons/Collapse';
 import { useTranslation } from 'react-i18next';
-import { type TranslationKey } from 'i18next';
+import { type TranslationKey } from '@/lib/i18n.d';
 
 /**
  * The type defining all possible properties for a menu item
@@ -19,7 +20,7 @@ type MenuItemProperties<Translate extends boolean> = {
   name: Translate extends true ? TranslationKey : Translate extends false ? string : TranslationKey | string;
   path: `/${string}`;
   submenus: MenuItem<false>[];
-  translate: boolean;
+  translate: Translate;
 };
 
 /**
@@ -36,7 +37,7 @@ export type MenuItem<
 > = (IncludeIcons extends true
   ? Pick<MenuItemProperties<Translate>, 'icon'>
   : IncludeIcons extends false
-    ? Record<string, never>
+    ? Partial<Record<'icon', never>>
     : Partial<Pick<MenuItemProperties<Translate>, 'icon'>>) &
   (
     | (Omit<MenuItemProperties<Translate>, 'path' | 'icon'> & Partial<Record<'path', never>>)
@@ -89,7 +90,7 @@ export default function Navbar() {
     return 'path' in item ? (
       <Link href={item.path as string} className={`${styles.button} ${styles.link}`} key={item.name}>
         <div className={`${styles.buttonContent} ${styles['indent-' + (after.split(',').length - 1)]}`}>
-          {'icon' in item ? item.icon() : ''}
+          {'icon' in item ? (item as MenuItem<true>).icon() : ''}
           <div className={styles.name}>{item.translate ? t(item.name as TranslationKey) : item.name}</div>
         </div>
       </Link>
@@ -103,7 +104,7 @@ export default function Navbar() {
         <div
           className={`${styles.buttonContent} ${styles['indent-' + (after.split(',').length - 1)]}`}
           onClick={() => toggleSelected([after, item.name].join(','))}>
-          {'icon' in item ? item.icon() : ''}
+          {'icon' in item ? (item as MenuItem<true>).icon() : ''}
           <div className={styles.name}>{item.translate ? t(item.name as TranslationKey) : item.name}</div>
         </div>
         <div className={styles.buttonChildrenContainer}>

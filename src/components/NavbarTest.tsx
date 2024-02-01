@@ -18,6 +18,7 @@ export default function NavbarTest() {
               {
                 name: 'PX01',
                 path: '/ues/px01',
+                translate: false,
               },
               {
                 parents: 'Mes Matières',
@@ -34,6 +35,7 @@ export default function NavbarTest() {
               {
                 name: 'PX01',
                 path: '/ues/px01',
+                translate: false,
               },
               {
                 parents: 'Mes Matières',
@@ -51,6 +53,7 @@ export default function NavbarTest() {
               {
                 name: 'PX01',
                 path: '/ues/px01',
+                translate: false,
               },
               {
                 parents: 'Mes Matières',
@@ -68,6 +71,7 @@ export default function NavbarTest() {
               {
                 name: 'PX02',
                 path: '/ues/px02',
+                translate: false,
               },
               t('common:navbar.titles'),
             ),

@@ -25,8 +25,9 @@ i18n
     },
     supportedLngs,
     ns: ['common'],
-    defaultNS: 'common',
     preload: ['fr'],
+    nsSeparator: ':',
+    defaultNS: 'common',
     // debug: true,  // Uncomment to let i18next log to the console
   } satisfies Omit<CustomTypeOptions, 'resources'>);
 
