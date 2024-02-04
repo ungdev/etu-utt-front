@@ -21,7 +21,7 @@ export default function NavbarTest() {
                 translate: false,
               },
               {
-                parents: 'Mes Matières',
+                parents: 'common:navbar.myUEs',
               },
             ),
           )
@@ -38,7 +38,7 @@ export default function NavbarTest() {
                 translate: false,
               },
               {
-                parents: 'Mes Matières',
+                parents: 'common:navbar.myUEs',
                 after: 'SY04',
               },
             ),
@@ -56,7 +56,7 @@ export default function NavbarTest() {
                 translate: false,
               },
               {
-                parents: 'Mes Matières',
+                parents: 'common:navbar.myUEs',
                 before: 'SY04',
               },
             ),
@@ -79,8 +79,8 @@ export default function NavbarTest() {
         }>
         Rename l'UE PX01 en PX02
       </div>
-      <div onClick={() => dispatch(removeMenuItem('Mes Matières,PX01'))}>Quitter l'UE PX01</div>
-      <div onClick={() => dispatch(removeMenuItem('Mes Matières,PX02'))}>Quitter l'UE PX02</div>
+      <div onClick={() => dispatch(removeMenuItem('common:navbar.myUEs', 'PX01'))}>Quitter l'UE PX01</div>
+      <div onClick={() => dispatch(removeMenuItem('common:navbar.myUEs', 'PX02'))}>Quitter l'UE PX02</div>
     </div>
   );
 }

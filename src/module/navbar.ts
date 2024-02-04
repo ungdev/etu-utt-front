@@ -50,17 +50,16 @@ export const userSlice = createSlice({
       if (duplicateCheckIndex >= 0 && duplicateCheckIndex != index) return; // an other item already has this name
       if (index >= 0) list.splice(index, 1, action.payload.item);
     },
-    removeItem: (state, action: PayloadAction<string>) => {
-      const location = action.payload.split(',');
+    removeItem: (state, action: PayloadAction<string[]>) => {
       let list: MenuItem<boolean>[] | null = state.items;
-      for (let i = 0; i < location.length - 1; i++) {
-        const index: number = list.findIndex(({ name, submenus }) => name === location[i] && submenus != null);
+      for (let i = 0; i < action.payload.length - 1; i++) {
+        const index: number = list.findIndex(({ name, submenus }) => name === action.payload[i] && submenus != null);
         if (index < 0) {
           return;
         }
         list = list[index].submenus!;
       }
-      const index = list.findIndex(({ name }) => name === location[location.length - 1]);
+      const index = list.findIndex(({ name }) => name === action.payload[action.payload.length - 1]);
       if (index >= 0) list.splice(index, 1);
     },
     moveSeparator: (state, action: PayloadAction<number>) => {
@@ -142,8 +141,6 @@ export const userSlice = createSlice({
       },
     ],
     seperator: 4,
-    // Throws a nextjs error because next is trying to interpret localStorage server-side (the error has no effect and can be ignored)
-    // If you are willing to kick this error out, do not use a useState as the delay will display the close animation to the user.
     collapsed: isClientSide() && localStorage.getItem('navbarCollapsed') === 'true',
   },
 });
@@ -174,9 +171,9 @@ export const replaceMenuItem = (item: MenuItem, replacedItemName: string) =>
     dispatch(replaceItem({ item, search: replacedItemName }));
   }) as unknown as Action;
 
-export const removeMenuItem = (itemName: string) =>
+export const removeMenuItem = (...pathToItem: string[]) =>
   ((dispatch: AppDispatch) => {
-    dispatch(removeItem(itemName));
+    dispatch(removeItem(pathToItem));
   }) as unknown as Action;
 
 export const setAlwaysVisibleCount = (count: number) =>
