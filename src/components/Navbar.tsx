@@ -1,4 +1,5 @@
 'use client';
+
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import styles from './Navbar.module.scss';
 import { useState } from 'react';
@@ -7,16 +8,19 @@ import Link from 'next/link';
 import User from '@/icons/User';
 import Menu from '@/icons/Menu';
 import Collapse from '@/icons/Collapse';
+import { useTranslation } from 'react-i18next';
+import { type TranslationKey } from '@/lib/i18n.d';
 
 /**
  * The type defining all possible properties for a menu item
  * This is an internal type that should not be used when developping features.
  * */
-type MenuItemProperties = {
+type MenuItemProperties<Translate extends boolean> = {
   icon: () => JSX.Element;
-  name: string;
+  name: Translate extends true ? TranslationKey : Translate extends false ? string : TranslationKey | string;
   path: `/${string}`;
   submenus: MenuItem<false>[];
+  translate: Translate;
 };
 
 /**
@@ -25,16 +29,19 @@ type MenuItemProperties = {
  * - {@link MenuItemProperties.path} the path the MenuItem will redirect on click
  * - {@link MenuItemProperties.submenus} a list of {@link MenuItem} describing all the items of the submenu.
  *
- * Can have an icon using {@link MenuItemProperties.icon}. By default, an icon can be used and is optional. Use the parameter <code>IncludeIcons</code> to require or forbid icons
+ * Can have an icon using {@link MenuItemProperties.icon}. By default, an icon can be used and is optional. Use the parameter {@link IncludeIcons} to require or forbid icons.
  */
-export type MenuItem<IncludeIcons extends boolean = boolean> = (IncludeIcons extends true
-  ? Pick<MenuItemProperties, 'icon'>
+export type MenuItem<
+  IncludeIcons extends boolean = boolean,
+  Translate extends boolean = boolean,
+> = (IncludeIcons extends true
+  ? Pick<MenuItemProperties<Translate>, 'icon'>
   : IncludeIcons extends false
-  ? object
-  : Partial<Pick<MenuItemProperties, 'icon'>>) &
+    ? Partial<Record<'icon', never>>
+    : Partial<Pick<MenuItemProperties<Translate>, 'icon'>>) &
   (
-    | (Omit<MenuItemProperties, 'path' | 'icon'> & Partial<Record<'path', never>>)
-    | (Omit<MenuItemProperties, 'submenus' | 'icon'> & Partial<Record<'submenus', never>>)
+    | (Omit<MenuItemProperties<Translate>, 'path' | 'icon'> & Partial<Record<'path', never>>)
+    | (Omit<MenuItemProperties<Translate>, 'submenus' | 'icon'> & Partial<Record<'submenus', never>>)
   );
 
 /**
@@ -56,6 +63,8 @@ export default function Navbar() {
   const [selectedMenuName, setSelectedMenuName] = useState<string>('');
   const menuItems = useAppSelector(getMenu);
   const dispatch = useAppDispatch();
+
+  const { t, i18n } = useTranslation();
 
   /**
    * Switches the selected menu. If the menu (or one of its children) is already selected, the menu will close.
@@ -81,8 +90,8 @@ export default function Navbar() {
     return 'path' in item ? (
       <Link href={item.path as string} className={`${styles.button} ${styles.link}`} key={item.name}>
         <div className={`${styles.buttonContent} ${styles['indent-' + (after.split(',').length - 1)]}`}>
-          {'icon' in item ? item.icon() : ''}
-          <div className={styles.name}>{item.name}</div>
+          {'icon' in item ? (item as MenuItem<true>).icon() : ''}
+          <div className={styles.name}>{item.translate ? t(item.name as TranslationKey) : item.name}</div>
         </div>
       </Link>
     ) : (
@@ -95,8 +104,8 @@ export default function Navbar() {
         <div
           className={`${styles.buttonContent} ${styles['indent-' + (after.split(',').length - 1)]}`}
           onClick={() => toggleSelected([after, item.name].join(','))}>
-          {'icon' in item ? item.icon() : ''}
-          <div className={styles.name}>{item.name}</div>
+          {'icon' in item ? (item as MenuItem<true>).icon() : ''}
+          <div className={styles.name}>{item.translate ? t(item.name as TranslationKey) : item.name}</div>
         </div>
         <div className={styles.buttonChildrenContainer}>
           {item.submenus.map((item) => inflateButton(item, [after, item.name].join(',')))}
@@ -119,8 +128,17 @@ export default function Navbar() {
         <div className={styles.roundIcon}>
           <User />
         </div>
-        <div className={styles.name}>Mon Profil</div>
+        <div className={styles.name}>{t('common:navbar.profile')}</div>
       </div>
+      <select
+        value={i18n.language}
+        onChange={(e) => {
+          i18n.changeLanguage(e.target.value);
+          localStorage.setItem('etu-utt-lang', e.target.value);
+        }}>
+        <option value="fr">Français</option>
+        <option value="en">English</option>
+      </select>
     </div>
   );
 }

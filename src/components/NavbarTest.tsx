@@ -2,9 +2,11 @@
 
 import { useAppDispatch } from '@/lib/hooks';
 import { addMenuItem, removeMenuItem, replaceMenuItem } from '@/module/navbar';
+import { useTranslation } from 'react-i18next';
 
 export default function NavbarTest() {
   const dispatch = useAppDispatch();
+  const { t } = useTranslation();
 
   return (
     <div>
@@ -16,9 +18,10 @@ export default function NavbarTest() {
               {
                 name: 'PX01',
                 path: '/ues/px01',
+                translate: false,
               },
               {
-                parents: 'Mes Matières',
+                parents: 'common:navbar.myUEs',
               },
             ),
           )
@@ -32,9 +35,10 @@ export default function NavbarTest() {
               {
                 name: 'PX01',
                 path: '/ues/px01',
+                translate: false,
               },
               {
-                parents: 'Mes Matières',
+                parents: 'common:navbar.myUEs',
                 after: 'SY04',
               },
             ),
@@ -49,9 +53,10 @@ export default function NavbarTest() {
               {
                 name: 'PX01',
                 path: '/ues/px01',
+                translate: false,
               },
               {
-                parents: 'Mes Matières',
+                parents: 'common:navbar.myUEs',
                 before: 'SY04',
               },
             ),
@@ -66,15 +71,16 @@ export default function NavbarTest() {
               {
                 name: 'PX02',
                 path: '/ues/px02',
+                translate: false,
               },
-              'Mes Matières,PX01',
+              t('common:navbar.titles'),
             ),
           )
         }>
         Rename l'UE PX01 en PX02
       </div>
-      <div onClick={() => dispatch(removeMenuItem('Mes Matières,PX01'))}>Quitter l'UE PX01</div>
-      <div onClick={() => dispatch(removeMenuItem('Mes Matières,PX02'))}>Quitter l'UE PX02</div>
+      <div onClick={() => dispatch(removeMenuItem('common:navbar.myUEs', 'PX01'))}>Quitter l'UE PX01</div>
+      <div onClick={() => dispatch(removeMenuItem('common:navbar.myUEs', 'PX02'))}>Quitter l'UE PX02</div>
     </div>
   );
 }
