@@ -7,5 +7,3 @@ export default function User() {
     </svg>
   );
 }
-
-export default User;

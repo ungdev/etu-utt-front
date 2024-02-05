@@ -17,7 +17,7 @@ export default function UEBranchOptionFilter<Branch extends 'RT' | 'ISI' | 'SN'>
 }) {
   const [branchOption, setBranchOption] = useState<(typeof branchOptions)[Branch][number]>(branchOptions[branch][0]);
   useEffect(() => {
-    onUpdate(branchOption, `branchOption=${branchOption}`);
+    onUpdate(branchOption, branchOption);
   }, [branchOption]);
   return (
     <select

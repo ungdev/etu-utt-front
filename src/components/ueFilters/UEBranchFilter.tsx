@@ -5,7 +5,7 @@ type Branch = 'RT' | 'ISI' | 'SN';
 export default function UEBranchFilter({ onUpdate }: { onUpdate: (value: Branch, newUrlPart: string) => void }) {
   const [branch, setBranch] = useState<Branch>('RT');
   useEffect(() => {
-    onUpdate(branch, `branch=${branch}`);
+    onUpdate(branch, branch);
   }, [branch]);
   return (
     <select value={branch} onChange={(event) => setBranch(event.target.value as Branch)}>

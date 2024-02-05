@@ -7,7 +7,7 @@ export default function UECreditTypeFilter({
 }) {
   const [creditType, setCreditType] = useState<'CS' | 'TM'>('CS');
   useEffect(() => {
-    onUpdate(creditType, `creditType=${creditType}`);
+    onUpdate(creditType, creditType);
   }, [creditType]);
   return (
     <select value={creditType} onChange={(event) => setCreditType(event.target.value as 'CS' | 'TM')}>

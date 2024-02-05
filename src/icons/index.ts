@@ -5,6 +5,7 @@ import Home from '@/icons/Home';
 import Menu from '@/icons/Menu';
 import User from '@/icons/User';
 import Users from '@/icons/Users';
+import Trash from '@/icons/Trash';
 
 const Icons = {
   Book,
@@ -12,6 +13,7 @@ const Icons = {
   Collapse,
   Home,
   Menu,
+  Trash,
   User,
   Users,
 };

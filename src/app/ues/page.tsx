@@ -8,6 +8,7 @@ import UEBranchFilter from '@/components/ueFilters/UEBranchFilter';
 import UEBranchOptionFilter from '@/components/ueFilters/UEBranchOptionFilter';
 import UESemesterFilter from '@/components/ueFilters/UESemesterFilter';
 import Trash from '@/icons/Trash';
+import { useSearchUEs } from '@/api/ue/search';
 
 type UEFilterComponent<UEFilterType extends keyof UEFiltersType> = (
   props: {
@@ -22,6 +23,7 @@ type DependencyProps<UEFilterType extends keyof UEFiltersType> = {
 type UEFilter<UEFilterType extends keyof UEFiltersType> = {
   component: UEFilterComponent<UEFilterType>;
   name: string;
+  parameterName: string;
 } & (UEFiltersType[UEFilterType]['dependsOn']['length'] extends 0
   ? object
   : {
@@ -37,31 +39,47 @@ type UEFiltersType = {
 };
 
 const ueFilters = Object.freeze({
-  name: { component: UENameFilter, name: '' }, // This one does not need a name as it will never be displayed
-  creditType: { component: UECreditTypeFilter, name: 'Type de crédits' },
-  branch: { component: UEBranchFilter, name: 'Branche' },
-  branchOption: { component: UEBranchOptionFilter, name: 'Filière', dependsOn: ['branch'] },
-  semester: { component: UESemesterFilter, name: 'Semestre' },
+  name: { component: UENameFilter, name: '', parameterName: 'q' }, // This one does not need a name as it will never be displayed
+  creditType: { component: UECreditTypeFilter, name: 'Type de crédits', parameterName: 'creditType' },
+  branch: { component: UEBranchFilter, name: 'Branche', parameterName: 'branch' },
+  branchOption: {
+    component: UEBranchOptionFilter,
+    name: 'Filière',
+    dependsOn: ['branch'],
+    parameterName: 'branchOption',
+  },
+  semester: { component: UESemesterFilter, name: 'Semestre', parameterName: 'semester' },
 } as const satisfies {
-  [key in keyof UEFiltersType]: UEFilter<key>;
+  [key in keyof UEFiltersType]: DeepReadonly<UEFilter<key>>;
 });
 
 type UEFilterInstance<T extends keyof UEFiltersType = keyof UEFiltersType> = {
   filter: keyof typeof ueFilters;
   value: UEFiltersType[T]['value'] | null;
-  urlPart: string | null;
+  search: string | null;
+};
+
+type RealUEFilterInstance<T extends keyof UEFiltersType = keyof UEFiltersType> = {
+  [K in keyof UEFilterInstance<T>]: Exclude<UEFilterInstance<T>[K], null>;
 };
 
 export default function Page() {
   const [showAddFilterDropdown, setShowAddFilterDropdown] = useState<boolean>(false);
-  const [filters, setFilters] = useState<Array<UEFilterInstance>>([{ filter: 'name', value: null, urlPart: null }]);
+  const [filters, setFilters] = useState<Array<UEFilterInstance>>([{ filter: 'name', value: null, search: null }]);
   const [lastUpdate] = useState<{ value: number }>({ value: Date.now() });
+  const [ues, updateUEs] = useSearchUEs();
   useEffect(() => {
     const now = Date.now();
     lastUpdate.value = now;
     setTimeout(() => {
       if (lastUpdate.value === now) {
-        console.log('Filters have not been updated for 1 second');
+        updateUEs(
+          Object.fromEntries(
+            filters
+              .filter((filter): filter is RealUEFilterInstance => filter.search !== null)
+              .map((filter) => [ueFilters[filter.filter].parameterName, filter.search]),
+          ),
+        );
       }
     }, 1000);
   }, [filters]);
@@ -72,11 +90,11 @@ export default function Page() {
   ) => {
     const newFilters = [...filters];
     newFilters[filterIndex].value = value;
-    newFilters[filterIndex].urlPart = newUrlPart;
+    newFilters[filterIndex].search = newUrlPart;
     setFilters(newFilters);
   };
   const addFilter = (name: keyof typeof ueFilters) => {
-    setFilters([...filters, { filter: name, value: null, urlPart: null }]);
+    setFilters([...filters, { filter: name, value: null, search: null }]);
   };
   const deleteFilter = (index: number) => {
     const newFilters = filters.toSpliced(index, 1).filter(
@@ -142,6 +160,14 @@ export default function Page() {
             ))}
           </div>
         </div>
+      </div>
+      <div>
+        {ues.map((ue) => (
+          <div key={ue.code}>
+            <h2>{ue.code}</h2>
+            <p>{ue.name}</p>
+          </div>
+        ))}
       </div>
     </div>
   );
