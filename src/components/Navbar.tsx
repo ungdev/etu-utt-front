@@ -13,7 +13,7 @@ import Collapse from '@/icons/Collapse';
  * This is an internal type that should not be used when developping features.
  * */
 type MenuItemProperties = {
-  icon: (...params: any) => JSX.Element;
+  icon: () => JSX.Element;
   name: string;
   path: `/${string}`;
   submenus: MenuItem<false>[];
@@ -25,12 +25,12 @@ type MenuItemProperties = {
  * - {@link MenuItemProperties.path} the path the MenuItem will redirect on click
  * - {@link MenuItemProperties.submenus} a list of {@link MenuItem} describing all the items of the submenu.
  *
- * Can have an icon using {@link MenuItemProperties.icon}. By default an icon can be used and is optional. Use the paramater {@link IncludeIcons} to require or forbid icons
+ * Can have an icon using {@link MenuItemProperties.icon}. By default, an icon can be used and is optional. Use the parameter <code>IncludeIcons</code> to require or forbid icons
  */
 export type MenuItem<IncludeIcons extends boolean = boolean> = (IncludeIcons extends true
   ? Pick<MenuItemProperties, 'icon'>
   : IncludeIcons extends false
-  ? {}
+  ? object
   : Partial<Pick<MenuItemProperties, 'icon'>>) &
   (
     | (Omit<MenuItemProperties, 'path' | 'icon'> & Partial<Record<'path', never>>)
