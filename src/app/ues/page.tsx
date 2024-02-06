@@ -9,6 +9,7 @@ import UEBranchOptionFilter from '@/components/ueFilters/UEBranchOptionFilter';
 import UESemesterFilter from '@/components/ueFilters/UESemesterFilter';
 import Trash from '@/icons/Trash';
 import { useSearchUEs } from '@/api/ue/search';
+import { useRouter } from 'next/navigation';
 
 type UEFilterComponent<UEFilterType extends keyof UEFiltersType> = (
   props: {
@@ -64,6 +65,7 @@ type RealUEFilterInstance<T extends keyof UEFiltersType = keyof UEFiltersType> =
 };
 
 export default function Page() {
+  const router = useRouter();
   const [showAddFilterDropdown, setShowAddFilterDropdown] = useState<boolean>(false);
   const [filters, setFilters] = useState<Array<UEFilterInstance>>([{ filter: 'name', value: null, search: null }]);
   const [lastUpdate] = useState<{ value: number }>({ value: Date.now() });
@@ -163,9 +165,12 @@ export default function Page() {
       </div>
       <div>
         {ues.map((ue) => (
-          <div key={ue.code}>
-            <h2>{ue.code}</h2>
-            <p>{ue.name}</p>
+          <div key={ue.code} className={styles.ue} onClick={() => router.push(`/ues/${ue.code}`)}>
+            <div className={styles.basicInfo}>
+              <h2>{ue.code}</h2>
+              <p>{ue.name}</p>
+            </div>
+            <p className={styles.details}>Détails {'>'}</p>
           </div>
         ))}
       </div>

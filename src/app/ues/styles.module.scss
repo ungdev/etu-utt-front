@@ -49,4 +49,53 @@
       }
     }
   }
+
+  .ue {
+    --box-padding: 6px;
+    background-color: white;
+    padding: var(--box-padding);
+    overflow: hidden;
+    margin: 10px;
+    border: transparent 3px solid;
+    border-radius: 3px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: border-color 0.2s ease-out;
+    cursor: pointer;
+
+    h2, p {
+      margin: 0;
+    }
+
+    .basicInfo {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+
+      h2 {
+        width: 5rem;
+      }
+
+      p {
+        font-size: 1.1rem;
+      }
+    }
+
+    .details {
+      color: $ung-light-blue;
+      translate: calc(100% + var(--box-padding));
+      transition: translate 0.2s ease-out;
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+
+    &:hover {
+      border-color: $ung-light-blue;
+
+      .details {
+        translate: 0;
+      }
+    }
+  }
 }
