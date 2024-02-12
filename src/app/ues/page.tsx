@@ -10,6 +10,7 @@ import UESemesterFilter from '@/components/ueFilters/UESemesterFilter';
 import Trash from '@/icons/Trash';
 import { useSearchUEs } from '@/api/ue/search';
 import { useRouter } from 'next/navigation';
+import { DeepReadonly } from '@/types';
 
 type UEFilterComponent<UEFilterType extends keyof UEFiltersType> = (
   props: {

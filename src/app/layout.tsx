@@ -1,3 +1,4 @@
+import styles from './layout.module.scss';
 import '@/global.scss';
 import Providers from '@/lib/Providers';
 import React from 'react';
@@ -18,7 +19,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <AutoLogin />
         <body>
           <Navbar />
-          {children}
+          <div className={styles.page}>{children}</div>
         </body>
       </Providers>
     </html>

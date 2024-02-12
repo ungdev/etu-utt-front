@@ -2,11 +2,11 @@
 
 import { useAppDispatch } from '@/lib/hooks';
 import { addMenuItem, removeMenuItem, replaceMenuItem } from '@/module/navbar';
-import { useTranslation } from 'react-i18next';
+import { useAppTranslation } from '@/lib/i18n';
 
 export default function NavbarTest() {
   const dispatch = useAppDispatch();
-  const { t } = useTranslation();
+  const { t } = useAppTranslation();
 
   return (
     <div>
@@ -73,7 +73,7 @@ export default function NavbarTest() {
                 path: '/ues/px02',
                 translate: false,
               },
-              t('common:navbar.titles'),
+              t('common:navbar.title'),
             ),
           )
         }>

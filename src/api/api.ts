@@ -17,6 +17,10 @@ export type APIResponse<ResponseType extends ResponseDto> =
     }
   | { error: ResponseError };
 
+type RawResponseType<T extends object> = {
+  [K in keyof T]: T[K] extends object ? RawResponseType<T[K]> : T[K] extends Date ? string : T[K];
+};
+
 export function handleAPIResponse<T extends ResponseDto>(
   response: APIResponse<T>,
   handlers: { [status: number]: (body: T) => void } & Partial<{ [status in ResponseError]: () => void }>,
@@ -34,6 +38,22 @@ export function handleAPIResponse<T extends ResponseDto>(
       console.error(`Unsupported error type : ${response.error}`);
     }
   }
+}
+
+function formatResponse<T extends object>(rawResponse: RawResponseType<T> | T): T {
+  const response: Partial<T> = {};
+  for (const [key, value] of Object.entries(rawResponse)) {
+    if (Array.isArray(value)) {
+      response[key] = value.map(formatResponse) as T[keyof T];
+    } else if (typeof value === 'object' && value !== null) {
+      response[key] = formatResponse(value as object) as T[keyof T];
+    } else if (typeof value === 'string' && !isNaN(Date.parse(value))) {
+      response[key] = new Date(value) as T[keyof T];
+    } else {
+      response[key] = value as T[keyof T];
+    }
+  }
+  return response as T;
 }
 
 // Send request to API and handle errors
@@ -71,8 +91,9 @@ async function requestAPI<RequestType extends RequestDto, ResponseType extends R
     );
 
     if (!response.headers.get('content-type')?.includes('application/json')) return { error: ResponseError.not_json };
+    const rawResponse: RawResponseType<ResponseType> = await response.json();
 
-    return { error: 'no_error', code: response.status, body: (await response.json()) as ResponseType };
+    return { error: 'no_error', code: response.status, body: formatResponse(rawResponse) };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     if (error instanceof Error && error.name === 'AbortError') {

@@ -8,8 +8,8 @@ import Link from 'next/link';
 import User from '@/icons/User';
 import Menu from '@/icons/Menu';
 import Collapse from '@/icons/Collapse';
-import { useTranslation } from 'react-i18next';
-import { type TranslationKey } from '@/lib/i18n.d';
+import { type NotParameteredTranslationKey } from '@/lib/i18n';
+import { useAppTranslation } from '@/lib/i18n';
 
 /**
  * The type defining all possible properties for a menu item
@@ -17,7 +17,11 @@ import { type TranslationKey } from '@/lib/i18n.d';
  * */
 type MenuItemProperties<Translate extends boolean> = {
   icon: () => JSX.Element;
-  name: Translate extends true ? TranslationKey : Translate extends false ? string : TranslationKey | string;
+  name: Translate extends true
+    ? NotParameteredTranslationKey
+    : Translate extends false
+    ? string
+    : NotParameteredTranslationKey | string;
   path: `/${string}`;
   submenus: MenuItem<false>[];
   translate: Translate;
@@ -37,8 +41,8 @@ export type MenuItem<
 > = (IncludeIcons extends true
   ? Pick<MenuItemProperties<Translate>, 'icon'>
   : IncludeIcons extends false
-    ? Partial<Record<'icon', never>>
-    : Partial<Pick<MenuItemProperties<Translate>, 'icon'>>) &
+  ? Partial<Record<'icon', never>>
+  : Partial<Pick<MenuItemProperties<Translate>, 'icon'>>) &
   (
     | (Omit<MenuItemProperties<Translate>, 'path' | 'icon'> & Partial<Record<'path', never>>)
     | (Omit<MenuItemProperties<Translate>, 'submenus' | 'icon'> & Partial<Record<'submenus', never>>)
@@ -64,7 +68,8 @@ export default function Navbar() {
   const menuItems = useAppSelector(getMenu);
   const dispatch = useAppDispatch();
 
-  const { t, i18n } = useTranslation();
+  const { t, i18n } = useAppTranslation();
+  const [language, setLanguage] = useState(i18n.language);
 
   /**
    * Switches the selected menu. If the menu (or one of its children) is already selected, the menu will close.
@@ -91,7 +96,7 @@ export default function Navbar() {
       <Link href={item.path as string} className={`${styles.button} ${styles.link}`} key={item.name}>
         <div className={`${styles.buttonContent} ${styles['indent-' + (after.split(',').length - 1)]}`}>
           {'icon' in item ? (item as MenuItem<true>).icon() : ''}
-          <div className={styles.name}>{item.translate ? t(item.name as TranslationKey) : item.name}</div>
+          <div className={styles.name}>{item.translate ? t(item.name as NotParameteredTranslationKey) : item.name}</div>
         </div>
       </Link>
     ) : (
@@ -105,7 +110,7 @@ export default function Navbar() {
           className={`${styles.buttonContent} ${styles['indent-' + (after.split(',').length - 1)]}`}
           onClick={() => toggleSelected([after, item.name].join(','))}>
           {'icon' in item ? (item as MenuItem<true>).icon() : ''}
-          <div className={styles.name}>{item.translate ? t(item.name as TranslationKey) : item.name}</div>
+          <div className={styles.name}>{item.translate ? t(item.name as NotParameteredTranslationKey) : item.name}</div>
         </div>
         <div className={styles.buttonChildrenContainer}>
           {item.submenus.map((item) => inflateButton(item, [after, item.name].join(',')))}
@@ -131,10 +136,11 @@ export default function Navbar() {
         <div className={styles.name}>{t('common:navbar.profile')}</div>
       </div>
       <select
-        value={i18n.language}
+        value={language}
         onChange={(e) => {
           i18n.changeLanguage(e.target.value);
           localStorage.setItem('etu-utt-lang', e.target.value);
+          setLanguage(e.target.value);
         }}>
         <option value="fr">Français</option>
         <option value="en">English</option>

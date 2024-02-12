@@ -2,11 +2,11 @@ import styles from './UENameFilter.module.scss';
 import { useEffect, useState } from 'react';
 import Input from '@/components/UI/Input';
 import Icons from '@/icons';
-import { useTranslation } from 'react-i18next';
+import { useAppTranslation } from '@/lib/i18n';
 
 export default function UENameFilter({ onUpdate }: { onUpdate: (value: string, newUrlPart: string) => void }) {
   const [search, setSearch] = useState<string>('');
-  const { t } = useTranslation();
+  const { t } = useAppTranslation();
   useEffect(() => {
     onUpdate(search, search);
   }, [search]);

@@ -4,7 +4,7 @@
   "private": false,
   "scripts": {
     "dev": "env-cmd -f .env.dev next dev -p 8080",
-    "build": "env-cmd -f .env.dist next build",
+    "build": "env-cmd -f .env.prod next build",
     "start": "env-cmd -f .env.dev next start -p 8080",
     "lint": "next lint",
     "lint:fix": "next lint --fix"
