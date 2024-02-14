@@ -5,7 +5,7 @@ import { Comment } from '@/api/ue/fetchComments';
 
 export interface GetCommentResponseDto extends ResponseDto, Comment {}
 
-export function useGetComment(commentId: string) {
+export function useGetComment(commentId: string): [Comment | null, (comment: Comment | null) => void] {
   const [comment, setComment] = useState<Comment | null>(null);
   useEffect(() => {
     API.get<GetCommentResponseDto>(`/ue/comments/${commentId}`).then((res) =>
@@ -16,5 +16,5 @@ export function useGetComment(commentId: string) {
       }),
     );
   }, []);
-  return comment;
+  return [comment, setComment];
 }

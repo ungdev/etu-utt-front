@@ -7,12 +7,15 @@ import useFetchUE from '@/api/ue/fetch';
 import { useAppTranslation } from '@/lib/i18n';
 import TextArea from '@/components/UI/TextArea';
 import Button from '@/components/UI/Button';
+import { sendReply } from '@/api/ue/sendReply';
+import { useState } from 'react';
 
 export default function CommentDetails() {
   const { t } = useAppTranslation();
   const params = useParams<{ code: string; commentId: string }>();
-  const comment = useGetComment(params.commentId);
+  const [comment, setComment] = useGetComment(params.commentId);
   const ue = useFetchUE(params.code);
+  const [answer, setAnswer] = useState('');
   if (!comment || !ue) {
     return;
   }
@@ -55,9 +58,19 @@ export default function CommentDetails() {
         ))}
       </div>
       <h2 className={styles.answerTitle}>{t('ues:detailed.comments.answers.answerTitle')}</h2>
-      <TextArea className={styles.input} />
+      <TextArea className={styles.input} onChange={setAnswer} value={answer} />
       <div className={styles.buttonWrapper}>
-        <Button className={styles.button}>{t('ues:detailed.comments.answers.answerButton')}</Button>
+        <Button
+          className={styles.button}
+          onClick={() =>
+            sendReply(params.commentId, answer).then((answer) => {
+              if (answer === null) return;
+              setAnswer('');
+              setComment({ ...comment, answers: [...(comment?.answers ?? []), answer] });
+            })
+          }>
+          {t('ues:detailed.comments.answers.answerButton')}
+        </Button>
       </div>
     </div>
   );
