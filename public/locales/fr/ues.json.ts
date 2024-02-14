@@ -20,8 +20,14 @@ export default {
   "detailed.requirements.none": "Aucun pré-requis",
   "detailed.comments.loginRequired": "Connexion requise pour voir les commentaires",
   "detailed.comments.author.anonymous": "Anonyme",
+  "detailed.comments.author.deleted": "Utilisateur supprimé",
   "detailed.comments.writtenDate": "Écrit le {{date}}",
   "detailed.comments.conversation.see": "Voir la conversation ({{responseCount}} réponses)",
   "detailed.comments.conversation.see.empty": "Répondre",
+  "detailed.comments.resume": "Commentaire de {{authorFirstName}} {{authorLastName}} sur l'UE {{ue}} au semestre {{semester}} ({{date}})",
+  "detailed.comments.updatedAt": "Mis à jour le {{date}}",
+  "detailed.comments.resume.anonymous": "Commentaire anonyme sur l'UE {{ue}} au semestre {{semester}} ({{date}})",
+  "detailed.comments.answers.answerTitle": "Répondre dans ce fil de discussion",
+  "detailed.comments.answers.answerButton": "Envoyer"
 } as const;
 

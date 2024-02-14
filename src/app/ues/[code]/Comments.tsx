@@ -23,6 +23,10 @@ export default function Comments({ code }: { code: string }) {
             {comment.semester.code}
             {' - '}
             {t('ues:detailed.comments.writtenDate', { date: comment.createdAt.toLocaleDateString() })}
+            {comment.updatedAt &&
+              ` (${t('ues:detailed.comments.updatedAt', {
+                date: comment.updatedAt.toLocaleDateString(),
+              })})`}
           </p>
           <p className={styles.body}>{comment.body}</p>
           <p className={styles.conversation}>

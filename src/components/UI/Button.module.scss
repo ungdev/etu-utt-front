@@ -7,4 +7,9 @@
   border: none;
   color: white;
   font-size: 1.5rem;
+
+  &:hover {
+    background-color: mix($blue, black, 90%);
+    cursor: pointer;
+  }
 }
