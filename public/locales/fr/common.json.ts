@@ -25,5 +25,6 @@ export default {
   "navbar.associations": "Associations",
   "navbar.myAssociations": "Mes Assos",
   "navbar.myTimetable": "Mon EdT",
-  "navbar.myUEs": "Mes matières"
+  "navbar.myUEs": "Mes matières",
+  "input.editableText.modify": "Modifier"
 } as const;

@@ -50,6 +50,10 @@
           width: 3px;
           background: linear-gradient(90deg, $ung-dark-grey, rgba($ung-dark-grey, 0.5));
         }
+
+        .button {
+          right: 0;
+        }
       }
 
       &:last-child {

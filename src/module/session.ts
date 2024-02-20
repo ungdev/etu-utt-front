@@ -5,6 +5,7 @@ import { LoginRequestDto, LoginResponseDto } from '@/api/auth/login';
 import { StatusCodes } from 'http-status-codes';
 import { RegisterRequestDto, RegisterResponseDto } from '@/api/auth/register';
 import { IsLoggedInResponseDto } from '@/api/auth/isLoggedIn';
+import { fetchUser } from '@/module/user';
 
 interface SessionSlice {
   logged: boolean;
@@ -28,7 +29,10 @@ export const login = (login: string, password: string) =>
   (async (dispatch: AppDispatch) => {
     const res = await API.post<LoginRequestDto, LoginResponseDto>('/auth/signin', { login, password });
     handleAPIResponse(res, {
-      [StatusCodes.OK]: (body) => dispatch(setToken(body.access_token)),
+      [StatusCodes.OK]: (body) => {
+        dispatch(setToken(body.access_token));
+        dispatch(fetchUser());
+      },
       [StatusCodes.UNAUTHORIZED]: (body) => console.error('Wrong credentials', body),
       [StatusCodes.BAD_REQUEST]: (body) => console.error('Bad request', body),
     });
@@ -63,6 +67,7 @@ export const autoLogin = () =>
       [StatusCodes.OK]: (body) => {
         if (body.valid) {
           dispatch(setToken(token));
+          dispatch(fetchUser());
         }
       },
     });

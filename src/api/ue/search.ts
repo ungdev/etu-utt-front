@@ -1,54 +1,13 @@
 import { useEffect, useState } from 'react';
-import { API, handleAPIResponse, ResponseDto } from '@/api/api';
+import { API, handleAPIResponse } from '@/api/api';
 import { StatusCodes } from 'http-status-codes';
-
-interface UE {
-  code: string;
-  inscriptionCode: string;
-  name: string;
-  credits: {
-    credits: number;
-    category: {
-      code: string;
-      name: string;
-    };
-  };
-  branchOption: {
-    branch: {
-      code: string;
-      name: string;
-    };
-    code: string;
-    name: string;
-  };
-  info: {
-    requirements: {
-      code: string;
-    }[];
-    comment: string;
-    degree: string;
-    languages: string;
-    minors: string;
-    objectives: string;
-    program: string;
-  };
-  openSemester: Array<{
-    code: string;
-    start: Date;
-    end: Date;
-  }>;
-}
-
-export interface SearchUEsResponseDto extends ResponseDto {
-  items: UE[];
-  itemsPerPage: number;
-  itemCount: number;
-}
+import { Pagination } from '@/api/api.interface';
+import { UE } from '@/api/ue/ue.interface';
 
 export function useSearchUEs(): [UE[], (filters: Record<string, string>) => void] {
   const fetch = async (filters: Record<string, string>) => {
     const params = new URLSearchParams(filters).toString();
-    const res = await API.get<SearchUEsResponseDto>(`/ue?${params}`);
+    const res = await API.get<Pagination<UE>>(`/ue?${params}`);
     handleAPIResponse(res, {
       [StatusCodes.OK]: (body) => {
         setUEs(body.items);

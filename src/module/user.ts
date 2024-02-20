@@ -1,9 +1,19 @@
 import { type Action, createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import { AppDispatch, RootState } from 'src/lib/store';
+import { AppDispatch } from 'src/lib/store';
+import { useAppSelector } from '@/lib/hooks';
+import { fetchProfile } from '@/api/profile/fetchProfile';
 
 interface UserSlice {
+  id: string;
+  login: string;
   firstName: string;
   lastName: string;
+  studentId: number;
+  sex: string;
+  nickname: string;
+  passions: string;
+  website: string;
+  birthday: Date;
 }
 
 export const userSlice = createSlice({
@@ -17,10 +27,8 @@ export const userSlice = createSlice({
 const { setUser } = userSlice.actions;
 
 export const fetchUser = () =>
-  ((dispatch: AppDispatch) => {
-    dispatch(setUser({ firstName: 'test', lastName: 'test' }));
-  }) as unknown as Action;
+  (async (dispatch: AppDispatch) => dispatch(setUser((await fetchProfile()) ?? null))) as unknown as Action;
 
-export const getConnectedUser = (state: RootState) => state.user;
+export const useConnectedUser = () => useAppSelector((state) => state.user);
 
 export default userSlice.reducer;

@@ -28,6 +28,7 @@ export default {
   "detailed.comments.updatedAt": "Mis à jour le {{date}}",
   "detailed.comments.resume.anonymous": "Commentaire anonyme sur l'UE {{ue}} au semestre {{semester}} ({{date}})",
   "detailed.comments.answers.answerTitle": "Répondre dans ce fil de discussion",
-  "detailed.comments.answers.answerButton": "Envoyer"
+  "detailed.comments.answers.answerButton": "Envoyer",
+  "detailed.comments.answers.answerEntry": "Tapez votre réponse ici"
 } as const;
 

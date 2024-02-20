@@ -2,7 +2,7 @@
 
 import styles from './style.module.scss';
 import { useParams } from 'next/navigation';
-import useFetchUE from '@/api/ue/fetch';
+import useFetchUE from '@/api/ue/fetchUEs';
 import { useAppSelector } from '@/lib/hooks';
 import Comments from '@/app/ues/[code]/Comments';
 import { useAppTranslation } from '@/lib/i18n';

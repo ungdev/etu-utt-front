@@ -1,15 +1,12 @@
 import { apiUrl } from '@/utils/environment';
 
-export interface RequestDto {}
-export interface ResponseDto {}
-
 export enum ResponseError {
   'not_json',
   'timeout',
   'unknown',
 }
 
-export type APIResponse<ResponseType extends ResponseDto> =
+export type APIResponse<ResponseType extends object> =
   | {
       error: 'no_error';
       code: number;
@@ -21,21 +18,23 @@ type RawResponseType<T extends object> = {
   [K in keyof T]: T[K] extends object ? RawResponseType<T[K]> : T[K] extends Date ? string : T[K];
 };
 
-export function handleAPIResponse<T extends ResponseDto>(
+export function handleAPIResponse<T extends object, R>(
   response: APIResponse<T>,
-  handlers: { [status: number]: (body: T) => void } & Partial<{ [status in ResponseError]: () => void }>,
-) {
+  handlers: { [status: number]: (body: T) => R } & Partial<{ [status in ResponseError]: () => R }>,
+): R | null {
   if (response.error === 'no_error') {
     if (handlers[response.code]) {
-      handlers[response.code](response.body);
+      return handlers[response.code](response.body);
     } else {
       console.error(`Unsupported response code : ${response.code}`);
+      return null;
     }
   } else {
     if (handlers[response.error]) {
-      handlers[response.error]!();
+      return handlers[response.error]!();
     } else {
       console.error(`Unsupported error type : ${response.error}`);
+      return null;
     }
   }
 }
@@ -57,7 +56,7 @@ function formatResponse<T extends object>(rawResponse: RawResponseType<T> | T): 
 }
 
 // Send request to API and handle errors
-async function requestAPI<RequestType extends RequestDto, ResponseType extends ResponseDto>(
+async function requestAPI<RequestType extends object, ResponseType extends object>(
   method: string,
   route: string,
   body: RequestType | null = null,
@@ -118,16 +117,16 @@ const getAuthorizationToken = () => localStorage.getItem('etuutt-token');
 
 // Access the API through different HTTP methods
 export const API = {
-  get: <ResponseType extends ResponseDto>(route: string) => requestAPI<never, ResponseType>('GET', route),
+  get: <ResponseType extends object>(route: string) => requestAPI<never, ResponseType>('GET', route),
 
-  post: <RequestType extends RequestDto, ResponseType extends ResponseDto>(route: string, body: RequestType) =>
+  post: <RequestType extends object, ResponseType extends object>(route: string, body: RequestType) =>
     requestAPI<RequestType, ResponseType>('POST', route, body),
 
-  put: <RequestType extends RequestDto, ResponseType extends ResponseDto>(route: string, body: RequestType) =>
+  put: <RequestType extends object, ResponseType extends object>(route: string, body: RequestType) =>
     requestAPI<RequestType, ResponseType>('PUT', route, body),
 
-  patch: <RequestType extends RequestDto, ResponseType extends ResponseDto>(route: string, body: RequestType) =>
+  patch: <RequestType extends object, ResponseType extends object>(route: string, body: RequestType) =>
     requestAPI<RequestType, ResponseType>('PATCH', route, body),
 
-  delete: <ResponseType extends ResponseDto>(route: string) => requestAPI<never, ResponseType>('DELETE', route),
+  delete: <ResponseType extends object>(route: string) => requestAPI<never, ResponseType>('DELETE', route),
 };
