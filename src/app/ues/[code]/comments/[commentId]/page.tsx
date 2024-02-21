@@ -3,7 +3,7 @@
 import styles from '@/app/ues/[code]/comments/[commentId]/style.module.scss';
 import { useParams } from 'next/navigation';
 import { useGetComment } from '@/api/comment/getComment';
-import useFetchUE from '@/api/ue/fetch';
+import useFetchUE from '@/api/ue/fetchUEs';
 import { TFunction, useAppTranslation } from '@/lib/i18n';
 import TextArea from '@/components/UI/TextArea';
 import Button from '@/components/UI/Button';

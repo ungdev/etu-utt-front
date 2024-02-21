@@ -1,7 +1,7 @@
 @import '@/variables';
 
 .button {
-  background-color: $blue;
+  background-color: $ung-light-blue;
   border-radius: 5px;
   padding: 10px;
   border: none;
@@ -10,12 +10,12 @@
   transition: background-color 0.07s ease-out;
 
   &:hover {
-    background-color: mix($blue, black, 90%);
+    background-color: mix($ung-light-blue, black, 90%);
     cursor: pointer;
   }
 
   &:disabled {
-    background-color: grayscale($blue);
+    background-color: grayscale($ung-light-blue);
     cursor: not-allowed;
   }
 }

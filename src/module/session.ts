@@ -51,8 +51,6 @@ export const register = (lastName: string, firstName: string, login: string, pas
     });
     handleAPIResponse(res, {
       [StatusCodes.CREATED]: (body) => dispatch(setToken(body.access_token)),
-      [StatusCodes.CONFLICT]: (body) => console.error('User already exists', body),
-      [StatusCodes.BAD_REQUEST]: (body) => console.error('Bad request', body),
     });
   }) as unknown as Action;
 

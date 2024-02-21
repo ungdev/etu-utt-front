@@ -18,11 +18,11 @@
         border: none;
         text-transform: uppercase;
         font-weight: bold;
-        color: $blue;
+        color: $ung-light-blue;
         font-size: 1.3rem;
 
         &:disabled {
-          color: mix($blue, #000, 80%);
+          color: mix($ung-light-blue, #000, 80%);
         }
       }
 

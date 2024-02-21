@@ -14,7 +14,7 @@ export type APIResponse<ResponseType extends object> =
     }
   | { error: ResponseError };
 
-type RawResponseType<T extends object> = {
+type RawResponseType<T> = {
   [K in keyof T]: T[K] extends object ? RawResponseType<T[K]> : T[K] extends Date ? string : T[K];
 };
 
@@ -39,20 +39,23 @@ export function handleAPIResponse<T extends object, R>(
   }
 }
 
-function formatResponse<T extends object>(rawResponse: RawResponseType<T> | T): T {
-  const response: Partial<T> = {};
-  for (const [key, value] of Object.entries(rawResponse)) {
-    if (Array.isArray(value)) {
-      response[key] = value.map(formatResponse) as T[keyof T];
-    } else if (typeof value === 'object' && value !== null) {
-      response[key] = formatResponse(value as object) as T[keyof T];
-    } else if (typeof value === 'string' && !isNaN(Date.parse(value))) {
-      response[key] = new Date(value) as T[keyof T];
-    } else {
-      response[key] = value as T[keyof T];
+function formatResponse<T>(rawResponse: RawResponseType<T> | T): T {
+  function internalFormatResponse<T extends object>(rawResponse: RawResponseType<T> | T): T {
+    const response: Partial<T> = {};
+    for (const [key, value] of Object.entries(rawResponse)) {
+      if (Array.isArray(value)) {
+        response[key] = value.map(internalFormatResponse) as T[keyof T];
+      } else if (typeof value === 'object' && value !== null) {
+        response[key] = internalFormatResponse(value as object) as T[keyof T];
+      } else if (typeof value === 'string' && !isNaN(Date.parse(value))) {
+        response[key] = new Date(value) as T[keyof T];
+      } else {
+        response[key] = value as T[keyof T];
+      }
     }
+    return response as T;
   }
-  return response as T;
+  return internalFormatResponse({ value: rawResponse }).value as T;
 }
 
 // Send request to API and handle errors

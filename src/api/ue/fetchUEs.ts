@@ -13,6 +13,6 @@ export default function useFetchUE(code: string): DetailedUE | null {
         },
       }),
     );
-  }, []);
+  }, [code]);
   return ue;
 }

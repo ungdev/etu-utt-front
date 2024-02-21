@@ -44,8 +44,6 @@ export interface DetailedUE extends UE {
     internship: number;
   };
   starVotes: {
-    criterionId: string;
-    createdAt: Date;
-    value: number;
+    [criterionId: string]: number;
   };
 }
