@@ -6,7 +6,7 @@ export default async function deleteUERate(ueCode: string, criterion: string): P
   const res = await API.delete<UERate>(`ue/${ueCode}/rate/${criterion}`);
   return (
     handleAPIResponse(res, {
-      [StatusCodes.NO_CONTENT]: () => true,
+      [StatusCodes.OK]: () => true,
     }) ?? false
   );
 }

@@ -52,55 +52,14 @@
       gap: 10%;
       justify-content: center;
 
-      & > div {
+      .criterion {
         margin-top: 30px;
+
         h3 {
           text-align: center;
           margin-bottom: 1rem;
           color: $ung-light-blue;
         }
-
-        .icons {
-          margin-top: 10px;
-          display: flex;
-          justify-content: center;
-
-          & > div {
-            position: relative;
-
-            & > svg {
-              width: 24px;
-              height: 24px;
-              margin: 3px 3px;
-              stroke: black;
-              fill: gold;
-              transition: all 0.1s linear;
-            }
-
-            &:after {
-              content: '';
-              position: absolute;
-              top: 0;
-              right: 0;
-              height: 100%;
-              mix-blend-mode: color;
-              width: calc(100% * (1 - var(--filled)));
-              background-color: white;
-            }
-          }
-        }
-      }
-    }
-
-    .myRate .icons > div:hover, .myRate .icons > div:has(~ div:hover) {
-      & > svg {
-        width: 30px;
-        height: 30px;
-        margin: 0;
-      }
-
-      &:after {
-        width: 0;
       }
     }
   }

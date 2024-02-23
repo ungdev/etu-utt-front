@@ -8,12 +8,11 @@ import Comments from '@/app/ues/[code]/Comments';
 import { useAppTranslation } from '@/lib/i18n';
 import { useUERateCriteria } from '@/module/ueRateCriterion';
 import { UERateCriterion } from '@/api/ueRate/ueRateCriterion.interface';
-import { CSSProperties } from 'react';
-import Star from '@/icons/Star';
 import Button from '@/components/UI/Button';
 import useGetRate from '@/api/ueRate/getUERate';
 import doUERate from '@/api/ueRate/doUERate';
 import deleteUERate from '@/api/ueRate/deleteUERate';
+import StarRating from '@/components/StarRating';
 
 export default function UEDetailsPage() {
   const params = useParams<{ code: string }>();
@@ -22,9 +21,31 @@ export default function UEDetailsPage() {
   const [ue, refreshUE] = useFetchUE(params.code as string);
   const criteria = useUERateCriteria();
   const [myRates, setMyRates] = useGetRate(params.code);
-  if (!ue || !criteria || !myRates) {
+  if (!ue || !criteria || (!myRates && logged)) {
     return false;
   }
+
+  const onRate = async (criterionId: string, hasAlreadyRated: boolean, rate: number) => {
+    const newRate = await doUERate(params.code, criterionId as string, rate);
+    if (!newRate) return;
+    if (hasAlreadyRated) {
+      setMyRates(
+        myRates!.map((rate) =>
+          rate.criterionId === criterionId ? { criterionId: criterionId as string, value: newRate.value } : rate,
+        ),
+      );
+    } else {
+      setMyRates([...myRates!, { criterionId: criterionId as string, value: newRate.value }]);
+    }
+    refreshUE();
+  };
+
+  const deleteRate = async (criterionId: string) => {
+    if (!(await deleteUERate(params.code, criterionId as string))) return;
+    setMyRates(myRates!.filter((rate) => rate.criterionId !== criterionId));
+    refreshUE();
+  };
+
   return (
     <div className={styles.page}>
       <h1>{ue.code}</h1>
@@ -80,75 +101,24 @@ export default function UEDetailsPage() {
       <div className={styles.thoughts}>
         <h2>Avis des étudiants</h2>
         <div className={styles.rates}>
-          {Object.entries(ue.starVotes).map(([id, value]) => (
-            <div key={id}>
-              <h3>{criteria.find((criterion): criterion is UERateCriterion => criterion.id === id)?.name}</h3>
-              <div className={styles.icons}>
-                {new Array(5).fill(0).map((_, i) => (
-                  <div style={{ '--filled': value < i ? 0 : value > i + 1 ? 1 : value - i } as CSSProperties} key={i}>
-                    <Star />
-                  </div>
-                ))}
-              </div>
-              <div className={styles.myRate}>
-                <div className={styles.icons}>
-                  {new Array(5).fill(0).map((_, i) => {
-                    const myRate = myRates.find((rate) => rate.criterionId === id);
-                    return (
-                      <div
-                        style={{ '--filled': myRate ? (myRate.value > i ? 1 : 0) : 0 } as CSSProperties}
-                        key={i}
-                        onClick={async () => {
-                          const newRate = await doUERate(params.code, id as string, i + 1);
-                          if (!newRate) return;
-                          if (myRate) {
-                            setMyRates(
-                              myRates.map((rate) =>
-                                rate.criterionId === id ? { criterionId: id as string, value: newRate.value } : rate,
-                              ),
-                            );
-                          } else {
-                            setMyRates([...myRates, { criterionId: id as string, value: newRate.value }]);
-                          }
-                          refreshUE();
-                        }}>
-                        <Star />
-                      </div>
-                    );
-                  })}
-                </div>
-                {myRates.some((rate) => rate.criterionId === id) && (
-                  <Button
-                    className={styles.deleteRate}
-                    onClick={() => {
-                      if (!deleteUERate(params.code, id as string)) return;
-                      setMyRates(myRates.filter((rate) => rate.criterionId !== id));
-                      refreshUE();
-                    }}>
-                    Supprimer mon avis
-                  </Button>
+          {Object.entries(ue.starVotes).map(([id, value]) => {
+            const myRate = myRates?.find((rate) => rate.criterionId === id);
+            return (
+              <div key={id} className={styles.criterion}>
+                <h3>{criteria.find((criterion): criterion is UERateCriterion => criterion.id === id)?.name}</h3>
+                <StarRating value={value} />
+                {myRates && (
+                  <>
+                    <StarRating value={myRate?.value ?? 0} onClick={(rate) => onRate(id as string, !!myRate, rate)} />
+                    <Button className={styles.deleteRate} onClick={() => deleteRate(id as string)}>
+                      Supprimer mon avis
+                    </Button>
+                  </>
                 )}
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
-        {/*<div className={styles.myRate}>
-          <div className={styles.icons}>
-            {new Array(5).fill(0).map((_, i) => (
-              <div
-                key={i}
-                onMouseEnter={(e) => {
-                  let star = e.target as HTMLElement;
-                  do {
-                    star.classList.add(styles.hover);
-                    star = star.previousElementSibling as HTMLElement;
-                  } while (star);
-                }}>
-                <Star />
-              </div>
-            ))}
-          </div>
-        </div>*/}
         {logged ? <Comments code={params.code as string} /> : t('ues:detailed.comments.loginRequired')}
       </div>
     </div>
