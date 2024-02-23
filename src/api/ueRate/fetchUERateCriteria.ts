@@ -1,6 +1,6 @@
 import { API, handleAPIResponse } from '@/api/api';
 import { StatusCodes } from 'http-status-codes';
-import { UERateCriterion } from '@/api/ueRateCriterion/ueRateCriterion.interface';
+import { UERateCriterion } from '@/api/ueRate/ueRateCriterion.interface';
 
 export default async function fetchUERateCriteria(): Promise<UERateCriterion[] | null> {
   const res = await API.get<UERateCriterion[]>('ue/rate/criteria');

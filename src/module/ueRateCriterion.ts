@@ -2,8 +2,8 @@ import { type Action, createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import { AppDispatch } from '@/lib/store';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import { useEffect } from 'react';
-import apiFetchUERateCriteria from '@/api/ueRateCriterion/fetchUERateCriteria';
-import { UERateCriterion } from '@/api/ueRateCriterion/ueRateCriterion.interface';
+import apiFetchUERateCriteria from '@/api/ueRate/fetchUERateCriteria';
+import { UERateCriterion } from '@/api/ueRate/ueRateCriterion.interface';
 
 interface UERateCriterionSlice {
   items: UERateCriterion[] | null;

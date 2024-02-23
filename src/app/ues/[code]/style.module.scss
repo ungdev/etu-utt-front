@@ -71,8 +71,10 @@
             & > svg {
               width: 24px;
               height: 24px;
+              margin: 3px 3px;
               stroke: black;
               fill: gold;
+              transition: all 0.1s linear;
             }
 
             &:after {
@@ -87,6 +89,18 @@
             }
           }
         }
+      }
+    }
+
+    .myRate .icons > div:hover, .myRate .icons > div:has(~ div:hover) {
+      & > svg {
+        width: 30px;
+        height: 30px;
+        margin: 0;
+      }
+
+      &:after {
+        width: 0;
       }
     }
   }
