@@ -9,13 +9,18 @@ import { useConnectedUser } from '@/module/user';
 import { Comment } from '@/api/comment/comment.interface';
 import { useState } from 'react';
 import { editComment } from '@/api/comment/editComment';
+import StarRating from '@/components/StarRating';
+import upvoteComment from '@/api/comment/upvote';
+import { unUpvoteComment } from '@/api/comment/unUpvote';
 
 function CommentEditorFooter(comment: Comment, onUpdate: (text: string, anonymous: boolean) => void, t: TFunction) {
   return function CommentEditorFooter({ text, disable }: { text: string; disable: () => void }) {
     const [anonymous, setAnonymous] = useState<boolean>(comment.isAnonymous);
     return (
       <div className={styles.commentEditorFooter}>
-        <div>Anonyme : <input type={"checkbox"} checked={anonymous} onChange={() => setAnonymous(!anonymous)} /></div>
+        <div>
+          Anonyme : <input type={'checkbox'} checked={anonymous} onChange={() => setAnonymous(!anonymous)} />
+        </div>
         <Button
           className={styles.button}
           disabled={text === comment.body && anonymous === comment.isAnonymous}
@@ -30,22 +35,53 @@ function CommentEditorFooter(comment: Comment, onUpdate: (text: string, anonymou
   };
 }
 
-function CommentFooter(code: string, comment: Comment, t: TFunction) {
+function CommentFooter(
+  code: string,
+  comment: Comment,
+  isMyComment: boolean,
+  t: TFunction,
+  updateComment: (updatedComment: Comment) => void,
+) {
   return function CommentFooter() {
-    return <p className={styles.commentFooter}>
-      <a href={`/ues/${code}/comments/${comment.id}`}>
-        {comment.answers.length === 0
-          ? t('ues:detailed.comments.conversation.see.empty')
-          : t('ues:detailed.comments.conversation.see', { responseCount: comment.answers.length.toString() })}
-        <Icons.Caret />
-      </a>
-    </p>;
+    return (
+      <div className={styles.commentFooter}>
+        <div className={styles.upvotes}>
+          <StarRating
+            stars={1}
+            value={comment.upvoted ? 1 : 0}
+            onClick={
+              isMyComment
+                ? undefined
+                : async () => {
+                    if (
+                      (!comment.upvoted && !(await upvoteComment(comment.id))) ||
+                      (comment.upvoted && !(await unUpvoteComment(comment.id)))
+                    )
+                      return;
+                    updateComment({
+                      ...comment,
+                      upvotes: comment.upvotes + (comment.upvoted ? -1 : 1),
+                      upvoted: !comment.upvoted,
+                    });
+                  }
+            }
+          />
+          <p>{t('ues:detailed.comments.upvotes', { count: comment.upvotes.toString() })}</p>
+        </div>
+        <a className={styles.gotoConversation} href={`/ues/${code}/comments/${comment.id}`}>
+          {comment.answers.length === 0
+            ? t('ues:detailed.comments.conversation.see.empty')
+            : t('ues:detailed.comments.conversation.see', { responseCount: comment.answers.length.toString() })}
+          <Icons.Caret />
+        </a>
+      </div>
+    );
   };
 }
 
 export default function Comments({ code }: { code: string }) {
   const { t } = useAppTranslation();
-  const [comments, setComments] = useFetchComments(code);
+  const [comments, setComment] = useFetchComments(code);
   const user = useConnectedUser()!;
   if (comments === null) {
     return '';
@@ -73,12 +109,18 @@ export default function Comments({ code }: { code: string }) {
             textClassName={styles.text}
             text={comment.body}
             enabled={comment.author?.id === user.id}
-            EditingFooter={CommentEditorFooter(comment, async (text, anonymous) => {
-              const updatedComment = await editComment(comment.id, text, anonymous);
-              if (!updatedComment) return;
-              setComments([...comments.slice(0, i), updatedComment, ...comments.slice(i + 1)]);
-            }, t)}
-            NormalViewFooter={CommentFooter(code, comment, t)}
+            EditingFooter={CommentEditorFooter(
+              comment,
+              async (text, anonymous) => {
+                const updatedComment = await editComment(comment.id, text, anonymous);
+                if (!updatedComment) return;
+                setComment(i, updatedComment);
+              },
+              t,
+            )}
+            NormalViewFooter={CommentFooter(code, comment, comment.author?.id === user.id, t, (updatedComment) =>
+              setComment(i, updatedComment),
+            )}
           />
         </div>
       ))}

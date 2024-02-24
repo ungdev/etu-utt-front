@@ -1,4 +1,5 @@
 import { apiUrl } from '@/utils/environment';
+import { StatusCodes } from 'http-status-codes';
 
 export enum ResponseError {
   'not_json',
@@ -6,7 +7,7 @@ export enum ResponseError {
   'unknown',
 }
 
-export type APIResponse<ResponseType extends object> =
+export type APIResponse<ResponseType> =
   | {
       error: 'no_error';
       code: number;
@@ -59,7 +60,7 @@ function formatResponse<T>(rawResponse: RawResponseType<T> | T): T {
 }
 
 // Send request to API and handle errors
-async function requestAPI<RequestType extends object, ResponseType extends object>(
+async function requestAPI<RequestType, ResponseType>(
   method: string,
   route: string,
   body: RequestType | null = null,
@@ -92,6 +93,9 @@ async function requestAPI<RequestType extends object, ResponseType extends objec
       },
     );
 
+    if (response.status === StatusCodes.NO_CONTENT) {
+      return { error: 'no_error', code: response.status, body: null as ResponseType };
+    }
     if (!response.headers.get('content-type')?.includes('application/json')) return { error: ResponseError.not_json };
     const rawResponse: RawResponseType<ResponseType> = await response.json();
 
@@ -120,16 +124,16 @@ const getAuthorizationToken = () => localStorage.getItem('etuutt-token');
 
 // Access the API through different HTTP methods
 export const API = {
-  get: <ResponseType extends object>(route: string) => requestAPI<never, ResponseType>('GET', route),
+  get: <ResponseType = never>(route: string) => requestAPI<never, ResponseType>('GET', route),
 
-  post: <RequestType extends object, ResponseType extends object>(route: string, body: RequestType) =>
+  post: <RequestType, ResponseType = never>(route: string, body = {} as RequestType) =>
     requestAPI<RequestType, ResponseType>('POST', route, body),
 
-  put: <RequestType extends object, ResponseType extends object>(route: string, body: RequestType) =>
+  put: <RequestType, ResponseType = never>(route: string, body = {} as RequestType) =>
     requestAPI<RequestType, ResponseType>('PUT', route, body),
 
-  patch: <RequestType extends object, ResponseType extends object>(route: string, body: RequestType) =>
+  patch: <RequestType, ResponseType = never>(route: string, body = {} as RequestType) =>
     requestAPI<RequestType, ResponseType>('PATCH', route, body),
 
-  delete: <ResponseType extends object>(route: string) => requestAPI<never, ResponseType>('DELETE', route),
+  delete: <ResponseType = never>(route: string) => requestAPI<never, ResponseType>('DELETE', route),
 };

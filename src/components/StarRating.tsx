@@ -3,15 +3,17 @@ import { CSSProperties } from 'react';
 import Star from '@/icons/Star';
 
 export default function StarRating({
+  stars,
   value,
   onClick,
 }: {
+  stars: number;
   value: number;
   onClick?: (score: number) => void;
 }) {
   return (
     <div className={styles.icons}>
-      {new Array(5).fill(0).map((_, i) => (
+      {new Array(stars).fill(0).map((_, i) => (
         <div
           style={{ '--filled': value < i ? 0 : value > i + 1 ? 1 : value - i } as CSSProperties}
           key={i}

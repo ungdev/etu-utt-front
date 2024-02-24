@@ -106,10 +106,14 @@ export default function UEDetailsPage() {
             return (
               <div key={id} className={styles.criterion}>
                 <h3>{criteria.find((criterion): criterion is UERateCriterion => criterion.id === id)?.name}</h3>
-                <StarRating value={value} />
+                <StarRating stars={5} value={value} />
                 {myRates && (
                   <>
-                    <StarRating value={myRate?.value ?? 0} onClick={(rate) => onRate(id as string, !!myRate, rate)} />
+                    <StarRating
+                      stars={5}
+                      value={myRate?.value ?? 0}
+                      onClick={(rate) => onRate(id as string, !!myRate, rate)}
+                    />
                     <Button className={styles.deleteRate} onClick={() => deleteRate(id as string)}>
                       Supprimer mon avis
                     </Button>

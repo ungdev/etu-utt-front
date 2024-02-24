@@ -35,9 +35,16 @@
       }
 
       .commentFooter {
-        text-align: right;
+        display: flex;
+        justify-content: space-between;
 
-        a {
+        .upvotes {
+          display: flex;
+          align-items: center;
+          padding-left: 2rem;
+        }
+
+        .gotoConversation {
           color: $ung-light-blue;
           text-decoration: none;
           font-size: 1.1rem;
