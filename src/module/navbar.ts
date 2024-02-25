@@ -1,6 +1,7 @@
 import { MenuItem } from '@/components/Navbar';
 import { type Action, createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import { AppDispatch, RootState } from 'src/lib/store';
+import { isClientSide } from '@/utils/environment';
 import Icons from '@/icons';
 
 export const userSlice = createSlice({
@@ -30,32 +31,32 @@ export const userSlice = createSlice({
         list.splice(index + 1, 0, action.payload.item);
       } else list.push(action.payload.item);
     },
-    replaceItem: (state, action: PayloadAction<{ item: MenuItem; search: string }>) => {
-      const location = action.payload.search.split(',');
+    replaceItem: (state, action: PayloadAction<{ item: MenuItem; search: string[] }>) => {
       let list: MenuItem<boolean>[] | null = state.items;
-      for (let i = 0; i < location.length - 1; i++) {
-        const index: number = list.findIndex(({ name, submenus }) => name === location[i] && submenus != null);
+      for (let i = 0; i < action.payload.search.length - 1; i++) {
+        const index: number = list.findIndex(
+          ({ name, submenus }) => name === action.payload.search[i] && submenus != null,
+        );
         if (index < 0) {
           return;
         }
         list = list[index].submenus!;
       }
-      const index = list.findIndex(({ name }) => name === location[location.length - 1]);
+      const index = list.findIndex(({ name }) => name === action.payload.search[action.payload.search.length - 1]);
       const duplicateCheckIndex = list.findIndex(({ name }) => name === action.payload.item.name);
       if (duplicateCheckIndex >= 0 && duplicateCheckIndex != index) return; // an other item already has this name
       if (index >= 0) list.splice(index, 1, action.payload.item);
     },
-    removeItem: (state, action: PayloadAction<string>) => {
-      const location = action.payload.split(',');
+    removeItem: (state, action: PayloadAction<string[]>) => {
       let list: MenuItem<boolean>[] | null = state.items;
-      for (let i = 0; i < location.length - 1; i++) {
-        const index: number = list.findIndex(({ name, submenus }) => name === location[i] && submenus != null);
+      for (let i = 0; i < action.payload.length - 1; i++) {
+        const index: number = list.findIndex(({ name, submenus }) => name === action.payload[i] && submenus != null);
         if (index < 0) {
           return;
         }
         list = list[index].submenus!;
       }
-      const index = list.findIndex(({ name }) => name === location[location.length - 1]);
+      const index = list.findIndex(({ name }) => name === action.payload[action.payload.length - 1]);
       if (index >= 0) list.splice(index, 1);
     },
     moveSeparator: (state, action: PayloadAction<number>) => {
@@ -66,31 +67,36 @@ export const userSlice = createSlice({
       state.collapsed = action.payload;
     },
   },
-  initialState: <{ items: MenuItem<boolean>[]; seperator: number; collapsed: boolean }>{
+  initialState: <{ items: MenuItem[]; seperator: number; collapsed: boolean }>{
     items: [
       {
         icon: Icons.Home,
-        name: 'Accueil',
+        name: 'common:navbar.home',
         path: '/',
+        translate: true,
       },
       {
         icon: Icons.User,
-        name: 'Trombinoscope',
+        name: 'common:navbar.userBrowser',
         path: '/users',
+        translate: true,
       },
       {
         icon: Icons.Book,
-        name: 'Guide des ues',
+        name: 'common:navbar.uesBrowser',
         path: '/ues',
+        translate: true,
       },
       {
         icon: Icons.Users,
-        name: 'Associations',
+        name: 'common:navbar.associations',
         path: '/assos',
+        translate: true,
       },
       {
         icon: Icons.Caret,
-        name: 'Mes Matières',
+        name: 'common:navbar.myUEs',
+        translate: true,
         submenus: [
           {
             name: 'IF01',
@@ -112,7 +118,8 @@ export const userSlice = createSlice({
       },
       {
         icon: Icons.Caret,
-        name: 'Mes Assos',
+        name: 'common:navbar.myAssociations',
+        translate: true,
         submenus: [
           {
             name: 'UNG',
@@ -125,14 +132,13 @@ export const userSlice = createSlice({
         ],
       },
       {
-        name: 'Mon EDT',
+        name: 'common:navbar.myTimetable',
         path: '/user/schedule',
+        translate: true,
       },
     ],
     seperator: 4,
-    // Throws a nextjs error because next is trying to interpret localStorage server-side (the error has no effect and can be ignored)
-    // If you are willing to kick this error out, do not use a useState as the delay will display the close animation to the user.
-    collapsed: localStorage.getItem('navbarCollapsed') === 'true',
+    collapsed: isClientSide() && localStorage.getItem('navbarCollapsed') === 'true',
   },
 });
 
@@ -157,14 +163,14 @@ export const addMenuItem = (
     );
   }) as unknown as Action;
 
-export const replaceMenuItem = (item: MenuItem, replacedItemName: string) =>
+export const replaceMenuItem = (item: MenuItem, ...replacedItemName: string[]) =>
   ((dispatch: AppDispatch) => {
     dispatch(replaceItem({ item, search: replacedItemName }));
   }) as unknown as Action;
 
-export const removeMenuItem = (itemName: string) =>
+export const removeMenuItem = (...pathToItem: string[]) =>
   ((dispatch: AppDispatch) => {
-    dispatch(removeItem(itemName));
+    dispatch(removeItem(pathToItem));
   }) as unknown as Action;
 
 export const setAlwaysVisibleCount = (count: number) =>
