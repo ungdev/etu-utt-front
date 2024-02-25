@@ -13,6 +13,9 @@ import useGetRate from '@/api/ueRate/getUERate';
 import doUERate from '@/api/ueRate/doUERate';
 import deleteUERate from '@/api/ueRate/deleteUERate';
 import StarRating from '@/components/StarRating';
+import TextArea from '@/components/UI/TextArea';
+import { useState } from 'react';
+import sendComment from '@/api/comment/sendComment';
 
 export default function UEDetailsPage() {
   const params = useParams<{ code: string }>();
@@ -21,6 +24,7 @@ export default function UEDetailsPage() {
   const [ue, refreshUE] = useFetchUE(params.code as string);
   const criteria = useUERateCriteria();
   const [myRates, setMyRates] = useGetRate(params.code);
+  const [writtingComment, setWrittingComment] = useState<string>('');
   if (!ue || !criteria || (!myRates && logged)) {
     return false;
   }
@@ -114,16 +118,31 @@ export default function UEDetailsPage() {
                       value={myRate?.value ?? 0}
                       onClick={(rate) => onRate(id as string, !!myRate, rate)}
                     />
-                    <Button className={styles.deleteRate} onClick={() => deleteRate(id as string)}>
-                      Supprimer mon avis
-                    </Button>
+                    {myRate && (
+                      <Button className={styles.deleteRate} onClick={() => deleteRate(id as string)}>
+                        Supprimer mon avis
+                      </Button>
+                    )}
                   </>
                 )}
               </div>
             );
           })}
         </div>
-        {logged ? <Comments code={params.code as string} /> : t('ues:detailed.comments.loginRequired')}
+        {logged ? (
+          <>
+            <div className={styles.writeComment}>
+              {t('ues:detailed.comments.write')}
+              <TextArea value={writtingComment} onChange={setWrittingComment} />
+              <Button onClick={() => sendComment(ue.code, writtingComment, false)}>
+                {t('ues:detailed.comments.write.send')}
+              </Button>
+            </div>
+            <Comments code={params.code as string} />
+          </>
+        ) : (
+          t('ues:detailed.comments.loginRequired')
+        )}
       </div>
     </div>
   );

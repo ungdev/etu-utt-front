@@ -33,7 +33,7 @@ export default function CommentDetails() {
   const { t } = useAppTranslation();
   const params = useParams<{ code: string; commentId: string }>();
   const [comment, setComment] = useGetComment(params.commentId);
-  const ue = useFetchUE(params.code);
+  const [ue] = useFetchUE(params.code);
   const [answer, setAnswer] = useState('');
   const user = useConnectedUser();
   if (!comment || !ue || !user) {

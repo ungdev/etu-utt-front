@@ -1,6 +1,6 @@
 import { API, handleAPIResponse } from '@/api/api';
 import { StatusCodes } from 'http-status-codes';
-import { CommentReply } from '@/api/ue/ue.types';
+import { CommentReply } from '@/api/commentReply/commentReply.interface';
 
 export interface EditCommentReplyRequestDto {
   body: string;

@@ -63,4 +63,19 @@
       }
     }
   }
+
+  .writeComment {
+    margin-top: 2rem;
+
+    textarea {
+      resize: vertical;
+      width: 100%;
+      margin-top: 0.3rem;
+    }
+
+    button {
+      margin-top: 0.5rem;
+      width: 100%;
+    }
+  }
 }

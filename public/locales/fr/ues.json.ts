@@ -31,5 +31,7 @@ export default {
   "detailed.comments.answers.answerButton": "Envoyer",
   "detailed.comments.answers.answerEntry": "Tapez votre réponse ici",
   "detailed.comments.upvotes": "{{count}} upvotes",
+  "detailed.comments.write": "Écrire un commentaire sur cette UE",
+  "detailed.comments.write.send": "Envoyer le commentaire"
 } as const;
 
