@@ -1,6 +1,8 @@
 import '@/global.scss';
 import Providers from '@/lib/Providers';
 import React from 'react';
+import Redirecter from '@/components/utilities/Redirecter';
+import AutoLogin from '@/components/utilities/AutoLogin';
 import Navbar from '@/components/Navbar';
 
 export const metadata = {
@@ -12,6 +14,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html>
       <Providers>
+        <Redirecter />
+        <AutoLogin />
         <body>
           <Navbar />
           {children}

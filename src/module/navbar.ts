@@ -1,12 +1,8 @@
 import { MenuItem } from '@/components/Navbar';
-import Book from '@/icons/Book';
-import Caret from '@/icons/Caret';
-import Home from '@/icons/Home';
-import User from '@/icons/User';
-import Users from '@/icons/Users';
 import { type Action, createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import { AppDispatch, RootState } from 'src/lib/store';
 import { isClientSide } from '@/utils/environment';
+import Icons from '@/icons';
 
 export const userSlice = createSlice({
   name: 'navbar',
@@ -74,31 +70,31 @@ export const userSlice = createSlice({
   initialState: <{ items: MenuItem[]; seperator: number; collapsed: boolean }>{
     items: [
       {
-        icon: Home,
+        icon: Icons.Home,
         name: 'common:navbar.home',
         path: '/',
         translate: true,
       },
       {
-        icon: User,
+        icon: Icons.User,
         name: 'common:navbar.userBrowser',
         path: '/users',
         translate: true,
       },
       {
-        icon: Book,
+        icon: Icons.Book,
         name: 'common:navbar.uesBrowser',
         path: '/ues',
         translate: true,
       },
       {
-        icon: Users,
+        icon: Icons.Users,
         name: 'common:navbar.associations',
         path: '/assos',
         translate: true,
       },
       {
-        icon: Caret,
+        icon: Icons.Caret,
         name: 'common:navbar.myUEs',
         translate: true,
         submenus: [
@@ -121,7 +117,7 @@ export const userSlice = createSlice({
         ],
       },
       {
-        icon: Caret,
+        icon: Icons.Caret,
         name: 'common:navbar.myAssociations',
         translate: true,
         submenus: [

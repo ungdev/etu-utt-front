@@ -37,8 +37,8 @@ export type MenuItem<
 > = (IncludeIcons extends true
   ? Pick<MenuItemProperties<Translate>, 'icon'>
   : IncludeIcons extends false
-    ? Partial<Record<'icon', never>>
-    : Partial<Pick<MenuItemProperties<Translate>, 'icon'>>) &
+  ? Partial<Record<'icon', never>>
+  : Partial<Pick<MenuItemProperties<Translate>, 'icon'>>) &
   (
     | (Omit<MenuItemProperties<Translate>, 'path' | 'icon'> & Partial<Record<'path', never>>)
     | (Omit<MenuItemProperties<Translate>, 'submenus' | 'icon'> & Partial<Record<'submenus', never>>)
