@@ -1,8 +1,8 @@
 import { MenuItem } from '@/components/Navbar';
 import { type Action, createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import { AppDispatch, RootState } from 'src/lib/store';
-import Icons from '@/icons';
 import { isClientSide } from '@/utils/environment';
+import Icons from '@/icons';
 
 export const userSlice = createSlice({
   name: 'navbar',
@@ -31,17 +31,18 @@ export const userSlice = createSlice({
         list.splice(index + 1, 0, action.payload.item);
       } else list.push(action.payload.item);
     },
-    replaceItem: (state, action: PayloadAction<{ item: MenuItem; search: string }>) => {
-      const location = action.payload.search.split(',');
+    replaceItem: (state, action: PayloadAction<{ item: MenuItem; search: string[] }>) => {
       let list: MenuItem<boolean>[] | null = state.items;
-      for (let i = 0; i < location.length - 1; i++) {
-        const index: number = list.findIndex(({ name, submenus }) => name === location[i] && submenus != null);
+      for (let i = 0; i < action.payload.search.length - 1; i++) {
+        const index: number = list.findIndex(
+          ({ name, submenus }) => name === action.payload.search[i] && submenus != null,
+        );
         if (index < 0) {
           return;
         }
         list = list[index].submenus!;
       }
-      const index = list.findIndex(({ name }) => name === location[location.length - 1]);
+      const index = list.findIndex(({ name }) => name === action.payload.search[action.payload.search.length - 1]);
       const duplicateCheckIndex = list.findIndex(({ name }) => name === action.payload.item.name);
       if (duplicateCheckIndex >= 0 && duplicateCheckIndex != index) return; // an other item already has this name
       if (index >= 0) list.splice(index, 1, action.payload.item);
@@ -162,7 +163,7 @@ export const addMenuItem = (
     );
   }) as unknown as Action;
 
-export const replaceMenuItem = (item: MenuItem, replacedItemName: string) =>
+export const replaceMenuItem = (item: MenuItem, ...replacedItemName: string[]) =>
   ((dispatch: AppDispatch) => {
     dispatch(replaceItem({ item, search: replacedItemName }));
   }) as unknown as Action;
