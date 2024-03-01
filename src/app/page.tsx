@@ -16,7 +16,7 @@ export const widgetsEnum = {
 const defaultWidgets = [
   { widget: 'widget1', x: 0, y: 0, width: 1, height: 1 },
   { widget: 'widget2', x: 0, y: 1, width: 3, height: 1 },
-  //{ widget: 'widget3', x: 3, y: 0, width: 1, height: 2 },
+  { widget: 'widget3', x: 3, y: 0, width: 1, height: 2 },
 ] satisfies WidgetInstance[];
 
 export type BoundingBox = { x: number; y: number; width: number; height: number };

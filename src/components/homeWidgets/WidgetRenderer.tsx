@@ -101,13 +101,29 @@ export default function WidgetRenderer({
   const modifyFakeElement = (bb: Partial<BoundingBox>) => {
     if (!fakeElement.current) return;
     const newFakeElement = { ...fakeElement.current, ...bb };
-    if (
-      newFakeElement.x < 0 ||
-      newFakeElement.y < 0 ||
-      newFakeElement.x + newFakeElement.width > 10 ||
-      newFakeElement.y + newFakeElement.height > 10
-    )
+    if (newFakeElement.width <= 0 || newFakeElement.height <= 0) {
       return;
+    }
+    if (newFakeElement.x < 0) {
+      newFakeElement.x = fakeElement.current.x;
+    }
+    if (newFakeElement.y < 0) {
+      newFakeElement.y = fakeElement.current.y;
+    }
+    if (newFakeElement.x + newFakeElement.width > 10) {
+      if (newFakeElement.x === fakeElement.current.x) {
+        newFakeElement.width = fakeElement.current.width;
+      } else {
+        newFakeElement.x = fakeElement.current.x;
+      }
+    }
+    if (newFakeElement.x + newFakeElement.height > 10) {
+      if (newFakeElement.y === fakeElement.current.y) {
+        newFakeElement.height = fakeElement.current.height;
+      } else {
+        newFakeElement.y = fakeElement.current.y;
+      }
+    }
     for (const otherBB of otherWidgetsBBRef.current) {
       if (
         newFakeElement.x + newFakeElement.width > otherBB.x &&
@@ -115,7 +131,30 @@ export default function WidgetRenderer({
         newFakeElement.y + newFakeElement.height > otherBB.y &&
         newFakeElement.y < otherBB.y + otherBB.height
       ) {
-        return;
+        if (fakeElement.current.x === otherBB.x + otherBB.width) {
+          newFakeElement.x = fakeElement.current.x;
+        }
+        if (fakeElement.current.y === otherBB.y + otherBB.height) {
+          newFakeElement.y = fakeElement.current.y;
+        }
+        if (fakeElement.current.x + fakeElement.current.width === otherBB.x) {
+          newFakeElement.width = fakeElement.current.width;
+        }
+        if (fakeElement.current.y + fakeElement.current.height === otherBB.y) {
+          newFakeElement.height = fakeElement.current.height;
+        }
+        // If the condition is still true, we cannot do anything more.
+        // It can happen if the given bb is not entirely in the page.
+        // The first conditions of the function will then have modified the bb in a way that makes the collisions unpredictable
+        // (The new bb is not necessarily in the given one, so nothing ensures there are no collisions)
+        if (
+          newFakeElement.x + newFakeElement.width > otherBB.x &&
+          newFakeElement.x < otherBB.x + otherBB.width &&
+          newFakeElement.y + newFakeElement.height > otherBB.y &&
+          newFakeElement.y < otherBB.y + otherBB.height
+        ) {
+          return;
+        }
       }
     }
     fakeElement.current = newFakeElement;
