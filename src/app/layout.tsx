@@ -18,7 +18,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <AutoLogin />
         <body>
           <Navbar />
-          {children}
+          <div style={{ width: '100%', height: '100%' }}>{children}</div>
         </body>
       </Providers>
     </html>
