@@ -163,6 +163,7 @@ export default function WidgetRenderer({
   const updateFakeElement = () => {
     if (!fakeElement.current) {
       fakeElementRef.current!.style.display = 'none';
+      resizerRef.current!.style.zIndex = '1';
       return;
     }
     fakeElementRef.current!.style.display = 'block';
@@ -170,6 +171,7 @@ export default function WidgetRenderer({
     fakeElementRef.current!.style.top = `${fakeElement.current.y * 10}%`;
     fakeElementRef.current!.style.width = `${fakeElement.current.width * 10}%`;
     fakeElementRef.current!.style.height = `${fakeElement.current.height * 10}%`;
+    resizerRef.current!.style.zIndex = '2';
   };
   const snap = () => {
     isSnapResizing.current = true;
