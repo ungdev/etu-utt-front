@@ -1,5 +1,5 @@
 import styles from './WidgetRenderer.module.scss';
-import { BoundingBox, WidgetInstance, widgetsEnum } from '@/app/page';
+import { BoundingBox, gridSize, WidgetInstance, widgetsEnum } from '@/app/page';
 import { useEffect, useMemo, useRef } from 'react';
 import { isClientSide } from '@/utils/environment';
 
@@ -26,14 +26,17 @@ export default function WidgetRenderer({
   // True when the widget is being resized, to let the observer know it should skip the observation
   const isSnapResizing = useRef(false);
   // We need something faster than a useState to avoid a double call of the second useEffect
-  const dragging = useRef<boolean>(false);
+  const draggingInfo = useRef<{ x: number; y: number } | null>(null);
   const observer = useMemo<ResizeObserver | undefined>(
     () =>
       isClientSide()
         ? new ResizeObserver(function (mutations) {
-            if (mutations[0].target === document.body) return;
+            //if (mutations[0].target === document.body) return;
+            if (mutations[0].target !== resizerRef.current) return;
             if (isSnapResizing.current) {
-              setTimeout(() => (isSnapResizing.current = false), 0.1);
+              setTimeout(() => {
+                //isSnapResizing.current = false;
+              }, 1000);
               return;
             }
             if (!fakeElement.current) {
@@ -42,8 +45,8 @@ export default function WidgetRenderer({
               const widgetBB = resizerRef.current!.getBoundingClientRect();
               const parentBB = resizerRef.current!.parentElement!.parentElement!.getBoundingClientRect();
               modifyFakeElement({
-                width: Math.round((widgetBB.width / parentBB.width) * 10),
-                height: Math.round((widgetBB.height / parentBB.height) * 10),
+                width: Math.round((widgetBB.width / parentBB.width / gridSize[0]) * 100),
+                height: Math.round((widgetBB.height / parentBB.height / gridSize[1]) * 100),
               });
             }
           })
@@ -54,35 +57,51 @@ export default function WidgetRenderer({
     if (!resizerRef.current || !draggerRef.current || !fakeElementRef.current || !observer) return;
     updateFakeElement();
     observer.observe(document.body);
+    observer.observe(resizerRef.current.parentElement!.parentElement!);
     observer.observe(resizerRef.current);
-    const onMouseDown = () => {
-      dragging.current = true;
+    const onMouseDownResizer = () => {
+      isSnapResizing.current = false;
+    };
+    const onMouseDownDragger = (e: MouseEvent) => {
+      const bb = draggerRef.current!.getBoundingClientRect();
+      draggingInfo.current = {
+        x: e.clientX - bb.x,
+        y: e.clientY - bb.y,
+      };
       createFakeElement();
     };
     const onMouseUp = () => {
-      if (!dragging.current) return;
-      dragging.current = false;
+      isSnapResizing.current = true;
+      if (!draggingInfo.current) return;
+      draggingInfo.current = null;
       snap();
     };
     const onMouseMove = (e: MouseEvent) => {
-      if (!dragging.current) return;
-      const bb = resizerRef.current!.getBoundingClientRect();
+      if (!draggingInfo.current) return;
+      const widgetBB = resizerRef.current!.getBoundingClientRect();
       const parentBB = resizerRef.current!.parentElement!.parentElement!.getBoundingClientRect();
-      const left = bb.left - parentBB.left + e.movementX;
-      const top = bb.top - parentBB.top + e.movementY;
+      const left = Math.max(
+        0,
+        Math.min(parentBB.width - widgetBB.width, e.clientX - parentBB.left - draggingInfo.current.x),
+      );
+      const top = Math.max(
+        0,
+        Math.min(parentBB.height - widgetBB.height, e.clientY - parentBB.top - draggingInfo.current.y),
+      );
       resizerRef.current!.style.left = `${left}px`;
       resizerRef.current!.style.top = `${top}px`;
       modifyFakeElement({
-        x: Math.round((left / parentBB.width) * 10),
-        y: Math.round((top / parentBB.height) * 10),
+        x: Math.round((left / parentBB.width / gridSize[0]) * 100),
+        y: Math.round((top / parentBB.height / gridSize[1]) * 100),
       });
     };
-    draggerRef.current!.addEventListener('mousedown', onMouseDown);
+    resizerRef.current!.addEventListener('mousedown', onMouseDownResizer);
+    draggerRef.current!.addEventListener('mousedown', onMouseDownDragger);
     document.addEventListener('mouseup', onMouseUp);
     document.addEventListener('mousemove', onMouseMove);
     return () => {
       observer.disconnect();
-      draggerRef.current!.removeEventListener('mousedown', onMouseDown);
+      draggerRef.current!.removeEventListener('mousedown', onMouseDownDragger);
       document.removeEventListener('mouseup', onMouseUp);
       document.removeEventListener('mousemove', onMouseMove);
     };
@@ -91,10 +110,10 @@ export default function WidgetRenderer({
     const widgetBB = resizerRef.current!.getBoundingClientRect();
     const parentBB = resizerRef.current!.parentElement!.parentElement!.getBoundingClientRect();
     fakeElement.current = {
-      x: Math.round(((widgetBB.left - parentBB.left) / parentBB.width) * 10),
-      y: Math.round(((widgetBB.top - parentBB.top) / parentBB.height) * 10),
-      width: Math.round((widgetBB.width / parentBB.width) * 10),
-      height: Math.round((widgetBB.height / parentBB.height) * 10),
+      x: Math.round(((widgetBB.left - parentBB.left) / parentBB.width / gridSize[0]) * 100),
+      y: Math.round(((widgetBB.top - parentBB.top) / parentBB.height / gridSize[1]) * 100),
+      width: Math.round((widgetBB.width / parentBB.width / gridSize[0]) * 100),
+      height: Math.round((widgetBB.height / parentBB.height / gridSize[1]) * 100),
     };
     updateFakeElement();
   };
@@ -110,14 +129,14 @@ export default function WidgetRenderer({
     if (newFakeElement.y < 0) {
       newFakeElement.y = fakeElement.current.y;
     }
-    if (newFakeElement.x + newFakeElement.width > 10) {
+    if (newFakeElement.x + newFakeElement.width > gridSize[0]) {
       if (newFakeElement.x === fakeElement.current.x) {
         newFakeElement.width = fakeElement.current.width;
       } else {
         newFakeElement.x = fakeElement.current.x;
       }
     }
-    if (newFakeElement.x + newFakeElement.height > 10) {
+    if (newFakeElement.y + newFakeElement.height > gridSize[1]) {
       if (newFakeElement.y === fakeElement.current.y) {
         newFakeElement.height = fakeElement.current.height;
       } else {
@@ -167,19 +186,19 @@ export default function WidgetRenderer({
       return;
     }
     fakeElementRef.current!.style.display = 'block';
-    fakeElementRef.current!.style.left = `${fakeElement.current.x * 10}%`;
-    fakeElementRef.current!.style.top = `${fakeElement.current.y * 10}%`;
-    fakeElementRef.current!.style.width = `${fakeElement.current.width * 10}%`;
-    fakeElementRef.current!.style.height = `${fakeElement.current.height * 10}%`;
+    fakeElementRef.current!.style.left = `${(fakeElement.current.x / gridSize[0]) * 100}%`;
+    fakeElementRef.current!.style.top = `${(fakeElement.current.y / gridSize[1]) * 100}%`;
+    fakeElementRef.current!.style.width = `${(fakeElement.current.width / gridSize[0]) * 100}%`;
+    fakeElementRef.current!.style.height = `${(fakeElement.current.height / gridSize[1]) * 100}%`;
     resizerRef.current!.style.zIndex = '2';
   };
   const snap = () => {
-    isSnapResizing.current = true;
+    // isSnapResizing.current = true;
     // We need to do it here because if the width or height has not changed, the inline style will not be updated, and thus not override what the user set.
-    resizerRef.current!.style.left = `${fakeElement.current!.x * 10}%`;
-    resizerRef.current!.style.top = `${fakeElement.current!.y * 10}%`;
-    resizerRef.current!.style.width = `${fakeElement.current!.width * 10}%`;
-    resizerRef.current!.style.height = `${fakeElement.current!.height * 10}%`;
+    resizerRef.current!.style.left = `${(fakeElement.current!.x / gridSize[0]) * 100}%`;
+    resizerRef.current!.style.top = `${(fakeElement.current!.y / gridSize[1]) * 100}%`;
+    resizerRef.current!.style.width = `${(fakeElement.current!.width / gridSize[0]) * 100}%`;
+    resizerRef.current!.style.height = `${(fakeElement.current!.height / gridSize[1]) * 100}%`;
     changeDivBBRef.current(fakeElement.current!);
     fakeElement.current = null;
     updateFakeElement();
@@ -191,10 +210,10 @@ export default function WidgetRenderer({
         ref={resizerRef}
         className={styles.widgetResizer}
         style={{
-          left: `${widget.x * 10}%`,
-          top: `${widget.y * 10}%`,
-          width: `${widget.width * 10}%`,
-          height: `${widget.height * 10}%`,
+          left: `${(widget.x / gridSize[0]) * 100}%`,
+          top: `${(widget.y / gridSize[1]) * 100}%`,
+          width: `${(widget.width / gridSize[0]) * 100}%`,
+          height: `${(widget.height / gridSize[1]) * 100}%`,
         }}
         onClick={() => fakeElement.current && snap()}>
         <div ref={draggerRef} className={styles.widgetDragger}>

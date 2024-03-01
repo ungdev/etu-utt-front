@@ -13,6 +13,8 @@ export const widgetsEnum = {
   widget3: Widget3,
 };
 
+export const gridSize = [10, 10];
+
 const defaultWidgets = [
   { widget: 'widget1', x: 0, y: 0, width: 1, height: 1 },
   { widget: 'widget2', x: 0, y: 1, width: 3, height: 1 },

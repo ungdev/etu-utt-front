@@ -3,6 +3,7 @@
     position: absolute;
     resize: both;
     overflow: auto;
+    transition: all .03s linear;
 
     .widgetDragger {
       width: 100%;
@@ -14,6 +15,8 @@
     position: absolute;
     background-color: rgba(yellow, 0.3);
     border: 1px solid yellow;
+    z-index: 3;
+    transition: all .1s linear;
 
     & > * {
       pointer-events: none;
