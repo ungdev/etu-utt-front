@@ -1,13 +1,29 @@
 .widgetRenderer {
   .widgetResizer {
     position: absolute;
-    resize: both;
-    overflow: auto;
     transition: all .03s linear;
+
+    &.modifyingLayout {
+      resize: both;
+      overflow: auto;
+    }
 
     .widgetDragger {
       width: 100%;
       height: 100%;
+
+      .removeButton {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 16px;
+        height: 16px;
+
+        * {
+          width: 100%;
+          height: 100%;
+        }
+      }
     }
   }
 
@@ -17,6 +33,7 @@
     border: 1px solid yellow;
     z-index: 3;
     transition: all .1s linear;
+    pointer-events: none;
 
     & > * {
       pointer-events: none;

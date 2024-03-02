@@ -1,45 +1,56 @@
 'use client';
 
 import styles from './style.module.scss';
-import Widget1 from '@/components/homeWidgets/Widget1';
-import Widget2 from '@/components/homeWidgets/Widget2';
-import Widget3 from '@/components/homeWidgets/Widget3';
 import WidgetRenderer from '@/components/homeWidgets/WidgetRenderer';
-import { useState } from 'react';
+import { usePageSettings } from '@/module/pageSettings';
+import Button from '@/components/UI/Button';
+import { useStateWithReference } from '@/utils/hooks';
+import { useAppDispatch, useAppSelector } from '@/lib/hooks';
+import { setParking } from '@/module/parking';
 
-export const widgetsEnum = {
-  widget1: Widget1,
-  widget2: Widget2,
-  widget3: Widget3,
-};
-
-export const gridSize = [10, 10];
-
-const defaultWidgets = [
-  { widget: 'widget1', x: 0, y: 0, width: 1, height: 1 },
-  { widget: 'widget2', x: 0, y: 1, width: 3, height: 1 },
-  { widget: 'widget3', x: 3, y: 0, width: 1, height: 2 },
-] satisfies WidgetInstance[];
-
-export type BoundingBox = { x: number; y: number; width: number; height: number };
-
-export type WidgetInstance = BoundingBox & { widget: keyof typeof widgetsEnum };
+function AdditionalNavbarComponent({
+  modifyingLayout,
+  onModify,
+  onDone,
+}: {
+  modifyingLayout: boolean;
+  onModify: () => void;
+  onDone: () => void;
+}) {
+  return <Button onClick={modifyingLayout ? onDone : onModify}>{modifyingLayout ? 'Terminer' : 'Modifier'}</Button>;
+}
 
 export default function HomePage() {
-  const [widgets, setWidgets] = useState(defaultWidgets);
+  const [modifyingLayout, setModifyingLayout, modifyingLayoutRef] = useStateWithReference(false);
+  usePageSettings(
+    {
+      navbarAdditionalComponent: () => (
+        <AdditionalNavbarComponent
+          modifyingLayout={modifyingLayoutRef.current}
+          onModify={() => setModifyingLayout(true)}
+          onDone={() => setModifyingLayout(false)}
+        />
+      ),
+    },
+    [modifyingLayout],
+  );
+  const widgets = useAppSelector((state) => state.parking);
+  const dispatch = useAppDispatch();
   return (
     <div className={styles.page}>
       {widgets.map((widget, i) => {
         return (
           <WidgetRenderer
-            key={i}
+            key={widget.id}
             widget={widget}
+            modifyingLayout={modifyingLayout}
             otherWidgetsBB={widgets
               .filter((_, j) => j !== i)
               .map((w) => ({ x: w.x, y: w.y, width: w.width, height: w.height }))}
-            changeDivBB={(newWidget) => {
-              setWidgets([...widgets.slice(0, i), { ...newWidget, widget: widget.widget }, ...widgets.slice(i + 1)]);
-            }}
+            changeBB={(newWidget) =>
+              dispatch(setParking([...widgets.slice(0, i), { ...widget, ...newWidget }, ...widgets.slice(i + 1)]))
+            }
+            remove={() => dispatch(setParking(widgets.filter((_, j) => j !== i)))}
           />
         );
       })}

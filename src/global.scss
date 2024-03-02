@@ -10,3 +10,7 @@ body {
   display: flex;
   flex-flow: row nowrap;
 }
+
+svg {
+  pointer-events: none;
+}

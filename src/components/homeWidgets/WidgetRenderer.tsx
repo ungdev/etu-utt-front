@@ -1,26 +1,34 @@
 import styles from './WidgetRenderer.module.scss';
-import { BoundingBox, gridSize, WidgetInstance, widgetsEnum } from '@/app/page';
 import { useEffect, useMemo, useRef } from 'react';
 import { isClientSide } from '@/utils/environment';
+import { BoundingBox, gridSize, WidgetInstance, WIDGETS } from '@/module/parking';
+import { CloseIcon } from 'next/dist/client/components/react-dev-overlay/internal/icons/CloseIcon';
+import Menu from '@/icons/Menu';
+import Button from '@/components/UI/Button';
 
 export default function WidgetRenderer({
   widget,
+  modifyingLayout,
   otherWidgetsBB = [],
-  changeDivBB = () => {},
+  changeBB = () => {},
+  remove = () => {},
 }: {
   widget: WidgetInstance;
-  otherWidgetsBB?: BoundingBox[];
-  changeDivBB?: (newWidget: BoundingBox) => void;
+  modifyingLayout: boolean;
+  otherWidgetsBB: BoundingBox[];
+  changeBB: (newWidget: BoundingBox) => void;
+  remove: () => void;
 }) {
   // We use a native callback, in which we need the latest version of these props, so we use refs
   const otherWidgetsBBRef = useRef(otherWidgetsBB);
   otherWidgetsBBRef.current = otherWidgetsBB;
-  const changeDivBBRef = useRef(changeDivBB);
-  changeDivBBRef.current = changeDivBB;
+  const changeDivBBRef = useRef(changeBB);
+  changeDivBBRef.current = changeBB;
   // References to the DOM elements
   const resizerRef = useRef<HTMLDivElement>(null);
   const draggerRef = useRef<HTMLDivElement>(null);
   const fakeElementRef = useRef<HTMLDivElement>(null);
+  const removeButtonRef = useRef<HTMLDivElement>(null);
   // Data about the fake element, it will be used to snap the widget to the grid
   const fakeElement = useRef<BoundingBox | null>(null);
   // True when the widget is being resized, to let the observer know it should skip the observation
@@ -54,7 +62,7 @@ export default function WidgetRenderer({
     [isClientSide()],
   );
   useEffect(() => {
-    if (!resizerRef.current || !draggerRef.current || !fakeElementRef.current || !observer) return;
+    if (!resizerRef.current || !draggerRef.current || !fakeElementRef.current || !observer || !modifyingLayout) return;
     updateFakeElement();
     observer.observe(document.body);
     observer.observe(resizerRef.current.parentElement!.parentElement!);
@@ -63,6 +71,7 @@ export default function WidgetRenderer({
       isSnapResizing.current = false;
     };
     const onMouseDownDragger = (e: MouseEvent) => {
+      if (e.target === removeButtonRef.current) return;
       const bb = draggerRef.current!.getBoundingClientRect();
       draggingInfo.current = {
         x: e.clientX - bb.x,
@@ -101,11 +110,11 @@ export default function WidgetRenderer({
     document.addEventListener('mousemove', onMouseMove);
     return () => {
       observer.disconnect();
-      draggerRef.current!.removeEventListener('mousedown', onMouseDownDragger);
+      draggerRef.current?.removeEventListener('mousedown', onMouseDownDragger); // draggerRef.current might be null if this element was just removed
       document.removeEventListener('mouseup', onMouseUp);
       document.removeEventListener('mousemove', onMouseMove);
     };
-  }, [resizerRef.current, draggerRef.current, fakeElementRef.current, observer]);
+  }, [resizerRef.current, draggerRef.current, fakeElementRef.current, observer, modifyingLayout]);
   const createFakeElement = () => {
     const widgetBB = resizerRef.current!.getBoundingClientRect();
     const parentBB = resizerRef.current!.parentElement!.parentElement!.getBoundingClientRect();
@@ -193,7 +202,6 @@ export default function WidgetRenderer({
     resizerRef.current!.style.zIndex = '2';
   };
   const snap = () => {
-    // isSnapResizing.current = true;
     // We need to do it here because if the width or height has not changed, the inline style will not be updated, and thus not override what the user set.
     resizerRef.current!.style.left = `${(fakeElement.current!.x / gridSize[0]) * 100}%`;
     resizerRef.current!.style.top = `${(fakeElement.current!.y / gridSize[1]) * 100}%`;
@@ -203,12 +211,12 @@ export default function WidgetRenderer({
     fakeElement.current = null;
     updateFakeElement();
   };
-  const Widget = widgetsEnum[widget.widget];
+  const Widget = WIDGETS[widget.widget];
   return (
     <div className={styles.widgetRenderer}>
       <div
         ref={resizerRef}
-        className={styles.widgetResizer}
+        className={`${styles.widgetResizer} ${modifyingLayout ? styles.modifyingLayout : ''}`}
         style={{
           left: `${(widget.x / gridSize[0]) * 100}%`,
           top: `${(widget.y / gridSize[1]) * 100}%`,
@@ -218,6 +226,13 @@ export default function WidgetRenderer({
         onClick={() => fakeElement.current && snap()}>
         <div ref={draggerRef} className={styles.widgetDragger}>
           <Widget />
+          {modifyingLayout && (
+            <div className={styles.removeButton} ref={removeButtonRef}>
+              <Button onClick={remove} raw={true}>
+                <Menu />
+              </Button>
+            </div>
+          )}
         </div>
       </div>
       <div ref={fakeElementRef} className={styles.fakeElement} />

@@ -10,6 +10,7 @@ import Menu from '@/icons/Menu';
 import Collapse from '@/icons/Collapse';
 import { useTranslation } from 'react-i18next';
 import { type TranslationKey } from '@/lib/i18n.d';
+import { usePageSettings } from '@/module/pageSettings';
 
 /**
  * The type defining all possible properties for a menu item
@@ -63,6 +64,7 @@ export default function Navbar() {
   const [selectedMenuName, setSelectedMenuName] = useState<string>('');
   const menuItems = useAppSelector(getMenu);
   const dispatch = useAppDispatch();
+  const { navbarAdditionalComponent } = usePageSettings();
 
   const { t, i18n } = useTranslation();
 
@@ -117,12 +119,18 @@ export default function Navbar() {
   return (
     <div className={`${styles.navbar} ${menuItems.collapsed ? styles.collapsed : ''}`}>
       <div className={styles.collapseIcon} onClick={toggleCollapsed}>
-        {menuItems.collapsed ? Menu() : Collapse()}
+        {menuItems.collapsed ? Menu({}) : Collapse()}
       </div>
       <div className={styles.menuing}>
         {menuItems.items.slice(0, menuItems.seperator).map((item) => inflateButton(item))}
         <div className={styles.separator} />
         {menuItems.items.slice(menuItems.seperator).map((item) => inflateButton(item))}
+        {navbarAdditionalComponent && (
+          <>
+            <div className={styles.separator} />
+            {navbarAdditionalComponent()}
+          </>
+        )}
       </div>
       <div className={styles.profile}>
         <div className={styles.roundIcon}>
