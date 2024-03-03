@@ -2,7 +2,6 @@ import styles from './WidgetRenderer.module.scss';
 import { useEffect, useMemo, useRef } from 'react';
 import { isClientSide } from '@/utils/environment';
 import { BoundingBox, gridSize, WidgetInstance, WIDGETS } from '@/module/parking';
-import { CloseIcon } from 'next/dist/client/components/react-dev-overlay/internal/icons/CloseIcon';
 import Menu from '@/icons/Menu';
 import Button from '@/components/UI/Button';
 

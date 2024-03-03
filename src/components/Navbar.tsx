@@ -119,7 +119,7 @@ export default function Navbar() {
   return (
     <div className={`${styles.navbar} ${menuItems.collapsed ? styles.collapsed : ''}`}>
       <div className={styles.collapseIcon} onClick={toggleCollapsed}>
-        {menuItems.collapsed ? Menu({}) : Collapse()}
+        {menuItems.collapsed ? <Menu /> : <Collapse />}
       </div>
       <div className={styles.menuing}>
         {menuItems.items.slice(0, menuItems.seperator).map((item) => inflateButton(item))}

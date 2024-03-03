@@ -6,18 +6,38 @@ import { usePageSettings } from '@/module/pageSettings';
 import Button from '@/components/UI/Button';
 import { useStateWithReference } from '@/utils/hooks';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
-import { setParking } from '@/module/parking';
+import { addWidget, modifyBB, removeWidget, WIDGETS } from '@/module/parking';
+import { useState } from 'react';
 
 function AdditionalNavbarComponent({
   modifyingLayout,
+  onAdd,
   onModify,
   onDone,
 }: {
   modifyingLayout: boolean;
+  onAdd: (widget: keyof typeof WIDGETS) => void;
   onModify: () => void;
   onDone: () => void;
 }) {
-  return <Button onClick={modifyingLayout ? onDone : onModify}>{modifyingLayout ? 'Terminer' : 'Modifier'}</Button>;
+  const [widgetToAdd, setWidgetToAdd] = useState<keyof typeof WIDGETS>('widget1');
+  return (
+    <>
+      <Button onClick={modifyingLayout ? onDone : onModify}>{modifyingLayout ? 'Terminer' : 'Modifier'}</Button>
+      {modifyingLayout && (
+        <>
+          <select
+            value={widgetToAdd}
+            onChange={(e) => setWidgetToAdd((e.target as HTMLSelectElement).value as keyof typeof WIDGETS)}>
+            <option value="widget1">widget1</option>
+            <option value="widget2">widget2</option>
+            <option value="widget3">widget3</option>
+          </select>
+          <Button onClick={() => onAdd(widgetToAdd)}>Ajouter</Button>
+        </>
+      )}
+    </>
+  );
 }
 
 export default function HomePage() {
@@ -29,6 +49,7 @@ export default function HomePage() {
           modifyingLayout={modifyingLayoutRef.current}
           onModify={() => setModifyingLayout(true)}
           onDone={() => setModifyingLayout(false)}
+          onAdd={(widget) => dispatch(addWidget(widget))}
         />
       ),
     },
@@ -47,10 +68,8 @@ export default function HomePage() {
             otherWidgetsBB={widgets
               .filter((_, j) => j !== i)
               .map((w) => ({ x: w.x, y: w.y, width: w.width, height: w.height }))}
-            changeBB={(newWidget) =>
-              dispatch(setParking([...widgets.slice(0, i), { ...widget, ...newWidget }, ...widgets.slice(i + 1)]))
-            }
-            remove={() => dispatch(setParking(widgets.filter((_, j) => j !== i)))}
+            changeBB={(newWidget) => dispatch(modifyBB(i, { ...widget, ...newWidget }))}
+            remove={() => dispatch(removeWidget(i))}
           />
         );
       })}
