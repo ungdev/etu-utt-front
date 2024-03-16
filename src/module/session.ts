@@ -22,7 +22,7 @@ export const sessionSlice = createSlice({
   initialState: { logged: false } as SessionSlice,
 });
 
-const { setToken } = sessionSlice.actions;
+export const { setToken } = sessionSlice.actions;
 
 export const login = (login: string, password: string) =>
   (async (dispatch: AppDispatch) => {
