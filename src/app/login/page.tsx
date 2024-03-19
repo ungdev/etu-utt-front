@@ -8,14 +8,14 @@ import { setToken } from '@/module/session';
 import { StatusCodes } from 'http-status-codes';
 import { useAppDispatch } from '@/lib/hooks';
 import { useEffect, useState } from 'react';
-import { usePageSettings } from '@/module/pageSettings';
+//import { usePageSettings } from '@/module/pageSettings';
 import Button from '@/components/UI/Button';
 import { RegisterResponseDto } from '@/api/auth/register';
 import { CasRegisterRequestDto } from '@/api/auth/casRegister';
 import { useTranslation } from 'react-i18next';
 
 export default function LoginPage() {
-  usePageSettings({ hasNavbar: false, permissions: 'public' });
+  //usePageSettings({ hasNavbar: false, permissions: 'public' });
   const params = useSearchParams();
   const router = useRouter();
   const dispatch = useAppDispatch();
