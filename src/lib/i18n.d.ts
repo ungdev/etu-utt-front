@@ -3,7 +3,7 @@ import { type CustomTypeOptions, type FlatNamespace, type InitOptions } from 'i1
 
 declare module 'i18next' {
   interface CustomTypeOptions extends InitOptions {
-    ns: ['common'];
+    ns: ['common', 'login'];
     nsSeparator: ':';
     defaultNS: 'common';
     // custom resources type

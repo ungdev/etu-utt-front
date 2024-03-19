@@ -21,8 +21,10 @@ export default function LoginPage() {
   const dispatch = useAppDispatch();
   const { t } = useTranslation();
   const [registerToken, setRegisterToken] = useState<string | null>(null);
+  const [validatedToken, setValidatedToken] = useState(false);
   useEffect(() => {
-    if (!params.get('ticket')) return;
+    if (!params.get('ticket') || validatedToken) return;
+    setValidatedToken(true);
     API.post<CasLoginRequestDto, CasLoginResponseDto>('auth/signin/cas', {
       ticket: params.get('ticket')!,
       service: 'https://etu.utt.fr/dummyurl',
@@ -53,7 +55,7 @@ export default function LoginPage() {
               registerToken,
             });
             handleAPIResponse(res, {
-              [StatusCodes.OK]: (body) => {
+              [StatusCodes.CREATED]: (body) => {
                 dispatch(setToken(body.access_token));
                 router.push('/');
               },
