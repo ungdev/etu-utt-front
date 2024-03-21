@@ -1,24 +1,23 @@
 import { apiUrl } from '@/utils/environment';
 
-export enum ResponseError {
+enum ResponseError {
   'not_json',
   'timeout',
   'unknown',
 }
 
-export type APIResponse<ResponseType extends object> =
+type APIResponse<ResponseType extends object> =
   | {
-      error: 'no_error';
       code: number;
       body: ResponseType;
     }
-  | { error: ResponseError };
+  | Record<'error', ResponseError>;
 
 export function handleAPIResponse<T extends object>(
   response: APIResponse<T>,
   handlers: { [status: number]: (body: T) => void } & Partial<{ [status in ResponseError]: () => void }>,
 ) {
-  if (response.error === 'no_error') {
+  if (!('error' in response)) {
     if (handlers[response.code]) {
       handlers[response.code](response.body);
     } else {
