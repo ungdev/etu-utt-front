@@ -70,7 +70,7 @@ async function requestAPI<RequestType extends object, ResponseType extends objec
 
     const res: ResponseType = await response.json();
     replaceStringByDate(res);
-    return { error: 'no_error', code: response.status, body: res as ResponseType };
+    return { code: response.status, body: res as ResponseType };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     if (error instanceof Error && error.name === 'AbortError') {
