@@ -1,4 +1,4 @@
-import { apiUrl } from '@/utils/environment';
+import { apiTimeout, apiUrl, apiVersion } from '@/utils/environment';
 
 enum ResponseError {
   'not_json',
@@ -37,7 +37,7 @@ async function requestAPI<RequestType extends object, ResponseType extends objec
   method: string,
   route: string,
   body: RequestType | null = null,
-  timeoutMillis = 10000,
+  { timeoutMillis = apiTimeout, version = apiVersion }: { timeoutMillis?: number; version?: string } = {},
 ): Promise<APIResponse<ResponseType>> {
   // Generate headers
   const token = getAuthorizationToken();
@@ -54,7 +54,7 @@ async function requestAPI<RequestType extends object, ResponseType extends objec
   try {
     // Make the request
     const response = await fetch(
-      `${apiUrl.slice(-1) === '/' ? apiUrl.slice(0, -1) : apiUrl}/${
+      `${apiUrl.slice(-1) === '/' ? apiUrl.slice(0, -1) : apiUrl}/${version}/${
         route.slice(0, 1) === '/' ? route.slice(1) : route
       }`,
       {
@@ -68,16 +68,22 @@ async function requestAPI<RequestType extends object, ResponseType extends objec
 
     if (!response.headers.get('content-type')?.includes('application/json')) return { error: ResponseError.not_json };
 
-    const res: ResponseType = await response.json();
-    replaceStringByDate(res);
-    return { code: response.status, body: res as ResponseType };
+    try {
+      const res: ResponseType = await response.json();
+      replaceStringByDate(res);
+      return { code: response.status, body: res as ResponseType };
+    } catch (error) {
+      // BROOO, who makes APIs that return headers with Content-Type: application/json without a json body :(
+      // (Ok, in theory none, but it's better to be safe than sorry)
+      return { error: ResponseError.not_json };
+    }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     if (error instanceof Error && error.name === 'AbortError') {
       console.error('Request timed out');
       return { error: ResponseError.timeout };
     }
-    if (error.message.startsWith('Network Error') || error.code === 'ECONNABORTED') {
+    if (error.message?.startsWith('Network Error') || error.code === 'ECONNABORTED') {
       console.error('Cannot connect to server');
     } else {
       console.error('An error occurred when making a request to the API');
@@ -95,18 +101,29 @@ const getAuthorizationToken = () => localStorage.getItem('etuutt-token');
 
 // Access the API through different HTTP methods
 export const API = {
-  get: <ResponseType extends object>(route: string) => requestAPI<never, ResponseType>('GET', route),
+  get: <ResponseType extends object>(route: string, options: { version?: string } = {}) =>
+    requestAPI<never, ResponseType>('GET', route, null, options),
 
-  post: <RequestType extends object, ResponseType extends object>(route: string, body: RequestType) =>
-    requestAPI<RequestType, ResponseType>('POST', route, body),
+  post: <RequestType extends object, ResponseType extends object>(
+    route: string,
+    body: RequestType,
+    options: { version?: string } = {},
+  ) => requestAPI<RequestType, ResponseType>('POST', route, body, options),
 
-  put: <RequestType extends object, ResponseType extends object>(route: string, body: RequestType) =>
-    requestAPI<RequestType, ResponseType>('PUT', route, body),
+  put: <RequestType extends object, ResponseType extends object>(
+    route: string,
+    body: RequestType,
+    options: { version?: string } = {},
+  ) => requestAPI<RequestType, ResponseType>('PUT', route, body, options),
 
-  patch: <RequestType extends object, ResponseType extends object>(route: string, body: RequestType) =>
-    requestAPI<RequestType, ResponseType>('PATCH', route, body),
+  patch: <RequestType extends object, ResponseType extends object>(
+    route: string,
+    body: RequestType,
+    options: { version?: string } = {},
+  ) => requestAPI<RequestType, ResponseType>('PATCH', route, body, options),
 
-  delete: <ResponseType extends object>(route: string) => requestAPI<never, ResponseType>('DELETE', route),
+  delete: <ResponseType extends object>(route: string, options: { version?: string } = {}) =>
+    requestAPI<never, ResponseType>('DELETE', route, null, options),
 };
 
 function replaceStringByDate(obj: any) {
