@@ -30,7 +30,7 @@ type MenuItemProperties = {
 export type MenuItem<IncludeIcons extends boolean = boolean> = (IncludeIcons extends true
   ? Pick<MenuItemProperties, 'icon'>
   : IncludeIcons extends false
-  ? object
+  ? Record<string, never>
   : Partial<Pick<MenuItemProperties, 'icon'>>) &
   (
     | (Omit<MenuItemProperties, 'path' | 'icon'> & Partial<Record<'path', never>>)

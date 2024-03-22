@@ -3,4 +3,8 @@
 .link {
   color: $blue;
   text-decoration: none;
+
+  span {
+    border-bottom: 1px solid $ung-light-blue;
+  }
 }
