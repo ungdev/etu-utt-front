@@ -126,6 +126,7 @@ export const API = {
     requestAPI<never, ResponseType>('DELETE', route, null, options),
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function replaceStringByDate(obj: any) {
   for (const [key, value] of Object.entries(obj)) {
     if (typeof value === 'object') replaceStringByDate(value);

@@ -7,5 +7,3 @@ export default function Book() {
     </svg>
   );
 }
-
-export default Book;

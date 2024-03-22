@@ -10,5 +10,3 @@ export default function Collapse() {
     </svg>
   );
 }
-
-export default Collapse;

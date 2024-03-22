@@ -7,5 +7,3 @@ export default function Caret() {
     </svg>
   );
 }
-
-export default Caret;

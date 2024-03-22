@@ -7,5 +7,3 @@ export default function Menu() {
     </svg>
   );
 }
-
-export default Menu;
