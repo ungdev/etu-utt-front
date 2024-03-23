@@ -1,6 +1,6 @@
 @import '@/variables';
 
-.loginForm {
+.authForm {
   justify-content: center;
   padding: 50px 50px 30px;
   background-color: white;
@@ -30,11 +30,11 @@
     width: 100%;
   }
 
-  .registerLink {
+  .link {
     margin: 10px auto 0;
   }
 
-  .connectButton {
+  .button {
     width: 100%;
     margin-top: 30px;
     cursor: pointer;
