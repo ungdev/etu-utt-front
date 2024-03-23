@@ -8,9 +8,7 @@ export interface SendReplyRequestDto {
 
 export async function sendCommentReply(commentId: string, body: string): Promise<CommentReply | null> {
   const res = await API.post<SendReplyRequestDto, CommentReply>(`/ue/comments/${commentId}/reply`, { body });
-  let reply: CommentReply | null = null;
-  handleAPIResponse(res, {
-    [StatusCodes.CREATED]: (body) => (reply = body),
+  return handleAPIResponse(res, {
+    [StatusCodes.CREATED]: (body) => body,
   });
-  return reply;
 }
