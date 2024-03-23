@@ -3,6 +3,14 @@
 
 export default {
   "filter.search": "Recherche dans le guide des UEs",
+  "filter.creditType": "Type de crédits",
+  "filter.creditType.all": "Tous",
+  "filter.branch": "Branche",
+  "filter.branch.all": "Toutes",
+  "filter.branchOption": "Filière",
+  "filter.branchOption.all": "Toutes",
+  "filter.semester": "Semestre",
+  "filter.semester.all": "Tous",
   "detailed.inscriptionCode": "Code d'inscription",
   "detailed.workTime" : "Temps de travail",
   "detailed.workTime.project": "Projet",

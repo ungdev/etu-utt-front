@@ -16,7 +16,6 @@ export default function EditableText({
   className?: string;
   textClassName?: string;
   enabled?: boolean;
-  onUpdate?: (value: string) => boolean | Promise<boolean>;
   NormalViewFooter?: JSXElementConstructor<Record<string, never>>;
 }) {
   const [selected, setSelected] = useState<boolean>(false);

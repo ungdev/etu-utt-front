@@ -1,6 +1,6 @@
 import styles from './Comments.module.scss';
 
-import useFetchComments from '@/api/comment/fetchComments';
+import useComments from '@/api/comment/fetchComments';
 import { TFunction, useAppTranslation } from '@/lib/i18n';
 import Icons from '@/icons';
 import EditableText from '@/components/EditableText';
@@ -53,11 +53,14 @@ function CommentFooter(
               isMyComment
                 ? undefined
                 : async () => {
+                    // Upvote or un-upvote the comment. If it returns false, it means the request failed (for example, it was already upvoted / un-upvoted)
+                    // If that's the case, we don't update the number of upvotes.
                     if (
                       (!comment.upvoted && !(await upvoteComment(comment.id))) ||
                       (comment.upvoted && !(await unUpvoteComment(comment.id)))
-                    )
+                    ) {
                       return;
+                    }
                     updateComment({
                       ...comment,
                       upvotes: comment.upvotes + (comment.upvoted ? -1 : 1),
@@ -81,7 +84,7 @@ function CommentFooter(
 
 export default function Comments({ code }: { code: string }) {
   const { t } = useAppTranslation();
-  const [comments, setComment] = useFetchComments(code);
+  const [comments, setComment] = useComments(code);
   const user = useConnectedUser()!;
   if (comments === null) {
     return '';

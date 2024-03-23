@@ -2,7 +2,7 @@
 
 import styles from './style.module.scss';
 import { useParams } from 'next/navigation';
-import useFetchUE from '@/api/ue/fetchUEs';
+import useUE from '@/api/ue/fetchUEs';
 import { useAppSelector } from '@/lib/hooks';
 import Comments from '@/app/ues/[code]/Comments';
 import { useAppTranslation } from '@/lib/i18n';
@@ -21,7 +21,7 @@ export default function UEDetailsPage() {
   const params = useParams<{ code: string }>();
   const { t } = useAppTranslation();
   const logged = useAppSelector((state) => state.session.logged);
-  const [ue, refreshUE] = useFetchUE(params.code as string);
+  const [ue, refreshUE] = useUE(params.code as string);
   const criteria = useUERateCriteria();
   const [myRates, setMyRates] = useGetRate(params.code);
   const [writtingComment, setWrittingComment] = useState<string>('');

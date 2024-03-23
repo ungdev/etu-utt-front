@@ -2,8 +2,8 @@
 
 import styles from '@/app/ues/[code]/comments/[commentId]/style.module.scss';
 import { useParams } from 'next/navigation';
-import { useGetComment } from '@/api/comment/getComment';
-import useFetchUE from '@/api/ue/fetchUEs';
+import { useUEComment } from '@/api/comment/getComment';
+import useUE from '@/api/ue/fetchUEs';
 import { TFunction, useAppTranslation } from '@/lib/i18n';
 import TextArea from '@/components/UI/TextArea';
 import Button from '@/components/UI/Button';
@@ -32,8 +32,8 @@ function CommentEditorFooter(originalComment: string, onUpdate: (text: string) =
 export default function CommentDetails() {
   const { t } = useAppTranslation();
   const params = useParams<{ code: string; commentId: string }>();
-  const [comment, setComment] = useGetComment(params.commentId);
-  const [ue] = useFetchUE(params.code);
+  const [comment, setComment] = useUEComment(params.commentId);
+  const [ue] = useUE(params.code);
   const [answer, setAnswer] = useState('');
   const user = useConnectedUser();
   if (!comment || !ue || !user) {

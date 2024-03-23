@@ -4,11 +4,11 @@ import Input from '@/components/UI/Input';
 import Icons from '@/icons';
 import { useAppTranslation } from '@/lib/i18n';
 
-export default function UENameFilter({ onUpdate }: { onUpdate: (value: string, newUrlPart: string) => void }) {
+export default function UENameFilter({ onUpdate }: { onUpdate: (value: string | null, newUrlPart: string | null) => void }) {
   const [search, setSearch] = useState<string>('');
   const { t } = useAppTranslation();
   useEffect(() => {
-    onUpdate(search, search);
+    onUpdate(search === '' ? null : search, search === '' ? null : search);
   }, [search]);
   return (
     <div className={styles.filter}>

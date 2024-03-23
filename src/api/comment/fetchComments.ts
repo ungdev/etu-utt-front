@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { Pagination } from '@/api/api.interface';
 import { Comment } from '@/api/comment/comment.interface';
 
-export default function useFetchComments(code: string): [Comment[] | null, (index: number, comment: Comment) => void] {
+export default function useComments(code: string): [Comment[] | null, (index: number, comment: Comment) => void] {
   const [comments, setComments] = useState<Comment[] | null>(null);
   useEffect(() => {
     API.get<Pagination<Comment>>(`/ue/${code}/comments`).then((res) =>

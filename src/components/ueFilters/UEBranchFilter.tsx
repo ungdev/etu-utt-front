@@ -1,17 +1,29 @@
 import { useEffect, useState } from 'react';
+import { useAppTranslation } from '@/lib/i18n';
 
-type Branch = 'RT' | 'ISI' | 'SN';
+const branches = ['RT', 'ISI', 'SN'] as const;
+export type Branch = (typeof branches)[number];
 
-export default function UEBranchFilter({ onUpdate }: { onUpdate: (value: Branch, newUrlPart: string) => void }) {
-  const [branch, setBranch] = useState<Branch>('RT');
+export default function UEBranchFilter({
+  onUpdate,
+}: {
+  onUpdate: (value: Branch | null, newUrlPart: string | null) => void;
+}) {
+  const [branch, setBranch] = useState<Branch | 'all'>('all');
+  const { t } = useAppTranslation();
   useEffect(() => {
-    onUpdate(branch, branch);
+    onUpdate(branch === 'all' ? null : branch, branch === 'all' ? null : branch);
   }, [branch]);
   return (
-    <select value={branch} onChange={(event) => setBranch(event.target.value as Branch)}>
-      <option value="RT">RT</option>
-      <option value="ISI">ISI</option>
-      <option value="SN">SN</option>
+    <select value={branch} onChange={(event) => setBranch(event.target.value as Branch | 'all')}>
+      <option key={null} value="all">
+        {t('ues:filter.branch.all')}
+      </option>
+      {branches.map((branch) => (
+        <option key={branch} value={branch}>
+          {branch}
+        </option>
+      ))}
     </select>
   );
 }

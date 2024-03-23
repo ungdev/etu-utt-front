@@ -4,7 +4,7 @@ import { StatusCodes } from 'http-status-codes';
 import { Pagination } from '@/api/api.interface';
 import { UE } from '@/api/ue/ue.interface';
 
-export function useSearchUEs(): [UE[], (filters: Record<string, string>) => void] {
+export function useUEs(): [UE[], (filters: Record<string, string>) => void] {
   const fetch = async (filters: Record<string, string>) => {
     const params = new URLSearchParams(filters).toString();
     const res = await API.get<Pagination<UE>>(`/ue?${params}`);
