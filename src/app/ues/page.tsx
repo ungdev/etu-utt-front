@@ -121,13 +121,11 @@ export default function Page() {
           <tbody>
             {filters.map((filter, i) => {
               const Filter = ueFilters[filter.filter].component;
-              const otherProps = (ueFilters[filter.filter] as { dependsOn?: unknown }).dependsOn
-                ? Object.fromEntries(
-                    { dependsOn: [], ...ueFilters[filter.filter] }.dependsOn?.map((dependsOn) => {
-                      return [dependsOn, filters.find((f) => f.filter === dependsOn)?.value];
-                    }),
-                  )
-                : {};
+              const otherProps = Object.fromEntries(
+                (ueFilters[filter.filter] as { dependsOn?: string[] }).dependsOn?.map((dependsOn) => {
+                  return [dependsOn, filters.find((f) => f.filter === dependsOn)?.value];
+                }) ?? [],
+              );
               return (
                 <tr key={filter.filter}>
                   <td>
