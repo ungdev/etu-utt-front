@@ -1,11 +1,9 @@
-import { API, handleAPIResponse } from '@/api/api';
-import { StatusCodes } from 'http-status-codes';
+import { API } from '@/api/api';
 
-export async function unUpvoteComment(commentId: string): Promise<boolean> {
-  const res = await API.delete(`ue/comments/${commentId}/upvote`);
-  return (
-    handleAPIResponse(res, {
-      [StatusCodes.NO_CONTENT]: () => true,
-    }) ?? false
-  );
+export function unUpvoteComment(api: API, commentId: string) {
+  return api
+    .delete(`ue/comments/${commentId}/upvote`)
+    .on('success', () => true)
+    .on('error', () => false)
+    .on('failure', () => false);
 }

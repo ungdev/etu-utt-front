@@ -12,6 +12,7 @@ import { editComment } from '@/api/comment/editComment';
 import StarRating from '@/components/StarRating';
 import upvoteComment from '@/api/comment/upvote';
 import { unUpvoteComment } from '@/api/comment/unUpvote';
+import { useAPI } from '@/api/api';
 
 function CommentEditorFooter(comment: Comment, onUpdate: (text: string, anonymous: boolean) => void, t: TFunction) {
   return function CommentEditorFooter({ text, disable }: { text: string; disable: () => void }) {
@@ -43,6 +44,7 @@ function CommentFooter(
   updateComment: (updatedComment: Comment) => void,
 ) {
   return function CommentFooter() {
+    const api = useAPI();
     return (
       <div className={styles.commentFooter}>
         <div className={styles.upvotes}>
@@ -56,8 +58,8 @@ function CommentFooter(
                     // Upvote or un-upvote the comment. If it returns false, it means the request failed (for example, it was already upvoted / un-upvoted)
                     // If that's the case, we don't update the number of upvotes.
                     if (
-                      (!comment.upvoted && !(await upvoteComment(comment.id))) ||
-                      (comment.upvoted && !(await unUpvoteComment(comment.id)))
+                      (!comment.upvoted && !(await upvoteComment(api, comment.id).toPromise())) ||
+                      (comment.upvoted && !(await unUpvoteComment(api, comment.id).toPromise()))
                     ) {
                       return;
                     }
@@ -86,6 +88,7 @@ export default function Comments({ code }: { code: string }) {
   const { t } = useAppTranslation();
   const [comments, setComment] = useComments(code);
   const user = useConnectedUser()!;
+  const api = useAPI();
   if (comments === null) {
     return '';
   }
@@ -115,7 +118,7 @@ export default function Comments({ code }: { code: string }) {
             EditingFooter={CommentEditorFooter(
               comment,
               async (text, anonymous) => {
-                const updatedComment = await editComment(comment.id, text, anonymous);
+                const updatedComment = await editComment(api, comment.id, text, anonymous).toPromise();
                 if (!updatedComment) return;
                 setComment(i, updatedComment);
               },

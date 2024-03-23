@@ -1,5 +1,4 @@
-import { API, handleAPIResponse } from '@/api/api';
-import { StatusCodes } from 'http-status-codes';
+import { API } from '@/api/api';
 import { Comment } from '@/api/comment/comment.interface';
 
 export interface SendCommentRequestDto {
@@ -7,9 +6,6 @@ export interface SendCommentRequestDto {
   isAnonymous: boolean;
 }
 
-export default async function sendComment(ueCode: string, body: string, isAnonymous: boolean) {
-  const res = await API.post<SendCommentRequestDto, Comment>(`/ue/${ueCode}/comments`, { body, isAnonymous });
-  return handleAPIResponse(res, {
-    [StatusCodes.OK]: (data) => data,
-  });
+export default async function sendComment(api: API, ueCode: string, body: string, isAnonymous: boolean) {
+  return api.post<SendCommentRequestDto, Comment>(`/ue/${ueCode}/comments`, { body, isAnonymous });
 }

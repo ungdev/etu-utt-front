@@ -1,11 +1,9 @@
-import { API, handleAPIResponse } from '@/api/api';
-import { StatusCodes } from 'http-status-codes';
+import { API } from '@/api/api';
 
-export default async function upvoteComment(commentId: string): Promise<boolean> {
-  const res = await API.post(`ue/comments/${commentId}/upvote`);
-  return (
-    handleAPIResponse(res, {
-      [StatusCodes.NO_CONTENT]: () => true,
-    }) ?? false
-  );
+export default function upvoteComment(api: API, commentId: string) {
+  return api
+    .post(`ue/comments/${commentId}/upvote`)
+    .on('success', () => true)
+    .on('error', () => false)
+    .on('failure', () => false);
 }

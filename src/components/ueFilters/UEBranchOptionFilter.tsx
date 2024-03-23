@@ -18,7 +18,7 @@ export default function UEBranchOptionFilter<Branch extends BranchType>({
   branch: Branch;
 }) {
   const [branchOption, setBranchOption] = useState<(typeof branchOptions)[Branch][number] | 'all'>('all');
-  const {t} = useAppTranslation();
+  const { t } = useAppTranslation();
   useEffect(() => {
     onUpdate(branchOption === 'all' ? null : branchOption, branchOption === 'all' ? null : branchOption);
   }, [branchOption]);

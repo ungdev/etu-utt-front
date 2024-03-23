@@ -1,12 +1,10 @@
-import { API, handleAPIResponse } from '@/api/api';
+import { API } from '@/api/api';
 import { UERate } from '@/api/ueRate/ueRateCriterion.interface';
-import { StatusCodes } from 'http-status-codes';
 
-export default async function deleteUERate(ueCode: string, criterion: string): Promise<boolean> {
-  const res = await API.delete<UERate>(`ue/${ueCode}/rate/${criterion}`);
-  return (
-    handleAPIResponse(res, {
-      [StatusCodes.OK]: () => true,
-    }) ?? false
-  );
+export default function deleteUERate(api: API, ueCode: string, criterion: string) {
+  return api
+    .delete<UERate>(`ue/${ueCode}/rate/${criterion}`)
+    .on('success', () => true)
+    .on('error', () => false)
+    .on('failure', () => false);
 }

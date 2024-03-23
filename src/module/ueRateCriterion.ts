@@ -1,9 +1,9 @@
-import { type Action, createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import { AppDispatch } from '@/lib/store';
+import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import { useEffect } from 'react';
-import apiFetchUERateCriteria from '@/api/ueRate/fetchUERateCriteria';
+import fetchUERateCriteria from '@/api/ueRate/fetchUERateCriteria';
 import { UERateCriterion } from '@/api/ueRate/ueRateCriterion.interface';
+import { useAPI } from '@/api/api';
 
 interface UERateCriterionSlice {
   items: UERateCriterion[] | null;
@@ -21,17 +21,15 @@ export const ueRateCriterionSlice = createSlice({
 
 const { setCriteria } = ueRateCriterionSlice.actions;
 
-export const fetchUERateCriteria = () =>
-  (async (dispatch: AppDispatch) => {
-    dispatch(setCriteria(await apiFetchUERateCriteria()));
-  }) as unknown as Action;
-
 export function useUERateCriteria(): UERateCriterion[] | null {
   const ueRateCriteria = useAppSelector((state) => state.ueRateCriterion.items);
   const dispatch = useAppDispatch();
+  const api = useAPI();
   useEffect(() => {
     if (ueRateCriteria === null) {
-      dispatch(fetchUERateCriteria());
+      fetchUERateCriteria(api)
+        .toPromise()
+        .then((criteria) => criteria && dispatch(setCriteria(criteria)));
     }
   }, []);
   return ueRateCriteria;

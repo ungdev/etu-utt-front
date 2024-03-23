@@ -45,7 +45,7 @@ export function useAppTranslation() {
 }
 
 export interface TFunction {
-  //(key: string, params: Record<string, string>): string;
+  // (key: string, params: Record<string, string>): string;
   <T extends ParameteredTranslationKey>(key: T, params: Record<ParamsOfKey<T>, string>): string;
   <T extends NotParameteredTranslationKey>(key: T): string;
 }

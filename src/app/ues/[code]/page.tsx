@@ -16,6 +16,7 @@ import StarRating from '@/components/StarRating';
 import TextArea from '@/components/UI/TextArea';
 import { useState } from 'react';
 import sendComment from '@/api/comment/sendComment';
+import { useAPI } from '@/api/api';
 
 export default function UEDetailsPage() {
   const params = useParams<{ code: string }>();
@@ -25,12 +26,13 @@ export default function UEDetailsPage() {
   const criteria = useUERateCriteria();
   const [myRates, setMyRates] = useGetRate(params.code);
   const [writtingComment, setWrittingComment] = useState<string>('');
+  const api = useAPI();
   if (!ue || !criteria || (!myRates && logged)) {
     return false;
   }
 
   const onRate = async (criterionId: string, hasAlreadyRated: boolean, rate: number) => {
-    const newRate = await doUERate(params.code, criterionId as string, rate);
+    const newRate = await doUERate(api, params.code, criterionId as string, rate).toPromise();
     if (!newRate) return;
     if (hasAlreadyRated) {
       setMyRates(
@@ -45,7 +47,7 @@ export default function UEDetailsPage() {
   };
 
   const deleteRate = async (criterionId: string) => {
-    if (!(await deleteUERate(params.code, criterionId as string))) return;
+    if (!(await deleteUERate(api, params.code, criterionId as string).toPromise())) return;
     setMyRates(myRates!.filter((rate) => rate.criterionId !== criterionId));
     refreshUE();
   };
@@ -134,7 +136,7 @@ export default function UEDetailsPage() {
             <div className={styles.writeComment}>
               {t('ues:detailed.comments.write')}
               <TextArea value={writtingComment} onChange={setWrittingComment} />
-              <Button onClick={() => sendComment(ue.code, writtingComment, false)}>
+              <Button onClick={() => sendComment(api, ue.code, writtingComment, false)}>
                 {t('ues:detailed.comments.write.send')}
               </Button>
             </div>

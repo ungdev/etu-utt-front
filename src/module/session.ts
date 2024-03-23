@@ -1,11 +1,12 @@
 import { type Action, createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import { AppDispatch } from '@/lib/store';
-import { API, handleAPIResponse } from '@/api/api';
 import { LoginRequestDto, LoginResponseDto } from '@/api/auth/login';
 import { StatusCodes } from 'http-status-codes';
 import { RegisterRequestDto, RegisterResponseDto } from '@/api/auth/register';
 import { IsLoggedInResponseDto } from '@/api/auth/isLoggedIn';
-import { fetchUser } from '@/module/user';
+import { setUser } from '@/module/user';
+import { API } from '@/api/api';
+import { fetchProfile } from '@/api/profile/fetchProfile';
 
 interface SessionSlice {
   logged: boolean;
@@ -25,49 +26,42 @@ export const sessionSlice = createSlice({
 
 const { setToken } = sessionSlice.actions;
 
-export const login = (login: string, password: string) =>
-  (async (dispatch: AppDispatch) => {
-    const res = await API.post<LoginRequestDto, LoginResponseDto>('/auth/signin', { login, password });
-    handleAPIResponse(res, {
-      [StatusCodes.OK]: (body) => {
+export const login = (api: API, login: string, password: string) =>
+  ((dispatch: AppDispatch) =>
+    api
+      .post<LoginRequestDto, LoginResponseDto>('/auth/signin', { login, password })
+      .on('success', async (body) => {
         dispatch(setToken(body.access_token));
-        dispatch(fetchUser());
-      },
-      [StatusCodes.UNAUTHORIZED]: (body) => console.error('Wrong credentials', body),
-      [StatusCodes.BAD_REQUEST]: (body) => console.error('Bad request', body),
-    });
-  }) as unknown as Action;
+        dispatch(setUser((await fetchProfile(api).toPromise()) ?? null));
+      })
+      .on(StatusCodes.UNAUTHORIZED, (body) => console.error('Wrong credentials', body))
+      .on(StatusCodes.BAD_REQUEST, (body) => console.error('Bad request', body))) as unknown as Action;
 
-export const register = (lastName: string, firstName: string, login: string, password: string) =>
-  (async (dispatch: AppDispatch) => {
-    const res = await API.post<RegisterRequestDto, RegisterResponseDto>('/auth/signup', {
-      lastName,
-      firstName,
-      login,
-      password,
-      sex: 'OTHER',
-      role: 'STUDENT',
-      birthday: new Date(2003, 1, 28),
-    });
-    handleAPIResponse(res, {
-      [StatusCodes.CREATED]: (body) => dispatch(setToken(body.access_token)),
-    });
-  }) as unknown as Action;
+export const register = (api: API, lastName: string, firstName: string, login: string, password: string) =>
+  (async (dispatch: AppDispatch) =>
+    api
+      .post<RegisterRequestDto, RegisterResponseDto>('/auth/signup', {
+        lastName,
+        firstName,
+        login,
+        password,
+        sex: 'OTHER',
+        role: 'STUDENT',
+        birthday: new Date(2003, 1, 28),
+      })
+      .on('success', (body) => dispatch(setToken(body.access_token)))) as unknown as Action;
 
-export const autoLogin = () =>
+export const autoLogin = (api: API) =>
   (async (dispatch: AppDispatch) => {
     const token = localStorage.getItem('etuutt-token');
     if (!token) {
       return;
     }
-    const res = await API.get<IsLoggedInResponseDto>('/auth/signin');
-    handleAPIResponse(res, {
-      [StatusCodes.OK]: (body) => {
-        if (body.valid) {
-          dispatch(setToken(token));
-          dispatch(fetchUser());
-        }
-      },
+    api.get<IsLoggedInResponseDto>('/auth/signin').on('success', async (body) => {
+      if (body.valid) {
+        dispatch(setToken(token));
+        dispatch(setUser((await fetchProfile(api).toPromise()) ?? null));
+      }
     });
   }) as unknown as Action;
 

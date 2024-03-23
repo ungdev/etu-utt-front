@@ -12,6 +12,7 @@ import { useState } from 'react';
 import { useConnectedUser } from '@/module/user';
 import EditableText from '@/components/EditableText';
 import { editCommentReply } from '@/api/commentReply/editCommentReply';
+import { useAPI } from '@/api/api';
 
 function CommentEditorFooter(originalComment: string, onUpdate: (text: string) => void, t: TFunction) {
   return function CommentEditorFooter({ text, disable }: { text: string; disable: () => void }) {
@@ -36,6 +37,7 @@ export default function CommentDetails() {
   const [ue] = useUE(params.code);
   const [answer, setAnswer] = useState('');
   const user = useConnectedUser();
+  const api = useAPI();
   if (!comment || !ue || !user) {
     return;
   }
@@ -79,7 +81,7 @@ export default function CommentDetails() {
               EditingFooter={CommentEditorFooter(
                 answer.body,
                 async (body) => {
-                  const newAnswer = await editCommentReply(answer.id, body);
+                  const newAnswer = await editCommentReply(api, answer.id, body).toPromise();
                   if (!newAnswer) return false;
                   setComment({
                     ...comment,
@@ -105,11 +107,13 @@ export default function CommentDetails() {
         <Button
           className={styles.button}
           onClick={() =>
-            sendCommentReply(params.commentId, answer).then((answer) => {
-              if (answer === null) return;
-              setAnswer('');
-              setComment({ ...comment, answers: [...(comment?.answers ?? []), answer] });
-            })
+            sendCommentReply(api, params.commentId, answer)
+              .toPromise()
+              .then((answer) => {
+                if (!answer) return;
+                setAnswer('');
+                setComment({ ...comment, answers: [...(comment?.answers ?? []), answer] });
+              })
           }>
           {t('ues:detailed.comments.answers.answerButton')}
         </Button>

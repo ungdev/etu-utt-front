@@ -1,16 +1,12 @@
 import { UERate } from '@/api/ueRate/ueRateCriterion.interface';
-import { API, handleAPIResponse } from '@/api/api';
-import { StatusCodes } from 'http-status-codes';
+import { useAPI } from '@/api/api';
 import { useEffect, useState } from 'react';
 
-export default function useGetUERate(ueCode: string): [UERate[] | null, (newVal: UERate[]) => void] {
+export default function useUERate(ueCode: string): [UERate[] | null, (newVal: UERate[]) => void] {
   const [rates, setRates] = useState<UERate[] | null>(null);
+  const api = useAPI();
   useEffect(() => {
-    API.get<UERate[]>(`ue/${ueCode}/rate`).then((res) =>
-      handleAPIResponse(res, {
-        [StatusCodes.OK]: (body) => setRates(body),
-      }),
-    );
+    api.get<UERate[]>(`ue/${ueCode}/rate`).on('success', setRates);
   }, []);
   return [rates, setRates];
 }
