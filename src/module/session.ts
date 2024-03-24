@@ -16,7 +16,8 @@ export const sessionSlice = createSlice({
   reducers: {
     setToken: (state, action: PayloadAction<string>) => {
       localStorage.setItem('etuutt-token', action.payload);
-      return { ...state, token: action.payload, logged: !!action.payload };
+      state.token = action.payload;
+      state.logged = !!action.payload;
     },
   },
   initialState: { logged: false } as SessionSlice,

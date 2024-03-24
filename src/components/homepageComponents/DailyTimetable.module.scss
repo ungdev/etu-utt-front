@@ -1,0 +1,77 @@
+@import '@/variables';
+
+.dailyTimetable {
+  display: flex;
+  flex-direction: column;
+  width: 30%;
+
+  h2 {
+    text-align: center;
+  }
+
+  .chooseDay {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    white-space: nowrap;
+
+    button {
+      width: 1.5rem;
+      height: 1.5rem;
+    }
+  }
+
+  .timetable {
+    flex-grow: 1;
+    display: flex;
+    gap: 10px;
+
+    .hours {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 100%;
+      overflow-y: hidden; // The page would become scrollable for 1 pixel, probably due to a computing imprecision somewhere in the interpretation of the CSS.
+
+      > div {
+        flex-grow: 1;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+      }
+    }
+
+    .events {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 100%;
+      position: relative;
+      flex-grow: 1;
+      overflow-y: hidden; // The page would become scrollable for 1 pixel, probably due to a computing imprecision somewhere in the interpretation of the CSS.
+
+      .timeSeparator {
+        width: 100%;
+        flex-grow: 1;
+        position: relative;
+
+        &:after {
+          content: '';
+          position: absolute;
+          width: 100%;
+          height: 1px;
+          background-color: $ung-dark-grey;
+          top: calc(50% - 1px);
+          left: 0;
+        }
+      }
+
+      .event {
+        position: absolute;
+        background-color: red;
+        width: 100%;
+      }
+    }
+  }
+}

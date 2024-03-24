@@ -1,9 +1,9 @@
-import NavbarTest from '@/components/NavbarTest';
+import DailyTimetable from '@/components/homepageComponents/DailyTimetable';
 
 export default function HomePage() {
   return (
     <>
-      <NavbarTest />
+      <DailyTimetable />
     </>
   );
 }

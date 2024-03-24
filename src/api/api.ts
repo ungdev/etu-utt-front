@@ -1,27 +1,23 @@
-import { apiUrl } from '@/utils/environment';
+import { apiTimeout, apiUrl, apiVersion } from '@/utils/environment';
 
-export interface RequestDto {}
-export interface ResponseDto {}
-
-export enum ResponseError {
+enum ResponseError {
   'not_json',
   'timeout',
   'unknown',
 }
 
-export type APIResponse<ResponseType extends ResponseDto> =
+type APIResponse<ResponseType extends object> =
   | {
-      error: 'no_error';
       code: number;
       body: ResponseType;
     }
-  | { error: ResponseError };
+  | Record<'error', ResponseError>;
 
-export function handleAPIResponse<T extends ResponseDto>(
+export function handleAPIResponse<T extends object>(
   response: APIResponse<T>,
   handlers: { [status: number]: (body: T) => void } & Partial<{ [status in ResponseError]: () => void }>,
 ) {
-  if (response.error === 'no_error') {
+  if (!('error' in response)) {
     if (handlers[response.code]) {
       handlers[response.code](response.body);
     } else {
@@ -37,11 +33,11 @@ export function handleAPIResponse<T extends ResponseDto>(
 }
 
 // Send request to API and handle errors
-async function requestAPI<RequestType extends RequestDto, ResponseType extends ResponseDto>(
+async function requestAPI<RequestType extends object, ResponseType extends object>(
   method: string,
   route: string,
   body: RequestType | null = null,
-  timeoutMillis = 10000,
+  { timeoutMillis = apiTimeout, version = apiVersion }: { timeoutMillis?: number; version?: string } = {},
 ): Promise<APIResponse<ResponseType>> {
   // Generate headers
   const token = getAuthorizationToken();
@@ -58,7 +54,7 @@ async function requestAPI<RequestType extends RequestDto, ResponseType extends R
   try {
     // Make the request
     const response = await fetch(
-      `${apiUrl.slice(-1) === '/' ? apiUrl.slice(0, -1) : apiUrl}/${
+      `${apiUrl.slice(-1) === '/' ? apiUrl.slice(0, -1) : apiUrl}/${version}/${
         route.slice(0, 1) === '/' ? route.slice(1) : route
       }`,
       {
@@ -72,14 +68,22 @@ async function requestAPI<RequestType extends RequestDto, ResponseType extends R
 
     if (!response.headers.get('content-type')?.includes('application/json')) return { error: ResponseError.not_json };
 
-    return { error: 'no_error', code: response.status, body: (await response.json()) as ResponseType };
+    try {
+      const res: ResponseType = await response.json();
+      replaceStringByDate(res);
+      return { code: response.status, body: res as ResponseType };
+    } catch (error) {
+      // BROOO, who makes APIs that return headers with Content-Type: application/json without a json body :(
+      // (Ok, in theory none, but it's better to be safe than sorry)
+      return { error: ResponseError.not_json };
+    }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     if (error instanceof Error && error.name === 'AbortError') {
       console.error('Request timed out');
       return { error: ResponseError.timeout };
     }
-    if (error.message.startsWith('Network Error') || error.code === 'ECONNABORTED') {
+    if (error.message?.startsWith('Network Error') || error.code === 'ECONNABORTED') {
       console.error('Cannot connect to server');
     } else {
       console.error('An error occurred when making a request to the API');
@@ -97,16 +101,40 @@ const getAuthorizationToken = () => localStorage.getItem('etuutt-token');
 
 // Access the API through different HTTP methods
 export const API = {
-  get: <ResponseType extends ResponseDto>(route: string) => requestAPI<never, ResponseType>('GET', route),
+  get: <ResponseType extends object>(route: string, options: { version?: string } = {}) =>
+    requestAPI<never, ResponseType>('GET', route, null, options),
 
-  post: <RequestType extends RequestDto, ResponseType extends ResponseDto>(route: string, body: RequestType) =>
-    requestAPI<RequestType, ResponseType>('POST', route, body),
+  post: <RequestType extends object, ResponseType extends object>(
+    route: string,
+    body: RequestType,
+    options: { version?: string } = {},
+  ) => requestAPI<RequestType, ResponseType>('POST', route, body, options),
 
-  put: <RequestType extends RequestDto, ResponseType extends ResponseDto>(route: string, body: RequestType) =>
-    requestAPI<RequestType, ResponseType>('PUT', route, body),
+  put: <RequestType extends object, ResponseType extends object>(
+    route: string,
+    body: RequestType,
+    options: { version?: string } = {},
+  ) => requestAPI<RequestType, ResponseType>('PUT', route, body, options),
 
-  patch: <RequestType extends RequestDto, ResponseType extends ResponseDto>(route: string, body: RequestType) =>
-    requestAPI<RequestType, ResponseType>('PATCH', route, body),
+  patch: <RequestType extends object, ResponseType extends object>(
+    route: string,
+    body: RequestType,
+    options: { version?: string } = {},
+  ) => requestAPI<RequestType, ResponseType>('PATCH', route, body, options),
 
-  delete: <ResponseType extends ResponseDto>(route: string) => requestAPI<never, ResponseType>('DELETE', route),
+  delete: <ResponseType extends object>(route: string, options: { version?: string } = {}) =>
+    requestAPI<never, ResponseType>('DELETE', route, null, options),
 };
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function replaceStringByDate(obj: any) {
+  for (const [key, value] of Object.entries(obj)) {
+    if (typeof value === 'object') replaceStringByDate(value);
+    if (typeof value === 'string') {
+      const timestamp = Date.parse(value);
+      if (!isNaN(timestamp)) {
+        obj[key] = new Date(timestamp);
+      }
+    }
+  }
+}
