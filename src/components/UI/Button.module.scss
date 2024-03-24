@@ -1,13 +1,15 @@
 @import '@/variables';
 
 .button {
-  background-color: $ung-light-blue;
-  border-radius: 5px;
-  padding: 10px;
   border: none;
-  color: white;
-  font-size: 1.5rem;
-  transition: background-color 0.07s ease-out;
+  padding: 0;
+
+  &:not(.noStyle) {
+    background-color: $ung-light-blue;
+    border-radius: 5px;
+    padding: 10px;
+    color: white;
+  }
 
   &:hover {
     background-color: mix($ung-light-blue, black, 90%);

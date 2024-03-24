@@ -1,4 +1,4 @@
-import { apiUrl } from '@/utils/environment';
+import { apiTimeout, apiUrl, apiVersion } from '@/utils/environment';
 import { StatusCodes } from 'http-status-codes';
 
 /**
@@ -20,15 +20,19 @@ type APIResponse<ResponseType> =
       code: number;
       body: ResponseType;
     }
-  | { error: ResponseError };
+  | Record<'error', ResponseError>;
 
 /**
  * Dates do not exist in JSON, so the API does not return type Date, but instead string.
  * This type represents what the response should look like, except for Date being replaced by strings.
  */
-type RawResponseType<T> = {
-  [K in keyof T]: T[K] extends object ? RawResponseType<T[K]> : T[K] extends Date ? string : T[K];
-};
+type RawResponseType<T> = T extends Date
+  ? string
+  : T extends object
+  ? {
+      [K in keyof T]: T[K] extends object ? RawResponseType<T[K]> : T[K] extends Date ? string : T[K];
+    }
+  : T;
 
 /**
  * The response handler is a class that allows you to handle the response of a request to the API.
@@ -98,23 +102,18 @@ export class ResponseHandler<T, R = undefined> {
  * Format the JSON response to replace strings that are dates by actual Date objects.
  * @param rawResponse The raw response from the API.
  */
-function formatResponse<T>(rawResponse: RawResponseType<T> | T): T {
-  function internalFormatResponse<T extends object>(rawResponse: RawResponseType<T> | T): T {
-    const response: Partial<T> = {};
-    for (const [key, value] of Object.entries(rawResponse)) {
-      if (Array.isArray(value)) {
-        response[key] = value.map(internalFormatResponse) as T[keyof T];
-      } else if (typeof value === 'object' && value !== null) {
-        response[key] = internalFormatResponse(value as object) as T[keyof T];
-      } else if (typeof value === 'string' && !isNaN(Date.parse(value))) {
-        response[key] = new Date(value) as T[keyof T];
-      } else {
-        response[key] = value as T[keyof T];
-      }
-    }
-    return response as T;
+function formatResponse<T>(rawResponse: RawResponseType<T>): T {
+  if (typeof rawResponse === 'string' && !isNaN(Date.parse(rawResponse))) {
+    return new Date(rawResponse) as T;
+  } else if (Array.isArray(rawResponse)) {
+    return rawResponse.map(formatResponse) as T;
+  } else if (typeof rawResponse === 'object' && rawResponse !== null) {
+    return Object.fromEntries(
+      Object.entries(rawResponse).map(([key, value]) => [key, formatResponse(value as RawResponseType<typeof value>)]),
+    ) as T;
+  } else {
+    return rawResponse as T;
   }
-  return internalFormatResponse({ value: rawResponse }).value as T;
 }
 
 /**
@@ -123,12 +122,14 @@ function formatResponse<T>(rawResponse: RawResponseType<T> | T): T {
  * @param route The route to call.
  * @param body The body of the request.
  * @param timeoutMillis The timeout of the request.
+ * @param version The version of the API to use : v1, v2, ...
  */
 async function internalRequestAPI<RequestType, ResponseType>(
   method: string,
   route: string,
   body: RequestType | null,
   timeoutMillis: number,
+  version: string,
 ): Promise<APIResponse<ResponseType>> {
   // Generate headers
   const token = getAuthorizationToken();
@@ -145,7 +146,7 @@ async function internalRequestAPI<RequestType, ResponseType>(
   try {
     // Make the request
     const response = await fetch(
-      `${apiUrl.slice(-1) === '/' ? apiUrl.slice(0, -1) : apiUrl}/${
+      `${apiUrl.slice(-1) === '/' ? apiUrl.slice(0, -1) : apiUrl}/${version}/${
         route.slice(0, 1) === '/' ? route.slice(1) : route
       }`,
       {
@@ -161,16 +162,22 @@ async function internalRequestAPI<RequestType, ResponseType>(
       return { code: response.status, body: null as ResponseType };
     }
     if (!response.headers.get('content-type')?.includes('application/json')) return { error: ResponseError.not_json };
-    const rawResponse: RawResponseType<ResponseType> = await response.json();
 
-    return { code: response.status, body: formatResponse(rawResponse) };
+    try {
+      const res: RawResponseType<ResponseType> = await response.json();
+      return { code: response.status, body: formatResponse(res) as ResponseType };
+    } catch (error) {
+      // BROOO, who makes APIs that return headers with Content-Type: application/json without a json body :(
+      // (Ok, in theory none, but it's better to be safe than sorry)
+      return { error: ResponseError.not_json };
+    }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     if (error instanceof Error && error.name === 'AbortError') {
       console.error('Request timed out');
       return { error: ResponseError.timeout };
     }
-    if (error.message.startsWith('Network Error') || error.code === 'ECONNABORTED') {
+    if (error.message?.startsWith('Network Error') || error.code === 'ECONNABORTED') {
       console.error('Cannot connect to server');
     } else {
       console.error('An error occurred when making a request to the API');
@@ -189,14 +196,15 @@ async function internalRequestAPI<RequestType, ResponseType>(
  * @param route The route to call.
  * @param body The body of the request. Defaults to `null`.
  * @param timeoutMillis The timeout of the request, in milliseconds. Defaults to 10000 milliseconds (10 seconds).
+ * @param version The version of the API to use : v1, v2, ... Defaults to the environment variable `NEXT_PUBLIC_API_VERSION`.
  */
 function requestAPI<RequestType, ResponseType>(
   method: string,
   route: string,
   body: RequestType | null = null,
-  timeoutMillis = 10000,
+  { timeoutMillis = apiTimeout, version = apiVersion }: { timeoutMillis?: number; version?: string } = {},
 ): ResponseHandler<ResponseType> {
-  return new ResponseHandler(internalRequestAPI(method, route, body, timeoutMillis));
+  return new ResponseHandler(internalRequestAPI(method, route, body, timeoutMillis, version));
 }
 
 // Set the authorization header with the given token for next requests
@@ -209,15 +217,25 @@ const getAuthorizationToken = () => localStorage.getItem('etuutt-token');
 // TODO : wellll, implement that page settings thingy once it's merged.
 export function useAPI() {
   return {
-    get: <ResponseType = never>(route: string) => applyDefaultHandler(requestAPI<never, ResponseType>('GET', route)),
-    post: <RequestType, ResponseType = never>(route: string, body = {} as RequestType) =>
-      applyDefaultHandler(requestAPI<RequestType, ResponseType>('POST', route, body)),
-    put: <RequestType, ResponseType = never>(route: string, body = {} as RequestType) =>
-      applyDefaultHandler(requestAPI<RequestType, ResponseType>('PUT', route, body)),
-    patch: <RequestType, ResponseType = never>(route: string, body = {} as RequestType) =>
-      applyDefaultHandler(requestAPI<RequestType, ResponseType>('PATCH', route, body)),
-    delete: <ResponseType = never>(route: string) =>
-      applyDefaultHandler(requestAPI<never, ResponseType>('DELETE', route)),
+    get: <ResponseType = never>(route: string, options: { version?: string } = {}) =>
+      applyDefaultHandler(requestAPI<never, ResponseType>('GET', route, null, options)),
+    post: <RequestType, ResponseType = never>(
+      route: string,
+      body = {} as RequestType,
+      options: { version?: string } = {},
+    ) => applyDefaultHandler(requestAPI<RequestType, ResponseType>('POST', route, body, options)),
+    put: <RequestType, ResponseType = never>(
+      route: string,
+      body = {} as RequestType,
+      options: { version?: string } = {},
+    ) => applyDefaultHandler(requestAPI<RequestType, ResponseType>('PUT', route, body, options)),
+    patch: <RequestType, ResponseType = never>(
+      route: string,
+      body = {} as RequestType,
+      options: { version?: string } = {},
+    ) => applyDefaultHandler(requestAPI<RequestType, ResponseType>('PATCH', route, body, options)),
+    delete: <ResponseType = never>(route: string, options: { version?: string } = {}) =>
+      applyDefaultHandler(requestAPI<never, ResponseType>('DELETE', route, null, options)),
   };
 }
 

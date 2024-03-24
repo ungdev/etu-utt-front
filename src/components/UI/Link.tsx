@@ -14,7 +14,7 @@ export default function Link({
 }) {
   return (
     <ReactLink href={href} className={`${styles.link} ${className}`}>
-      {children}
+      <span>{children}</span>
     </ReactLink>
   );
 }

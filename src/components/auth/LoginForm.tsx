@@ -1,13 +1,13 @@
 'use client';
 
-import styles from './LoginForm.module.scss';
+import styles from './AuthForm.module.scss';
 import { useState } from 'react';
 import * as sessionModule from '@/module/session';
 import { useAppDispatch } from '@/lib/hooks';
 import Input from '@/components/UI/Input';
 import Button from '@/components/UI/Button';
 import Link from '@/components/UI/Link';
-import ung from '@/../public/images/ung-logo.png';
+import ung from '@/../public/images/ung-logo.svg';
 import { useAPI } from '@/api/api';
 
 export default function LoginForm() {
@@ -18,7 +18,7 @@ export default function LoginForm() {
   const submit = () => dispatch(sessionModule.login(api, username, password));
 
   return (
-    <div className={styles.loginForm}>
+    <div className={styles.authForm}>
       <img alt="Logo UNG" src={ung.src} className={styles.logo} />
       <div className={styles.title}>
         CONNEX<span className={styles.bluePart}>ION</span>
@@ -31,10 +31,10 @@ export default function LoginForm() {
         placeholder="Mot de passe"
         type="password"
       />
-      <Link href={'/register'} className={styles.registerLink}>
+      <Link href={'/register'} className={styles.link}>
         Pas encore de compte ? Inscrivez-vous !
       </Link>
-      <Button onClick={submit} className={styles.connectButton}>
+      <Button onClick={submit} className={styles.button}>
         Se connecter
       </Button>
     </div>

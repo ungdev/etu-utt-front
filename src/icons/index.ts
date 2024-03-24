@@ -7,15 +7,19 @@ import User from '@/icons/User';
 import Users from '@/icons/Users';
 import Star from '@/icons/Star';
 import Trash from '@/icons/Trash';
+import LeftArrow from '@/icons/LeftArrow';
+import RightArrow from '@/icons/RightArrow';
 
 const Icons = {
   Book,
   Caret,
   Collapse,
   Home,
+  LeftArrow,
   Menu,
   Star,
   Trash,
+  RightArrow,
   User,
   Users,
 };
