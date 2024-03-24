@@ -7,4 +7,5 @@ next-env.d.ts
 # IDEs
 .idea/
 
-.env
+.env.prod
+.env.dev
