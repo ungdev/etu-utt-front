@@ -227,7 +227,7 @@ export default function WidgetRenderer({
           <Widget />
           {modifyingLayout && (
             <div className={styles.removeButton} ref={removeButtonRef}>
-              <Button onClick={remove} raw={true}>
+              <Button onClick={remove} noStyle={true}>
                 <Menu />
               </Button>
             </div>

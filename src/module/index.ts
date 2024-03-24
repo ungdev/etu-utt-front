@@ -6,4 +6,4 @@ import pageSettings from './pageSettings';
 import parking from './parking';
 import ueRateCriterion from '@/module/ueRateCriterion';
 
-export default combineReducers({ user, navbar, session, pageSettings, parking, unRateCriterion });
+export default combineReducers({ user, navbar, session, pageSettings, parking, ueRateCriterion });
