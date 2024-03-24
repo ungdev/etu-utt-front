@@ -8,9 +8,11 @@ import Input from '@/components/UI/Input';
 import Link from '@/components/UI/Link';
 import Button from '@/components/UI/Button';
 import * as sessionModule from '@/module/session';
+import { useAPI } from '@/api/api';
 
 export default function RegisterForm() {
   const dispatch = useAppDispatch();
+  const api = useAPI();
   const [lastname, setLastname] = useState('');
   const [firstname, setFirstname] = useState('');
   const [username, setUsername] = useState('');
@@ -18,7 +20,7 @@ export default function RegisterForm() {
   const [passwordConfirmation, setPasswordConfirmation] = useState('');
   const submit = () => {
     if (password === passwordConfirmation && password)
-      dispatch(sessionModule.register(lastname, firstname, username, password));
+      dispatch(sessionModule.register(api, lastname, firstname, username, password));
   };
 
   return (

@@ -7,13 +7,15 @@ import { useAppDispatch } from '@/lib/hooks';
 import Input from '@/components/UI/Input';
 import Button from '@/components/UI/Button';
 import Link from '@/components/UI/Link';
-import ung from '../../../public/images/ung-logo.svg';
+import ung from '@/../public/images/ung-logo.svg';
+import { useAPI } from '@/api/api';
 
 export default function LoginForm() {
   const dispatch = useAppDispatch();
+  const api = useAPI();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const submit = () => dispatch(sessionModule.login(username, password));
+  const submit = () => dispatch(sessionModule.login(api, username, password));
 
   return (
     <div className={styles.authForm}>

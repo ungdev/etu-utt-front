@@ -2,8 +2,7 @@
 import styles from './DailyTimetable.module.scss';
 import { useEffect, useState } from 'react';
 import { GetDailyTimetableResponseDto, TimetableEvent } from '@/api/users/getDailyTimetable';
-import { API, handleAPIResponse } from '@/api/api';
-import { StatusCodes } from 'http-status-codes';
+import { useAPI } from '@/api/api';
 import { format } from 'date-fns';
 import * as locale from 'date-fns/locale';
 import Icons from '@/icons';
@@ -19,6 +18,7 @@ export default function DailyTimetable() {
   const [timetable, setTimetable] = useState([] as TimetableEvent[]);
   const [selectedDate, setSelectedDate] = useState(new Date(0));
   const [columnsCount, setColumnsCount] = useState(0);
+  const api = useAPI();
 
   useEffect(() => {
     const now = new Date();
@@ -34,17 +34,15 @@ export default function DailyTimetable() {
    */
   useEffect(() => {
     if (selectedDate.getTime() === 0) return;
-    API.get<GetDailyTimetableResponseDto>(
-      `/timetable/current/daily/${selectedDate.getDate()}/${selectedDate.getMonth() + 1}/${selectedDate.getFullYear()}`,
-    ).then((res) =>
-      handleAPIResponse(res, {
-        [StatusCodes.OK]: (body) => {
-          const columnsCount = formatTimetable(body);
-          setTimetable(body);
-          setColumnsCount(columnsCount);
-        },
-      }),
-    );
+    api
+      .get<GetDailyTimetableResponseDto>(
+        `/timetable/current/daily/${selectedDate.getDate()}/${selectedDate.getMonth() + 1}/${selectedDate.getFullYear()}`,
+      )
+      .on('success', (body) => {
+        const columnsCount = formatTimetable(body);
+        setTimetable(body);
+        setColumnsCount(columnsCount);
+      });
   }, [selectedDate]);
 
   /**
