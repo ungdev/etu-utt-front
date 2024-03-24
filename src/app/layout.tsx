@@ -1,3 +1,4 @@
+import styles from './layout.module.scss';
 import '@/global.scss';
 import Providers from '@/lib/Providers';
 import React, { ReactNode } from 'react';

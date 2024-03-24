@@ -5,15 +5,17 @@ export default function Button({
   children = false,
   onClick = () => {},
   className = '',
-  raw = false,
+  disabled = false,
+  noStyle = false,
 }: {
   children?: ReactNode;
   onClick?: () => void;
   className?: string;
-  raw?: boolean;
+  disabled?: boolean;
+  noStyle?: boolean;
 }) {
   return (
-    <button onClick={onClick} className={`${styles.button} ${className} ${raw ? styles.raw : ''}`}>
+    <button onClick={onClick} className={`${styles.button} ${className} ${noStyle ? styles.noStyle : ''}`} disabled={disabled}>
       {children}
     </button>
   );

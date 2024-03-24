@@ -1,16 +1,18 @@
 'use client';
 
-import styles from './RegisterForm.module.scss';
+import styles from './AuthForm.module.scss';
 import { useState } from 'react';
 import { useAppDispatch } from '@/lib/hooks';
-import ung from '../../../public/images/ung-logo.png';
+import ung from '../../../public/images/ung-logo.svg';
 import Input from '@/components/UI/Input';
 import Link from '@/components/UI/Link';
 import Button from '@/components/UI/Button';
 import * as sessionModule from '@/module/session';
+import { useAPI } from '@/api/api';
 
 export default function RegisterForm() {
   const dispatch = useAppDispatch();
+  const api = useAPI();
   const [lastname, setLastname] = useState('');
   const [firstname, setFirstname] = useState('');
   const [username, setUsername] = useState('');
@@ -18,11 +20,11 @@ export default function RegisterForm() {
   const [passwordConfirmation, setPasswordConfirmation] = useState('');
   const submit = () => {
     if (password === passwordConfirmation && password)
-      dispatch(sessionModule.register(lastname, firstname, username, password));
+      dispatch(sessionModule.register(api, lastname, firstname, username, password));
   };
 
   return (
-    <div className={styles.registerForm}>
+    <div className={styles.authForm}>
       <img alt="Logo UNG" src={ung.src} className={styles.logo} />
       <div className={styles.title}>
         INSCRIPT<span className={styles.bluePart}>ION</span>
@@ -38,10 +40,10 @@ export default function RegisterForm() {
         placeholder="Confirmation de mot de passe"
         type="password"
       />
-      <Link href={'/login'} className={styles.registerLink}>
+      <Link href={'/login'} className={styles.link}>
         Vous avez déjà un compte ? Connectez-vous !
       </Link>
-      <Button onClick={submit} className={styles.registerButton}>
+      <Button onClick={submit} className={styles.button}>
         Créer un compte
       </Button>
     </div>
