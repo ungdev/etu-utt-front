@@ -1,6 +1,11 @@
 @import '@/variables';
 
 .link {
+  text-decoration: none;
+  color: unset;
+}
+
+.link:not(.noStyle) {
   color: $ung-light-blue;
   text-decoration: none;
 
