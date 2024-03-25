@@ -1,5 +1,5 @@
 import styles from './FilteredSearch.module.scss';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Trash from '@/icons/Trash';
 import { NotParameteredTranslationKey, TranslationKey, useAppTranslation } from '@/lib/i18n';
 
@@ -132,6 +132,18 @@ export default function FilteredSearch<
       }
     }, 1000);
   }, [filters]);
+
+  const deleteDependentFilters = (filterName: FilterNames) => {
+    filters
+      .filter((filter) =>
+        ({ dependsOn: [], ...filtersData[filter.filter] }).dependsOn.some((dependsOn) => dependsOn === filterName),
+      )
+      .map((filter) => deleteFilter(filter.filter));
+  };
+
+  const addFilter = (name: FilterNames) => {
+    setFilters([...filters, { filter: name, value: null, search: null }]);
+  };
   const updateFilter = <T extends FilterNames>(
     filterIndex: number,
     value: FiltersType[T]['value'] | null,
@@ -141,23 +153,23 @@ export default function FilteredSearch<
     newFilters[filterIndex].value = value;
     newFilters[filterIndex].search = newUrlPart;
     setFilters(newFilters);
+    if (value === null) {
+      deleteDependentFilters(newFilters[filterIndex].filter);
+    }
   };
-  const addFilter = (name: FilterNames) => {
-    setFilters([...filters, { filter: name, value: null, search: null }]);
+  const deleteFilter = (filterName: FilterNames) => {
+    deleteDependentFilters(filterName);
+    setFilters((filters) => {
+      return filters.filter((filter) => filter.filter !== filterName);
+    });
   };
-  const deleteFilter = (index: number) => {
-    const newFilters = filters.toSpliced(index, 1).filter(
-      (filter) =>
-        !{
-          dependsOn: [],
-          ...filtersData[filter.filter],
-        }.dependsOn.some((dependency) => dependency === filters[index].filter),
-    );
-    setFilters(newFilters);
-  };
-  const hasFilter = (filter: FilterNames) => filters.some((usedFilter) => usedFilter.filter === filter);
+
+  const hasFilter = (filter: FilterNames, acceptNull: boolean) =>
+    filters.some((usedFilter) => usedFilter.filter === filter && (usedFilter.value !== null || acceptNull));
+
   const addableFilters = Object.keys(filtersData).filter(
-    (filter) => !hasFilter(filter) && { dependsOn: [], ...filtersData[filter] }.dependsOn.every(hasFilter),
+    (filter) =>
+      !hasFilter(filter, true) && { dependsOn: [], ...filtersData[filter] }.dependsOn.every((f) => hasFilter(f, false)),
   ) as Exclude<FilterNames, DefaultFilterName>[];
 
   return (
@@ -181,7 +193,7 @@ export default function FilteredSearch<
                 </td>
                 <td>
                   {i !== 0 && (
-                    <button onClick={() => deleteFilter(i)}>
+                    <button onClick={() => deleteFilter(filter.filter)}>
                       <Trash className={styles.trash} />
                     </button>
                   )}

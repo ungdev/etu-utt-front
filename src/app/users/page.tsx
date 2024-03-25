@@ -1,9 +1,10 @@
 'use client';
 
-import FilteredSearch, { FiltersDataType, GenericFiltersType } from '@/components/FilteredSearch';
-import { createInputFilter } from '@/components/searchFilters/InputFilter';
+import FilteredSearch, { FiltersDataType, GenericFiltersType } from '@/components/filteredSearch/FilteredSearch';
+import { createInputFilter } from '@/components/filteredSearch/InputFilter';
 import Icons from '@/icons';
 import { useUsers } from '@/api/users/searchUsers.hook';
+import { useEffect, useState } from 'react';
 
 type FilterNames = 'name' | 'firstName' | 'lastName' | 'nickname';
 

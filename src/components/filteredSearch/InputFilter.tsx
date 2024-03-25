@@ -2,7 +2,7 @@ import styles from './InputFilter.module.scss';
 import { useEffect, useState } from 'react';
 import Input from '@/components/UI/Input';
 import { NotParameteredTranslationKey, useAppTranslation } from '@/lib/i18n';
-import { BaseFilterProps } from '@/components/FilteredSearch';
+import { BaseFilterProps } from '@/components/filteredSearch/FilteredSearch';
 
 export function InputFilter({
   onUpdate,
