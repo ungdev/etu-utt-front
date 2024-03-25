@@ -1,5 +1,5 @@
-import styles from './WaitWTF.module.scss';
-import { ReactElement, useEffect, useState } from 'react';
+import styles from './FilteredSearch.module.scss';
+import { useEffect, useState } from 'react';
 import Trash from '@/icons/Trash';
 import { NotParameteredTranslationKey, TranslationKey, useAppTranslation } from '@/lib/i18n';
 
@@ -10,23 +10,23 @@ import { NotParameteredTranslationKey, TranslationKey, useAppTranslation } from 
  */
 type FilterComponent<
   FilterNames extends string,
-  FiltersType extends FiltersTypeLayout<FilterNames>,
-  FilterType extends FilterNames,
-> = (
-  props: {
-    onUpdate: (value: FiltersType[FilterType]['value'] | null, newUrlPart: string | null) => void;
-  } & DependencyProps<FilterNames, FiltersType, FilterType>,
-) => ReactElement;
+  FiltersType extends GenericFiltersType<FilterNames>,
+  FilterName extends FilterNames,
+> = React.FC<BaseFilterProps<FiltersType[FilterName]['value']> & DependencyProps<FilterNames, FiltersType, FilterName>>;
 
 /**
  * The props that a filter component must take when it has dependencies.
  */
 type DependencyProps<
   FilterNames extends string,
-  FiltersType extends FiltersTypeLayout<FilterNames>,
-  FilterType extends FilterNames,
+  FiltersType extends GenericFiltersType<FilterNames>,
+  FilterName extends FilterNames,
 > = {
-  [K in FiltersType[FilterType]['dependsOn'][number]]: FiltersType[K]['value'];
+  [K in FiltersType[FilterName]['dependsOn'][number]]: FiltersType[K]['value'];
+};
+
+export type BaseFilterProps<Value extends string> = {
+  onUpdate: (value: Value | null, newUrlPart: string | null) => void;
 };
 
 /**
@@ -38,7 +38,7 @@ type DependencyProps<
  */
 type Filter<
   FilterNames extends string,
-  FiltersType extends FiltersTypeLayout<FilterNames>,
+  FiltersType extends GenericFiltersType<FilterNames>,
   FilterType extends FilterNames,
   DefaultFilterName extends FilterNames,
 > = {
@@ -58,13 +58,13 @@ type Filter<
 /**
  * A type that will be implemented by the interface representing the different filters that exist.
  */
-export type FiltersTypeLayout<FilterNames extends string> = {
+export type GenericFiltersType<FilterNames extends string> = {
   [K in FilterNames]: { dependsOn: FilterNames[]; value: string };
 };
 
 export type FiltersDataType<
   FilterNames extends string,
-  FiltersType extends FiltersTypeLayout<FilterNames>,
+  FiltersType extends GenericFiltersType<FilterNames>,
   DefaultFilterName extends FilterNames,
 > = {
   [FilterName in FilterNames]: Filter<FilterNames, FiltersType, FilterName, DefaultFilterName>;
@@ -76,7 +76,7 @@ export type FiltersDataType<
  */
 type FilterInstance<
   FilterNames extends string,
-  FiltersType extends FiltersTypeLayout<FilterNames>,
+  FiltersType extends GenericFiltersType<FilterNames>,
   T extends FilterNames = FilterNames,
 > = {
   filter: FilterNames;
@@ -89,7 +89,7 @@ type FilterInstance<
  */
 type NonNullFilterInstance<
   FilterNames extends string,
-  FiltersType extends FiltersTypeLayout<FilterNames>,
+  FiltersType extends GenericFiltersType<FilterNames>,
   T extends FilterNames = FilterNames,
 > = {
   [K in keyof FilterInstance<FilterNames, FiltersType, T>]: Exclude<
@@ -98,9 +98,9 @@ type NonNullFilterInstance<
   >;
 };
 
-export default function WaitWTF<
+export default function FilteredSearch<
   FilterNames extends string,
-  FiltersType extends FiltersTypeLayout<FilterNames>,
+  FiltersType extends GenericFiltersType<FilterNames>,
   DefaultFilterName extends FilterNames,
 >({
   filtersData,
