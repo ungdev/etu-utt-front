@@ -1,248 +1,120 @@
 @import '@/variables.scss';
 
-.navbar {
-  display: flex; 
-  flex-direction: column; 
-  justify-content: space-between; 
-  align-items: center;
-  width: clamp(250px, 20%, 350px); 
-  height: 100vh; 
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+$white: #ffffff;
+$navigation-background-color: #030303;
+$navigation-link-color: #9e9fa4;
+$navigation-link-hover-background-color: #313239;
+$navigation-item-height: 45px;
+$navigation-item-border-radius: 5px;
+$navigation-item-tooltip-color: #6b6b6b;
+
+// -------------- NAVIGATION
+
+.navigation {
   background-color: $ung-dark-grey;
-
-  .navItems {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
-    gap: 1rem;
-    position: relative;
-    padding-left: 1.25rem;
-    padding-right: 1.25rem; 
-
-    .indicator {
-      position: absolute; 
-      top: 0; 
-      right: 0; 
-      left: 5%;
-      border-radius: 0.5rem; 
-      width: 90%;
-      height: 2.5rem; 
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      background-color: $ung-light-blue;
-      padding-left: 1rem;
-      padding-right: 1rem;
-    }
-
-    .logo {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      width: 100%;
-      height: 3rem;
-
-      svg {
-        width: 3rem; 
-        color: white; 
-      }
-
-      .tohide {
-       opacity: 1;
-       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      }
-    }  
-
-    .item {
-      width: 100%; 
-      height: 2.5rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      z-index: 10;
+  color: $white;
+  height: 100vh;
+  width: clamp(300px, 30%, 400px);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
   
-      svg {
-        width: 2rem;
-        height: 2rem;
-        color: white;
-      }
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
 
-      p {
-        opacity: 1;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        color: white;  
+  .logout {
+    margin-top: auto;
+  }
+}
+
+// -------------- NAVIGATION LOGO
+
+.navigationLogo {
+  color: $white;
+  text-decoration: none;
+  font-size: 24px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  margin: 8px;
+  margin-bottom: 30px;
+
+  >svg {
+    margin-right: 8px;
+    min-width: 32px;
+  }
+}
+
+// -------------- NAVIGATION LINK
+
+.navigationLink {
+  display: block;
+  color: $navigation-link-color;
+  display: flex;
+  align-items: center;
+  padding: 0 0.5rem;
+  margin: 0.5rem 0;
+  height: $navigation-item-height;
+  line-height: $navigation-item-height;
+  border-radius: $navigation-item-border-radius;
+  text-decoration: none;
+  transition: all 0.2s ease-out;
+  white-space: nowrap;
+  $this: &;
+
+  >svg {
+    min-width: 32px;
+  }
+
+  >span {
+    margin-left: 12px;
+
+    // Collapsed state tooltip
+
+    [class$="__collapsed"] & {
+      padding: 0.5em;
+      line-height: 1;
+      border-radius: ceil($navigation-item-border-radius / 2);
+      color: $navigation-item-tooltip-color;
+      transition: transform 0.2s ease-out;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+        0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      pointer-events: none;
+      position: absolute;
+      left: 48px;
+
+      &::before {
+        width: 0;
+        height: 0;
+        border-top: 5px solid transparent;
+        border-right: 7px solid $white;
+        border-bottom: 5px solid transparent;
+        left: -7px;
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
       }
     }
   }
-  
-  &.collapsed {
-    width: 3rem;
-    
-    .logo {
-      width: 2rem;
 
-      .tohide {
-        opacity: 0;
-        width: 0;
-      }
-    }
-    .item {
-      p {
-        opacity: 0;
+  &:hover {
+    background-color: $ung-light-grey;
+    color: $white;
+
+    [class$="__collapsed"] & #{$this}__name {
+      position: absolute;
+      opacity: 1 !important;
+      font-size: 0.875rem;
+      transform: translateX(4px);
+      background: $white;
+      left: 60px;
+
+      &::before {
+        content: "";
       }
     }
   }
 }
-
-// .navbar {
-//   display: flex;
-//   flex-flow: column nowrap;
-//   height: 100vh;
-//   background-color: $ung-dark-grey;
-//   width: 30%;
-//   max-width: 350px;
-//   overflow-x: hidden;
-//   font-size: 1.5rem;
-//   color: white;
-//   border-right: 8px solid $ung-light-blue;
-//   transition: max-width 0.2s ease-in-out;
-
-//   .collapseIcon {
-//     display: block;
-//     height: 2rem;
-//     width: 2rem;
-//     position: relative;
-//     padding: 11px 11px 10px;
-//     cursor: pointer;
-//     color: $ung-light-blue;
-
-//     svg {
-//       display: inline-block;
-//       height: 100%;
-//     }
-//   }
-
-//   .menuing {
-//     position: relative;
-//     flex: 1 0 auto;
-//     display: flex;
-//     flex-flow: column wrap;
-//     justify-content: center;
-//     align-items: flex-start;
-
-//     .button {
-//       display: flex;
-//       flex-flow: column nowrap;
-//       width: 100%;
-
-//       &.link {
-//         color: white;
-//         text-decoration: none;
-//       }
-
-//       &.category {
-//         transition: all 0.25s ease-in-out;
-//         overflow: hidden;
-//         position: relative;
-//         justify-content: flex-start;
-
-//         &.containerOpen .buttonContent svg {
-//           transform: rotate(90deg);
-//         }
-
-//         &.containerClose {
-//           max-height: calc(2rem + 20px) !important;
-//         }
-//       }
-
-//       .buttonContent {
-//         display: flex;
-//         flex-flow: row nowrap;
-//         overflow-x: hidden;
-//         text-overflow: ellipsis;
-//         white-space: nowrap;
-//         align-items: center;
-//         gap: 10px;
-//         flex: 1 0 auto;
-//         padding: 10px 15px;
-//         box-sizing: border-box;
-//         cursor: pointer;
-
-//         svg {
-//           flex: 0 0 auto;
-//           height: 1.5rem;
-//           transition: transform 0.25s ease-in-out;
-//         }
-//         .name {
-//           text-transform: uppercase;
-//         }
-//       }
-
-//       .indent-0 {
-//         padding-left: 15px;
-//       }
-//       @for $i from 1 through 8 {
-//         .indent-#{$i} {
-//           padding-left: calc($i * 1.5rem + 30px);
-//         }
-//       }
-//     }
-
-//     .separator {
-//       margin: 25px 0;
-//       background-color: $ung-light-blue;
-//       width: 80%;
-//       align-self: center;
-//       box-sizing: border-box;
-//       height: 3px;
-
-//       & ~ .button .name {
-//         text-transform: unset;
-//       }
-//     }
-//   }
-
-//   .profile {
-//     flex: 0 0 auto;
-//     display: flex;
-//     flex-flow: row nowrap;
-//     align-items: center;
-//     gap: 10px;
-//     padding: 15px;
-//     transition: padding 0.15s ease-in-out;
-
-//     .roundIcon {
-//       flex: 0 0 auto;
-//       width: 2.5rem;
-//       height: 2.5rem;
-//       overflow: hidden;
-//       border-radius: 1.25rem;
-//       background-color: $ung-light-grey;
-//     }
-
-//     .name {
-//       display: block;
-//       overflow: hidden;
-//       white-space: nowrap;
-//     }
-//   }
-
-//   &.collapsed {
-//     max-width: calc(1.5rem + 30px);
-
-//     .collapseIcon {
-//       color: white;
-//     }
-
-//     .name,
-//     .separator,
-//     .separator ~ .button {
-//       display: none;
-//     }
-
-//     .profile {
-//       padding: 8px 6px 10px;
-//     }
-//   }
-// }

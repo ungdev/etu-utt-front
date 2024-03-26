@@ -2,12 +2,9 @@
 
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import styles from './Navbar.module.scss';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { getMenu, setCollapsed } from '@/module/navbar';
 import Link from 'next/link';
-import User from '@/icons/User';
-import Menu from '@/icons/Menu';
-import Collapse from '@/icons/Collapse';
 import { type NotParameteredTranslationKey } from '@/lib/i18n';
 import { useAppTranslation } from '@/lib/i18n';
 
@@ -20,8 +17,8 @@ type MenuItemProperties<Translate extends boolean> = {
   name: Translate extends true
     ? NotParameteredTranslationKey
     : Translate extends false
-    ? string
-    : NotParameteredTranslationKey | string;
+      ? string
+      : NotParameteredTranslationKey | string;
   path: `/${string}`;
   submenus: MenuItem<false>[];
   translate: Translate;
@@ -120,31 +117,119 @@ export default function Navbar() {
   };
 
   return (
-    <nav className={`${styles.navbar}  ${menuItems.collapsed ? styles.collapsed : ''}`}>
-      <a className={`${styles.logo}`} onClick={toggleCollapsed}>
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 270.93 270.93"><path fill="currentColor" d="M135.467 15.236s-7.123 28.86-13.624 47.366-13.081 32.011-19.664 39.949c5.473 9.804 9.79 18.927 12.452 27.309 6.851 21.57 5.23 44.074 4.139 59.387-1.133 15.902-6.4 33.644-11.027 47.806 11.416 6.082 27.724 18.655 27.724 18.655s18.007-13.359 27.727-18.655c-4.627-14.162-9.894-31.904-11.027-47.806-1.091-15.314-2.712-37.817 4.139-59.387 2.662-8.381 6.978-17.505 12.452-27.309-6.583-7.938-13.162-21.443-19.664-39.949-5.33-15.547-13.628-47.366-13.628-47.366zm-35.434 217.031s10.291-25.126 11.093-52.526c.822-28.115-3.767-43.064-3.767-43.064s-10.168 21.396-32.806 32.837c-22.7 11.471-45.041 4.152-45.041 4.152s6.662 23.26 39.641 30.714c30.83 6.968 30.879 27.889 30.879 27.889zm70.87 0s-10.291-25.126-11.093-52.526c-.822-28.115 3.767-43.064 3.767-43.064s10.168 21.396 32.806 32.837c22.7 11.471 45.041 4.152 45.041 4.152s-6.662 23.26-39.641 30.714c-30.83 6.968-30.879 27.889-30.879 27.889z"/></svg>
-        <svg className={`${styles.tohide}`} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+    <div className={`${styles.navigation} ${menuItems.collapsed ? 'navigation__collapsed' : ''}`}>
+      {/* LOGO */}
+      <a className={`${styles.navigationLogo}`} onClick={toggleCollapsed}>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width={32}
+          height={32}
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="feather feather-box navigation-logo__icon">
+          <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+          <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+          <line x1={12} y1="22.08" x2={12} y2={12} />
         </svg>
+        <span>EtuUTT</span>
       </a>
-      <div className={`${styles.navItems}`}>
-        <a className={`${styles.item}`} onClick={toggleCollapsed}>
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-          </svg>
-          <p>Home</p>
-        </a>
-        <div className={`${styles.indicator}`}></div>
-      </div>
-
-      <a className={`${styles.item}`}>
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+      {/* NAVIGATION */}
+      <nav role="navigation">
+        <ul>
+          <li>
+            <a className={`${styles.navigationLink}`} href="#">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width={24}
+                height={24}
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+                strokeLinecap="round"
+                strokeLinejoin="round">
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+              </svg>
+              <span>Analytics</span>
+            </a>
+          </li>
+          <li>
+            <a className={`${styles.navigationLink}`} href="#">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width={24}
+                height={24}
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+                strokeLinecap="round"
+                strokeLinejoin="round">
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+              </svg>
+              <span>Analytics</span>
+            </a>
+          </li>
+          <li>
+            <a className={`${styles.navigationLink}`} href="#">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width={24}
+                height={24}
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+                strokeLinecap="round"
+                strokeLinejoin="round">
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+              </svg>
+              <span>Analytics</span>
+            </a>
+          </li>
+          <li>
+            <a className={`${styles.navigationLink}`} href="#">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width={24}
+                height={24}
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+                strokeLinecap="round"
+                strokeLinejoin="round">
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+              </svg>
+              <span>Analytics</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+      {/* LOGOUT */}
+      <a className={`${styles.navigationLink} ${styles.logout}`} href="#">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width={24}
+          height={24}
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={2}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="navigation-link__icon feather feather-power">
+          <path d="M18.36 6.64a9 9 0 1 1-12.73 0" />
+          <line x1={12} y1={2} x2={12} y2={12} />
         </svg>
+        <span className="navigation-link__name js_navigation-item-name">Logout</span>
       </a>
-    </nav>
+    </div>
   );
-
 
   // return (
   //   <div className={`${styles.navbar} ${menuItems.collapsed ? styles.collapsed : ''}`}>
