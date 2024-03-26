@@ -1,7 +1,7 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import Widget1 from '@/components/homeWidgets/Widget1';
-import Widget2 from '@/components/homeWidgets/Widget2';
-import Widget3 from '@/components/homeWidgets/Widget3';
+import DailyTimetableWidget from '@/components/homeWidgets/DailyTimetableWidget';
+import UEBrowserWidget from '@/components/homeWidgets/UEBrowserWidget';
+import TestWidget from '@/components/homeWidgets/TestWidget';
 
 export type BoundingBox = { x: number; y: number; width: number; height: number };
 export type WidgetInstance = BoundingBox & { widget: keyof typeof WIDGETS; id: number };
@@ -13,9 +13,9 @@ export function collidesWith(bb1: BoundingBox, bb2: BoundingBox) {
 }
 
 export const WIDGETS = {
-  widget1: Widget1,
-  widget2: Widget2,
-  widget3: Widget3,
+  dailyTimetableWidget: { component: DailyTimetableWidget, minWidth: 3, minHeight: 3 },
+  ueBrowserWidget: { component: UEBrowserWidget, minWidth: 3, minHeight: 3 },
+  // test: TestWidget,
 } as const;
 
 export const gridSize = [10, 10];
@@ -55,10 +55,10 @@ export const pageSettingsSlice = createSlice({
     },
   },
   initialState: [
-    { widget: 'widget1', x: 0, y: 0, width: 1, height: 1, id: Math.random() },
-    { widget: 'widget2', x: 0, y: 1, width: 3, height: 1, id: Math.random() },
-    { widget: 'widget3', x: 3, y: 0, width: 1, height: 2, id: Math.random() },
-  ] as WidgetInstance[],
+    { widget: 'ueBrowserWidget', x: 0, y: 0, width: 3, height: 6, id: Math.random() },
+    { widget: 'dailyTimetableWidget', x: 3, y: 1, width: 3, height: 3, id: Math.random() },
+    // { widget: 'test', x: 0, y: 0, width: 1, height: 1, id: Math.random() },
+  ] satisfies WidgetInstance[] as WidgetInstance[],
 });
 
 export const { modifyBB, addWidget, removeWidget } = pageSettingsSlice.actions;

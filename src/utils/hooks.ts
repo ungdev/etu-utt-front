@@ -6,3 +6,8 @@ export function useStateWithReference<T>(initialValue: T): [T, Dispatch<SetState
   ref.current = value;
   return [value, setValue, ref];
 }
+
+export function useForceUpdate() {
+  const [, setValue] = useState(false);
+  return () => setValue((value) => !value);
+}

@@ -1,5 +1,5 @@
 'use client';
-import styles from './DailyTimetable.module.scss';
+import styles from './DailyTimetableWidget.module.scss';
 import { useEffect, useState } from 'react';
 import { GetDailyTimetableResponseDto, TimetableEvent } from '@/api/users/getDailyTimetable';
 import { useAPI } from '@/api/api';
@@ -14,7 +14,7 @@ const DAY_LENGTH = 24 * 3_600_000;
  * Renders a one-day timetable.
  * Users can choose the day they want to see.
  */
-export default function DailyTimetable() {
+export default function DailyTimetableWidget() {
   const [timetable, setTimetable] = useState([] as TimetableEvent[]);
   const [selectedDate, setSelectedDate] = useState(new Date(0));
   const [columnsCount, setColumnsCount] = useState(0);

@@ -6,11 +6,23 @@
     &.modifyingLayout {
       resize: both;
       overflow: auto;
+      cursor: move;
+
+      .widgetDragger > div {
+        pointer-events: none;
+        user-select: none;
+      }
     }
 
     .widgetDragger {
       width: 100%;
       height: 100%;
+
+      > div {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
 
       .removeButton {
         position: absolute;

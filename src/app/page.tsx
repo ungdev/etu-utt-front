@@ -20,7 +20,7 @@ function AdditionalNavbarComponent({
   onModify: () => void;
   onDone: () => void;
 }) {
-  const [widgetToAdd, setWidgetToAdd] = useState<keyof typeof WIDGETS>('widget1');
+  const [widgetToAdd, setWidgetToAdd] = useState<keyof typeof WIDGETS>('ueBrowserWidget');
   return (
     <>
       <Button onClick={modifyingLayout ? onDone : onModify}>{modifyingLayout ? 'Terminer' : 'Modifier'}</Button>
