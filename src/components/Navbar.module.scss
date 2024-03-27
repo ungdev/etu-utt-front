@@ -2,7 +2,7 @@
 
 .navigation {
   background-color: $ung-dark-grey;
-  color: $white;
+  color: $navigation-text-color;
   height: 100dvh;
   width: clamp(250px, 20%, 350px);
   padding: 16px;
@@ -55,7 +55,7 @@
 }
 
 .navigationLogo {
-  color: $white;
+  color: $navigation-text-color;
   text-decoration: none;
   font-size: 24px;
   font-weight: 500;
@@ -114,7 +114,7 @@
         width: 0;
         height: 0;
         border-top: 5px solid transparent;
-        border-right: 7px solid $white;
+        border-right: 7px solid $navigation-text-color;
         border-bottom: 5px solid transparent;
         left: -7px;
         position: absolute;
@@ -126,14 +126,14 @@
 
   &:hover {
     background-color: $ung-light-grey;
-    color: $white;
+    color: $navigation-text-color;
 
     .navigation__collapsed & >span {
       position: absolute;
       opacity: 1 !important;
       font-size: 0.875rem;
       transform: translateX(4px);
-      background: $white;
+      background: $navigation-text-color;
       left: 60px;
 
       &::before {
