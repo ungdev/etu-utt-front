@@ -5,6 +5,7 @@ import React from 'react';
 import Redirecter from '@/components/utilities/Redirecter';
 import AutoLogin from '@/components/utilities/AutoLogin';
 import Navbar from '@/components/Navbar';
+import GoTo from '@/components/toplevel/GoTo';
 
 export const metadata = {
   title: 'Next.js',
@@ -19,6 +20,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <AutoLogin />
         <body>
           <Navbar />
+          <GoTo />
           <div className={styles.page}>{children}</div>
         </body>
       </Providers>
