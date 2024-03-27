@@ -168,7 +168,7 @@ export default function Navbar() {
           </li>
         </ul>
       </nav>
-      {/* LOGOUT */}
+      {/* ACCOUNT */}
       <a className={`${styles.profile}`} href="#">
         <img src='https://picsum.photos/200' alt="Profile picture"/>
         <div>
