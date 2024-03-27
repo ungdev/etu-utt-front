@@ -4,7 +4,7 @@
 
 body {
   margin: 0;
-  height: 100vh;
+  height: 100dvh;
   min-height: 100%;
   font-family: Lexend, Tahoma, Geneva, Verdana, sans-serif;
   display: flex;
@@ -13,4 +13,9 @@ body {
 
 p, h1, h2, h3, h4, h5, h6 {
   margin: 0;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
 }

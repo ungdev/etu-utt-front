@@ -2,11 +2,12 @@
 
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import styles from './Navbar.module.scss';
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { getMenu, setCollapsed } from '@/module/navbar';
 import Link from 'next/link';
 import { type NotParameteredTranslationKey } from '@/lib/i18n';
 import { useAppTranslation } from '@/lib/i18n';
+import Icons from '@/icons';
 
 /**
  * The type defining all possible properties for a menu item
@@ -116,9 +117,10 @@ export default function Navbar() {
     );
   };
 
+  // Based on : https://codepen.io/guled10/pen/zYqVqed
   return (
-    <div className={`${styles.navigation} ${menuItems.collapsed ? 'navigation__collapsed' : ''}`}>
-      {/* LOGO */}
+    <div className={`${styles.navigation} ${menuItems.collapsed ? styles.navigation__collapsed : ''}`}>
+      {/* LOGO ETUUTT */}
       <a className={`${styles.navigationLogo}`} onClick={toggleCollapsed}>
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -142,121 +144,38 @@ export default function Navbar() {
         <ul>
           <li>
             <a className={`${styles.navigationLink}`} href="#">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width={24}
-                height={24}
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={2}
-                strokeLinecap="round"
-                strokeLinejoin="round">
-                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
-              </svg>
-              <span>Analytics</span>
+              <Icons.Home />
+              <span>Accueil</span>
             </a>
           </li>
           <li>
             <a className={`${styles.navigationLink}`} href="#">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width={24}
-                height={24}
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={2}
-                strokeLinecap="round"
-                strokeLinejoin="round">
-                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
-              </svg>
-              <span>Analytics</span>
+              <Icons.Book />
+              <span>Trombinoscope</span>
             </a>
           </li>
           <li>
             <a className={`${styles.navigationLink}`} href="#">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width={24}
-                height={24}
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={2}
-                strokeLinecap="round"
-                strokeLinejoin="round">
-                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
-              </svg>
-              <span>Analytics</span>
+              <Icons.Book />
+              <span>Guide des UEs</span>
             </a>
           </li>
           <li>
             <a className={`${styles.navigationLink}`} href="#">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width={24}
-                height={24}
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={2}
-                strokeLinecap="round"
-                strokeLinejoin="round">
-                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
-              </svg>
-              <span>Analytics</span>
+              <Icons.Book />
+              <span>Associations</span>
             </a>
           </li>
         </ul>
       </nav>
       {/* LOGOUT */}
-      <a className={`${styles.navigationLink} ${styles.logout}`} href="#">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width={24}
-          height={24}
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={2}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="navigation-link__icon feather feather-power">
-          <path d="M18.36 6.64a9 9 0 1 1-12.73 0" />
-          <line x1={12} y1={2} x2={12} y2={12} />
-        </svg>
-        <span className="navigation-link__name js_navigation-item-name">Logout</span>
+      <a className={`${styles.profile}`} href="#">
+        <img src='https://picsum.photos/200' alt="Profile picture"/>
+        <div>
+          <p className={styles.name}>Noé Landré</p>
+          <p className={styles.role}>Étudiant</p>
+        </div>
       </a>
     </div>
   );
-
-  // return (
-  //   <div className={`${styles.navbar} ${menuItems.collapsed ? styles.collapsed : ''}`}>
-  //     <div className={styles.collapseIcon} onClick={toggleCollapsed}>
-  //       {menuItems.collapsed ? Menu() : Collapse()}
-  //     </div>
-  //     <div className={styles.menuing}>
-  //       {menuItems.items.slice(0, menuItems.seperator).map((item) => inflateButton(item))}
-  //       <div className={styles.separator} />
-  //       {menuItems.items.slice(menuItems.seperator).map((item) => inflateButton(item))}
-  //     </div>
-  //     <div className={styles.profile}>
-  //       <div className={styles.roundIcon}>
-  //         <User />
-  //       </div>
-  //       <div className={styles.name}>{t('common:navbar.profile')}</div>
-  //     </div>
-  //     <select
-  //       value={language}
-  //       onChange={(e) => {
-  //         i18n.changeLanguage(e.target.value);
-  //         localStorage.setItem('etu-utt-lang', e.target.value);
-  //         setLanguage(e.target.value);
-  //       }}>
-  //       <option value="fr">Français</option>
-  //       <option value="en">English</option>
-  //     </select>
-  //   </div>
-  // );
 }

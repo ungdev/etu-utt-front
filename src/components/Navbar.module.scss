@@ -1,23 +1,14 @@
 @import '@/variables.scss';
 
-$white: #ffffff;
-$navigation-background-color: #030303;
-$navigation-link-color: #9e9fa4;
-$navigation-link-hover-background-color: #313239;
-$navigation-item-height: 45px;
-$navigation-item-border-radius: 5px;
-$navigation-item-tooltip-color: #6b6b6b;
-
-// -------------- NAVIGATION
-
 .navigation {
   background-color: $ung-dark-grey;
   color: $white;
-  height: 100vh;
-  width: clamp(300px, 30%, 400px);
+  height: 100dvh;
+  width: clamp(250px, 20%, 350px);
   padding: 16px;
   display: flex;
   flex-direction: column;
+  transition: all 200ms cubic-bezier(0.350, -0.355, 0.615, 1.315);
   
   ul {
     list-style: none;
@@ -25,12 +16,43 @@ $navigation-item-tooltip-color: #6b6b6b;
     margin: 0;
   }
 
-  .logout {
+  .profile {
     margin-top: auto;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+
+    >img {
+      min-width: 2.75rem;
+      height: 2.75rem;
+      border-radius: 50%;
+    }
+
+    >div {
+      display: flex;
+      flex-direction: column;
+      min-width: 200px;
+
+      >.name {
+        font-weight: 500;
+        color: white;
+      }
+
+      >.role {
+        font-size: 0.825rem;
+        color: $navigation-link-color;
+      }
+    }
+  }
+
+  &__collapsed {
+    width: 80px;
+
+    .profile>div {
+      opacity: 0;
+    }
   }
 }
-
-// -------------- NAVIGATION LOGO
 
 .navigationLogo {
   color: $white;
@@ -41,14 +63,18 @@ $navigation-item-tooltip-color: #6b6b6b;
   align-items: center;
   margin: 8px;
   margin-bottom: 30px;
+  cursor: pointer;
 
   >svg {
+    min-width: 2rem; 
+    height: 2rem;
     margin-right: 8px;
-    min-width: 32px;
+  }
+
+  .navigation__collapsed & >span {
+    opacity: 0;
   }
 }
-
-// -------------- NAVIGATION LINK
 
 .navigationLink {
   display: block;
@@ -61,30 +87,28 @@ $navigation-item-tooltip-color: #6b6b6b;
   line-height: $navigation-item-height;
   border-radius: $navigation-item-border-radius;
   text-decoration: none;
-  transition: all 0.2s ease-out;
   white-space: nowrap;
-  $this: &;
 
   >svg {
-    min-width: 32px;
+    min-width: 2rem; 
+    height: 1.5rem;
   }
 
   >span {
     margin-left: 12px;
 
-    // Collapsed state tooltip
-
-    [class$="__collapsed"] & {
+    .navigation__collapsed & {
       padding: 0.5em;
       line-height: 1;
       border-radius: ceil($navigation-item-border-radius / 2);
       color: $navigation-item-tooltip-color;
-      transition: transform 0.2s ease-out;
+      transition: all 100ms ease-in-out;
       box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
         0 10px 10px -5px rgba(0, 0, 0, 0.04);
       pointer-events: none;
       position: absolute;
       left: 48px;
+      opacity: 0;
 
       &::before {
         width: 0;
@@ -104,7 +128,7 @@ $navigation-item-tooltip-color: #6b6b6b;
     background-color: $ung-light-grey;
     color: $white;
 
-    [class$="__collapsed"] & #{$this}__name {
+    .navigation__collapsed & >span {
       position: absolute;
       opacity: 1 !important;
       font-size: 0.875rem;
