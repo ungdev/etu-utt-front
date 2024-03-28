@@ -5,11 +5,9 @@ import styles from './Navbar.module.scss';
 import { useState } from 'react';
 import { getMenu, setCollapsed } from '@/module/navbar';
 import Link from 'next/link';
-import User from '@/icons/User';
-import Menu from '@/icons/Menu';
-import Collapse from '@/icons/Collapse';
 import { type NotParameteredTranslationKey } from '@/lib/i18n';
 import { useAppTranslation } from '@/lib/i18n';
+import Icons from '@/icons';
 
 /**
  * The type defining all possible properties for a menu item
@@ -20,8 +18,8 @@ type MenuItemProperties<Translate extends boolean> = {
   name: Translate extends true
     ? NotParameteredTranslationKey
     : Translate extends false
-    ? string
-    : NotParameteredTranslationKey | string;
+      ? string
+      : NotParameteredTranslationKey | string;
   path: `/${string}`;
   submenus: MenuItem<false>[];
   translate: Translate;
@@ -119,32 +117,69 @@ export default function Navbar() {
     );
   };
 
+  // Based on : https://codepen.io/guled10/pen/zYqVqed
   return (
-    <div className={`${styles.navbar} ${menuItems.collapsed ? styles.collapsed : ''}`}>
-      <div className={styles.collapseIcon} onClick={toggleCollapsed}>
-        {menuItems.collapsed ? Menu() : Collapse()}
-      </div>
-      <div className={styles.menuing}>
-        {menuItems.items.slice(0, menuItems.seperator).map((item) => inflateButton(item))}
-        <div className={styles.separator} />
-        {menuItems.items.slice(menuItems.seperator).map((item) => inflateButton(item))}
-      </div>
-      <div className={styles.profile}>
-        <div className={styles.roundIcon}>
-          <User />
+    <div className={`${styles.navigation} ${menuItems.collapsed ? styles.navigation__collapsed : ''}`}>
+      {/* LOGO ETUUTT */}
+      <a className={`${styles.navigationLogo}`} >
+        <div>
+          <div className={`${styles.navigationIcons}`} onClick={() => menuItems.collapsed && toggleCollapsed()}>
+            <Icons.Menu />
+            <Icons.Home />
+          </div>
+          <span>EtuUTT</span>
         </div>
-        <div className={styles.name}>{t('common:navbar.profile')}</div>
+        <div onClick={toggleCollapsed}>
+          <Icons.Menu />
+        </div>
+      </a>
+      {/* NAVIGATION */}
+      <nav role="navigation">
+        <ul>
+          <li>
+            <a className={`${styles.navigationLink}`} href="#">
+              <Icons.Home />
+              <span>Accueil</span>
+            </a>
+          </li>
+          <li>
+            <a className={`${styles.navigationLink}`} href="#">
+              <Icons.Book />
+              <span>Trombinoscope</span>
+            </a>
+          </li>
+          <li>
+            <a className={`${styles.navigationLink}`} href="#">
+              <Icons.Book />
+              <span>Guide des UEs</span>
+            </a>
+          </li>
+          <li>
+            <a className={`${styles.navigationLink}`} href="#">
+              <Icons.Book />
+              <span>Associations</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+      {/* ACCOUNT */}
+      <div className={styles.bottom}>
+        <a href="#" className={styles.profile}>
+          <img src='https://picsum.photos/200' alt="Profile picture"/>
+          <div className={styles.infos}>
+            <p className={styles.name}>Alban Souchard de Lavoreille hsuisuisdhufhudsh</p>
+            <p className={styles.role}>Étudiant</p>
+          </div>
+          <div className={styles.actions}>
+            <div onClick={() => console.log("HEYYYYY")}>
+              <Icons.User />
+            </div>
+            <div onClick={() => console.log("HEYYYYY")}>
+              <Icons.Star />
+            </div>
+          </div>
+        </a>
       </div>
-      <select
-        value={language}
-        onChange={(e) => {
-          i18n.changeLanguage(e.target.value);
-          localStorage.setItem('etu-utt-lang', e.target.value);
-          setLanguage(e.target.value);
-        }}>
-        <option value="fr">Français</option>
-        <option value="en">English</option>
-      </select>
     </div>
   );
 }
