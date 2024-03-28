@@ -7,6 +7,8 @@ import { format } from 'date-fns';
 import * as locale from 'date-fns/locale';
 import Icons from '@/icons';
 import Button from '@/components/UI/Button';
+import { WidgetLayout } from '@/components/homeWidgets/WidgetLayout';
+import { useAppTranslation } from '@/lib/i18n';
 
 const DAY_LENGTH = 24 * 3_600_000;
 
@@ -19,6 +21,7 @@ export default function DailyTimetableWidget() {
   const [selectedDate, setSelectedDate] = useState(new Date(0));
   const [columnsCount, setColumnsCount] = useState(0);
   const api = useAPI();
+  const { t } = useAppTranslation();
 
   useEffect(() => {
     const now = new Date();
@@ -74,8 +77,10 @@ export default function DailyTimetableWidget() {
   };
 
   return (
-    <div className={styles.dailyTimetable}>
-      <h2>EDT JOURNALIER</h2>
+    <WidgetLayout
+      className={styles.dailyTimetable}
+      title={t('parking:dailyTimetable.title')}
+      subtitle={t('parking:dailyTimetable.subtitle')}>
       <div className={styles.chooseDay}>
         <Button noStyle onClick={() => setSelectedDate(new Date(selectedDate.getTime() - DAY_LENGTH))}>
           <Icons.LeftArrow />
@@ -116,6 +121,6 @@ export default function DailyTimetableWidget() {
           ))}
         </div>
       </div>
-    </div>
+    </WidgetLayout>
   );
 }
