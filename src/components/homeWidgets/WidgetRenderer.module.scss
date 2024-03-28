@@ -1,0 +1,55 @@
+.widgetRenderer {
+  .widgetResizer {
+    position: absolute;
+    transition: all .03s linear;
+
+    &.modifyingLayout {
+      resize: both;
+      overflow: auto;
+      cursor: move;
+
+      .widgetDragger > div {
+        pointer-events: none;
+        user-select: none;
+      }
+    }
+
+    .widgetDragger {
+      width: 100%;
+      height: 100%;
+
+      > div {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+
+      .removeButton {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 16px;
+        height: 16px;
+
+        * {
+          width: 100%;
+          height: 100%;
+        }
+      }
+    }
+  }
+
+  .fakeElement {
+    position: absolute;
+    background-color: rgba(yellow, 0.3);
+    border: 1px solid yellow;
+    border-radius: 30px;
+    z-index: 3;
+    transition: all .1s linear;
+    pointer-events: none;
+
+    & > * {
+      pointer-events: none;
+    }
+  }
+}

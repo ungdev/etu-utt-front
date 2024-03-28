@@ -1,14 +1,38 @@
 @import '@/variables';
 
-.input {
-  background-color: #F0F0F2;
-  color: #444C5F;
-  border-radius: 10px;
-  padding: 10px 15px;
-  border: 2px solid #D3D3D3;
 
-  &:focus {
-    border-color: $ung-light-blue;
-    outline: none;
+.inputWrapper {
+  display: flex;
+  border-radius: 10px;
+  background-color: $ung-light-blue;
+
+  input {
+    background-color: #F0F0F2;
+    color: #444C5F;
+    border-radius: 10px;
+    padding: 10px 15px;
+    border: 3px solid #D3D3D3;
+    width: 100%;
+
+    &:focus {
+      border-color: $ung-light-blue;
+      outline: none;
+    }
+  }
+
+  svg {
+    height: 100%;
+    width: 54px;
+    padding: 3px;
+    color: white;
+  }
+
+  &:focus-within {
+    background-color: $ung-light-blue;
+
+    input {
+      color: $ung-light-blue;
+    }
   }
 }
+

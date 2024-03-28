@@ -1,5 +1,5 @@
 'use client';
-import styles from './DailyTimetable.module.scss';
+import styles from './DailyTimetableWidget.module.scss';
 import { useEffect, useState } from 'react';
 import { GetDailyTimetableResponseDto, TimetableEvent } from '@/api/users/getDailyTimetable';
 import { useAPI } from '@/api/api';
@@ -7,6 +7,8 @@ import { format } from 'date-fns';
 import * as locale from 'date-fns/locale';
 import Icons from '@/icons';
 import Button from '@/components/UI/Button';
+import { WidgetLayout } from '@/components/homeWidgets/WidgetLayout';
+import { useAppTranslation } from '@/lib/i18n';
 
 const DAY_LENGTH = 24 * 3_600_000;
 
@@ -14,11 +16,12 @@ const DAY_LENGTH = 24 * 3_600_000;
  * Renders a one-day timetable.
  * Users can choose the day they want to see.
  */
-export default function DailyTimetable() {
+export default function DailyTimetableWidget() {
   const [timetable, setTimetable] = useState([] as TimetableEvent[]);
   const [selectedDate, setSelectedDate] = useState(new Date(0));
   const [columnsCount, setColumnsCount] = useState(0);
   const api = useAPI();
+  const { t } = useAppTranslation();
 
   useEffect(() => {
     const now = new Date();
@@ -74,8 +77,10 @@ export default function DailyTimetable() {
   };
 
   return (
-    <div className={styles.dailyTimetable}>
-      <h2>EDT JOURNALIER</h2>
+    <WidgetLayout
+      className={styles.dailyTimetable}
+      title={t('parking:dailyTimetable.title')}
+      subtitle={t('parking:dailyTimetable.subtitle')}>
       <div className={styles.chooseDay}>
         <Button noStyle onClick={() => setSelectedDate(new Date(selectedDate.getTime() - DAY_LENGTH))}>
           <Icons.LeftArrow />
@@ -116,6 +121,6 @@ export default function DailyTimetable() {
           ))}
         </div>
       </div>
-    </div>
+    </WidgetLayout>
   );
 }
