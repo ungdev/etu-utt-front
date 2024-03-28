@@ -5,6 +5,7 @@ import React, { ReactNode } from 'react';
 import Redirecter from '@/components/utilities/Redirecter';
 import AutoLogin from '@/components/utilities/AutoLogin';
 import Wrapper from '@/components/utilities/Wrapper';
+import PageSearchParams from '@/components/utilities/PageSearchParams';
 
 export const metadata = {
   title: 'Next.js',
@@ -17,6 +18,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <Providers>
         <Redirecter />
         <AutoLogin />
+        <PageSearchParams />
         <body>
           <Wrapper>{children}</Wrapper>
         </body>

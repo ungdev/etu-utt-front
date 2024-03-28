@@ -12,6 +12,8 @@ import { useUEs } from '@/api/ue/search';
 import { useRouter } from 'next/navigation';
 import { DeepReadonly } from '@/types';
 import { TranslationKey, useAppTranslation } from '@/lib/i18n';
+import { useAppSelector } from '@/lib/hooks';
+import { usePageSettings } from '@/module/pageSettings';
 
 /**
  * A React component that can be used as a filter.
@@ -21,6 +23,7 @@ import { TranslationKey, useAppTranslation } from '@/lib/i18n';
 type UEFilterComponent<UEFilterType extends keyof UEFiltersType> = (
   props: {
     onUpdate: (value: UEFiltersType[UEFilterType]['value'] | null, newUrlPart: string | null) => void;
+    forcedValue: string | null;
   } & DependencyProps<UEFilterType>,
 ) => ReactElement;
 
@@ -89,6 +92,7 @@ type UEFilterInstance<T extends keyof UEFiltersType = keyof UEFiltersType> = {
   filter: keyof typeof ueFilters;
   value: UEFiltersType[T]['value'] | null;
   search: string | null;
+  forcedValue: UEFiltersType[T]['value'] | null;
 };
 
 /**
@@ -101,39 +105,41 @@ type NonNullUEFilterInstance<T extends keyof UEFiltersType = keyof UEFiltersType
 type NotNameFilter = Exclude<keyof UEFiltersType, 'name'>;
 
 export default function Page() {
+  usePageSettings({});
   const router = useRouter();
   const [showAddFilterDropdown, setShowAddFilterDropdown] = useState<boolean>(false);
-  const [filters, setFilters] = useState<Array<UEFilterInstance>>([{ filter: 'name', value: null, search: null }]);
+  const [filters, setFilters] = useState<Array<UEFilterInstance>>([
+    { filter: 'name', value: null, search: null, forcedValue: null },
+  ]);
   const [lastUpdate] = useState<{ value: number }>({ value: Date.now() });
   const [ues, updateUEs] = useUEs();
   const { t } = useAppTranslation();
+  const searchParams = useAppSelector((state) => state.pageSettings.searchParams);
   useEffect(() => {
-    const now = Date.now();
-    lastUpdate.value = now;
-    setTimeout(() => {
-      if (lastUpdate.value === now) {
-        updateUEs(
-          Object.fromEntries(
-            filters
-              .filter((filter): filter is NonNullUEFilterInstance => filter.search !== null)
-              .map((filter) => [ueFilters[filter.filter].parameterName, filter.search]),
-          ),
-        );
+    if (!Object.keys(searchParams).length) return;
+    for (const [key, value] of Object.entries(searchParams)) {
+      const [filterName, ] = Object.entries(ueFilters).find(([, filter]) => filter.parameterName === key) ?? [undefined,];
+      if (filterName === undefined) return;
+      const index = filters.findIndex((filter) => filter.filter === filterName);
+      if (index >= 0) {
+        updateFilter(index, { forcedValue: value });
+      } else {
+        addFilter(filterName, value);
       }
-    }, 1000);
-  }, [filters]);
+    }
+  }, [searchParams]);
   const updateFilter = <T extends keyof UEFiltersType>(
     filterIndex: number,
-    value: UEFiltersType[T]['value'] | null,
-    newUrlPart: string | null,
+    { value, search, forcedValue }: Partial<Omit<UEFilterInstance<T>, 'filter'>>,
   ) => {
     const newFilters = [...filters];
-    newFilters[filterIndex].value = value;
-    newFilters[filterIndex].search = newUrlPart;
+    if (value !== undefined) newFilters[filterIndex].value = value;
+    if (search !== undefined) newFilters[filterIndex].search = search;
+    if (forcedValue !== undefined) newFilters[filterIndex].forcedValue = forcedValue;
     setFilters(newFilters);
   };
-  const addFilter = (name: keyof typeof ueFilters) => {
-    setFilters([...filters, { filter: name, value: null, search: null }]);
+  const addFilter = (name: keyof typeof ueFilters, forcedValue?: string) => {
+    setFilters([...filters, { filter: name, value: null, search: null, forcedValue: forcedValue ?? null }]);
   };
   const deleteFilter = (index: number) => {
     const newFilters = filters.toSpliced(index, 1).filter(
@@ -166,7 +172,8 @@ export default function Page() {
                 <tr key={filter.filter}>
                   <td>
                     <Filter
-                      onUpdate={(value, newUrlPart) => updateFilter(i, value, newUrlPart)}
+                      onUpdate={(value, newUrlPart) => updateFilter(i, { value, search: newUrlPart })}
+                      forcedValue={filter.forcedValue}
                       {...(otherProps as DependencyProps<typeof filter.filter>)}
                     />
                   </td>

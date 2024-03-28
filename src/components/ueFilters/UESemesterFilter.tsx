@@ -1,12 +1,19 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useAppTranslation } from '@/lib/i18n';
 
 export default function UESemesterFilter({
   onUpdate,
+  forcedValue,
 }: {
   onUpdate: (value: 'A' | 'P' | null, newUrlPart: string | null) => void;
+  forcedValue: 'A' | 'P' | null;
 }) {
   const [semester, setSemester] = useState<'A' | 'P' | 'both'>('both');
+  const forcedValueRef = useRef<string | null>(null);
+  if (forcedValue !== forcedValueRef.current && forcedValue !== null) {
+    forcedValueRef.current = forcedValue;
+    setSemester(forcedValue);
+  }
   const { t } = useAppTranslation();
   useEffect(() => {
     onUpdate(semester === 'both' ? null : semester, semester === 'both' ? null : semester);

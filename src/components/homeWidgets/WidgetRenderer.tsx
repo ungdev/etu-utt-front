@@ -142,7 +142,9 @@ export default function WidgetRenderer({
     const newFakeElement = { ...fakeElement.current, ...bb };
     if (
       newFakeElement.width < WIDGETS[widgetRef.current.widget].minWidth ||
-      newFakeElement.height < WIDGETS[widgetRef.current.widget].minHeight
+      newFakeElement.height < WIDGETS[widgetRef.current.widget].minHeight ||
+      newFakeElement.width > WIDGETS[widgetRef.current.widget].maxWidth ||
+      newFakeElement.height > WIDGETS[widgetRef.current.widget].maxHeight
     ) {
       return;
     }
