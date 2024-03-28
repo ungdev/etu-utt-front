@@ -121,23 +121,17 @@ export default function Navbar() {
   return (
     <div className={`${styles.navigation} ${menuItems.collapsed ? styles.navigation__collapsed : ''}`}>
       {/* LOGO ETUUTT */}
-      <a className={`${styles.navigationLogo}`} onClick={toggleCollapsed}>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width={32}
-          height={32}
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="feather feather-box navigation-logo__icon">
-          <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
-          <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
-          <line x1={12} y1="22.08" x2={12} y2={12} />
-        </svg>
-        <span>EtuUTT</span>
+      <a className={`${styles.navigationLogo}`} >
+        <div>
+          <div className={`${styles.navigationIcons}`} onClick={() => menuItems.collapsed && toggleCollapsed()}>
+            <Icons.Menu />
+            <Icons.Home />
+          </div>
+          <span>EtuUTT</span>
+        </div>
+        <div onClick={toggleCollapsed}>
+          <Icons.Menu />
+        </div>
       </a>
       {/* NAVIGATION */}
       <nav role="navigation">
@@ -169,13 +163,23 @@ export default function Navbar() {
         </ul>
       </nav>
       {/* ACCOUNT */}
-      <a className={`${styles.profile}`} href="#">
-        <img src='https://picsum.photos/200' alt="Profile picture"/>
-        <div>
-          <p className={styles.name}>Noé Landré</p>
-          <p className={styles.role}>Étudiant</p>
-        </div>
-      </a>
+      <div className={styles.bottom}>
+        <a href="#" className={styles.profile}>
+          <img src='https://picsum.photos/200' alt="Profile picture"/>
+          <div className={styles.infos}>
+            <p className={styles.name}>Alban Souchard de Lavoreille hsuisuisdhufhudsh</p>
+            <p className={styles.role}>Étudiant</p>
+          </div>
+          <div className={styles.actions}>
+            <div onClick={() => console.log("HEYYYYY")}>
+              <Icons.User />
+            </div>
+            <div onClick={() => console.log("HEYYYYY")}>
+              <Icons.Star />
+            </div>
+          </div>
+        </a>
+      </div>
     </div>
   );
 }
