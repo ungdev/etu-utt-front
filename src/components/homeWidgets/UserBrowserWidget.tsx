@@ -10,12 +10,12 @@ export default function UserBrowserWidget() {
   const router = useRouter();
   const [search, setSearch] = useState('');
   return (
-    <WidgetLayout title={t('parking:userBrowser.title')} subtitle={t('parking:userBrowser.subtitle')}>
+    <WidgetLayout title={t('homepage:userBrowser.title')} subtitle={t('homepage:userBrowser.subtitle')}>
       <Input
         value={search}
         onChange={setSearch}
         Icon={Icons.User}
-        placeholder={t('parking:userBrowser.searchBar.placeholder')}
+        placeholder={t('homepage:userBrowser.searchBar.placeholder')}
         onEnter={() => router.push(`/users?q=${search}`)}
       />
     </WidgetLayout>

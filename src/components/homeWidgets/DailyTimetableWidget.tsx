@@ -79,8 +79,8 @@ export default function DailyTimetableWidget() {
   return (
     <WidgetLayout
       className={styles.dailyTimetable}
-      title={t('parking:dailyTimetable.title')}
-      subtitle={t('parking:dailyTimetable.subtitle')}>
+      title={t('homepage:dailyTimetable.title')}
+      subtitle={t('homepage:dailyTimetable.subtitle')}>
       <div className={styles.chooseDay}>
         <Button noStyle onClick={() => setSelectedDate(new Date(selectedDate.getTime() - DAY_LENGTH))}>
           <Icons.LeftArrow />

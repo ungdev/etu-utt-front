@@ -8,8 +8,8 @@ export default function UEBrowserWidget() {
   const users = useTodaysBirthdays();
   return (
     <WidgetLayout
-      title={t('parking:todaysBirthdays.title')}
-      subtitle={t('parking:todaysBirthdays.subtitle')}
+      title={t('homepage:todaysBirthdays.title')}
+      subtitle={t('homepage:todaysBirthdays.subtitle')}
       className={styles.widget}>
       {users !== null
         ? users.length === 0
@@ -19,10 +19,10 @@ export default function UEBrowserWidget() {
                 <div className={styles.name}>
                   {user.firstName} {user.lastName}
                 </div>
-                <div className={styles.age}>{t('parking:todaysBirthday:age', { age: user.age })}</div>
+                <div className={styles.age}>{t('homepage:todaysBirthday:age', { age: user.age })}</div>
               </div>
             ))
-        : t('parking:todaysBirthday:beConnected')}
+        : t('homepage:todaysBirthday:beConnected')}
     </WidgetLayout>
   );
 }

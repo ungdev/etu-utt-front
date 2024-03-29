@@ -1,7 +1,7 @@
 import styles from './WidgetRenderer.module.scss';
 import { useEffect, useMemo, useRef } from 'react';
 import { isClientSide } from '@/utils/environment';
-import { BoundingBox, gridSize, WidgetInstance, WIDGETS } from '@/module/parking';
+import { BoundingBox, gridSize, WidgetInstance, WIDGETS } from '@/module/homepage';
 import Menu from '@/icons/Menu';
 import Button from '@/components/UI/Button';
 
@@ -38,13 +38,13 @@ export default function WidgetRenderer({
   const isUserResizing = useRef(true);
   // We need something faster than a useState to avoid a double call of the second useEffect
   const draggingInfo = useRef<{ x: number; y: number } | null>(null);
-  const parkingSize = useRef<{ width: number; height: number } | null>(null);
+  const homepageSize = useRef<{ width: number; height: number } | null>(null);
   const observer = useMemo<ResizeObserver | undefined>(
     () =>
       isClientSide()
         ? new ResizeObserver(function (mutations) {
             if (mutations[0].target === resizerRef.current!.parentElement!.parentElement) {
-              parkingSize.current = {
+              homepageSize.current = {
                 width: resizerRef.current!.parentElement!.parentElement!.clientWidth,
                 height: resizerRef.current!.parentElement!.parentElement!.clientHeight,
               };
@@ -60,8 +60,8 @@ export default function WidgetRenderer({
             } else {
               const widgetBB = resizerRef.current!.getBoundingClientRect();
               modifyFakeElement({
-                width: Math.round((widgetBB.width / parkingSize.current!.width) * gridSize[0]),
-                height: Math.round((widgetBB.height / parkingSize.current!.height) * gridSize[1]),
+                width: Math.round((widgetBB.width / homepageSize.current!.width) * gridSize[0]),
+                height: Math.round((widgetBB.height / homepageSize.current!.height) * gridSize[1]),
               });
             }
           })
@@ -213,15 +213,15 @@ export default function WidgetRenderer({
     resizerRef.current!.style.zIndex = '2';
   };
   const snap = () => {
-    isUserResizing.current = false
+    isUserResizing.current = false;
     positionTile(resizerRef.current!, fakeElement.current!);
     changeDivBBRef.current(fakeElement.current!);
     fakeElement.current = null;
     updateFakeElement();
   };
   const positionTile = (element: HTMLElement, position: BoundingBox) => {
-    const tileWidth = (parkingSize.current!.width - (gridSize[0] + 1) * GAP_SIZE) / gridSize[0];
-    const tileHeight = (parkingSize.current!.height - (gridSize[1] + 1) * GAP_SIZE) / gridSize[1];
+    const tileWidth = (homepageSize.current!.width - (gridSize[0] + 1) * GAP_SIZE) / gridSize[0];
+    const tileHeight = (homepageSize.current!.height - (gridSize[1] + 1) * GAP_SIZE) / gridSize[1];
     // We need to do it here because if the width or height has not changed, the inline style will not be updated, and thus not override what the user set.
     element.style.left = `${(tileWidth + GAP_SIZE) * position.x + GAP_SIZE}px`;
     element.style.top = `${(tileHeight + GAP_SIZE) * position.y + GAP_SIZE}px`;

@@ -6,7 +6,7 @@ import { usePageSettings } from '@/module/pageSettings';
 import Button from '@/components/UI/Button';
 import { useStateWithReference } from '@/utils/hooks';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
-import { addWidget, modifyBB, removeWidget, WIDGETS } from '@/module/parking';
+import { addWidget, modifyBB, removeWidget, WIDGETS } from '@/module/homepage';
 import { useState } from 'react';
 
 function AdditionalNavbarComponent({
@@ -55,7 +55,7 @@ export default function HomePage() {
     },
     [modifyingLayout],
   );
-  const widgets = useAppSelector((state) => state.parking);
+  const widgets = useAppSelector((state) => state.homepage);
   const dispatch = useAppDispatch();
   return (
     <div className={styles.page}>

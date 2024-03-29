@@ -10,12 +10,12 @@ export default function UEBrowserWidget() {
   const router = useRouter();
   const [search, setSearch] = useState('');
   return (
-    <WidgetLayout title={t('parking:ueBrowser.title')} subtitle={t('parking:ueBrowser.subtitle')}>
+    <WidgetLayout title={t('homepage:ueBrowser.title')} subtitle={t('homepage:ueBrowser.subtitle')}>
       <Input
         value={search}
         onChange={setSearch}
         Icon={Icons.User}
-        placeholder={t('parking:ueBrowser.searchBar.placeholder')}
+        placeholder={t('homepage:ueBrowser.searchBar.placeholder')}
         onEnter={() => router.push(`/ues?q=${search}`)}
       />
     </WidgetLayout>
