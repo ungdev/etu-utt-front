@@ -4,12 +4,12 @@ import { ReactNode } from 'react';
 export function WidgetLayout({
   title,
   subtitle,
-  children,
+  children = false,
   className = '',
 }: {
   title: string;
   subtitle: string;
-  children: ReactNode;
+  children?: ReactNode;
   className?: string;
 }) {
   return (

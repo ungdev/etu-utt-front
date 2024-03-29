@@ -34,8 +34,8 @@ export default function WidgetRenderer({
   const removeButtonRef = useRef<HTMLDivElement>(null);
   // Data about the fake element, it will be used to snap the widget to the grid
   const fakeElement = useRef<BoundingBox | null>(null);
-  // True when the widget is being resized, to let the observer know it should skip the observation
-  const isSnapResizing = useRef(false);
+  // Used to let the observer know if the resizing is due to the user or the snapping / page being resized
+  const isUserResizing = useRef(true);
   // We need something faster than a useState to avoid a double call of the second useEffect
   const draggingInfo = useRef<{ x: number; y: number } | null>(null);
   const parkingSize = useRef<{ width: number; height: number } | null>(null);
@@ -48,10 +48,11 @@ export default function WidgetRenderer({
                 width: resizerRef.current!.parentElement!.parentElement!.clientWidth,
                 height: resizerRef.current!.parentElement!.parentElement!.clientHeight,
               };
+              isUserResizing.current = false;
               positionTile(resizerRef.current!, widgetRef.current);
             }
             if (mutations[0].target !== resizerRef.current) return;
-            if (isSnapResizing.current) {
+            if (!isUserResizing.current) {
               return;
             }
             if (!fakeElement.current) {
@@ -68,20 +69,18 @@ export default function WidgetRenderer({
     [isClientSide()],
   );
   useEffect(() => {
-    parkingSize.current = {
-      width: resizerRef.current!.parentElement!.parentElement!.clientWidth,
-      height: resizerRef.current!.parentElement!.parentElement!.clientHeight,
+    if (!resizerRef.current || !observer) return;
+    observer.observe(resizerRef.current.parentElement!.parentElement!);
+    observer.observe(resizerRef.current);
+    return () => {
+      observer.disconnect();
     };
-    positionTile(resizerRef.current!, widgetRef.current);
-  }, []);
+  }, [resizerRef.current, observer]);
   useEffect(() => {
     if (!resizerRef.current || !draggerRef.current || !fakeElementRef.current || !observer || !modifyingLayout) return;
     updateFakeElement();
-    // observer.observe(document.body);
-    observer.observe(resizerRef.current.parentElement!.parentElement!);
-    observer.observe(resizerRef.current);
     const onMouseDownResizer = () => {
-      isSnapResizing.current = false;
+      isUserResizing.current = true;
     };
     const onMouseDownDragger = (e: MouseEvent) => {
       if (e.target === removeButtonRef.current) return;
@@ -93,7 +92,7 @@ export default function WidgetRenderer({
       createFakeElement();
     };
     const onMouseUp = () => {
-      isSnapResizing.current = true;
+      isUserResizing.current = false;
       if (!draggingInfo.current) return;
       draggingInfo.current = null;
       snap();
@@ -122,7 +121,6 @@ export default function WidgetRenderer({
     document.addEventListener('mouseup', onMouseUp);
     document.addEventListener('mousemove', onMouseMove);
     return () => {
-      observer.disconnect();
       draggerRef.current?.removeEventListener('mousedown', onMouseDownDragger); // draggerRef.current might be null if this element was just removed
       document.removeEventListener('mouseup', onMouseUp);
       document.removeEventListener('mousemove', onMouseMove);
@@ -215,6 +213,7 @@ export default function WidgetRenderer({
     resizerRef.current!.style.zIndex = '2';
   };
   const snap = () => {
+    isUserResizing.current = false
     positionTile(resizerRef.current!, fakeElement.current!);
     changeDivBBRef.current(fakeElement.current!);
     fakeElement.current = null;

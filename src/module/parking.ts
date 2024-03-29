@@ -2,6 +2,7 @@ import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import DailyTimetableWidget from '@/components/homeWidgets/DailyTimetableWidget';
 import UEBrowserWidget from '@/components/homeWidgets/UEBrowserWidget';
 import UserBrowserWidget from '@/components/homeWidgets/UserBrowserWidget';
+import TodaysBirthdaysWidget from '@/components/homeWidgets/TodaysBirthdaysWidget';
 
 export type BoundingBox = { x: number; y: number; width: number; height: number };
 export type WidgetInstance = BoundingBox & { widget: keyof typeof WIDGETS; id: number };
@@ -16,6 +17,7 @@ export const WIDGETS = {
   dailyTimetableWidget: { component: DailyTimetableWidget, minWidth: 4, minHeight: 5, maxWidth: 10, maxHeight: 10 },
   ueBrowserWidget: { component: UEBrowserWidget, minWidth: 3, minHeight: 2, maxWidth: 10, maxHeight: 3 },
   userBrowserWidget: { component: UserBrowserWidget, minWidth: 3, minHeight: 2, maxWidth: 10, maxHeight: 3 },
+  todaysBirthdays: { component: TodaysBirthdaysWidget, minWidth: 3, minHeight: 2, maxWidth: 10, maxHeight: 10 },
 } as const;
 
 export const gridSize = [10, 10];
@@ -58,6 +60,7 @@ export const pageSettingsSlice = createSlice({
     { widget: 'ueBrowserWidget', x: 0, y: 0, width: 3, height: 2, id: Math.random() },
     { widget: 'userBrowserWidget', x: 0, y: 2, width: 3, height: 2, id: Math.random() },
     { widget: 'dailyTimetableWidget', x: 6, y: 0, width: 4, height: 10, id: Math.random() },
+    { widget: 'todaysBirthdays', x: 3, y: 0, width: 3, height: 10, id: Math.random() },
   ] satisfies WidgetInstance[] as WidgetInstance[],
 });
 

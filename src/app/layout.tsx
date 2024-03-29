@@ -8,7 +8,7 @@ import PageSearchParams from '@/components/utilities/PageSearchParams';
 import { Lexend } from 'next/font/google';
 
 const lexend = Lexend({
-  weight: '400',
+  weight: ['400', '600', '700', '800'],
   subsets: ['latin'],
   variable: '--font-lexend',
   fallback: ['sans-serif'],

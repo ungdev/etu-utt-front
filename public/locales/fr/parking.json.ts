@@ -10,4 +10,7 @@ export default {
   "userBrowser.searchBar.placeholder": "Rechercher dans le trombinoscope",
   "dailyTimetable.title": "EdT journalier",
   "dailyTimetable.subtitle": "Ton EdT du jour",
+  "todaysBirthdays.title": "Anniversaires",
+  "todaysBirthdays.subtitle": "Les annivs du jour",
+  "todaysBirthday.age": "{{age}} ans",
 } as const;
