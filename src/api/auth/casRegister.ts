@@ -1,5 +1,3 @@
-import { RequestDto, ResponseDto } from '@/api/api';
-
-export interface CasRegisterRequestDto extends RequestDto {
+export interface CasRegisterRequestDto {
   registerToken: string;
 }

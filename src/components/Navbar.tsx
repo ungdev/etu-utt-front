@@ -20,8 +20,8 @@ type MenuItemProperties<Translate extends boolean> = {
   name: Translate extends true
     ? NotParameteredTranslationKey
     : Translate extends false
-    ? string
-    : NotParameteredTranslationKey | string;
+      ? string
+      : NotParameteredTranslationKey | string;
   path: `/${string}`;
   submenus: MenuItem<false>[];
   translate: Translate;

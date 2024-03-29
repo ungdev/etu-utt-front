@@ -15,7 +15,10 @@ export default function Button({
   noStyle?: boolean;
 }) {
   return (
-    <button onClick={onClick} className={`${styles.button} ${className} ${noStyle ? styles.noStyle : ''}`} disabled={disabled}>
+    <button
+      onClick={onClick}
+      className={`${styles.button} ${className} ${noStyle ? styles.noStyle : ''}`}
+      disabled={disabled}>
       {children}
     </button>
   );

@@ -1,11 +1,9 @@
-import { RequestDto, ResponseDto } from '@/api/api';
-
-export interface CasLoginRequestDto extends RequestDto {
+export interface CasLoginRequestDto {
   ticket: string;
   service: string;
 }
 
-export interface CasLoginResponseDto extends ResponseDto {
+export interface CasLoginResponseDto {
   signedIn: boolean;
   access_token: string;
 }
