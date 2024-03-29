@@ -10,15 +10,15 @@ import { useEffect, useState } from 'react';
 import Button from '@/components/UI/Button';
 import { RegisterResponseDto } from '@/api/auth/register';
 import { CasRegisterRequestDto } from '@/api/auth/casRegister';
-import { useTranslation } from 'react-i18next';
 import { useAPI } from '@/api/api';
+import { useAppTranslation } from '@/lib/i18n';
 
 export default function LoginPage() {
   // usePageSettings({ hasNavbar: false, permissions: 'public' });
   const params = useSearchParams();
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const { t } = useTranslation();
+  const { t } = useAppTranslation();
   const [registerToken, setRegisterToken] = useState<string | null>(null);
   const [validatedToken, setValidatedToken] = useState(false);
   const api = useAPI();
@@ -66,7 +66,7 @@ export default function LoginPage() {
   return (
     <div id="login-page" className={styles.loginPage}>
       <LoginForm />
-      Ou{' '}
+      {t('common:or')}{' '}
       <a
         href={`https://cas.utt.fr/cas/login?${new URLSearchParams({
           service: 'https://etu.utt.fr/dummyurl',
