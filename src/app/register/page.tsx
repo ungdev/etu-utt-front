@@ -1,4 +1,4 @@
-import RegisterForm from '@/app/register/RegisterForm';
+import RegisterForm from '@/components/auth/RegisterForm';
 import styles from '@/app/login/style.module.scss';
 
 export default function RegisterPage() {

@@ -1,0 +1,14 @@
+.editableText {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  .textAreaContainer > textarea {
+    width: 100%;
+    resize: vertical;
+  }
+
+  &.clickable {
+    cursor: pointer;
+  }
+}

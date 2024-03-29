@@ -1,0 +1,91 @@
+@import '@/variables';
+
+.comments {
+  .comment {
+    margin: 30px 0;
+
+    .author {
+      font-weight: bold;
+      font-size: 1.2rem;
+      color: $ung-dark-grey;
+      margin-bottom: 0.2rem;
+    }
+
+    .date {
+      font-weight: bold;
+      color: $ung-light-grey;
+    }
+
+    .body {
+      .text {
+        margin-left: 1rem;
+        margin-top: 0.5rem;
+        padding-left: 0.7rem;
+        position: relative;
+
+        &:after {
+          content: '';
+          position: absolute;
+          left: 0;
+          top: 0;
+          height: 100%;
+          width: 3px;
+          background: linear-gradient(90deg, $ung-dark-grey, rgba($ung-dark-grey, 0.5));
+        }
+      }
+
+      .commentFooter {
+        display: flex;
+        justify-content: space-between;
+
+        .upvotes {
+          display: flex;
+          align-items: center;
+          padding-left: 2rem;
+        }
+
+        .gotoConversation {
+          color: $ung-light-blue;
+          text-decoration: none;
+          font-size: 1.1rem;
+          transition: color 0.2s ease-in-out;
+          position: relative;
+
+          svg {
+            width: 24px;
+            height: 24px;
+            position: relative;
+            top: 7px; // TODO : this is definitely a magic value
+          }
+
+          &:after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -1px;
+            width: 0;
+            height: 1px;
+            background-color: $ung-light-blue;
+            transition: all 0.2s ease-in-out;
+          }
+
+          &:hover {
+            color: mix($ung-light-blue, black);
+
+            &:after {
+              width: 100%;
+              background-color: mix($ung-light-blue, black);
+            }
+          }
+        }
+      }
+
+      .commentEditorFooter {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 10px;
+      }
+    }
+  }
+}

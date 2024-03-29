@@ -1,0 +1,21 @@
+@import '@/variables';
+
+.filter {
+  display: flex;
+  border-radius: 10px;
+
+  svg {
+    height: 100%;
+    width: 54px;
+    padding: 3px;
+    color: $ung-light-blue;
+  }
+
+  &:focus-within {
+    background-color: $ung-light-blue;
+
+    svg {
+      color: white;
+    }
+  }
+}

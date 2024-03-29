@@ -1,0 +1,10 @@
+@import '@/variables';
+
+.page {
+  margin: 30px;
+  padding: 3rem;
+  background-color: $light-gray;
+  width: 100%;
+  border-radius: 20px;
+  overflow: scroll;
+}
