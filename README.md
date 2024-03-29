@@ -1,6 +1,6 @@
 # etu-utt-front
 
-# Installing add-on
+## Installing add-on
 
 There is a firefox addon that is necessary for CAS connection to work.
 You can go to your firefox addon settings, and add a new addon as a file (don't browse the store, it is not stored online).
