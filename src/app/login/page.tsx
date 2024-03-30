@@ -12,6 +12,7 @@ import { RegisterResponseDto } from '@/api/auth/register';
 import { CasRegisterRequestDto } from '@/api/auth/casRegister';
 import { useAPI } from '@/api/api';
 import { useAppTranslation } from '@/lib/i18n';
+import { Trans } from 'react-i18next';
 
 export default function LoginPage() {
   // usePageSettings({ hasNavbar: false, permissions: 'public' });
@@ -45,34 +46,44 @@ export default function LoginPage() {
   }
   if (registerToken) {
     return (
-      <div>
-        {t('login:cgu.text')}
-        <Button
-          onClick={() =>
-            api
-              .post<CasRegisterRequestDto, RegisterResponseDto>('auth/signup/cas', {
-                registerToken,
-              })
-              .on('success', (body) => {
-                dispatch(setToken(body.access_token));
-                router.push('/');
-              })
-          }>
-          {t('login:cgu.button')}
-        </Button>
+      <div className={styles.confirmRegister}>
+        <div>
+          <Trans
+            //t={t as TFunction & TFunction<'common', undefined>}
+            i18nKey={'login:legal.text'}
+            components={{
+              toLegal: <a href="/legal" />,
+            }}
+          />
+        </div>
+        <div className={styles.options}>
+          <Button
+            className={styles.acceptButton}
+            onClick={() =>
+              api
+                .post<CasRegisterRequestDto, RegisterResponseDto>('auth/signup/cas', {
+                  registerToken,
+                })
+                .on('success', (body) => {
+                  dispatch(setToken(body.access_token));
+                  router.push('/');
+                })
+            }>
+            {t('login:cgu.button')}
+          </Button>
+          <Button
+            onClick={() => {
+              router.push('/');
+            }}>
+            {t('login:legal.dontConnect')}
+          </Button>
+        </div>
       </div>
     );
   }
   return (
     <div id="login-page" className={styles.loginPage}>
       <LoginForm />
-      {t('common:or')}{' '}
-      <a
-        href={`https://cas.utt.fr/cas/login?${new URLSearchParams({
-          service: 'https://etu.utt.fr/dummyurl',
-        }).toString()}`}>
-        {t('login:connectWithCas')}
-      </a>
     </div>
   );
 }

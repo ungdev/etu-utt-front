@@ -9,6 +9,7 @@ import Link from '@/components/UI/Link';
 import Button from '@/components/UI/Button';
 import * as sessionModule from '@/module/session';
 import { useAPI } from '@/api/api';
+import { useAppTranslation } from '@/lib/i18n';
 
 export default function RegisterForm() {
   const dispatch = useAppDispatch();
@@ -18,6 +19,7 @@ export default function RegisterForm() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [passwordConfirmation, setPasswordConfirmation] = useState('');
+  const { t } = useAppTranslation();
   const submit = () => {
     if (password === passwordConfirmation && password)
       dispatch(sessionModule.register(api, lastname, firstname, username, password));
@@ -46,6 +48,15 @@ export default function RegisterForm() {
       <Button onClick={submit} className={styles.button}>
         Créer un compte
       </Button>
+      <p>
+        {t('common:or')}{' '}
+        <a
+          href={`https://cas.utt.fr/cas/login?${new URLSearchParams({
+            service: 'https://etu.utt.fr/dummyurl',
+          }).toString()}`}>
+          {t('login:registerWithCas')}
+        </a>
+      </p>
     </div>
   );
 }

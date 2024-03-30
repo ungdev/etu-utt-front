@@ -31,7 +31,7 @@ i18n
     interpolation: {
       escapeValue: false,
     },
-    // debug: true,  // Uncomment to let i18next log to the console
+    debug: true, // Uncomment to let i18next log to the console
   } satisfies Omit<CustomTypeOptions, 'resources'>);
 
 export default i18n;
