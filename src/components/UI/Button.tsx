@@ -7,15 +7,20 @@ export default function Button({
   className = '',
   disabled = false,
   noStyle = false,
+  background = 'blue',
 }: {
   children?: ReactNode;
   onClick?: () => void;
   className?: string;
   disabled?: boolean;
   noStyle?: boolean;
+  background?: 'blue' | 'white';
 }) {
   return (
-    <button onClick={onClick} className={`${styles.button} ${className} ${noStyle ? styles.noStyle : ''}`} disabled={disabled}>
+    <button
+      onClick={onClick}
+      className={`${styles.button} ${className} ${noStyle ? styles.noStyle : ''} ${styles[`background-${background}`]}`}
+      disabled={disabled}>
       {children}
     </button>
   );

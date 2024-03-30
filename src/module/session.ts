@@ -7,25 +7,51 @@ import { IsLoggedInResponseDto } from '@/api/auth/isLoggedIn';
 import { setUser } from '@/module/user';
 import { API } from '@/api/api';
 import { fetchProfile } from '@/api/profile/fetchProfile';
+import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 
 interface SessionSlice {
   logged: boolean;
-  token: string;
+  token: string | null;
+  cookiesAccepted: boolean | null;
 }
 
 export const sessionSlice = createSlice({
   name: 'session',
   reducers: {
     setToken: (state, action: PayloadAction<string>) => {
-      localStorage.setItem('etuutt-token', action.payload);
+      if (state.cookiesAccepted) {
+        localStorage.setItem('etuutt-token', action.payload);
+      }
       state.token = action.payload;
       state.logged = !!action.payload;
     },
+    setCookiesAcceptance(state, action: PayloadAction<boolean>) {
+      state.cookiesAccepted = action.payload;
+      if (!action.payload) return;
+      localStorage.setItem('etuutt-cookies-accepted', 'yes');
+      if (state.token !== null) {
+        localStorage.setItem('etuutt-token', state.token);
+      }
+    },
   },
-  initialState: { logged: false } as SessionSlice,
+  initialState: { logged: false, cookiesAccepted: null } as SessionSlice,
 });
 
-const { setToken } = sessionSlice.actions;
+const { setToken, setCookiesAcceptance } = sessionSlice.actions;
+export { setCookiesAcceptance };
+
+/**
+ * Hook that checks if the user has already accepted cookies. If yes, it will set the cookiesAccepted state to true.
+ * @returns whether the user has accepted / rejected (true), or did not take a decision yet (false).
+ */
+export function useCookiesAcceptance() {
+  const dispatch = useAppDispatch();
+  const cookiesAccepted = useAppSelector((state) => state.session.cookiesAccepted);
+  if (localStorage.getItem('etuutt-cookies-accepted') === 'yes' && !cookiesAccepted) {
+    dispatch(setCookiesAcceptance(true));
+  }
+  return cookiesAccepted !== null;
+}
 
 export const login = (api: API, login: string, password: string) =>
   ((dispatch: AppDispatch) =>

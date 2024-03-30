@@ -5,6 +5,7 @@ import React from 'react';
 import Redirecter from '@/components/utilities/Redirecter';
 import AutoLogin from '@/components/utilities/AutoLogin';
 import Navbar from '@/components/Navbar';
+import { CookiePopup } from '@/components/CookiePopup';
 
 export const metadata = {
   title: 'Next.js',
@@ -18,6 +19,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Redirecter />
         <AutoLogin />
         <body>
+          <CookiePopup />
           <Navbar />
           <div className={styles.page}>{children}</div>
         </body>
