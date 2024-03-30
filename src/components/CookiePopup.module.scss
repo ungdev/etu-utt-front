@@ -19,3 +19,17 @@
     margin-top: 10px;
   }
 }
+
+@media screen and (max-width: 1224px) {
+.cookies {
+    width: 30%;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .cookies {
+    width: calc(100% - 20px);
+    left: 10px;
+    right: 10px;
+  }
+}
