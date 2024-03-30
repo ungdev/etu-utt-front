@@ -26,5 +26,8 @@ export default {
   "navbar.myAssociations": "Mes Assos",
   "navbar.myTimetable": "Mon EdT",
   "navbar.myUEs": "Mes matières",
-  "input.editableText.modify": "Modifier"
+  "input.editableText.modify": "Modifier",
+  "cookie.message": "Nous utilisons des cookies pour vous authentifier automatiquement. <br />Cliquez sur \"Autoriser\" pour autoriser ces cookies",
+  "cookie.authorize": "Autoriser",
+  "cookie.refuse": "Refuser",
 } as const;
