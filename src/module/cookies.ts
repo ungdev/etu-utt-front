@@ -1,6 +1,7 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import { useAppDispatch } from '@/lib/hooks';
 import { AppThunk } from '@/lib/store';
+import { isClientSide } from '@/utils/environment';
 
 export enum CookieNames {
   COOKIES_ACCEPTED = 'etuutt-cookies-accepted',
@@ -65,7 +66,9 @@ export function useCookie(name: CookieNames, bypassAcceptance: boolean = false) 
  */
 export function getCookie(name: CookieNames, bypassAcceptance: boolean = false): AppThunk<string | null> {
   return (_, getState) => {
-    return getState().cookies.cookiesAccepted || bypassAcceptance ? localStorage.getItem(name) : null;
+    return (getState().cookies.cookiesAccepted || bypassAcceptance) && isClientSide()
+      ? localStorage.getItem(name)
+      : null;
   };
 }
 

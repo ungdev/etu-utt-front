@@ -1,5 +1,5 @@
-import { type Action, createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import { AppDispatch } from '@/lib/store';
+import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import { AppDispatch, AppThunk } from '@/lib/store';
 import { LoginRequestDto, LoginResponseDto } from '@/api/auth/login';
 import { StatusCodes } from 'http-status-codes';
 import { RegisterRequestDto, RegisterResponseDto } from '@/api/auth/register';
@@ -28,8 +28,9 @@ export const sessionSlice = createSlice({
 
 const { setToken } = sessionSlice.actions;
 
-export const login = (api: API, login: string, password: string) =>
-  ((dispatch: AppDispatch) =>
+export const login =
+  (api: API, login: string, password: string): AppThunk =>
+  (dispatch) =>
     api
       .post<LoginRequestDto, LoginResponseDto>('/auth/signin', { login, password })
       .on('success', async (body) => {
@@ -37,10 +38,11 @@ export const login = (api: API, login: string, password: string) =>
         dispatch(setUser((await fetchProfile(api).toPromise()) ?? null));
       })
       .on(StatusCodes.UNAUTHORIZED, (body) => console.error('Wrong credentials', body))
-      .on(StatusCodes.BAD_REQUEST, (body) => console.error('Bad request', body))) as unknown as Action;
+      .on(StatusCodes.BAD_REQUEST, (body) => console.error('Bad request', body));
 
-export const register = (api: API, lastName: string, firstName: string, login: string, password: string) =>
-  (async (dispatch: AppDispatch) =>
+export const register =
+  (api: API, lastName: string, firstName: string, login: string, password: string): AppThunk =>
+  async (dispatch) =>
     api
       .post<RegisterRequestDto, RegisterResponseDto>('/auth/signup', {
         lastName,
@@ -51,7 +53,7 @@ export const register = (api: API, lastName: string, firstName: string, login: s
         role: 'STUDENT',
         birthday: new Date(2003, 1, 28),
       })
-      .on('success', (body) => dispatch(setToken(body.access_token)))) as unknown as Action;
+      .on('success', (body) => dispatch(setToken(body.access_token)));
 
 export const autoLogin = (api: API) => async (dispatch: AppDispatch) => {
   const token = dispatch(getCookie(CookieNames.TOKEN));

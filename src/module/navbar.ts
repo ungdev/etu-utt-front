@@ -1,6 +1,6 @@
 import { MenuItem } from '@/components/Navbar';
-import { type Action, createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import { AppDispatch, RootState } from 'src/lib/store';
+import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import { AppThunk, RootState } from 'src/lib/store';
 import { isClientSide } from '@/utils/environment';
 import Icons from '@/icons';
 
@@ -144,15 +144,16 @@ export const userSlice = createSlice({
 
 const { addItem, replaceItem, removeItem, moveSeparator, setCollapse } = userSlice.actions;
 
-export const addMenuItem = (
-  item: MenuItem,
-  options?: {
-    parents?: string;
-    before?: string;
-    after?: string;
-  },
-) =>
-  ((dispatch: AppDispatch) => {
+export const addMenuItem =
+  (
+    item: MenuItem,
+    options?: {
+      parents?: string;
+      before?: string;
+      after?: string;
+    },
+  ): AppThunk =>
+  (dispatch) => {
     dispatch(
       addItem({
         item,
@@ -161,26 +162,31 @@ export const addMenuItem = (
         after: options?.after || null,
       }),
     );
-  }) as unknown as Action;
+  };
 
-export const replaceMenuItem = (item: MenuItem, ...replacedItemName: string[]) =>
-  ((dispatch: AppDispatch) => {
+export const replaceMenuItem =
+  (item: MenuItem, ...replacedItemName: string[]): AppThunk =>
+  (dispatch) => {
     dispatch(replaceItem({ item, search: replacedItemName }));
-  }) as unknown as Action;
+  };
 
-export const removeMenuItem = (...pathToItem: string[]) =>
-  ((dispatch: AppDispatch) => {
+export const removeMenuItem =
+  (...pathToItem: string[]): AppThunk =>
+  (dispatch) => {
     dispatch(removeItem(pathToItem));
-  }) as unknown as Action;
+  };
 
-export const setAlwaysVisibleCount = (count: number) =>
-  ((dispatch: AppDispatch) => {
+export const setAlwaysVisibleCount =
+  (count: number): AppThunk =>
+  (dispatch) => {
     dispatch(moveSeparator(count));
-  }) as unknown as Action;
+  };
 
 export const getMenu = (state: RootState) => state.navbar;
 
-export const setCollapsed = (collapse: boolean) =>
-  ((dispatch: AppDispatch) => dispatch(setCollapse(collapse))) as unknown as Action;
+export const setCollapsed =
+  (collapse: boolean): AppThunk =>
+  (dispatch) =>
+    dispatch(setCollapse(collapse));
 
 export default userSlice.reducer;
