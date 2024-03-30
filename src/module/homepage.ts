@@ -26,11 +26,46 @@ export const pageSettingsSlice = createSlice({
   name: 'user',
   reducers: {
     modifyBB: {
-      reducer: (state, action: PayloadAction<{ index: number; widget: WidgetInstance }>) => [
-        ...state.slice(0, action.payload.index),
-        action.payload.widget,
-        ...state.slice(action.payload.index + 1),
-      ],
+      reducer: (state, action: PayloadAction<{ index: number; widget: WidgetInstance }>) => {
+        const newIndex = state.findIndex(
+          (widget) =>
+            widget.y > action.payload.widget.y ||
+            (widget.y === action.payload.widget.y && widget.x >= action.payload.widget.x),
+        );
+        console.log(`updating widget, with index = ${action.payload.index}, newIndex = ${newIndex}`);
+        if (newIndex === -1) {
+          return [
+            ...state.slice(0, action.payload.index),
+            ...state.slice(action.payload.index + 1),
+            action.payload.widget,
+          ];
+        }
+        if (newIndex < action.payload.index) {
+          return [
+            ...state.slice(0, newIndex),
+            action.payload.widget,
+            ...state.slice(newIndex, action.payload.index),
+            ...state.slice(action.payload.index + 1),
+          ];
+        }
+        console.log(state.slice(0, action.payload.index));
+        console.log(state.slice(action.payload.index + 1, newIndex));
+        console.log(action.payload.widget);
+        console.log(state.slice(action.payload.index));
+        if (newIndex > action.payload.index) {
+          return [
+            ...state.slice(0, action.payload.index),
+            ...state.slice(action.payload.index + 1, newIndex),
+            action.payload.widget,
+            ...state.slice(newIndex),
+          ];
+        }
+        return [
+          ...state.slice(0, action.payload.index),
+          action.payload.widget,
+          ...state.slice(action.payload.index + 1),
+        ];
+      },
       prepare: (index: number, widget: WidgetInstance) => ({ payload: { index, widget } }),
     },
     addWidget: {
@@ -39,7 +74,11 @@ export const pageSettingsSlice = createSlice({
           for (let x = 0; x < gridSize[0]; x++) {
             const bb: BoundingBox = { x, y, width: 1, height: 1 };
             if (state.every((widget) => !collidesWith(bb, widget))) {
-              return [...state, { ...action.payload, ...bb }];
+              const index = state.findIndex((widget) => widget.y > y || (widget.y === y && widget.x > x));
+              if (index === -1) {
+                return [...state, { ...action.payload, ...bb }];
+              }
+              return [...state.slice(0, index), { ...action.payload, ...bb }, ...state.slice(index)];
             }
           }
         }
@@ -58,9 +97,9 @@ export const pageSettingsSlice = createSlice({
   },
   initialState: [
     { widget: 'ueBrowserWidget', x: 0, y: 0, width: 3, height: 2, id: Math.random() },
-    { widget: 'userBrowserWidget', x: 0, y: 2, width: 3, height: 2, id: Math.random() },
-    { widget: 'dailyTimetableWidget', x: 6, y: 0, width: 4, height: 10, id: Math.random() },
     { widget: 'todaysBirthdays', x: 3, y: 0, width: 3, height: 10, id: Math.random() },
+    { widget: 'dailyTimetableWidget', x: 6, y: 0, width: 4, height: 10, id: Math.random() },
+    { widget: 'userBrowserWidget', x: 0, y: 2, width: 3, height: 2, id: Math.random() },
   ] satisfies WidgetInstance[] as WidgetInstance[],
 });
 

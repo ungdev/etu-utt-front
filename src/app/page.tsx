@@ -7,7 +7,8 @@ import Button from '@/components/UI/Button';
 import { useStateWithReference } from '@/utils/hooks';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import { addWidget, modifyBB, removeWidget, WIDGETS } from '@/module/homepage';
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { isClientSide } from '@/utils/environment';
 
 function AdditionalNavbarComponent({
   modifyingLayout,
@@ -41,38 +42,63 @@ function AdditionalNavbarComponent({
 }
 
 export default function HomePage() {
+  const [isSmallScreen, setIsSmallScreen] = useState(false);
   const [modifyingLayout, setModifyingLayout, modifyingLayoutRef] = useStateWithReference(false);
   usePageSettings(
     {
-      navbarAdditionalComponent: () => (
-        <AdditionalNavbarComponent
-          modifyingLayout={modifyingLayoutRef.current}
-          onModify={() => setModifyingLayout(true)}
-          onDone={() => setModifyingLayout(false)}
-          onAdd={(widget) => dispatch(addWidget(widget))}
-        />
-      ),
+      navbarAdditionalComponent: isSmallScreen
+        ? null
+        : () => (
+            <AdditionalNavbarComponent
+              modifyingLayout={modifyingLayoutRef.current}
+              onModify={() => setModifyingLayout(true)}
+              onDone={() => setModifyingLayout(false)}
+              onAdd={(widget) => dispatch(addWidget(widget))}
+            />
+          ),
     },
-    [modifyingLayout],
+    [modifyingLayout, isSmallScreen],
+  );
+  const resizeObserver = useMemo(
+    () =>
+      isClientSide()
+        ? new ResizeObserver(() => {
+            setIsSmallScreen((isSmallScreen) => {
+              if (!isSmallScreen && window.innerWidth <= 1024) setModifyingLayout(false);
+              return window.innerWidth <= 1024;
+            });
+          })
+        : null,
+    [isClientSide()],
   );
   const widgets = useAppSelector((state) => state.homepage);
   const dispatch = useAppDispatch();
+  useEffect(() => {
+    if (!resizeObserver) return;
+    resizeObserver.observe(document.body);
+    return () => resizeObserver.disconnect();
+  }, [resizeObserver]);
   return (
     <div className={styles.page}>
-      {widgets.map((widget, i) => {
-        return (
-          <WidgetRenderer
-            key={widget.id}
-            widget={widget}
-            modifyingLayout={modifyingLayout}
-            otherWidgetsBB={widgets
-              .filter((_, j) => j !== i)
-              .map((w) => ({ x: w.x, y: w.y, width: w.width, height: w.height }))}
-            changeBB={(newWidget) => dispatch(modifyBB(i, { ...widget, ...newWidget }))}
-            remove={() => dispatch(removeWidget(i))}
-          />
-        );
-      })}
+      {!isSmallScreen
+        ? widgets.map((widget, i) => {
+            return (
+              <WidgetRenderer
+                key={widget.id}
+                widget={widget}
+                modifyingLayout={modifyingLayout}
+                otherWidgetsBB={widgets
+                  .filter((_, j) => j !== i)
+                  .map((w) => ({ x: w.x, y: w.y, width: w.width, height: w.height }))}
+                changeBB={(newWidget) => dispatch(modifyBB(i, { ...widget, ...newWidget }))}
+                remove={() => dispatch(removeWidget(i))}
+              />
+            );
+          })
+        : widgets.map((widget) => {
+            const Widget = WIDGETS[widget.widget].component;
+            return <Widget key={widget.id} />;
+          })}
     </div>
   );
 }
