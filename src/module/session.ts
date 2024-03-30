@@ -7,51 +7,26 @@ import { IsLoggedInResponseDto } from '@/api/auth/isLoggedIn';
 import { setUser } from '@/module/user';
 import { API } from '@/api/api';
 import { fetchProfile } from '@/api/profile/fetchProfile';
-import { useAppDispatch, useAppSelector } from '@/lib/hooks';
+import { CookieNames, getCookie, setCookie } from '@/module/cookies';
 
 interface SessionSlice {
   logged: boolean;
   token: string | null;
-  cookiesAccepted: boolean | null;
 }
 
 export const sessionSlice = createSlice({
   name: 'session',
   reducers: {
     setToken: (state, action: PayloadAction<string>) => {
-      if (state.cookiesAccepted) {
-        localStorage.setItem('etuutt-token', action.payload);
-      }
+      setCookie('etuutt-token', action.payload);
       state.token = action.payload;
       state.logged = !!action.payload;
     },
-    setCookiesAcceptance(state, action: PayloadAction<boolean>) {
-      state.cookiesAccepted = action.payload;
-      if (!action.payload) return;
-      localStorage.setItem('etuutt-cookies-accepted', 'yes');
-      if (state.token !== null) {
-        localStorage.setItem('etuutt-token', state.token);
-      }
-    },
   },
-  initialState: { logged: false, cookiesAccepted: null } as SessionSlice,
+  initialState: { logged: false, token: null } as SessionSlice,
 });
 
-const { setToken, setCookiesAcceptance } = sessionSlice.actions;
-export { setCookiesAcceptance };
-
-/**
- * Hook that checks if the user has already accepted cookies. If yes, it will set the cookiesAccepted state to true.
- * @returns whether the user has accepted / rejected (true), or did not take a decision yet (false).
- */
-export function useCookiesAcceptance() {
-  const dispatch = useAppDispatch();
-  const cookiesAccepted = useAppSelector((state) => state.session.cookiesAccepted);
-  if (localStorage.getItem('etuutt-cookies-accepted') === 'yes' && !cookiesAccepted) {
-    dispatch(setCookiesAcceptance(true));
-  }
-  return cookiesAccepted !== null;
-}
+const { setToken } = sessionSlice.actions;
 
 export const login = (api: API, login: string, password: string) =>
   ((dispatch: AppDispatch) =>
@@ -78,18 +53,17 @@ export const register = (api: API, lastName: string, firstName: string, login: s
       })
       .on('success', (body) => dispatch(setToken(body.access_token)))) as unknown as Action;
 
-export const autoLogin = (api: API) =>
-  (async (dispatch: AppDispatch) => {
-    const token = localStorage.getItem('etuutt-token');
-    if (!token) {
-      return;
+export const autoLogin = (api: API) => async (dispatch: AppDispatch) => {
+  const token = dispatch(getCookie(CookieNames.TOKEN));
+  if (!token) {
+    return;
+  }
+  api.get<IsLoggedInResponseDto>('/auth/signin').on('success', async (body) => {
+    if (body.valid) {
+      dispatch(setToken(token));
+      dispatch(setUser((await fetchProfile(api).toPromise()) ?? null));
     }
-    api.get<IsLoggedInResponseDto>('/auth/signin').on('success', async (body) => {
-      if (body.valid) {
-        dispatch(setToken(token));
-        dispatch(setUser((await fetchProfile(api).toPromise()) ?? null));
-      }
-    });
-  }) as unknown as Action;
+  });
+};
 
 export default sessionSlice.reducer;

@@ -29,10 +29,10 @@ type APIResponse<ResponseType> =
 type RawResponseType<T> = T extends Date
   ? string
   : T extends object
-  ? {
-      [K in keyof T]: T[K] extends object ? RawResponseType<T[K]> : T[K] extends Date ? string : T[K];
-    }
-  : T;
+    ? {
+        [K in keyof T]: T[K] extends object ? RawResponseType<T[K]> : T[K] extends Date ? string : T[K];
+      }
+    : T;
 
 /**
  * The response handler is a class that allows you to handle the response of a request to the API.
@@ -72,8 +72,8 @@ export class ResponseHandler<T, R = undefined> {
         return this.handlers[response.error]
           ? this.handlers[response.error]!()
           : this.handlers.failure
-          ? this.handlers.failure()
-          : undefined;
+            ? this.handlers.failure()
+            : undefined;
       }
       if (response.code in this.handlers) {
         return this.handlers[response.code](response.body);
