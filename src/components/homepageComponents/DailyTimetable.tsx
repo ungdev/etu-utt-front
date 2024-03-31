@@ -7,6 +7,7 @@ import { format } from 'date-fns';
 import * as locale from 'date-fns/locale';
 import Icons from '@/icons';
 import Button from '@/components/UI/Button';
+import { TimetableDay } from '@/components/timetable/TimetableDay';
 
 const DAY_LENGTH = 24 * 3_600_000;
 
@@ -17,7 +18,6 @@ const DAY_LENGTH = 24 * 3_600_000;
 export default function DailyTimetable() {
   const [timetable, setTimetable] = useState([] as TimetableEvent[]);
   const [selectedDate, setSelectedDate] = useState(new Date(0));
-  const [columnsCount, setColumnsCount] = useState(0);
   const api = useAPI();
 
   useEffect(() => {
@@ -38,40 +38,8 @@ export default function DailyTimetable() {
       .get<GetDailyTimetableResponseDto>(
         `/timetable/current/daily/${selectedDate.getDate()}/${selectedDate.getMonth() + 1}/${selectedDate.getFullYear()}`,
       )
-      .on('success', (body) => {
-        const columnsCount = formatTimetable(body);
-        setTimetable(body);
-        setColumnsCount(columnsCount);
-      });
+      .on('success', setTimetable);
   }, [selectedDate]);
-
-  /**
-   * Clamps every event of the timetable in the current day, and assign a column number to each event.
-   * The operation is done in place.
-   * @param timetable The timetable to format.
-   * @returns The number of columns that are needed.
-   */
-  const formatTimetable = (timetable: TimetableEvent[]): number => {
-    const endOfSelectedDate = new Date(selectedDate.getTime() + DAY_LENGTH);
-    const columnsFreeFrom: Date[] = [];
-    for (const event of timetable) {
-      if (event.start < selectedDate) {
-        event.start = new Date(selectedDate);
-      }
-      if (event.end > endOfSelectedDate) {
-        event.end = new Date(endOfSelectedDate);
-      }
-      const columnIndex = columnsFreeFrom.findIndex((column) => column < event.start);
-      if (columnIndex === -1) {
-        columnsFreeFrom.push(event.end);
-        event.column = columnsFreeFrom.length - 1;
-      } else {
-        columnsFreeFrom[columnIndex] = event.end;
-        event.column = columnIndex;
-      }
-    }
-    return columnsFreeFrom.length;
-  };
 
   return (
     <div className={styles.dailyTimetable}>
@@ -87,35 +55,7 @@ export default function DailyTimetable() {
           <Icons.RightArrow />
         </Button>
       </div>
-      <div className={styles.timetable}>
-        <div className={styles.hours}>
-          {Array(12)
-            .fill(0)
-            .map((_, i) => (
-              <div key={i}>
-                <span>{i * 2}h</span>
-              </div>
-            ))}
-        </div>
-        <div className={styles.events}>
-          {Array(12)
-            .fill(0)
-            .map((_, i) => (
-              <div key={i} className={styles.timeSeparator} />
-            ))}
-          {timetable.map((event) => (
-            <div
-              key={event.id}
-              className={styles.event}
-              style={{
-                top: `${((event.start.getTime() - selectedDate.getTime()) / DAY_LENGTH) * 100}%`,
-                height: `${((event.end.getTime() - event.start.getTime()) / DAY_LENGTH) * 100}%`,
-                left: `${(event.column! / columnsCount) * 100}%`,
-                width: `${100 / columnsCount}%`,
-              }}></div>
-          ))}
-        </div>
-      </div>
+      <TimetableDay className={styles.timetable} day={selectedDate} events={timetable} />
     </div>
   );
 }

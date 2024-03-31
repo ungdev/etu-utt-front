@@ -1,0 +1,64 @@
+.timetablePage {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+
+  .settings {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-left: 3rem;
+    margin-right: 1.5rem;
+
+    .rangeLength {
+      > button {
+        margin: 0 10px;
+        &:first-child {
+          margin-left: 0;
+        }
+        &:last-child {
+          margin-right: 0;
+        }
+      }
+    }
+
+    .range {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 40%;
+      align-self: center;
+
+      & > p {
+        margin: auto 0;
+        font-size: 1.2rem;
+      }
+
+      & > button {
+        font-size: 2rem;
+      }
+    }
+  }
+
+  .timetable {
+    display: flex;
+    bottom: 0;
+    position: relative;
+    height: auto;
+    gap: 10px;
+    flex-grow: 1;
+
+    .day {
+      flex-grow: 1;
+
+      .dayTitle {
+        text-align: center;
+      }
+
+      .dayTimetable {
+        height: 100%;
+      }
+    }
+  }
+}
