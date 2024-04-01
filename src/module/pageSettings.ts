@@ -1,5 +1,5 @@
 import { type Action, createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import { AppDispatch, RootState } from 'src/lib/store';
+import { AppDispatch } from 'src/lib/store';
 import { DependencyList, ReactNode, useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import { usePathname } from 'next/navigation';

@@ -98,9 +98,9 @@ type UEFilterInstance<T extends keyof UEFiltersType = keyof UEFiltersType> = {
 /**
  * A filter instance that has a non-null value. Only these filters will be used to filter the UEs.
  */
-type NonNullUEFilterInstance<T extends keyof UEFiltersType = keyof UEFiltersType> = {
-  [K in keyof UEFilterInstance<T>]: Exclude<UEFilterInstance<T>[K], null>;
-};
+// type NonNullUEFilterInstance<T extends keyof UEFiltersType = keyof UEFiltersType> = {
+//   [K in keyof UEFilterInstance<T>]: Exclude<UEFilterInstance<T>[K], null>;
+// };
 
 type NotNameFilter = Exclude<keyof UEFiltersType, 'name'>;
 
@@ -111,8 +111,8 @@ export default function Page() {
   const [filters, setFilters] = useState<Array<UEFilterInstance>>([
     { filter: 'name', value: null, search: null, forcedValue: null },
   ]);
-  const [lastUpdate] = useState<{ value: number }>({ value: Date.now() });
-  const [ues, updateUEs] = useUEs();
+  // const [lastUpdate] = useState<{ value: number }>({ value: Date.now() });
+  const [ues /* updateUEs */] = useUEs();
   const { t } = useAppTranslation();
   const searchParams = useAppSelector((state) => state.pageSettings.searchParams);
   useEffect(() => {
