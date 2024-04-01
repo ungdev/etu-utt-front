@@ -116,10 +116,9 @@ export default function Page() {
   const { t } = useAppTranslation();
   const searchParams = useAppSelector((state) => state.pageSettings.searchParams);
   useEffect(() => {
-    if (!Object.keys(searchParams).length) return;
     for (const [key, value] of Object.entries(searchParams)) {
-      const [filterName, ] = Object.entries(ueFilters).find(([, filter]) => filter.parameterName === key) ?? [undefined,];
-      if (filterName === undefined) return;
+      const [filterName] = Object.entries(ueFilters).find(([, filter]) => filter.parameterName === key) ?? [undefined];
+      if (filterName === undefined) continue;
       const index = filters.findIndex((filter) => filter.filter === filterName);
       if (index >= 0) {
         updateFilter(index, { forcedValue: value });
@@ -162,7 +161,7 @@ export default function Page() {
         <table>
           <tbody>
             {filters.map((filter, i) => {
-              const Filter = ueFilters[filter.filter].component;
+              const Filter = ueFilters[filter.filter].component as UEFilterComponent<typeof filter.filter>;
               const otherProps = Object.fromEntries(
                 (ueFilters[filter.filter] as { dependsOn?: string[] }).dependsOn?.map((dependsOn) => {
                   return [dependsOn, filters.find((f) => f.filter === dependsOn)?.value];

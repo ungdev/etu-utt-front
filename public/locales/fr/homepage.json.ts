@@ -12,5 +12,7 @@ export default {
   "dailyTimetable.subtitle": "Ton EdT du jour",
   "todaysBirthdays.title": "Anniversaires",
   "todaysBirthdays.subtitle": "Les annivs du jour",
-  "todaysBirthday.age": "{{age}} ans",
+  "todaysBirthdays.age": "{{age}} ans",
+  "todaysBirthdays.beConnected": "Vous devez être connecté pour voir les anniversaires du jour",
+  "todaysBirthdays.noBirthdays": "Aucun anniversaire aujourd'hui",
 } as const;

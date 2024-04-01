@@ -23,7 +23,7 @@ const defaultPageSettings = {
 } as PageSettings;
 
 export const pageSettingsSlice = createSlice({
-  name: 'user',
+  name: 'pageSettings',
   reducers: {
     setPageSettings(
       state,
@@ -73,7 +73,5 @@ export function usePageSettings(settings?: Partial<PageSettings>, deps: Dependen
   }
   /* eslint-enable react-hooks/rules-of-hooks */
 }
-
-export const getConnectedUser = (state: RootState) => state.user;
 
 export default pageSettingsSlice.reducer;

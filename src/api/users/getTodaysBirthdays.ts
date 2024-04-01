@@ -6,7 +6,7 @@ export default function useTodaysBirthdays(): User[] | null {
   const [users, setUsers] = useState<User[] | null>(null);
   const api = useAPI();
   useEffect(() => {
-    api.get<User[]>('/users/birthdays/today').on('success', (body) => setUsers(body));
+    api.get<User[]>('/users/birthdays/today').on('success', setUsers);
   }, []);
   return users;
 }

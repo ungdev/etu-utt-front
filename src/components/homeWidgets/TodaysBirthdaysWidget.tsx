@@ -3,7 +3,7 @@ import { useAppTranslation } from '@/lib/i18n';
 import { WidgetLayout } from '@/components/homeWidgets/WidgetLayout';
 import useTodaysBirthdays from '@/api/users/getTodaysBirthdays';
 
-export default function UEBrowserWidget() {
+export default function TodaysBirthdaysWidget() {
   const { t } = useAppTranslation();
   const users = useTodaysBirthdays();
   return (
@@ -13,16 +13,16 @@ export default function UEBrowserWidget() {
       className={styles.widget}>
       {users !== null
         ? users.length === 0
-          ? "Aucun anniversaire aujourd'hui"
+          ? t('homepage:todaysBirthdays.noBirthdays')
           : users.map((user) => (
               <div key={user.id} className={styles.user}>
                 <div className={styles.name}>
                   {user.firstName} {user.lastName}
                 </div>
-                <div className={styles.age}>{t('homepage:todaysBirthday:age', { age: user.age })}</div>
+                <div className={styles.age}>{t('homepage:todaysBirthdays.age', { age: user.age })}</div>
               </div>
             ))
-        : t('homepage:todaysBirthday:beConnected')}
+        : t('homepage:todaysBirthdays.beConnected')}
     </WidgetLayout>
   );
 }
