@@ -24,14 +24,14 @@ i18n
       useSuspense: true,
     },
     supportedLngs,
-    ns: ['common', 'ues', 'homepage'],
+    ns: ['common', 'login', 'ues', 'homepage'],
     preload: ['fr'],
     nsSeparator: ':',
     defaultNS: 'common',
     interpolation: {
       escapeValue: false,
     },
-    // debug: true,  // Uncomment to let i18next log to the console
+    // debug: true, // Uncomment to let i18next log to the console
   } satisfies Omit<CustomTypeOptions, 'resources'>);
 
 export default i18n;
