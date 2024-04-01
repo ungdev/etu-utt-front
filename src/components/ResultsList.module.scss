@@ -1,7 +1,7 @@
-@import '@/variables';
+@import '@/variables.scss';
 
-.uePage {
-  .ue {
+.resultsList {
+  .result {
     --box-padding: 6px;
     background-color: white;
     padding: var(--box-padding);
@@ -15,14 +15,14 @@
     transition: border-color 0.2s ease-out;
     cursor: pointer;
 
-    h2, p {
+    > p {
       margin: 0;
     }
 
     .basicInfo {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
 
       h2 {
         width: 7rem;

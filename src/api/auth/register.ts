@@ -3,7 +3,7 @@ export interface RegisterRequestDto {
   lastName: string;
   login: string;
   password: string;
-  role: 'STUDENT' | 'TEACHER' | 'EMPLOYEE';
+  type: 'STUDENT' | 'TEACHER' | 'EMPLOYEE';
   sex: 'MALE' | 'FEMALE' | 'OTHER';
   birthday: Date;
 }

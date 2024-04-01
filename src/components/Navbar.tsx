@@ -2,7 +2,7 @@
 
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import styles from './Navbar.module.scss';
-import { useState } from 'react';
+import { FC, useState } from 'react';
 import { getMenu, setCollapsed } from '@/module/navbar';
 import Link from 'next/link';
 import User from '@/icons/User';
@@ -16,12 +16,12 @@ import { useAppTranslation } from '@/lib/i18n';
  * This is an internal type that should not be used when developping features.
  * */
 type MenuItemProperties<Translate extends boolean> = {
-  icon: () => JSX.Element;
+  icon: FC;
   name: Translate extends true
     ? NotParameteredTranslationKey
     : Translate extends false
-    ? string
-    : NotParameteredTranslationKey | string;
+      ? string
+      : NotParameteredTranslationKey | string;
   path: `/${string}`;
   submenus: MenuItem<false>[];
   translate: Translate;
@@ -95,7 +95,7 @@ export default function Navbar() {
     return 'path' in item ? (
       <Link href={item.path as string} className={`${styles.button} ${styles.link}`} key={item.name}>
         <div className={`${styles.buttonContent} ${styles['indent-' + (after.split(',').length - 1)]}`}>
-          {'icon' in item ? (item as MenuItem<true>).icon() : ''}
+          {'icon' in item ? (item as MenuItem<true>).icon({}) : ''}
           <div className={styles.name}>{item.translate ? t(item.name as NotParameteredTranslationKey) : item.name}</div>
         </div>
       </Link>
@@ -109,7 +109,7 @@ export default function Navbar() {
         <div
           className={`${styles.buttonContent} ${styles['indent-' + (after.split(',').length - 1)]}`}
           onClick={() => toggleSelected([after, item.name].join(','))}>
-          {'icon' in item ? (item as MenuItem<true>).icon() : ''}
+          {'icon' in item ? (item as MenuItem<true>).icon({}) : ''}
           <div className={styles.name}>{item.translate ? t(item.name as NotParameteredTranslationKey) : item.name}</div>
         </div>
         <div className={styles.buttonChildrenContainer}>

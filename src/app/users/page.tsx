@@ -1,10 +1,11 @@
 'use client';
-
 import FilteredSearch, { FiltersDataType, GenericFiltersType } from '@/components/filteredSearch/FilteredSearch';
 import { createInputFilter } from '@/components/filteredSearch/InputFilter';
 import Icons from '@/icons';
 import { useUsers } from '@/api/users/searchUsers.hook';
-import { useEffect, useState } from 'react';
+import styles from '@/app/ues/styles.module.scss';
+import { useRouter } from 'next/navigation';
+import { ResultsList } from '@/components/ResultsList';
 
 type FilterNames = 'name' | 'firstName' | 'lastName' | 'nickname';
 
@@ -34,24 +35,25 @@ const filtersData = Object.freeze({
   },
 } satisfies FiltersDataType<FilterNames, FiltersType, 'name'>);
 
-export default function Page() {
+export default function SearchUserPage() {
   const [users, updateUsers] = useUsers();
   return (
     <div>
+      <h1>Trombinoscope</h1>
       <FilteredSearch<FilterNames, FiltersType, 'name'>
         filtersData={filtersData}
         defaultFilter="name"
         updateSearch={updateUsers}
       />
-      <div>
-        {users.map((user) => (
-          <div key={user.id}>
-            <p>
-              {user.firstName} | {user.lastName} | {user.nickname}
-            </p>
+      <ResultsList
+        data={users}
+        baseRedirectUrl={'/users'}
+        InfoFC={({ item }) => (
+          <div>
+            {item.firstName} {item.lastName}
           </div>
-        ))}
-      </div>
+        )}
+      />
     </div>
   );
 }

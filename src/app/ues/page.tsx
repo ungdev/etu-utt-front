@@ -1,12 +1,11 @@
 'use client';
-
-import styles from './styles.module.scss';
 import { createInputFilter } from '@/components/filteredSearch/InputFilter';
 import { useUEs } from '@/api/ue/search';
 import { useRouter } from 'next/navigation';
 import FilteredSearch, { FiltersDataType, GenericFiltersType } from '@/components/filteredSearch/FilteredSearch';
 import Icons from '@/icons';
 import { createSelectFilter, SelectFilter } from '@/components/filteredSearch/SelectFilter';
+import { ResultsList } from '@/components/ResultsList';
 
 /**
  * The different filters that exist.
@@ -51,27 +50,26 @@ const ueFilters = Object.freeze({
 } satisfies FiltersDataType<FilterNames, UEFiltersType, 'name'>);
 
 export default function Page() {
-  const router = useRouter();
   const [ues, updateUEs] = useUEs();
   return (
-    <div className={styles.uePage}>
+    <div>
       <h1>Guide des UEs</h1>
       <FilteredSearch<FilterNames, UEFiltersType, 'name'>
         filtersData={ueFilters}
         defaultFilter={'name'}
         updateSearch={updateUEs}
       />
-      <div>
-        {ues.map((ue) => (
-          <div key={ue.code} className={styles.ue} onClick={() => router.push(`/ues/${ue.code}`)}>
-            <div className={styles.basicInfo}>
-              <h2>{ue.code}</h2>
-              <p>{ue.name}</p>
-            </div>
-            <p className={styles.details}>Détails {'>'}</p>
-          </div>
-        ))}
-      </div>
+      <ResultsList
+        data={ues}
+        baseRedirectUrl={'/ues'}
+        InfoFC={({ item }) => (
+          <>
+            <h2>{item.code}</h2>
+            <p>{item.name}</p>
+          </>
+        )}
+        getItemId={(ue) => ue.code}
+      />
     </div>
   );
 }
