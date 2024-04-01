@@ -1,18 +1,19 @@
 'use client';
 import styles from './styles.module.scss';
 import { useEffect, useState } from 'react';
-import { GetDailyTimetableResponseDto, TimetableEvent } from '@/api/users/getDailyTimetable';
 import { useAPI } from '@/api/api';
 import { DAY_LENGTH, roundToStartOfDay } from '@/utils/utils';
 import { TimetableDay } from '@/components/timetable/TimetableDay';
 import { format } from 'date-fns';
 import * as locale from 'date-fns/locale';
 import Button from '@/components/UI/Button';
+import { useTimetableEvents } from '@/api/timetable/getTimetableEvents';
+import { createTimetableEvent } from '@/api/timetable/createTimetableEvent';
 
 export default function TimetablePage() {
   const [firstDay, setFirstDay] = useState(roundToStartOfDay(new Date()));
   const [numberOfDays, setNumberOfDays] = useState(7);
-  const [events, setEvents] = useState([] as TimetableEvent[]);
+  const events = useTimetableEvents(firstDay, numberOfDays);
   const [eventIndicesPerDay, setEventIndicesPerDay] = useState([] as number[][]);
   const api = useAPI();
   useEffect(() => {
@@ -31,19 +32,6 @@ export default function TimetablePage() {
     }
     setEventIndicesPerDay(newEventsPerDay);
   }, [events, firstDay, numberOfDays]);
-
-  /**
-   * Called when the selected date is changed.
-   * Fetches the timetable of the user for the selected date, and update the state.
-   */
-  useEffect(() => {
-    if (firstDay.getTime() === 0) return;
-    api
-      .get<GetDailyTimetableResponseDto>(
-        `/timetable/current/daily/${firstDay.getDate()}/${firstDay.getMonth() + 1}/${firstDay.getFullYear()}`,
-      )
-      .on('success', setEvents);
-  }, [firstDay, numberOfDays]);
 
   return (
     <div className={styles.timetablePage}>
@@ -90,6 +78,9 @@ export default function TimetablePage() {
               events={eventIndices.map((i) => events[i])}
               day={new Date(firstDay.getTime() + i * DAY_LENGTH)}
               className={styles.dayTimetable}
+              onClickOnEmptySlot={(time) =>
+                createTimetableEvent(api, time, new Date(time.getTime() + 3_600_000), 'a random place')
+              }
             />
           </div>
         ))}

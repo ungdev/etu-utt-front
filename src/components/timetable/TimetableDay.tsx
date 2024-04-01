@@ -7,10 +7,12 @@ export function TimetableDay({
   events,
   day,
   className = '',
+  onClickOnEmptySlot = () => {},
 }: {
   events: TimetableEvent[];
   day: Date;
   className?: string;
+  onClickOnEmptySlot?: (time: Date) => void;
 }) {
   const [columnsCount, setColumnsCount] = useState(0);
 
@@ -58,7 +60,11 @@ export function TimetableDay({
             </div>
           ))}
       </div>
-      <div className={styles.events}>
+      <div
+        className={styles.events}
+        onClick={(e) => {
+          onClickOnEmptySlot(day);
+        }}>
         {Array(12)
           .fill(0)
           .map((_, i) => (
@@ -73,7 +79,8 @@ export function TimetableDay({
               height: `${((event.end.getTime() - event.start.getTime()) / DAY_LENGTH) * 100}%`,
               left: `${(event.column! / columnsCount) * 100}%`,
               width: `${100 / columnsCount}%`,
-            }}></div>
+            }}
+          />
         ))}
       </div>
     </div>
