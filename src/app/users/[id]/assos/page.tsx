@@ -1,8 +1,10 @@
 'use client';
 import { useAssosOfUser } from '@/api/users/assosOfUser';
 import { useParams } from 'next/navigation';
+import { usePageSettings } from '@/module/pageSettings';
 
 export default function AssociativePage() {
+  usePageSettings({});
   const { id: userId } = useParams<{ id: string }>();
   const associations = useAssosOfUser(userId);
   return (

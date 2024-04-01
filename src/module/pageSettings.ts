@@ -1,5 +1,5 @@
 import { type Action, createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import { AppDispatch, RootState } from 'src/lib/store';
+import { AppDispatch } from 'src/lib/store';
 import { DependencyList, ReactNode, useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import { usePathname } from 'next/navigation';
@@ -43,7 +43,7 @@ const { setPageSettings, setPageParams } = pageSettingsSlice.actions;
 export { setPageParams };
 
 export function usePageSettings(): PageSettingsSlice;
-export function usePageSettings(settings?: Partial<PageSettings>, deps?: DependencyList): void;
+export function usePageSettings(settings: Partial<PageSettings>, deps?: DependencyList): void;
 export function usePageSettings(settings?: Partial<PageSettings>, deps: DependencyList = []): PageSettingsSlice | void {
   /* eslint-disable react-hooks/rules-of-hooks */
   const pathname = usePathname();

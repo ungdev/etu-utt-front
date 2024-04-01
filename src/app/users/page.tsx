@@ -6,6 +6,7 @@ import { useUsers } from '@/api/users/searchUsers.hook';
 import styles from '@/app/ues/styles.module.scss';
 import { useRouter } from 'next/navigation';
 import { ResultsList } from '@/components/ResultsList';
+import { usePageSettings } from '@/module/pageSettings';
 
 type FilterNames = 'name' | 'firstName' | 'lastName' | 'nickname';
 
@@ -36,6 +37,7 @@ const filtersData = Object.freeze({
 } satisfies FiltersDataType<FilterNames, FiltersType, 'name'>);
 
 export default function SearchUserPage() {
+  usePageSettings({});
   const [users, updateUsers] = useUsers();
   return (
     <div>

@@ -41,7 +41,9 @@ const ueFilters = Object.freeze({
   },
   branch: { component: createSelectFilter(['RT', 'ISI', 'SN']), name: 'ues:filter.branch', parameterName: 'branch' },
   branchOption: {
-    component: ({ onUpdate, branch }) => <SelectFilter onUpdate={onUpdate} choices={branchOptions[branch]} />,
+    component: ({ onUpdate, forcedValue, branch }) => (
+      <SelectFilter onUpdate={onUpdate} forcedValue={forcedValue} choices={branchOptions[branch]} />
+    ),
     name: 'ues:filter.branchOption',
     dependsOn: ['branch'],
     parameterName: 'branchOption',

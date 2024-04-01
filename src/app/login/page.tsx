@@ -6,7 +6,7 @@ import { CasLoginRequestDto, CasLoginResponseDto } from '@/api/auth/casLogin';
 import { setToken } from '@/module/session';
 import { useAppDispatch } from '@/lib/hooks';
 import { useEffect, useState } from 'react';
-// import { usePageSettings } from '@/module/pageSettings';
+import { usePageSettings } from '@/module/pageSettings';
 import Button from '@/components/UI/Button';
 import { RegisterResponseDto } from '@/api/auth/register';
 import { CasRegisterRequestDto } from '@/api/auth/casRegister';
@@ -15,7 +15,7 @@ import { useAppTranslation } from '@/lib/i18n';
 import { Trans } from 'react-i18next';
 
 export default function LoginPage() {
-  // usePageSettings({ hasNavbar: false, permissions: 'public' });
+  usePageSettings({ hasNavbar: false, permissions: 'public' });
   const params = useSearchParams();
   const router = useRouter();
   const dispatch = useAppDispatch();
@@ -49,7 +49,6 @@ export default function LoginPage() {
       <div className={styles.confirmRegister}>
         <div>
           <Trans
-            //t={t as TFunction & TFunction<'common', undefined>}
             i18nKey={'login:legal.text'}
             components={{
               toLegal: <a href="/legal" />,

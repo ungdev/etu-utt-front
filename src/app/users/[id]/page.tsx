@@ -1,6 +1,7 @@
 'use client';
 import { useParams } from 'next/navigation';
 import { useUser } from '@/api/users/getUser';
+import { usePageSettings } from '@/module/pageSettings';
 
 function userData(data: string | number | undefined | null, label: string) {
   return (
@@ -13,6 +14,7 @@ function userData(data: string | number | undefined | null, label: string) {
 }
 
 export default function UserPage() {
+  usePageSettings({});
   const { id: userId } = useParams<{ id: string }>();
   const user = useUser(userId);
   if (!user) {

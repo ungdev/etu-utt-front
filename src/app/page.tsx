@@ -21,19 +21,20 @@ function AdditionalNavbarComponent({
   onModify: () => void;
   onDone: () => void;
 }) {
+  usePageSettings({});
   const [widgetToAdd, setWidgetToAdd] = useState<keyof typeof WIDGETS>('ueBrowserWidget');
   return (
     <>
       <Button onClick={modifyingLayout ? onDone : onModify}>{modifyingLayout ? 'Terminer' : 'Modifier'}</Button>
       {modifyingLayout && (
         <>
-          <select
+          {/*<select
             value={widgetToAdd}
             onChange={(e) => setWidgetToAdd((e.target as HTMLSelectElement).value as keyof typeof WIDGETS)}>
             <option value="widget1">widget1</option>
             <option value="widget2">widget2</option>
             <option value="widget3">widget3</option>
-          </select>
+          </select>*/}
           <Button onClick={() => onAdd(widgetToAdd)}>Ajouter</Button>
         </>
       )}
