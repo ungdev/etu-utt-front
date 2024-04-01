@@ -45,7 +45,7 @@ export default function LoginForm() {
         {t('common:or')}{' '}
         <a
           href={`https://cas.utt.fr/cas/login?${new URLSearchParams({
-            service: 'https://etu.utt.fr/dummyurl',
+            service: 'https://etu.assos.utt.fr/login',
           }).toString()}`}>
           {t('login:login.connectWithCas')}
         </a>
