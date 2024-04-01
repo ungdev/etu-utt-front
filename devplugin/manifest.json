@@ -1,0 +1,18 @@
+{
+  "manifest_version": 2,
+  "name": "EtuUTT dev plugin",
+  "version": "1.0",
+
+  "description": "Redirects route https://etu.utt.fr/dummyurl to http://localhost:8080/login with query parameters.",
+
+  "icons": {
+    "48": "icon.png"
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["https://etu.utt.fr/dummyurl?*"],
+      "js": ["cas-redirect-etuutt-to-localhost.js"]
+    }
+  ]
+}

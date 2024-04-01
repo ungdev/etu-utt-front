@@ -1,0 +1,23 @@
+@import '@/variables';
+
+.widget {
+  padding: 15px 10px;
+  border: 2px #E7E7E7 solid;
+  border-radius: 30px;
+  background-color: white;
+
+  .title {
+    color: $ung-dark-grey;
+    font-family: $lexend;
+    font-weight: 800;
+    font-size: 2rem;
+    text-transform: uppercase;
+  }
+
+  .subtitle {
+    color: $ung-light-blue;
+    font-family: $lexend;
+    font-weight: 800;
+    margin-bottom: 20px;
+  }
+}

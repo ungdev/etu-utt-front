@@ -21,6 +21,7 @@
     padding: 11px 11px 10px;
     cursor: pointer;
     color: $ung-light-blue;
+    margin-bottom: 16px;
 
     svg {
       display: inline-block;
@@ -33,7 +34,7 @@
     flex: 1 0 auto;
     display: flex;
     flex-flow: column wrap;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: flex-start;
 
     .button {

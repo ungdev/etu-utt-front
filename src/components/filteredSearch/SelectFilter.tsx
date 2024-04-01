@@ -1,13 +1,19 @@
-import { useEffect, useState } from 'react';
+import { FC, useEffect, useRef, useState } from 'react';
 import { useAppTranslation } from '@/lib/i18n';
 import { BaseFilterProps } from '@/components/filteredSearch/FilteredSearch';
 
 export function SelectFilter<Choices extends string>({
   onUpdate,
+  forcedValue,
   choices,
 }: BaseFilterProps<Choices> & { choices: Choices[] }) {
   const [value, setValue] = useState<Choices | 'all'>('all');
   const { t } = useAppTranslation();
+  const forcedValueRef = useRef<string | null>(null);
+  if (forcedValue !== forcedValueRef.current && forcedValue !== null) {
+    forcedValueRef.current = forcedValue;
+    setValue(([...choices, 'all'].includes(forcedValue) ? forcedValue : 'all') as Choices | 'all');
+  }
   useEffect(() => {
     onUpdate(value === 'all' ? null : value, value === 'all' ? null : value);
   }, [value]);
@@ -25,7 +31,7 @@ export function SelectFilter<Choices extends string>({
   );
 }
 
-export function createSelectFilter<Choices extends string>(choices: Choices[]): React.FC<BaseFilterProps<Choices>> {
+export function createSelectFilter<Choices extends string>(choices: Choices[]): FC<BaseFilterProps<Choices>> {
   return function SelectFilterWrapper(props: BaseFilterProps<Choices>) {
     return <SelectFilter {...props} choices={choices} />;
   };

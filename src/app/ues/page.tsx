@@ -1,11 +1,11 @@
 'use client';
 import { createInputFilter } from '@/components/filteredSearch/InputFilter';
 import { useUEs } from '@/api/ue/search';
-import { useRouter } from 'next/navigation';
 import FilteredSearch, { FiltersDataType, GenericFiltersType } from '@/components/filteredSearch/FilteredSearch';
 import Icons from '@/icons';
 import { createSelectFilter, SelectFilter } from '@/components/filteredSearch/SelectFilter';
 import { ResultsList } from '@/components/ResultsList';
+import { usePageSettings } from '@/module/pageSettings';
 
 /**
  * The different filters that exist.
@@ -50,6 +50,7 @@ const ueFilters = Object.freeze({
 } satisfies FiltersDataType<FilterNames, UEFiltersType, 'name'>);
 
 export default function Page() {
+  usePageSettings({});
   const [ues, updateUEs] = useUEs();
   return (
     <div>

@@ -1,5 +1,6 @@
 import styles from './Input.module.scss';
-import { HTMLInputTypeAttribute } from 'react';
+import { FC, HTMLInputTypeAttribute } from 'react';
+import Button from '@/components/UI/Button';
 
 export default function Input<T extends string | number>({
   className = '',
@@ -8,6 +9,7 @@ export default function Input<T extends string | number>({
   value,
   placeholder,
   type = 'text',
+  Icon,
 }: {
   className?: string;
   onChange?: (v: T) => void;
@@ -15,17 +17,22 @@ export default function Input<T extends string | number>({
   value?: T;
   placeholder?: string;
   type?: HTMLInputTypeAttribute;
+  Icon?: FC;
 }) {
   return (
-    <input
-      className={`${styles.input} ${className}`}
-      onChange={(v) => onChange(v.target.value as T)}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter') onEnter();
-      }}
-      value={value}
-      placeholder={placeholder}
-      type={type}
-    />
+    <div className={`${styles.inputWrapper} ${className}`}>
+      <input
+        onChange={(v) => onChange(v.target.value as T)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') onEnter();
+        }}
+        value={value}
+        placeholder={placeholder}
+        type={type}
+      />
+      <Button noStyle onClick={() => onEnter()}>
+        {Icon && <Icon />}
+      </Button>
+    </div>
   );
 }

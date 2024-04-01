@@ -1,0 +1,26 @@
+@import '@/variables';
+
+.widget {
+  .user {
+    padding: 20px;
+    box-shadow: 0 0 10px -5px black;
+    border-radius: 10px;
+
+    &:not(:last-child) {
+      margin-bottom: 10px;
+    }
+
+    .name {
+      font-size: 1.5rem;
+      font-weight: 900;
+      color: $ung-dark-grey;
+      margin-bottom: 0.7rem;
+    }
+
+    .age {
+      font-size: 1.2rem;
+      font-weight: 900;
+      color: #5F6982;
+    }
+  }
+}

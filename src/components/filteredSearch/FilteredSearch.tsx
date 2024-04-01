@@ -2,6 +2,7 @@ import styles from './FilteredSearch.module.scss';
 import React, { useEffect, useState } from 'react';
 import Trash from '@/icons/Trash';
 import { NotParameteredTranslationKey, TranslationKey, useAppTranslation } from '@/lib/i18n';
+import { useAppSelector } from '@/lib/hooks';
 
 /**
  * A React component that can be used as a filter.
@@ -26,7 +27,8 @@ type DependencyProps<
 };
 
 export type BaseFilterProps<Value extends string> = {
-  onUpdate: (value: Value | null, newUrlPart: string | null) => void;
+  onUpdate: (value: Value | null, search: string | null) => void;
+  forcedValue: string | null;
 };
 
 /**
@@ -82,6 +84,7 @@ type FilterInstance<
   filter: FilterNames;
   value: FiltersType[T]['value'] | null;
   search: string | null;
+  forcedValue: FiltersType[T]['value'] | null;
 };
 
 /**
@@ -112,11 +115,32 @@ export default function FilteredSearch<
   updateSearch: (filters: Record<string, string>) => void;
 }) {
   const [showAddFilterDropdown, setShowAddFilterDropdown] = useState<boolean>(false);
+  // The filters currently used.
   const [filters, setFilters] = useState<Array<FilterInstance<FilterNames, FiltersType>>>([
-    { filter: defaultFilter, value: null, search: null },
+    { filter: defaultFilter, value: null, search: null, forcedValue: null },
   ]);
+  // When the filters were last updated. Used to avoid updating the search too often.
   const [lastUpdate] = useState<{ value: number }>({ value: Date.now() });
   const { t } = useAppTranslation();
+  const searchParams = useAppSelector((state) => state.pageSettings.searchParams);
+
+  // Update the value of filters when the URL parameters.
+  useEffect(() => {
+    for (const [key, value] of Object.entries(searchParams)) {
+      const [filterName] = Object.entries(filtersData).find(([, filter]) => filter.parameterName === key) ?? [
+        undefined,
+      ];
+      if (filterName === undefined) continue;
+      const index = filters.findIndex((filter) => filter.filter === filterName);
+      if (index >= 0) {
+        updateFilter(index, { forcedValue: value });
+      } else {
+        addFilter(filterName, value);
+      }
+    }
+  }, [searchParams]);
+
+  // When filters are modified, update the search after 1 second.
   useEffect(() => {
     const now = Date.now();
     lastUpdate.value = now;
@@ -141,17 +165,17 @@ export default function FilteredSearch<
       .map((filter) => deleteFilter(filter.filter));
   };
 
-  const addFilter = (name: FilterNames) => {
-    setFilters([...filters, { filter: name, value: null, search: null }]);
+  const addFilter = (name: FilterNames, forcedValue?: string) => {
+    setFilters([...filters, { filter: name, value: null, search: null, forcedValue: forcedValue ?? null }]);
   };
   const updateFilter = <T extends FilterNames>(
     filterIndex: number,
-    value: FiltersType[T]['value'] | null,
-    newUrlPart: string | null,
+    { value, search, forcedValue }: Partial<Omit<FilterInstance<FilterNames, FiltersType, T>, 'filter'>>,
   ) => {
     const newFilters = [...filters];
-    newFilters[filterIndex].value = value;
-    newFilters[filterIndex].search = newUrlPart;
+    if (value !== undefined) newFilters[filterIndex].value = value;
+    if (search !== undefined) newFilters[filterIndex].search = search;
+    if (forcedValue !== undefined) newFilters[filterIndex].forcedValue = forcedValue;
     setFilters(newFilters);
     if (value === null) {
       deleteDependentFilters(newFilters[filterIndex].filter);
@@ -187,7 +211,8 @@ export default function FilteredSearch<
               <tr key={filter.filter}>
                 <td>
                   <Filter
-                    onUpdate={(value, newUrlPart) => updateFilter(i, value, newUrlPart)}
+                    onUpdate={(value, search) => updateFilter(i, { value, search })}
+                    forcedValue={filter.forcedValue}
                     {...(otherProps as DependencyProps<FilterNames, FiltersType, typeof filter.filter>)}
                   />
                 </td>

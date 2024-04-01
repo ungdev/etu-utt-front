@@ -1,15 +1,17 @@
 @import '@/variables';
 
-.button {
+.button.noStyle {
+  background: none;
   border: none;
   padding: 0;
+}
 
-  &:not(.noStyle) {
-    background-color: $ung-light-blue;
-    border-radius: 5px;
-    padding: 10px;
-    color: white;
-  }
+.button:not(.noStyle) {
+  border: none;
+  background-color: $ung-light-blue;
+  border-radius: 5px;
+  padding: 10px;
+  color: white;
 
   &:hover {
     background-color: mix($ung-light-blue, black, 90%);
