@@ -7,8 +7,9 @@ import User from '@/icons/User';
 import Users from '@/icons/Users';
 import Star from '@/icons/Star';
 import Trash from '@/icons/Trash';
+import LeftChevron from '@/icons/LeftChevron';
 import LeftArrow from '@/icons/LeftArrow';
-import RightArrow from '@/icons/RightArrow';
+import RightChevron from '@/icons/RightChevron';
 import Logout from './Logout';
 import Login from './Login';
 import Language from './Language';
@@ -21,13 +22,14 @@ const Icons = {
   Home,
   Language,
   LeftArrow,
+  LeftChevron,
   Login,
   LogoEtu,
   Logout,
   Menu,
   Star,
   Trash,
-  RightArrow,
+  RightChevron,
   User,
   Users,
 };

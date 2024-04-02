@@ -30,7 +30,7 @@ export default function Input<T extends string | number>({
         placeholder={placeholder}
         type={type}
       />
-      <Button noStyle onClick={() => onEnter()}>
+      <Button noStyle onClick={() => onEnter()} noTab>
         {Icon && <Icon />}
       </Button>
     </div>

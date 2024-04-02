@@ -8,6 +8,7 @@ import Input from '@/components/UI/Input';
 import Button from '@/components/UI/Button';
 import Link from '@/components/UI/Link';
 import ung from '@/../public/images/ung-logo.svg';
+import logoutt from '@/../public/images/logoutt.jpg';
 import { useAPI } from '@/api/api';
 import { useAppTranslation } from '@/lib/i18n';
 
@@ -27,29 +28,29 @@ export default function LoginForm() {
         {connectionText.slice(0, (connectionText.length * 2) / 3)}
         <span className={styles.bluePart}>{connectionText.slice((connectionText.length * 2) / 3)}</span>
       </div>
-      <Input value={username} onChange={(v) => setUsername(v)} onEnter={submit} placeholder="Adresse mail" />
-      <Input
-        value={password}
-        onChange={(v) => setPassword(v)}
-        onEnter={submit}
-        placeholder="Mot de passe"
-        type="password"
-      />
+      <a href={`https://cas.utt.fr/cas/login?${new URLSearchParams({
+            service: 'https://etu.assos.utt.fr/login',
+          }).toString()}`} className={styles.cas}>
+        <img src={logoutt.src} alt="Logo UTT" />
+        <span>{t('login:login.connectWithCas')}</span>
+      </a>
+      <span>{t('common:or').toUpperCase()}</span>
+      <div className={styles.inputContainer}>
+        <Input value={username} onChange={(v) => setUsername(v)} onEnter={submit} placeholder="Adresse mail" />
+        <Input
+          value={password}
+          onChange={(v) => setPassword(v)}
+          onEnter={submit}
+          placeholder="Mot de passe"
+          type="password"
+        />
+      </div>
       <Link href={'/register'} className={styles.link}>
         {t('login:login.noAccountYet')}
       </Link>
       <Button onClick={submit} className={styles.button}>
         {t('login:login.login')}
       </Button>
-      <p>
-        {t('common:or')}{' '}
-        <a
-          href={`https://cas.utt.fr/cas/login?${new URLSearchParams({
-            service: 'https://etu.assos.utt.fr/login',
-          }).toString()}`}>
-          {t('login:login.connectWithCas')}
-        </a>
-      </p>
     </div>
   );
 }

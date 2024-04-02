@@ -145,18 +145,18 @@ export default function Navbar() {
   return (
     <div className={`${styles.navigation} ${menuItems.collapsed ? styles.collapsed : ''}`}>
       {/* LOGO ETUUTT */}
-      <a className={`${styles.navigationLogo}`}>
+      <Link href="/" className={`${styles.navigationLogo}`}>
         <div>
-          <div className={`${styles.navigationIcons}`} onClick={() => menuItems.collapsed && toggleCollapsed()}>
+          <div className={styles.navigationIcons} onClick={() => menuItems.collapsed && toggleCollapsed()}>
             <Icons.Menu />
             <Icons.LogoEtu />
           </div>
           <span>EtuUTT</span>
         </div>
-        <div onClick={toggleCollapsed}>
-          <Icons.Menu />
+        <div className={styles.rightIcon} onClick={toggleCollapsed}>
+          <Icons.LeftArrow />
         </div>
-      </a>
+      </Link>
       {/* NAVIGATION */}
       <nav role="navigation">
         <ul>
@@ -221,10 +221,10 @@ export default function Navbar() {
         {/* NOT LOGGED IN */}
         {!loggedIn && (
           <div className={styles.guest}>
-            <a className={styles.navigationLink} href="#">
+            <Link className={styles.navigationLink} href="/login">
               <Icons.Login />
               <span>Connexion</span>
-            </a>
+            </Link>
             <div className={`${styles.buttons}`}>
               <Button onClick={() => router.push('/login')}>Connexion</Button>
               <Button onClick={() => router.push('/register')}>Inscription</Button>

@@ -7,18 +7,25 @@ export default function Button({
   className = '',
   disabled = false,
   noStyle = false,
+  noTab = false,
 }: {
   children?: ReactNode;
   onClick?: () => void;
   className?: string;
   disabled?: boolean;
   noStyle?: boolean;
+  noTab?: boolean;
 }) {
   return (
     <button
       onClick={onClick}
       className={`${styles.button} ${className} ${noStyle ? styles.noStyle : ''}`}
-      disabled={disabled}>
+      disabled={disabled}
+      tabIndex={
+        noTab
+          ? -1
+          : undefined
+      }>
       {children}
     </button>
   );

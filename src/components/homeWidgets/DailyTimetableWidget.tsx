@@ -83,13 +83,13 @@ export default function DailyTimetableWidget() {
       subtitle={t('homepage:dailyTimetable.subtitle')}>
       <div className={styles.chooseDay}>
         <Button noStyle onClick={() => setSelectedDate(new Date(selectedDate.getTime() - DAY_LENGTH))}>
-          <Icons.LeftArrow />
+          <Icons.LeftChevron />
         </Button>
         {format(selectedDate, `cccc d MMMM${selectedDate.getFullYear() === new Date().getFullYear() ? '' : ' yyyy'}`, {
           locale: locale.fr,
         })}
         <Button noStyle onClick={() => setSelectedDate(new Date(selectedDate.getTime() + DAY_LENGTH))}>
-          <Icons.RightArrow />
+          <Icons.RightChevron />
         </Button>
       </div>
       <div className={styles.timetable}>
