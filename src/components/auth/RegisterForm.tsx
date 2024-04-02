@@ -52,7 +52,7 @@ export default function RegisterForm() {
         {t('common:or')}{' '}
         <a
           href={`https://cas.utt.fr/cas/login?${new URLSearchParams({
-            service: 'https://etu.assos.utt.fr/api/login',
+            service: 'https://etu.assos.utt.fr/login',
           }).toString()}`}>
           {t('login:register.registerWithCas')}
         </a>
