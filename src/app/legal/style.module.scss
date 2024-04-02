@@ -5,7 +5,14 @@
     width: clamp(350px, 80%, 1920px);
     margin: 0 auto;
     padding: 4rem 0;
+    line-height: 1.25;
     //color: #fff;
+
+    >h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin: 1rem 0;
+    }
 
     .articleTitle {
       margin: 30px 0 20px 0;
@@ -13,7 +20,7 @@
     }
 
     .subArticleTitle {
-      margin: 26px 0 0 0;
+      margin: 20px 0 10px 0;
     }
 
     .cgv {
