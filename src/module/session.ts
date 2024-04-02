@@ -1,5 +1,5 @@
 import { type Action, createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import { AppDispatch } from '@/lib/store';
+import { AppDispatch, RootState } from '@/lib/store';
 import { LoginRequestDto, LoginResponseDto } from '@/api/auth/login';
 import { StatusCodes } from 'http-status-codes';
 import { RegisterRequestDto, RegisterResponseDto } from '@/api/auth/register';
@@ -51,6 +51,14 @@ export const register = (api: API, lastName: string, firstName: string, login: s
         birthday: new Date(2003, 1, 28),
       })
       .on('success', (body) => dispatch(setToken(body.access_token)))) as unknown as Action;
+
+export const logout = () =>
+  ((dispatch: AppDispatch) => {
+    dispatch(setToken(''));
+    dispatch(setUser(null));
+  }) as unknown as Action;
+
+export const isLoggedIn = (state: RootState) => state.session.logged;
 
 export const autoLogin = (api: API) =>
   (async (dispatch: AppDispatch) => {

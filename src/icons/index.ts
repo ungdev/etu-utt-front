@@ -9,13 +9,21 @@ import Star from '@/icons/Star';
 import Trash from '@/icons/Trash';
 import LeftArrow from '@/icons/LeftArrow';
 import RightArrow from '@/icons/RightArrow';
+import Logout from './Logout';
+import Login from './Login';
+import Language from './Language';
+import LogoEtu from './LogoEtu';
 
 const Icons = {
   Book,
   Caret,
   Collapse,
   Home,
+  Language,
   LeftArrow,
+  Login,
+  LogoEtu,
+  Logout,
   Menu,
   Star,
   Trash,
