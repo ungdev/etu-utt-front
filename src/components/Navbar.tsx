@@ -11,7 +11,7 @@ import Icons from '@/icons';
 import { isLoggedIn, logout } from '@/module/session';
 import Button from './UI/Button';
 import { usePageSettings } from '@/module/pageSettings';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 
 /**
  * The type defining all possible properties for a menu item
@@ -68,6 +68,7 @@ export default function Navbar() {
   //   > Menu3
   //   - Menu4
   const router = useRouter();
+  const pathname = usePathname();
   const [selectedMenuName, setSelectedMenuName] = useState<string>('');
   const menuItems = useAppSelector(getMenu);
   const loggedIn = useAppSelector(isLoggedIn);
@@ -116,7 +117,9 @@ export default function Navbar() {
     if (item.needLogin && !loggedIn) return false;
     return 'path' in item ? (
       <li key={item.name}>
-        <Link href={item.path as string} className={styles.navigationLink}>
+        <Link
+          href={item.path as string}
+          className={`${styles.navigationLink} ${pathname.startsWith(item.path as string) ? styles.active : ''}`}>
           {'icon' in item ? (item as MenuItem<true>).icon() : ''}
           <span>{item.translate ? t(item.name as NotParameteredTranslationKey) : item.name}</span>
         </Link>

@@ -319,6 +319,11 @@
     height: 1.5rem;
   }
 
+  &.active {
+    background-color: $ung-light-grey;
+    color: $navigation-text-color;
+  }
+
   > span {
     margin-left: 0.5rem;
 
