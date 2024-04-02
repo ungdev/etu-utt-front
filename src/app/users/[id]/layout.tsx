@@ -4,6 +4,7 @@ import { useUser } from '@/api/users/getUser';
 import Link from '@/components/UI/Link';
 import styles from './layout.module.scss';
 import defaultAvatar from '@/../public/images/default-avatar.jpg';
+import { apiUrl } from '@/utils/environment';
 
 const tabsInfo = [
   { path: '/', name: 'Informations' },
@@ -20,10 +21,20 @@ export default function UserDetailsLayout({ children }: { children: React.ReactN
   return (
     <div className={styles.userDetailsLayout}>
       <div className={styles.header}>
-        <img className={styles.avatar} src={defaultAvatar.src} />
-        <h1 className={styles.name}>
-          {user.firstName} {user.lastName}
-        </h1>
+        <img
+          className={styles.avatar}
+          src={user.avatar ? `${apiUrl}${user.avatar}` : defaultAvatar.src}
+          alt={'avatar'}
+        />
+        <div className={styles.basicInfo}>
+          <h1 className={styles.name}>
+            {user.firstName} {user.lastName}
+          </h1>
+          <p className={styles.semester}>
+            {user.branch}
+            {user.semester}
+          </p>
+        </div>
       </div>
       <div className={styles.tabs}>
         {tabsInfo.map((tab) => (
