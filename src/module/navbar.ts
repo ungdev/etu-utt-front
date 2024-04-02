@@ -74,29 +74,34 @@ export const userSlice = createSlice({
         name: 'common:navbar.home',
         path: '/',
         translate: true,
+        needLogin: false,
       },
       {
         icon: Icons.User,
         name: 'common:navbar.userBrowser',
         path: '/users',
         translate: true,
+        needLogin: true,
       },
       {
         icon: Icons.Book,
         name: 'common:navbar.uesBrowser',
         path: '/ues',
         translate: true,
+        needLogin: false,
       },
       {
         icon: Icons.Users,
         name: 'common:navbar.associations',
         path: '/assos',
         translate: true,
+        needLogin: false,
       },
       {
         icon: Icons.Caret,
         name: 'common:navbar.myUEs',
         translate: true,
+        needLogin: true,
         submenus: [
           {
             name: 'IF01',
@@ -120,6 +125,7 @@ export const userSlice = createSlice({
         icon: Icons.Caret,
         name: 'common:navbar.myAssociations',
         translate: true,
+        needLogin: true,
         submenus: [
           {
             name: 'UNG',
@@ -130,11 +136,6 @@ export const userSlice = createSlice({
             path: '/assos/bde',
           },
         ],
-      },
-      {
-        name: 'common:navbar.myTimetable',
-        path: '/user/schedule',
-        translate: true,
       },
     ],
     seperator: 4,

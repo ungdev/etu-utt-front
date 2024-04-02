@@ -19,7 +19,7 @@ export default function TodaysBirthdaysWidget() {
                 <div className={styles.name}>
                   {user.firstName} {user.lastName}
                 </div>
-                <div className={styles.age}>{t('homepage:todaysBirthdays.age', { age: user.age })}</div>
+                <div className={styles.age}>{t('homepage:todaysBirthdays.age', { age: user.age.toString() })}</div>
               </div>
             ))
         : t('homepage:todaysBirthdays.beConnected')}
