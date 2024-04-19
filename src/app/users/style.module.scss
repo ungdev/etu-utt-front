@@ -1,0 +1,27 @@
+@import '@/variables.scss';
+
+.searchUserPage {
+  .user {
+    display: flex;
+    gap: 1rem;
+    padding: 5px;
+
+    img {
+      width: 80px;
+      height: 80px;
+      border-radius: 100%;
+    }
+
+    .userInfo {
+      h2 {
+        font-weight: bold;
+        font-size: 1.3rem;
+        margin-bottom: 0.2rem;
+
+        .nickname {
+          color: $ung-dark-grey;
+        }
+      }
+    }
+  }
+}

@@ -27,10 +27,7 @@ export function ResultsList<T extends object>({
           key={getItemId(item)}
           className={styles.result}
           onClick={() => router.push(`${baseRedirectUrl}/${getItemId(item)}`)}>
-          <div className={styles.basicInfo}>
-            <InfoFC item={item} />
-          </div>
-          <p className={styles.details}>Détails {'>'}</p>
+          <InfoFC item={item} />
         </div>
       ))}
     </div>
