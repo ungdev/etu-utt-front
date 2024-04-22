@@ -1,7 +1,9 @@
 @import '@/variables';
 
 .page {
-  margin: 30px;
+  padding: 30px;
   width: 100%;
+  height: 100%;
   overflow: scroll;
+  background-color: #FAFBFC;
 }

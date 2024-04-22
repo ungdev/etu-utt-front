@@ -1,7 +1,6 @@
 import styles from './FilteredSearch.module.scss';
 import React, { useEffect, useState } from 'react';
-import Trash from '@/icons/Trash';
-import { NotParameteredTranslationKey, TranslationKey, useAppTranslation } from '@/lib/i18n';
+import { useAppTranslation } from '@/lib/i18n';
 import { useAppSelector } from '@/lib/hooks';
 
 /**
@@ -42,20 +41,14 @@ type Filter<
   FilterNames extends string,
   FiltersType extends GenericFiltersType<FilterNames>,
   FilterType extends FilterNames,
-  DefaultFilterName extends FilterNames,
 > = {
   component: FilterComponent<FilterNames, FiltersType, FilterType>;
   parameterName: string;
-} & (FilterType extends DefaultFilterName
+} & (FiltersType[FilterType]['dependsOn']['length'] extends 0
   ? object
   : {
-      name: TranslationKey;
-    }) &
-  (FiltersType[FilterType]['dependsOn']['length'] extends 0
-    ? object
-    : {
-        dependsOn: FiltersType[FilterType]['dependsOn'];
-      });
+      dependsOn: FiltersType[FilterType]['dependsOn'];
+    });
 
 /**
  * A type that will be implemented by the interface representing the different filters that exist.
@@ -64,12 +57,8 @@ export type GenericFiltersType<FilterNames extends string> = {
   [K in FilterNames]: { dependsOn: FilterNames[]; value: string };
 };
 
-export type FiltersDataType<
-  FilterNames extends string,
-  FiltersType extends GenericFiltersType<FilterNames>,
-  DefaultFilterName extends FilterNames,
-> = {
-  [FilterName in FilterNames]: Filter<FilterNames, FiltersType, FilterName, DefaultFilterName>;
+export type FiltersDataType<FilterNames extends string, FiltersType extends GenericFiltersType<FilterNames>> = {
+  [FilterName in FilterNames]: Filter<FilterNames, FiltersType, FilterName>;
 };
 
 /**
@@ -104,21 +93,19 @@ type NonNullFilterInstance<
 export default function FilteredSearch<
   FilterNames extends string,
   FiltersType extends GenericFiltersType<FilterNames>,
-  DefaultFilterName extends FilterNames,
 >({
   filtersData,
-  defaultFilter,
   updateSearch,
 }: {
-  filtersData: FiltersDataType<FilterNames, FiltersType, DefaultFilterName>;
-  defaultFilter: DefaultFilterName;
+  filtersData: FiltersDataType<FilterNames, FiltersType>;
   updateSearch: (filters: Record<string, string>) => void;
 }) {
-  const [showAddFilterDropdown, setShowAddFilterDropdown] = useState<boolean>(false);
   // The filters currently used.
-  const [filters, setFilters] = useState<Array<FilterInstance<FilterNames, FiltersType>>>([
-    { filter: defaultFilter, value: null, search: null, forcedValue: null },
-  ]);
+  const [filters, setFilters] = useState<Array<FilterInstance<FilterNames, FiltersType>>>(
+    Object.entries(filtersData)
+      .filter(([, filter]) => !('dependsOn' in filter))
+      .map(([filterName]) => ({ filter: filterName, value: null, search: null, forcedValue: null })),
+  );
   // When the filters were last updated. Used to avoid updating the search too often.
   const [lastUpdate] = useState<{ value: number }>({ value: Date.now() });
   const { t } = useAppTranslation();
@@ -162,88 +149,63 @@ export default function FilteredSearch<
       .filter((filter) =>
         ({ dependsOn: [], ...filtersData[filter.filter] }).dependsOn.some((dependsOn) => dependsOn === filterName),
       )
-      .map((filter) => deleteFilter(filter.filter));
+      .map((filter) => {
+        deleteDependentFilters(filter.filter);
+        setFilters((filters) => filters.filter((f) => f.filter !== filter.filter));
+      });
+  };
+
+  const createDependentFilters = (filterName: FilterNames) => {
+    Object.entries(filtersData)
+      .filter(([, filter]) => ({ dependsOn: [], ...filter }).dependsOn.some((dependsOn) => dependsOn === filterName))
+      .map(([filterName]) => addFilter(filterName));
   };
 
   const addFilter = (name: FilterNames, forcedValue?: string) => {
-    setFilters([...filters, { filter: name, value: null, search: null, forcedValue: forcedValue ?? null }]);
+    console.log('adding filter ' + name);
+    setFilters((filters) => [
+      ...filters,
+      { filter: name, value: null, search: null, forcedValue: forcedValue ?? null },
+    ]);
   };
+
   const updateFilter = <T extends FilterNames>(
     filterIndex: number,
     { value, search, forcedValue }: Partial<Omit<FilterInstance<FilterNames, FiltersType, T>, 'filter'>>,
   ) => {
     const newFilters = [...filters];
+    const oldValue = newFilters[filterIndex].value;
     if (value !== undefined) newFilters[filterIndex].value = value;
     if (search !== undefined) newFilters[filterIndex].search = search;
     if (forcedValue !== undefined) newFilters[filterIndex].forcedValue = forcedValue;
     setFilters(newFilters);
     if (value === null) {
       deleteDependentFilters(newFilters[filterIndex].filter);
+    } else if (oldValue === null) {
+      createDependentFilters(newFilters[filterIndex].filter);
     }
   };
-  const deleteFilter = (filterName: FilterNames) => {
-    deleteDependentFilters(filterName);
-    setFilters((filters) => {
-      return filters.filter((filter) => filter.filter !== filterName);
-    });
-  };
-
-  const hasFilter = (filter: FilterNames, acceptNull: boolean) =>
-    filters.some((usedFilter) => usedFilter.filter === filter && (usedFilter.value !== null || acceptNull));
-
-  const addableFilters = Object.keys(filtersData).filter(
-    (filter) =>
-      !hasFilter(filter, true) && { dependsOn: [], ...filtersData[filter] }.dependsOn.every((f) => hasFilter(f, false)),
-  ) as Exclude<FilterNames, DefaultFilterName>[];
 
   return (
     <div className={styles.filtersBar}>
-      <table>
-        <tbody>
-          {filters.map((filter, i) => {
-            const Filter = filtersData[filter.filter].component;
-            const otherProps = Object.fromEntries(
-              (filtersData[filter.filter] as { dependsOn?: string[] }).dependsOn?.map((dependsOn) => {
-                return [dependsOn, filters.find((f) => f.filter === dependsOn)?.value];
-              }) ?? [],
-            );
-            return (
-              <tr key={filter.filter}>
-                <td>
-                  <Filter
-                    onUpdate={(value, search) => updateFilter(i, { value, search })}
-                    forcedValue={filter.forcedValue}
-                    {...(otherProps as DependencyProps<FilterNames, FiltersType, typeof filter.filter>)}
-                  />
-                </td>
-                <td>
-                  {i !== 0 && (
-                    <button onClick={() => deleteFilter(filter.filter)}>
-                      <Trash className={styles.trash} />
-                    </button>
-                  )}
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-      <div className={styles.addFilter}>
-        <button
-          onFocus={() => setShowAddFilterDropdown(true)}
-          onBlur={() => setShowAddFilterDropdown(false)}
-          disabled={addableFilters.length === 0}>
-          + Ajouter des filtres
-        </button>
-        <div className={`${styles.addFilterDropdown} ${showAddFilterDropdown ? styles.show : ''}`}>
-          {addableFilters.map((filter) => (
-            <button key={filter} onClick={() => addFilter(filter)}>
-              {(filtersData[filter] as { name: NotParameteredTranslationKey }).name !== null &&
-                t((filtersData[filter] as { name: NotParameteredTranslationKey }).name!)}
-            </button>
-          ))}
-        </div>
-      </div>
+      <h2>Filtres</h2>
+      {filters.map((filter, i) => {
+        const Filter = filtersData[filter.filter].component;
+        const otherProps = Object.fromEntries(
+          (filtersData[filter.filter] as { dependsOn?: string[] }).dependsOn?.map((dependsOn) => {
+            return [dependsOn, filters.find((f) => f.filter === dependsOn)?.value];
+          }) ?? [],
+        );
+        return (
+          <div key={filter.filter} className={styles.filter}>
+            <Filter
+              onUpdate={(value, search) => updateFilter(i, { value, search })}
+              forcedValue={filter.forcedValue}
+              {...(otherProps as DependencyProps<FilterNames, FiltersType, typeof filter.filter>)}
+            />
+          </div>
+        );
+      })}
     </div>
   );
 }

@@ -4,6 +4,7 @@ import { FC } from 'react';
 
 export function ResultsList<T extends object>({
   data,
+  totalResults,
   baseRedirectUrl,
   getItemId = (item: T) =>
     'id' in item
@@ -15,6 +16,7 @@ export function ResultsList<T extends object>({
   InfoFC,
 }: {
   data: T[];
+  totalResults: number;
   baseRedirectUrl: string;
   getItemId?: (item: T) => string;
   InfoFC: FC<{ item: T }>;
@@ -22,14 +24,17 @@ export function ResultsList<T extends object>({
   const router = useRouter();
   return (
     <div className={styles.resultsList}>
-      {data.map((item) => (
-        <div
-          key={getItemId(item)}
-          className={styles.result}
-          onClick={() => router.push(`${baseRedirectUrl}/${getItemId(item)}`)}>
-          <InfoFC item={item} />
-        </div>
-      ))}
+      <div className={styles.totalResults}>{totalResults} résultats</div>
+      <div className={styles.results}>
+        {data.map((item) => (
+          <div
+            key={getItemId(item)}
+            className={styles.result}
+            onClick={() => router.push(`${baseRedirectUrl}/${getItemId(item)}`)}>
+            <InfoFC item={item} />
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

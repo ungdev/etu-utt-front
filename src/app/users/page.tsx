@@ -2,11 +2,9 @@
 import styles from './style.module.scss';
 import FilteredSearch, { FiltersDataType, GenericFiltersType } from '@/components/filteredSearch/FilteredSearch';
 import { createInputFilter } from '@/components/filteredSearch/InputFilter';
-import Icons from '@/icons';
 import { useUsers } from '@/api/users/searchUsers.hook';
 import { ResultsList } from '@/components/ResultsList';
 import { usePageSettings } from '@/module/pageSettings';
-import icons from '@/icons';
 import defaultAvatar from '@/../public/images/default-avatar.jpg';
 
 type FilterNames = 'name' | 'firstName' | 'lastName' | 'nickname';
@@ -19,54 +17,55 @@ interface FiltersType extends GenericFiltersType<FilterNames> {
 }
 
 const filtersData = Object.freeze({
-  name: { component: createInputFilter('users:filter.search', Icons.User), parameterName: 'q' },
+  name: {
+    component: createInputFilter('users:filter.search.placeholder', 'users:filter.search.title'),
+    parameterName: 'q',
+  },
   firstName: {
-    component: createInputFilter('users:filter.firstName'),
+    component: createInputFilter('users:filter.firstName.placeholder', 'users:filter.firstName.title'),
     parameterName: 'firstName',
-    name: 'users:filter.firstName',
   },
   lastName: {
-    component: createInputFilter('users:filter.lastName'),
+    component: createInputFilter('users:filter.lastName.placeholder', 'users:filter.lastName.title'),
     parameterName: 'lastName',
-    name: 'users:filter.lastName',
   },
   nickname: {
-    component: createInputFilter('users:filter.nickname'),
+    component: createInputFilter('users:filter.nickname.placeholder', 'users:filter.nickname.title'),
     parameterName: 'nickname',
-    name: 'users:filter.nickname',
   },
-} satisfies FiltersDataType<FilterNames, FiltersType, 'name'>);
+} satisfies FiltersDataType<FilterNames, FiltersType>);
 
 export default function SearchUserPage() {
   usePageSettings({});
-  const [users, updateUsers] = useUsers();
+  const [users, totalUsers, updateUsers] = useUsers();
   return (
     <div className={styles.searchUserPage}>
-      <h1>Trombinoscope</h1>
-      <FilteredSearch<FilterNames, FiltersType, 'name'>
-        filtersData={filtersData}
-        defaultFilter="name"
-        updateSearch={updateUsers}
-      />
-      <ResultsList
-        data={users}
-        baseRedirectUrl={'/users'}
-        InfoFC={({ item }) => (
-          <div className={styles.user}>
-            <img src={item.avatar || defaultAvatar.src} alt="avatar" />
-            <div className={styles.userInfo}>
-              <h2>
-                {item.firstName} {item.lastName}
-                {item.nickname && <span className={styles.nickname}>{item.nickname}</span>}
-              </h2>
-              {item.branch && <p>{item.branch}</p>}
-              <p>{item.mailUTT}</p>
-              {item.mailPersonal && <p>{item.mailPersonal}</p>}
-              {item.phone && <p>{item.phone}</p>}
-            </div>
-          </div>
-        )}
-      />
+      <h1 className={styles.title}>Trombinoscope</h1>
+      <div className={styles.content}>
+        <FilteredSearch<FilterNames, FiltersType> filtersData={filtersData} updateSearch={updateUsers} />
+        <div className={styles.results}>
+          <ResultsList
+            data={users}
+            totalResults={totalUsers}
+            baseRedirectUrl={'/users'}
+            InfoFC={({ item }) => (
+              <div className={styles.user}>
+                <img src={item.avatar || defaultAvatar.src} alt="avatar" />
+                <div className={styles.userInfo}>
+                  <h2>
+                    {item.firstName} {item.lastName}
+                    {item.nickname && <span className={styles.nickname}>{item.nickname}</span>}
+                  </h2>
+                  {item.branch && <p>{item.branch}</p>}
+                  <p>{item.mailUTT}</p>
+                  {item.mailPersonal && <p>{item.mailPersonal}</p>}
+                  {item.phone && <p>{item.phone}</p>}
+                </div>
+              </div>
+            )}
+          />
+        </div>
+      </div>
     </div>
   );
 }

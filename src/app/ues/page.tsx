@@ -1,4 +1,5 @@
 'use client';
+// import styles from './style.module.scss';
 import { createInputFilter } from '@/components/filteredSearch/InputFilter';
 import { useUEs } from '@/api/ue/search';
 import FilteredSearch, { FiltersDataType, GenericFiltersType } from '@/components/filteredSearch/FilteredSearch';
@@ -36,43 +37,40 @@ const ueFilters = Object.freeze({
   name: { component: createInputFilter('ues:filter.search', Icons.Book), parameterName: 'q' }, // This one does not need a name as it will never be displayed
   creditType: {
     component: createSelectFilter(['CS', 'TM']),
-    name: 'ues:filter.creditType',
     parameterName: 'creditType',
   },
-  branch: { component: createSelectFilter(['RT', 'ISI', 'SN']), name: 'ues:filter.branch', parameterName: 'branch' },
+  branch: { component: createSelectFilter(['RT', 'ISI', 'SN']), parameterName: 'branch' },
   branchOption: {
     component: ({ onUpdate, forcedValue, branch }) => (
       <SelectFilter onUpdate={onUpdate} forcedValue={forcedValue} choices={branchOptions[branch]} />
     ),
-    name: 'ues:filter.branchOption',
     dependsOn: ['branch'],
     parameterName: 'branchOption',
   },
-  semester: { component: createSelectFilter(['A', 'P']), name: 'ues:filter.semester', parameterName: 'semester' },
-} satisfies FiltersDataType<FilterNames, UEFiltersType, 'name'>);
+  semester: { component: createSelectFilter(['A', 'P']), parameterName: 'semester' },
+} satisfies FiltersDataType<FilterNames, UEFiltersType>);
 
 export default function Page() {
   usePageSettings({});
-  const [ues, updateUEs] = useUEs();
+  const [ues, totalUesCount, updateUEs] = useUEs();
   return (
-    <div>
+    <div /*className={styles.page}*/>
       <h1>Guide des UEs</h1>
-      <FilteredSearch<FilterNames, UEFiltersType, 'name'>
-        filtersData={ueFilters}
-        defaultFilter={'name'}
-        updateSearch={updateUEs}
-      />
-      <ResultsList
-        data={ues}
-        baseRedirectUrl={'/ues'}
-        InfoFC={({ item }) => (
-          <>
-            <h2>{item.code}</h2>
-            <p>{item.name}</p>
-          </>
-        )}
-        getItemId={(ue) => ue.code}
-      />
+      <div /*className={styles.content}*/>
+        <FilteredSearch<FilterNames, UEFiltersType> filtersData={ueFilters} updateSearch={updateUEs} />
+        <ResultsList
+          data={ues}
+          totalResults={totalUesCount}
+          baseRedirectUrl={'/ues'}
+          InfoFC={({ item }) => (
+            <>
+              <h2>{item.code}</h2>
+              <p>{item.name}</p>
+            </>
+          )}
+          getItemId={(ue) => ue.code}
+        />
+      </div>
     </div>
   );
 }
