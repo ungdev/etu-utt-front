@@ -103,7 +103,7 @@ export default function FilteredSearch<
   // The filters currently used.
   const [filters, setFilters] = useState<Array<FilterInstance<FilterNames, FiltersType>>>(
     Object.entries(filtersData)
-      .filter(([, filter]) => !('dependsOn' in filter))
+      .filter(([, filter]) => !('dependsOn' in filter) || filter.dependsOn.length === 0)
       .map(([filterName]) => ({ filter: filterName, value: null, search: null, forcedValue: null })),
   );
   // When the filters were last updated. Used to avoid updating the search too often.

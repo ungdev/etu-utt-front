@@ -1,12 +1,14 @@
+import styles from './SelectFilter.module.scss';
 import { FC, useEffect, useRef, useState } from 'react';
-import { useAppTranslation } from '@/lib/i18n';
+import { NotParameteredTranslationKey, useAppTranslation } from '@/lib/i18n';
 import { BaseFilterProps } from '@/components/filteredSearch/FilteredSearch';
 
 export function SelectFilter<Choices extends string>({
   onUpdate,
   forcedValue,
   choices,
-}: BaseFilterProps<Choices> & { choices: Choices[] }) {
+  title,
+}: BaseFilterProps<Choices> & { choices: Choices[]; title: NotParameteredTranslationKey }) {
   const [value, setValue] = useState<Choices | 'all'>('all');
   const { t } = useAppTranslation();
   const forcedValueRef = useRef<string | null>(null);
@@ -18,21 +20,27 @@ export function SelectFilter<Choices extends string>({
     onUpdate(value === 'all' ? null : value, value === 'all' ? null : value);
   }, [value]);
   return (
-    <select value={value} onChange={(event) => setValue(event.target.value as Choices | 'all')}>
-      <option key={null} value="all">
-        {t('ues:filter.semester.all')}
-      </option>
+    <div className={styles.filter}>
+      <h3 className={styles.title}>{t(title)}</h3>
+      <label key={'all'} className={styles.option}>
+        <input type={'radio'} name={title} value={'all'} onChange={() => setValue('all')} />
+        {t('ues:filter.all')}
+      </label>
       {choices.map((choice) => (
-        <option key={choice} value={choice}>
+        <label key={choice} className={styles.option}>
+          <input type={'radio'} name={title} value={choice} onChange={() => setValue(choice)} />
           {choice}
-        </option>
+        </label>
       ))}
-    </select>
+    </div>
   );
 }
 
-export function createSelectFilter<Choices extends string>(choices: Choices[]): FC<BaseFilterProps<Choices>> {
+export function createSelectFilter<Choices extends string>(
+  choices: Choices[],
+  title: NotParameteredTranslationKey,
+): FC<BaseFilterProps<Choices>> {
   return function SelectFilterWrapper(props: BaseFilterProps<Choices>) {
-    return <SelectFilter {...props} choices={choices} />;
+    return <SelectFilter {...props} choices={choices} title={title} />;
   };
 }

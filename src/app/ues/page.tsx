@@ -1,5 +1,5 @@
 'use client';
-// import styles from './style.module.scss';
+import styles from './style.module.scss';
 import { createInputFilter } from '@/components/filteredSearch/InputFilter';
 import { useUEs } from '@/api/ue/search';
 import FilteredSearch, { FiltersDataType, GenericFiltersType } from '@/components/filteredSearch/FilteredSearch';
@@ -34,42 +34,52 @@ const branchOptions = {
  * The definition of the filters. They can then be used in JavaScript code to get the filter component, the name of the filter, ...
  */
 const ueFilters = Object.freeze({
-  name: { component: createInputFilter('ues:filter.search', Icons.Book), parameterName: 'q' }, // This one does not need a name as it will never be displayed
+  name: {
+    component: createInputFilter('ues:filter.search', 'ues:filter.search.title', Icons.Book),
+    parameterName: 'q',
+  }, // This one does not need a name as it will never be displayed
   creditType: {
-    component: createSelectFilter(['CS', 'TM']),
+    component: createSelectFilter(['CS', 'TM'], 'ues:filter.creditType.title'),
     parameterName: 'creditType',
   },
-  branch: { component: createSelectFilter(['RT', 'ISI', 'SN']), parameterName: 'branch' },
+  branch: { component: createSelectFilter(['RT', 'ISI', 'SN'], 'ues:filter.branch.title'), parameterName: 'branch' },
   branchOption: {
     component: ({ onUpdate, forcedValue, branch }) => (
-      <SelectFilter onUpdate={onUpdate} forcedValue={forcedValue} choices={branchOptions[branch]} />
+      <SelectFilter
+        onUpdate={onUpdate}
+        forcedValue={forcedValue}
+        choices={branchOptions[branch]}
+        title={'ues:filter.branchOption.title'}
+      />
     ),
     dependsOn: ['branch'],
     parameterName: 'branchOption',
   },
-  semester: { component: createSelectFilter(['A', 'P']), parameterName: 'semester' },
+  semester: { component: createSelectFilter(['A', 'P'], 'ues:filter.semester.title'), parameterName: 'semester' },
 } satisfies FiltersDataType<FilterNames, UEFiltersType>);
 
 export default function Page() {
   usePageSettings({});
   const [ues, totalUesCount, updateUEs] = useUEs();
   return (
-    <div /*className={styles.page}*/>
-      <h1>Guide des UEs</h1>
-      <div /*className={styles.content}*/>
+    <div className={styles.page}>
+      <h1 className={styles.title}>Guide des UEs</h1>
+      <div className={styles.content}>
         <FilteredSearch<FilterNames, UEFiltersType> filtersData={ueFilters} updateSearch={updateUEs} />
-        <ResultsList
-          data={ues}
-          totalResults={totalUesCount}
-          baseRedirectUrl={'/ues'}
-          InfoFC={({ item }) => (
-            <>
-              <h2>{item.code}</h2>
-              <p>{item.name}</p>
-            </>
-          )}
-          getItemId={(ue) => ue.code}
-        />
+        <div className={styles.results}>
+          <ResultsList
+            data={ues}
+            totalResults={totalUesCount}
+            baseRedirectUrl={'/ues'}
+            InfoFC={({ item }) => (
+              <div>
+                <h2>{item.code}</h2>
+                <p>{item.name}</p>
+              </div>
+            )}
+            getItemId={(ue) => ue.code}
+          />
+        </div>
       </div>
     </div>
   );
