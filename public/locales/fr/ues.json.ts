@@ -2,15 +2,13 @@
 // For more information, check the common.json.ts file
 
 export default {
+  "browser": "Guide des UEs",
   "filter.search": "Recherche dans le guide des UEs",
-  "filter.creditType": "Type de crédits",
-  "filter.creditType.all": "Tous",
-  "filter.branch": "Branche",
-  "filter.branch.all": "Toutes",
-  "filter.branchOption": "Filière",
-  "filter.branchOption.all": "Toutes",
-  "filter.semester": "Semestre",
-  "filter.semester.all": "Tous",
+  "filter.search.title": "Recherche dans le guide des UEs",
+  "filter.creditType.title": "Type de crédits",
+  "filter.branch.title": "Branche",
+  "filter.branchOption.title": "Filière",
+  "filter.semester.title": "Semestre",
   "detailed.inscriptionCode": "Code d'inscription",
   "detailed.workTime" : "Temps de travail",
   "detailed.workTime.project": "Projet",

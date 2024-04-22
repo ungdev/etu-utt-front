@@ -7,6 +7,7 @@ import Icons from '@/icons';
 import { createSelectFilter, SelectFilter } from '@/components/filteredSearch/SelectFilter';
 import { ResultsList } from '@/components/ResultsList';
 import { usePageSettings } from '@/module/pageSettings';
+import { useAppTranslation } from '@/lib/i18n';
 
 /**
  * The different filters that exist.
@@ -60,10 +61,11 @@ const ueFilters = Object.freeze({
 
 export default function Page() {
   usePageSettings({});
+  const {t } = useAppTranslation();
   const [ues, totalUesCount, updateUEs] = useUEs();
   return (
     <div className={styles.page}>
-      <h1 className={styles.title}>Guide des UEs</h1>
+      <h1 className={styles.title}>{t('ues:browser')}</h1>
       <div className={styles.content}>
         <FilteredSearch<FilterNames, UEFiltersType> filtersData={ueFilters} updateSearch={updateUEs} />
         <div className={styles.results}>

@@ -1,6 +1,7 @@
 import styles from './ResultsList.module.scss';
 import { useRouter } from 'next/navigation';
 import { FC } from 'react';
+import { useAppTranslation } from '@/lib/i18n';
 
 export function ResultsList<T extends object>({
   data,
@@ -22,9 +23,12 @@ export function ResultsList<T extends object>({
   InfoFC: FC<{ item: T }>;
 }) {
   const router = useRouter();
+  const { t } = useAppTranslation();
   return (
     <div className={styles.resultsList}>
-      <div className={styles.totalResults}>{totalResults} résultats</div>
+      <div className={styles.totalResults}>
+        {totalResults} {t('common:results')}
+      </div>
       <div className={styles.results}>
         {data.map((item) => (
           <div

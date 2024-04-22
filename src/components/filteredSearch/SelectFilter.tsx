@@ -23,12 +23,18 @@ export function SelectFilter<Choices extends string>({
     <div className={styles.filter}>
       <h3 className={styles.title}>{t(title)}</h3>
       <label key={'all'} className={styles.option}>
-        <input type={'radio'} name={title} value={'all'} onChange={() => setValue('all')} />
-        {t('ues:filter.all')}
+        <input type={'radio'} name={title} value={'all'} onChange={() => setValue('all')} checked={value === 'all'} />
+        {t('common:filter.all')}
       </label>
       {choices.map((choice) => (
         <label key={choice} className={styles.option}>
-          <input type={'radio'} name={title} value={choice} onChange={() => setValue(choice)} />
+          <input
+            type={'radio'}
+            name={title}
+            value={choice}
+            onChange={() => setValue(choice)}
+            checked={value === choice}
+          />
           {choice}
         </label>
       ))}
