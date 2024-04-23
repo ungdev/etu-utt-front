@@ -8,7 +8,7 @@ export interface User {
   nationality: string;
   website: string;
   passions: string;
-  birthday: string;
+  birthday: Date;
   branch: string;
   semester: number;
   branchOption: string;

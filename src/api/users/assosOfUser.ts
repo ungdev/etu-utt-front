@@ -7,7 +7,7 @@ export function useAssosOfUser(userId: string): AssoMembership[] {
   const [assos, setAssos] = useState<AssoMembership[]>([]);
   const api = useAPI();
   useEffect(() => {
-    api.get<AssoMembership[]>(`/users/${userId}/assos`).on(StatusCodes.OK, setAssos);
+    api.get<AssoMembership[]>(`/users/${userId}/associations`).on(StatusCodes.OK, setAssos);
   }, [userId]);
   return assos;
 }

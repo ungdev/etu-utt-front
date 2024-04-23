@@ -10,5 +10,17 @@ export default {
   "filter.lastName.placeholder": "Recherche par nom de famille",
   "filter.nickname.title": "Surnom",
   "filter.nickname.placeholder": "Recherche par surnom",
+  "nickname": "Surnom",
+  "sex": "Sexe",
+  "mailUTT": "Mail UTT",
+  "mailPersonal": "Mail personnel",
+  "facebook": "Facebook",
+  "phone": "Téléphone",
+  "website": "Site web",
+  "passions": "Passions",
+  "birthday": "Date de naissance",
+  "branch": "Branche",
+  "semester": "Semestre",
+  "branchOption": "Filière",
 } as const;
 

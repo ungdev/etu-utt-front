@@ -23,7 +23,7 @@ export default function UserDetailsLayout({ children }: { children: React.ReactN
       <div className={styles.header}>
         <img
           className={styles.avatar}
-          src={user.avatar ? `${apiUrl}${user.avatar}` : defaultAvatar.src}
+          src={user.avatar && user.avatar !== 'default.png' ? `${apiUrl}${user.avatar}` : defaultAvatar.src}
           alt={'avatar'}
         />
         <div className={styles.basicInfo}>

@@ -47,6 +47,10 @@
         font-weight: bold;
         padding: 1rem;
       }
+
+      &:not(.active) {
+        background-color: #F9F9F9;
+      }
     }
   }
 
