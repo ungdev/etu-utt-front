@@ -2,7 +2,7 @@
 // For more information, check the common.json.ts file
 
 export default {
-  "search": "Rechercher",
+  "search": "Aller vers...",
   "users.normal": "Trombinoscope",
   "users.normal.keywords": "utilisateurs users personnes",
   "ues.normal": "Guide des UEs",
