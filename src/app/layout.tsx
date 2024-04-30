@@ -6,6 +6,8 @@ import AutoLogin from '@/components/utilities/AutoLogin';
 import Wrapper from '@/components/utilities/Wrapper';
 import PageSearchParams from '@/components/utilities/PageSearchParams';
 import { Lexend } from 'next/font/google';
+import Navbar from '@/components/Navbar';
+import GoTo from '@/components/toplevel/GoTo';
 
 const lexend = Lexend({
   weight: ['400', '600', '700', '800'],

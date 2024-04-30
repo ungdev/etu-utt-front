@@ -7,13 +7,15 @@ export default function Link({
   children,
   href,
   className = '',
+  noStyle = false,
 }: {
   children?: ReactNode;
   href: Url;
   className?: string;
+  noStyle?: boolean;
 }) {
   return (
-    <ReactLink href={href} className={`${styles.link} ${className}`}>
+    <ReactLink href={href} className={`${styles.link} ${className} ${styles.noStyle}`}>
       <span>{children}</span>
     </ReactLink>
   );
