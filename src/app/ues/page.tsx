@@ -38,12 +38,18 @@ const ueFilters = Object.freeze({
   name: {
     component: createInputFilter('ues:filter.search', 'ues:filter.search.title', Icons.Book),
     parameterName: 'q',
+    updateDelayed: true,
   }, // This one does not need a name as it will never be displayed
   creditType: {
     component: createSelectFilter(['CS', 'TM'], 'ues:filter.creditType.title'),
     parameterName: 'creditType',
+    updateDelayed: false,
   },
-  branch: { component: createSelectFilter(['RT', 'ISI', 'SN'], 'ues:filter.branch.title'), parameterName: 'branch' },
+  branch: {
+    component: createSelectFilter(['RT', 'ISI', 'SN'], 'ues:filter.branch.title'),
+    parameterName: 'branch',
+    updateDelayed: false,
+  },
   branchOption: {
     component: ({ onUpdate, forcedValue, branch }) => (
       <SelectFilter
@@ -55,13 +61,21 @@ const ueFilters = Object.freeze({
     ),
     dependsOn: ['branch'],
     parameterName: 'branchOption',
+    updateDelayed: false,
   },
-  semester: { component: createSelectFilter(['A', 'P'], 'ues:filter.semester.title'), parameterName: 'semester' },
+  semester: {
+    component: createSelectFilter(['A', 'P'], 'ues:filter.semester.title', {
+      A: 'ues:filter.semester.autumn',
+      P: 'ues:filter.semester.spring',
+    }),
+    parameterName: 'semester',
+    updateDelayed: false,
+  },
 } satisfies FiltersDataType<FilterNames, UEFiltersType>);
 
 export default function Page() {
   usePageSettings({});
-  const {t } = useAppTranslation();
+  const { t } = useAppTranslation();
   const [ues, totalUesCount, updateUEs] = useUEs();
   return (
     <div className={styles.page}>
@@ -73,7 +87,7 @@ export default function Page() {
             data={ues}
             totalResults={totalUesCount}
             baseRedirectUrl={'/ues'}
-            InfoFC={({ item }) => (
+            itemFactory={({ item }) => (
               <div>
                 <h2>{item.code}</h2>
                 <p>{item.name}</p>

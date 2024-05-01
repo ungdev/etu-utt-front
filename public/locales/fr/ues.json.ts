@@ -9,6 +9,8 @@ export default {
   "filter.branch.title": "Branche",
   "filter.branchOption.title": "Filière",
   "filter.semester.title": "Semestre",
+  "filter.semester.autumn": "Automne",
+  "filter.semester.spring": "Printemps",
   "detailed.inscriptionCode": "Code d'inscription",
   "detailed.workTime" : "Temps de travail",
   "detailed.workTime.project": "Projet",

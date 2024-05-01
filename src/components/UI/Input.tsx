@@ -9,7 +9,7 @@ export default function Input<T extends string | number>({
   value,
   placeholder,
   type = 'text',
-  Icon,
+  icon: Icon,
 }: {
   className?: string;
   onChange?: (v: T) => void;
@@ -17,7 +17,7 @@ export default function Input<T extends string | number>({
   value?: T;
   placeholder?: string;
   type?: HTMLInputTypeAttribute;
-  Icon?: FC;
+  icon?: FC;
 }) {
   return (
     <div className={`${styles.inputWrapper} ${className}`}>

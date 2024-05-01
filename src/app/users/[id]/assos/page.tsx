@@ -2,14 +2,21 @@
 import { useAssosOfUser } from '@/api/users/assosOfUser';
 import { useParams } from 'next/navigation';
 import { usePageSettings } from '@/module/pageSettings';
+import { useUser } from '@/api/users/getUser';
+import { useAppTranslation } from '@/lib/i18n';
 
 export default function AssociativePage() {
   usePageSettings({});
   const { id: userId } = useParams<{ id: string }>();
   const associations = useAssosOfUser(userId);
+  const user = useUser(userId);
+  const { t } = useAppTranslation();
+  if (!user) {
+    return false;
+  }
   return (
     <>
-      <h1>Associations de l'utilisateur</h1>
+      <h1>{t('users:assos.title', { name: `${user?.firstName} ${user?.lastName}` })}</h1>
       {associations.length
         ? associations.map((asso) => (
             <div key={asso.asso.name}>
@@ -17,7 +24,7 @@ export default function AssociativePage() {
               {asso.role}
             </div>
           ))
-        : "Cet utilisateur n'est membre d'aucune association."}
+        : t('users:assos.noAssos')}
     </>
   );
 }

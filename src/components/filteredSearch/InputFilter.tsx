@@ -8,11 +8,11 @@ export function InputFilter({
   onUpdate,
   forcedValue,
   placeholder,
-  Icon,
+  icon: Icon,
   title,
 }: BaseFilterProps<string> & {
   placeholder: NotParameteredTranslationKey;
-  Icon?: FC;
+  icon?: FC;
   title: NotParameteredTranslationKey;
 }) {
   const [search, setSearch] = useState<string>('');
@@ -46,11 +46,11 @@ export function InputFilter({
 export function createInputFilter(
   placeholder: NotParameteredTranslationKey,
   title: NotParameteredTranslationKey,
-  Icon?: FC,
+  icon?: FC,
 ): FC<BaseFilterProps<string>> {
   return function CustomInputFilter({ onUpdate, forcedValue }: BaseFilterProps<string>) {
     return (
-      <InputFilter onUpdate={onUpdate} forcedValue={forcedValue} placeholder={placeholder} Icon={Icon} title={title} />
+      <InputFilter onUpdate={onUpdate} forcedValue={forcedValue} placeholder={placeholder} icon={icon} title={title} />
     );
   };
 }

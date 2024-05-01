@@ -5,16 +5,18 @@ import Link from '@/components/UI/Link';
 import styles from './layout.module.scss';
 import defaultAvatar from '@/../public/images/default-avatar.jpg';
 import { apiUrl } from '@/utils/environment';
+import { NotParameteredTranslationKey, useAppTranslation } from '@/lib/i18n';
 
 const tabsInfo = [
-  { path: '/', name: 'Informations' },
-  { path: '/assos', name: 'Associatif' },
-];
+  { path: '/', name: 'users:generalInfo.tabName' },
+  { path: '/assos', name: 'users:assos.tabName' },
+] as Array<{ path: string; name: NotParameteredTranslationKey }>;
 
 export default function UserDetailsLayout({ children }: { children: React.ReactNode }) {
   const { id: userId } = useParams<{ id: string }>();
   const pathname = usePathname().match(/\/users\/[\w-]+(\/\w+)?/)?.[1] ?? '/';
   const user = useUser(userId);
+  const { t } = useAppTranslation();
   if (!user) {
     return false;
   }
@@ -43,7 +45,7 @@ export default function UserDetailsLayout({ children }: { children: React.ReactN
             href={`/users/${userId}${tab.path}`}
             className={`${styles.tab} ${tab.path === pathname ? styles.active : ''}`}
             noStyle>
-            {tab.name}
+            {t(tab.name)}
           </Link>
         ))}
       </div>

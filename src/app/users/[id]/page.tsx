@@ -8,9 +8,12 @@ import { useAppTranslation } from '@/lib/i18n';
 function userData(data: string | number | undefined | null, label: string) {
   return (
     data && (
-      <>
-        <strong>{label} :</strong> {data} <br />
-      </>
+      <tr>
+        <td>
+          <strong>{label}</strong>
+        </td>
+        <td>{data}</td>
+      </tr>
     )
   );
 }
@@ -25,8 +28,8 @@ export default function UserPage() {
   }
   return (
     <div className={styles.page}>
-      <h2>Informations générales sur l'utilisateur</h2>
-      <div>
+      <h2>{t('users:generalInfo.title')}</h2>
+      <table>
         {userData(user.nickname, t('users:nickname'))}
         {userData(user.sex, t('users:sex'))}
         {userData(user.mailUTT, t('users:mailUTT'))}
@@ -35,11 +38,11 @@ export default function UserPage() {
         {userData(user.phone, t('users:phone'))}
         {userData(user.website, t('users:website'))}
         {userData(user.passions, t('users:passions'))}
-        {userData(user.birthday.toLocaleDateString(), t('users:birthday'))}
+        {userData(user.birthday?.toLocaleDateString(), t('users:birthday'))}
         {userData(user.branch, t('users:branch'))}
         {userData(user.semester, t('users:semester'))}
         {userData(user.branchOption, t('users:branchOption'))}
-      </div>
+      </table>
     </div>
   );
 }

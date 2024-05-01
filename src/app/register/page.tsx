@@ -1,3 +1,4 @@
+'use client';
 import RegisterForm from '@/components/auth/RegisterForm';
 import styles from '@/app/login/style.module.scss';
 import { usePageSettings } from '@/module/pageSettings';

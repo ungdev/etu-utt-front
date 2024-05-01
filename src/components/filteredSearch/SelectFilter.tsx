@@ -8,7 +8,12 @@ export function SelectFilter<Choices extends string>({
   forcedValue,
   choices,
   title,
-}: BaseFilterProps<Choices> & { choices: Choices[]; title: NotParameteredTranslationKey }) {
+  humanReadableMapping,
+}: BaseFilterProps<Choices> & {
+  choices: Choices[];
+  title: NotParameteredTranslationKey;
+  humanReadableMapping?: Record<Choices, NotParameteredTranslationKey>;
+}) {
   const [value, setValue] = useState<Choices | 'all'>('all');
   const { t } = useAppTranslation();
   const forcedValueRef = useRef<string | null>(null);
@@ -35,7 +40,7 @@ export function SelectFilter<Choices extends string>({
             onChange={() => setValue(choice)}
             checked={value === choice}
           />
-          {choice}
+          {humanReadableMapping ? t(humanReadableMapping[choice]) : choice}
         </label>
       ))}
     </div>
@@ -45,8 +50,9 @@ export function SelectFilter<Choices extends string>({
 export function createSelectFilter<Choices extends string>(
   choices: Choices[],
   title: NotParameteredTranslationKey,
+  humanReadableMapping?: Record<Choices, NotParameteredTranslationKey>,
 ): FC<BaseFilterProps<Choices>> {
   return function SelectFilterWrapper(props: BaseFilterProps<Choices>) {
-    return <SelectFilter {...props} choices={choices} title={title} />;
+    return <SelectFilter {...props} choices={choices} title={title} humanReadableMapping={humanReadableMapping} />;
   };
 }

@@ -20,18 +20,22 @@ const filtersData = Object.freeze({
   name: {
     component: createInputFilter('users:filter.search.placeholder', 'users:filter.search.title'),
     parameterName: 'q',
+    updateDelayed: true,
   },
   firstName: {
     component: createInputFilter('users:filter.firstName.placeholder', 'users:filter.firstName.title'),
     parameterName: 'firstName',
+    updateDelayed: true,
   },
   lastName: {
     component: createInputFilter('users:filter.lastName.placeholder', 'users:filter.lastName.title'),
     parameterName: 'lastName',
+    updateDelayed: true,
   },
   nickname: {
     component: createInputFilter('users:filter.nickname.placeholder', 'users:filter.nickname.title'),
     parameterName: 'nickname',
+    updateDelayed: true,
   },
 } satisfies FiltersDataType<FilterNames, FiltersType>);
 
@@ -48,7 +52,7 @@ export default function SearchUserPage() {
             data={users}
             totalResults={totalUsers}
             baseRedirectUrl={'/users'}
-            InfoFC={({ item }) => (
+            itemFactory={({ item }) => (
               <div className={styles.user}>
                 <img src={item.avatar || defaultAvatar.src} alt="avatar" />
                 <div className={styles.userInfo}>

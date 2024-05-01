@@ -1,5 +1,5 @@
 import styles from './FilteredSearch.module.scss';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useAppTranslation } from '@/lib/i18n';
 import { useAppSelector } from '@/lib/hooks';
 
@@ -44,6 +44,7 @@ type Filter<
 > = {
   component: FilterComponent<FilterNames, FiltersType, FilterType>;
   parameterName: string;
+  updateDelayed: boolean;
 } & (FiltersType[FilterType]['dependsOn']['length'] extends 0
   ? object
   : {
@@ -90,6 +91,12 @@ type NonNullFilterInstance<
   >;
 };
 
+enum FilterUpdateType {
+  NoUpdate,
+  Delay,
+  Instant,
+}
+
 export default function FilteredSearch<
   FilterNames extends string,
   FiltersType extends GenericFiltersType<FilterNames>,
@@ -101,7 +108,7 @@ export default function FilteredSearch<
   updateSearch: (filters: Record<string, string>) => void;
 }) {
   // The filters currently used.
-  const [filters, setFilters] = useState<Array<FilterInstance<FilterNames, FiltersType>>>(
+  const [filters, _setFilters] = useState<Array<FilterInstance<FilterNames, FiltersType>>>(
     Object.entries(filtersData)
       .filter(([, filter]) => !('dependsOn' in filter) || filter.dependsOn.length === 0)
       .map(([filterName]) => ({ filter: filterName, value: null, search: null, forcedValue: null })),
@@ -110,6 +117,7 @@ export default function FilteredSearch<
   const [lastUpdate] = useState<{ value: number }>({ value: Date.now() });
   const { t } = useAppTranslation();
   const searchParams = useAppSelector((state) => state.pageSettings.searchParams);
+  const updateType = useRef(FilterUpdateType.NoUpdate);
 
   // Update the value of filters when the URL parameters.
   useEffect(() => {
@@ -130,19 +138,37 @@ export default function FilteredSearch<
   // When filters are modified, update the search after 1 second.
   useEffect(() => {
     const now = Date.now();
-    lastUpdate.value = now;
-    setTimeout(() => {
-      if (lastUpdate.value === now) {
-        updateSearch(
-          Object.fromEntries(
-            filters
-              .filter((filter): filter is NonNullFilterInstance<FilterNames, FiltersType> => filter.search !== null)
-              .map((filter) => [filtersData[filter.filter].parameterName, filter.search]),
-          ),
-        );
-      }
-    }, 1000);
+    switch (updateType.current) {
+      case FilterUpdateType.Instant:
+        lastUpdate.value = now;
+        callUpdateSearch();
+        break;
+      case FilterUpdateType.Delay:
+        lastUpdate.value = now;
+        setTimeout(() => {
+          if (lastUpdate.value === now) {
+            callUpdateSearch();
+          }
+        }, 300);
+        break;
+    }
+    updateType.current = FilterUpdateType.NoUpdate;
   }, [filters]);
+
+  const callUpdateSearch = () => {
+    updateSearch(
+      Object.fromEntries(
+        filters
+          .filter((filter): filter is NonNullFilterInstance<FilterNames, FiltersType> => filter.search !== null)
+          .map((filter) => [filtersData[filter.filter].parameterName, filter.search]),
+      ),
+    );
+  };
+
+  const setFilters = (filters: Parameters<typeof _setFilters>[0], updateTypeValue: FilterUpdateType) => {
+    _setFilters(filters);
+    updateType.current = Math.max(updateTypeValue, updateType.current);
+  };
 
   const deleteDependentFilters = (filterName: FilterNames) => {
     filters
@@ -151,7 +177,7 @@ export default function FilteredSearch<
       )
       .map((filter) => {
         deleteDependentFilters(filter.filter);
-        setFilters((filters) => filters.filter((f) => f.filter !== filter.filter));
+        setFilters((filters) => filters.filter((f) => f.filter !== filter.filter), FilterUpdateType.Instant);
       });
   };
 
@@ -162,11 +188,10 @@ export default function FilteredSearch<
   };
 
   const addFilter = (name: FilterNames, forcedValue?: string) => {
-    console.log('adding filter ' + name);
-    setFilters((filters) => [
-      ...filters,
-      { filter: name, value: null, search: null, forcedValue: forcedValue ?? null },
-    ]);
+    setFilters(
+      (filters) => [...filters, { filter: name, value: null, search: null, forcedValue: forcedValue ?? null }],
+      FilterUpdateType.Instant,
+    );
   };
 
   const updateFilter = <T extends FilterNames>(
@@ -178,7 +203,11 @@ export default function FilteredSearch<
     if (value !== undefined) newFilters[filterIndex].value = value;
     if (search !== undefined) newFilters[filterIndex].search = search;
     if (forcedValue !== undefined) newFilters[filterIndex].forcedValue = forcedValue;
-    setFilters(newFilters);
+    if (filtersData[newFilters[filterIndex].filter].updateDelayed) {
+      setFilters(newFilters, FilterUpdateType.Delay);
+    } else {
+      setFilters(newFilters, FilterUpdateType.Instant);
+    }
     if (value === null) {
       deleteDependentFilters(newFilters[filterIndex].filter);
     } else if (oldValue === null) {

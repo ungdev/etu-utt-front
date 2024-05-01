@@ -14,7 +14,7 @@ export default function UserBrowserWidget() {
       <Input
         value={search}
         onChange={setSearch}
-        Icon={Icons.User}
+        icon={Icons.User}
         placeholder={t('homepage:userBrowser.searchBar.placeholder')}
         onEnter={() => router.push(`/users?q=${search}`)}
       />

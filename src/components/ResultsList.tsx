@@ -14,13 +14,13 @@ export function ResultsList<T extends object>({
           console.error("Set value of getItemId, the field cannot be defaulted as 'id' is not a property of the item.");
           return '';
         })(),
-  InfoFC,
+  itemFactory: ItemFactory,
 }: {
   data: T[];
   totalResults: number;
   baseRedirectUrl: string;
   getItemId?: (item: T) => string;
-  InfoFC: FC<{ item: T }>;
+  itemFactory: FC<{ item: T }>;
 }) {
   const router = useRouter();
   const { t } = useAppTranslation();
@@ -35,7 +35,7 @@ export function ResultsList<T extends object>({
             key={getItemId(item)}
             className={styles.result}
             onClick={() => router.push(`${baseRedirectUrl}/${getItemId(item)}`)}>
-            <InfoFC item={item} />
+            <ItemFactory item={item} />
           </div>
         ))}
       </div>

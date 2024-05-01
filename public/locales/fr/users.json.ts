@@ -22,5 +22,11 @@ export default {
   "branch": "Branche",
   "semester": "Semestre",
   "branchOption": "Filière",
+  "generalInfo.tabName": "Informations",
+  "generalInfo.title": "Informations générales sur l'utilisateur",
+  "assos.tabName": "Associatif",
+  "assos.title": "Associations de {{name}}",
+  "assos.noAssos": "Cet utilisateur n'est membre d'aucune association.",
+  "profile.title": "Profil",
 } as const;
 
