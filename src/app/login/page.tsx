@@ -16,7 +16,7 @@ import { Trans } from 'react-i18next';
 
 export default function LoginPage() {
   usePageSettings({ hasNavbar: false, permissions: 'public' });
-  const params = useSearchParams();
+  const params = useSearchParams(); // TODO : replace it with useAppSelector(state => state.pageSettings.searchParams) (and verify it works)
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { t } = useAppTranslation();

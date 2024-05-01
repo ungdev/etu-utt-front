@@ -9,6 +9,7 @@ export interface User {
   website: string;
   passions: string;
   birthday: Date;
+  age: number;
   branch: string;
   semester: number;
   branchOption: string;
