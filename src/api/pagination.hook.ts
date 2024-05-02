@@ -35,7 +35,7 @@ export function usePaginationLoader<T>(path: string): PaginationHook<T> {
         setItems(body.items);
         lastSearch.current = queryData;
         setSearching(false);
-        pageIndex.current = 1;
+        pageIndex.current = (page && Number(page)) || 1;
       })
       .on('error', () => setSearching(false))
       .on('failure', () => setSearching(false));
