@@ -29,16 +29,14 @@ export function InputFilter({
   return (
     <div className={styles.filter}>
       <h3 className={styles.title}>{t(title)}</h3>
-      <div className={styles.input}>
-        <Input
-          type={'text'}
-          value={search}
-          onChange={setSearch}
-          className={styles.input}
-          placeholder={t(placeholder)}
-        />
-        {Icon && <Icon />}
-      </div>
+      <Input
+        type={'text'}
+        value={search}
+        onChange={setSearch}
+        className={styles.input}
+        placeholder={t(placeholder)}
+        icon={Icon}
+      />
     </div>
   );
 }

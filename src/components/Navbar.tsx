@@ -11,7 +11,7 @@ import Icons from '@/icons';
 import { isLoggedIn, logout } from '@/module/session';
 import Button from './UI/Button';
 import { usePageSettings } from '@/module/pageSettings';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 
 /**
  * The type defining all possible properties for a menu item
@@ -68,6 +68,7 @@ export default function Navbar() {
   //   > Menu3
   //   - Menu4
   const router = useRouter();
+  const pathname = usePathname();
   const [selectedMenuName, setSelectedMenuName] = useState<string>('');
   const menuItems = useAppSelector(getMenu);
   const loggedIn = useAppSelector(isLoggedIn);
@@ -116,7 +117,9 @@ export default function Navbar() {
     if (item.needLogin && !loggedIn) return false;
     return 'path' in item ? (
       <li key={item.name}>
-        <Link href={item.path as string} className={styles.navigationLink}>
+        <Link
+          href={item.path as string}
+          className={`${styles.navigationLink} ${pathname.startsWith(item.path as string) ? styles.active : ''}`}>
           {'icon' in item ? (item as MenuItem<true>).icon({}) : ''}
           <span>{item.translate ? t(item.name as NotParameteredTranslationKey) : item.name}</span>
         </Link>
@@ -145,18 +148,19 @@ export default function Navbar() {
   return (
     <div className={`${styles.navigation} ${menuItems.collapsed ? styles.collapsed : ''}`}>
       {/* LOGO ETUUTT */}
-      <a className={`${styles.navigationLogo}`}>
-        <div>
-          <div className={`${styles.navigationIcons}`} onClick={() => menuItems.collapsed && toggleCollapsed()}>
-            <Icons.Menu />
-            <Icons.LogoEtu />
-          </div>
+      <div className={styles.navigationHeader}>
+        <Link href="/" className={`${styles.navigationLogo}`}>
+          <Icons.LogoEtu />
           <span>EtuUTT</span>
+        </Link>
+        <div className={styles.rightIcon} onClick={toggleCollapsed}>
+          <Icons.LeftArrow />
         </div>
-        <div onClick={toggleCollapsed}>
+
+        <div className={styles.uncollapseButton} onClick={toggleCollapsed}>
           <Icons.Menu />
         </div>
-      </a>
+      </div>
       {/* NAVIGATION */}
       <nav role="navigation">
         <ul>
@@ -221,10 +225,10 @@ export default function Navbar() {
         {/* NOT LOGGED IN */}
         {!loggedIn && (
           <div className={styles.guest}>
-            <a className={styles.navigationLink} href="#">
+            <Link className={styles.navigationLink} href="/login">
               <Icons.Login />
               <span>Connexion</span>
-            </a>
+            </Link>
             <div className={`${styles.buttons}`}>
               <Button onClick={() => router.push('/login')}>Connexion</Button>
               <Button onClick={() => router.push('/register')}>Inscription</Button>

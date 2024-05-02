@@ -25,9 +25,36 @@
     }
   }
 
-  > input {
-    margin-top: 25px;
+  .cas {
+    border: 1px solid gray;
+    border-radius: 5px;
+    padding: 0.5rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+
+    svg {
+      width: 1.5rem;
+      height: 1.5rem;
+    }
+
+    &:hover {
+      background-color: #f1f1f1;
+      transition: all 0.2s ease-in-out;
+    }
+  }
+
+  > span {
+    text-align: center;
+    margin: 1rem 0;
+  }
+
+  .inputContainer {
     width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
   }
 
   .link {

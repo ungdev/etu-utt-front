@@ -4,7 +4,6 @@
 .inputWrapper {
   display: flex;
   border-radius: 10px;
-  background-color: $ung-light-blue;
 
   input {
     background-color: #F0F0F2;
@@ -24,7 +23,7 @@
     height: 100%;
     width: 54px;
     padding: 3px;
-    color: white;
+    color: $ung-light-blue;
   }
 
   &:focus-within {
@@ -32,6 +31,10 @@
 
     input {
       color: $ung-light-blue;
+    }
+
+    svg {
+      color: white;
     }
   }
 }

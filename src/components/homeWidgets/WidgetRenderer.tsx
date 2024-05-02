@@ -180,13 +180,15 @@ export default function WidgetRenderer({
       if (fakeElement.current.y === otherBB.y + otherBB.height) {
         newFakeElement.y = fakeElement.current.y;
       }
-      // If the right of the *original* fake element collides with the left of otherBB, reset the width.
+      // If the right of the *original* fake element collides with the left of otherBB, reset the width & x position.
       if (fakeElement.current.x + fakeElement.current.width === otherBB.x) {
         newFakeElement.width = fakeElement.current.width;
+        newFakeElement.x = fakeElement.current.x;
       }
-      // If the bottom of the *original* fake element collides with the top of otherBB, reset the height.
+      // If the bottom of the *original* fake element collides with the top of otherBB, reset the height & y position.
       if (fakeElement.current.y + fakeElement.current.height === otherBB.y) {
         newFakeElement.height = fakeElement.current.height;
+        newFakeElement.y = fakeElement.current.y;
       }
     }
     // Now, there are no more problems with the new bounding box. We can update the fake element.
