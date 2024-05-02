@@ -42,9 +42,9 @@ function Input<T extends string | number = string | number>(
         autoFocus={autoFocus}
       />
       {Icon && (
-      <Button noStyle onClick={() => onEnter()} noTab>
-        {Icon && <Icon />}
-      </Button>
+        <Button noStyle onClick={() => onEnter()} noTab>
+          <Icon />
+        </Button>
       )}
     </div>
   );

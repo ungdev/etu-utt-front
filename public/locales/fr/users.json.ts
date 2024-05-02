@@ -28,5 +28,11 @@ export default {
   "assos.title": "Associations de {{name}}",
   "assos.noAssos": "Cet utilisateur n'est membre d'aucune association.",
   "profile.title": "Profil",
+  "firstName": "Prénom",
+  "lastName": "Nom",
+  "username": "Nom d'utilisateur",
+  "mail": "Adresse mail",
+  "password": "Mot de passe",
+  "password.confirmation": "Confirmation de mot de passe",
 } as const;
 

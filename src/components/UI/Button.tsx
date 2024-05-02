@@ -21,11 +21,7 @@ export default function Button({
       onClick={onClick}
       className={`${styles.button} ${className} ${noStyle ? styles.noStyle : ''}`}
       disabled={disabled}
-      tabIndex={
-        noTab
-          ? -1
-          : undefined
-      }>
+      tabIndex={noTab ? -1 : undefined}>
       {children}
     </button>
   );

@@ -148,18 +148,19 @@ export default function Navbar() {
   return (
     <div className={`${styles.navigation} ${menuItems.collapsed ? styles.collapsed : ''}`}>
       {/* LOGO ETUUTT */}
-      <Link href="/" className={`${styles.navigationLogo}`}>
-        <div>
-          <div className={styles.navigationIcons} onClick={() => menuItems.collapsed && toggleCollapsed()}>
-            <Icons.Menu />
-            <Icons.LogoEtu />
-          </div>
+      <div className={styles.navigationHeader}>
+        <Link href="/" className={`${styles.navigationLogo}`}>
+          <Icons.LogoEtu />
           <span>EtuUTT</span>
-        </div>
+        </Link>
         <div className={styles.rightIcon} onClick={toggleCollapsed}>
           <Icons.LeftArrow />
         </div>
-      </Link>
+
+        <div className={styles.uncollapseButton} onClick={toggleCollapsed}>
+          <Icons.Menu />
+        </div>
+      </div>
       {/* NAVIGATION */}
       <nav role="navigation">
         <ul>

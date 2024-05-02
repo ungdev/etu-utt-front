@@ -28,20 +28,22 @@ export default function LoginForm() {
         {connectionText.slice(0, (connectionText.length * 2) / 3)}
         <span className={styles.bluePart}>{connectionText.slice((connectionText.length * 2) / 3)}</span>
       </div>
-      <a href={`https://cas.utt.fr/cas/login?${new URLSearchParams({
-            service: 'https://etu.assos.utt.fr/login',
-          }).toString()}`} className={styles.cas}>
+      <a
+        href={`https://cas.utt.fr/cas/login?${new URLSearchParams({
+          service: 'https://etu.assos.utt.fr/login',
+        }).toString()}`}
+        className={styles.cas}>
         <img src={logoutt.src} alt="Logo UTT" />
         <span>{t('login:login.connectWithCas')}</span>
       </a>
       <span>{t('common:or').toUpperCase()}</span>
       <div className={styles.inputContainer}>
-        <Input value={username} onChange={(v) => setUsername(v)} onEnter={submit} placeholder="Adresse mail" />
+        <Input value={username} onChange={(v) => setUsername(v)} onEnter={submit} placeholder={t('users:mail')} />
         <Input
           value={password}
           onChange={(v) => setPassword(v)}
           onEnter={submit}
-          placeholder="Mot de passe"
+          placeholder={t('users:password')}
           type="password"
         />
       </div>
