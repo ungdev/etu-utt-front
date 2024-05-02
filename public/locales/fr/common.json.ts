@@ -28,4 +28,7 @@ export default {
   "navbar.myUEs": "Mes matières",
   "input.editableText.modify": "Modifier",
   "or": "Ou",
+  "filter.all": "Tous",
+  "filters": "Filtres",
+  "results": "résultats",
 } as const;

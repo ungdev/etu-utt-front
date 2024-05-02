@@ -12,7 +12,7 @@ function Input<T extends string | number = string | number>(
     type = 'text',
     autoFocus = false,
     onArrowPressed = () => {},
-    Icon,
+    icon: Icon,
   }: {
     className?: string;
     onChange?: (v: T) => void;
@@ -22,7 +22,7 @@ function Input<T extends string | number = string | number>(
     type?: HTMLInputTypeAttribute;
     autoFocus?: boolean;
     onArrowPressed?: (direction: 'up' | 'down') => void;
-    Icon?: FC;
+    icon?: FC;
   },
   ref?: Ref<HTMLInputElement>,
 ) {

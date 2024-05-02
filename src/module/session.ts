@@ -47,7 +47,7 @@ export const register = (api: API, lastName: string, firstName: string, login: s
         login,
         password,
         sex: 'OTHER',
-        role: 'STUDENT',
+        type: 'STUDENT',
         birthday: new Date(2003, 1, 28),
       })
       .on('success', (body) => dispatch(setToken(body.access_token)))) as unknown as Action;

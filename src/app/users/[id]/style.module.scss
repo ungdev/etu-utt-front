@@ -1,0 +1,29 @@
+.page {
+  line-height: 1.5rem;
+
+  h2 {
+    margin-bottom: 2rem;
+  }
+
+  table {
+    border-spacing: 0;
+
+    tr {
+      td {
+        padding: 0.5rem 2rem;
+
+        &:first-child {
+          padding-left: 0.2rem;
+        }
+
+        &:last-child {
+          padding-right: 0.2rem;
+        }
+      }
+
+      &:not(:last-child) td {
+        border-bottom: black solid 1px;
+      }
+    }
+  }
+}

@@ -15,7 +15,7 @@ export default function Link({
   noStyle?: boolean;
 }) {
   return (
-    <ReactLink href={href} className={`${styles.link} ${className} ${styles.noStyle}`}>
+    <ReactLink href={href} className={`${styles.link} ${className} ${noStyle ? styles.noStyle : ''}`}>
       <span>{children}</span>
     </ReactLink>
   );

@@ -1,0 +1,63 @@
+@import '@/variables.scss';
+
+.userDetailsLayout {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  .header {
+    display: flex;
+    gap: 40px;
+
+    .avatar {
+      width: 200px;
+      border-radius: 30px;
+    }
+
+    .basicInfo {
+      padding-top: 1rem;
+      .name {
+        font-size: 2rem;
+        font-weight: bold;
+      }
+
+      .semester {
+        font-size: 1.5rem;
+        color: $ung-light-grey;
+      }
+    }
+  }
+
+  .tabs {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    padding-right: 5rem;
+
+    .tab {
+      display: flex;
+      align-items: center;
+      background-color: #FAFBFC;
+      padding: 0.5rem;
+      border-top-left-radius: 8px;
+      border-top-right-radius: 8px;
+
+      &.active {
+        background-color: #f0f0f0;
+        font-weight: bold;
+        padding: 1rem;
+      }
+
+      &:not(.active) {
+        background-color: #F9F9F9;
+      }
+    }
+  }
+
+  .page {
+    background-color: #F0F0F0;
+    height: 100%;
+    padding: 1.5rem 2rem;
+    border-radius: 10px;
+  }
+}

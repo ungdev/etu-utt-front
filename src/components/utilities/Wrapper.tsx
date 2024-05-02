@@ -1,5 +1,5 @@
 'use client';
-
+import styles from './Wrapper.module.scss';
 import Navbar from '@/components/Navbar';
 import React, { ReactNode } from 'react';
 import { usePageSettings } from '@/module/pageSettings';
@@ -11,7 +11,7 @@ export default function Wrapper({ children }: { children: ReactNode }) {
     <>
       <GoTo />
       {hasNavbar && <Navbar />}
-      <div style={{ width: '100%', height: '100%' }}>{children}</div>
+      <div className={styles.page}>{children}</div>
     </>
   );
 }

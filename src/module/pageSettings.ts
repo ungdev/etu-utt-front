@@ -43,7 +43,7 @@ const { setPageSettings, setPageParams } = pageSettingsSlice.actions;
 export { setPageParams };
 
 export function usePageSettings(): PageSettingsSlice;
-export function usePageSettings(settings?: Partial<PageSettings>, deps?: DependencyList): void;
+export function usePageSettings(settings: Partial<PageSettings>, deps?: DependencyList): void;
 export function usePageSettings(settings?: Partial<PageSettings>, deps: DependencyList = []): PageSettingsSlice | void {
   /* eslint-disable react-hooks/rules-of-hooks */
   const pathname = usePathname();
