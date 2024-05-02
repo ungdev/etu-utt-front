@@ -41,7 +41,7 @@ const filtersData = Object.freeze({
 
 export default function SearchUserPage() {
   usePageSettings({});
-  const [users, totalUsers, updateUsers] = useUsers();
+  const [users, totalUsers, isSearching, updateUsers, fetchNextPage] = useUsers();
   return (
     <div className={styles.searchUserPage}>
       <h1 className={styles.title}>Trombinoscope</h1>
@@ -52,6 +52,8 @@ export default function SearchUserPage() {
             data={users}
             totalResults={totalUsers}
             baseRedirectUrl={'/users'}
+            onEndReached={fetchNextPage}
+            loading={isSearching}
             itemFactory={({ item }) => (
               <div className={styles.user}>
                 <img src={item.avatar || defaultAvatar.src} alt="avatar" />

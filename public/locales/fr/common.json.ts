@@ -28,6 +28,7 @@ export default {
   "navbar.myUEs": "Mes matières",
   "input.editableText.modify": "Modifier",
   "or": "Ou",
+  "loading": "Chargement",
   "filter.all": "Tous",
   "filters": "Filtres",
   "results": "résultats",
