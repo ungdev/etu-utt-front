@@ -3,14 +3,13 @@
 import styles from './AuthForm.module.scss';
 import { useState } from 'react';
 import { useAppDispatch } from '@/lib/hooks';
-import ung from '../../../public/images/ung-logo.svg';
 import Input from '@/components/UI/Input';
 import Link from '@/components/UI/Link';
 import Button from '@/components/UI/Button';
 import * as sessionModule from '@/module/session';
 import { useAPI } from '@/api/api';
 import { useAppTranslation } from '@/lib/i18n';
-import logoUtt from '@/../public/images/logoutt.jpg';
+import Icons from '@/icons';
 
 export default function RegisterForm() {
   const dispatch = useAppDispatch();
@@ -28,7 +27,7 @@ export default function RegisterForm() {
 
   return (
     <div className={styles.authForm}>
-      <img alt="Logo UNG" src={ung.src} className={styles.logo} />
+      <Icons.LogoUNG className={styles.logo} />
       <div className={styles.title}>
         INSCRIPT<span className={styles.bluePart}>ION</span>
       </div>
@@ -37,7 +36,7 @@ export default function RegisterForm() {
           service: 'https://etu.assos.utt.fr/login',
         }).toString()}`}
         className={styles.cas}>
-        <img src={logoUtt.src} alt="Logo UTT" />
+        <Icons.LogoUTT />
         <span>{t('login:login.connectWithCas')}</span>
       </a>
       <span>{t('common:or').toUpperCase()}</span>

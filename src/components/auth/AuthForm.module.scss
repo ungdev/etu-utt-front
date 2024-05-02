@@ -34,7 +34,7 @@
     justify-content: center;
     gap: 0.5rem;
 
-    img {
+    svg {
       width: 1.5rem;
       height: 1.5rem;
     }
@@ -45,10 +45,10 @@
     }
   }
 
-  >span {
+  > span {
     text-align: center;
     margin: 1rem 0;
-  } 
+  }
 
   .inputContainer {
     width: 100%;

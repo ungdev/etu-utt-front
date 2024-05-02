@@ -14,6 +14,8 @@ import Logout from './Logout';
 import Login from './Login';
 import Language from './Language';
 import LogoEtu from './LogoEtu';
+import LogoUNG from './LogoUNG';
+import LogoUTT from './LogoUTT';
 
 const Icons = {
   Book,
@@ -25,6 +27,8 @@ const Icons = {
   LeftChevron,
   Login,
   LogoEtu,
+  LogoUNG,
+  LogoUTT,
   Logout,
   Menu,
   Star,
