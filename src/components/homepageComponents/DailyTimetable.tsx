@@ -8,8 +8,7 @@ import * as locale from 'date-fns/locale';
 import Icons from '@/icons';
 import Button from '@/components/UI/Button';
 import { TimetableDay } from '@/components/timetable/TimetableDay';
-
-const DAY_LENGTH = 24 * 3_600_000;
+import { DAY_LENGTH } from '@/utils/utils';
 
 /**
  * Renders a one-day timetable.

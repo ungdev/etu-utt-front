@@ -5,7 +5,6 @@ import { useAPI } from '@/api/api';
 import { DAY_LENGTH, roundToStartOfDay } from '@/utils/utils';
 import { TimetableDay } from '@/components/timetable/TimetableDay';
 import { format } from 'date-fns';
-import * as locale from 'date-fns/locale';
 import Button from '@/components/UI/Button';
 import { useTimetableEvents } from '@/api/timetable/getTimetableEvents';
 import { createTimetableEvent } from '@/api/timetable/createTimetableEvent';
@@ -42,13 +41,9 @@ export default function TimetablePage() {
             {'<'}
           </Button>
           <p>
-            {format(firstDay, `d MMMM yyyy`, {
-              locale: locale.fr,
-            })}{' '}
+            {format(firstDay, `d MMMM yyyy`)}{' '}
             au{' '}
-            {format(new Date(firstDay.getTime() + (numberOfDays - 1) * DAY_LENGTH), `d MMMM yyyy`, {
-              locale: locale.fr,
-            })}
+            {format(new Date(firstDay.getTime() + (numberOfDays - 1) * DAY_LENGTH), `d MMMM yyyy`)}
           </p>
           <Button noStyle onClick={() => setFirstDay(new Date(firstDay.getTime() + DAY_LENGTH * numberOfDays))}>
             {'>'}
@@ -70,16 +65,14 @@ export default function TimetablePage() {
         {eventIndicesPerDay.map((eventIndices, i) => (
           <div key={i} className={styles.day}>
             <h2 className={styles.dayTitle}>
-              {format(new Date(firstDay.getTime() + i * DAY_LENGTH), `ccc d`, {
-                locale: locale.fr,
-              })}
+              {format(new Date(firstDay.getTime() + i * DAY_LENGTH), `ccc d`)}
             </h2>
             <TimetableDay
               events={eventIndices.map((i) => events[i])}
               day={new Date(firstDay.getTime() + i * DAY_LENGTH)}
               className={styles.dayTimetable}
-              onClickOnEmptySlot={(time) =>
-                createTimetableEvent(api, time, new Date(time.getTime() + 3_600_000), 'a random place')
+              onClickOnEmptySlot={
+                (time) => createTimetableEvent(api, time, new Date(time.getTime() + 3_600_000), 'a random place', []) // TODO : It's missing an interface to fill-in the info woopsyyy
               }
             />
           </div>
