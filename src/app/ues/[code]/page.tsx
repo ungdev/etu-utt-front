@@ -17,8 +17,10 @@ import TextArea from '@/components/UI/TextArea';
 import { useState } from 'react';
 import sendComment from '@/api/comment/sendComment';
 import { useAPI } from '@/api/api';
+import { usePageSettings } from '@/module/pageSettings';
 
 export default function UEDetailsPage() {
+  usePageSettings({});
   const params = useParams<{ code: string }>();
   const { t } = useAppTranslation();
   const logged = useAppSelector((state) => state.session.logged);

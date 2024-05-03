@@ -3,12 +3,13 @@
 import styles from './AuthForm.module.scss';
 import { useState } from 'react';
 import { useAppDispatch } from '@/lib/hooks';
-import ung from '../../../public/images/ung-logo.svg';
 import Input from '@/components/UI/Input';
 import Link from '@/components/UI/Link';
 import Button from '@/components/UI/Button';
 import * as sessionModule from '@/module/session';
 import { useAPI } from '@/api/api';
+import { useAppTranslation } from '@/lib/i18n';
+import Icons from '@/icons';
 
 export default function RegisterForm() {
   const dispatch = useAppDispatch();
@@ -18,6 +19,7 @@ export default function RegisterForm() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [passwordConfirmation, setPasswordConfirmation] = useState('');
+  const { t } = useAppTranslation();
   const submit = () => {
     if (password === passwordConfirmation && password)
       dispatch(sessionModule.register(api, lastname, firstname, username, password));
@@ -25,26 +27,43 @@ export default function RegisterForm() {
 
   return (
     <div className={styles.authForm}>
-      <img alt="Logo UNG" src={ung.src} className={styles.logo} />
+      <Icons.LogoUNG className={styles.logo} />
       <div className={styles.title}>
         INSCRIPT<span className={styles.bluePart}>ION</span>
       </div>
-      <Input value={lastname} onChange={setLastname} onEnter={submit} placeholder="Nom" />
-      <Input value={firstname} onChange={setFirstname} onEnter={submit} placeholder="Prénom" />
-      <Input value={username} onChange={setUsername} onEnter={submit} placeholder="Nom d'utilisateur" />
-      <Input value={password} onChange={setPassword} onEnter={submit} placeholder="Mot de passe" type="password" />
-      <Input
-        value={passwordConfirmation}
-        onChange={setPasswordConfirmation}
-        onEnter={submit}
-        placeholder="Confirmation de mot de passe"
-        type="password"
-      />
+      <a
+        href={`https://cas.utt.fr/cas/login?${new URLSearchParams({
+          service: 'https://etu.assos.utt.fr/login',
+        }).toString()}`}
+        className={styles.cas}>
+        <Icons.LogoUTT />
+        <span>{t('login:login.connectWithCas')}</span>
+      </a>
+      <span>{t('common:or').toUpperCase()}</span>
+      <div className={styles.inputContainer}>
+        <Input value={lastname} onChange={setLastname} onEnter={submit} placeholder={t('users:lastName')} />
+        <Input value={firstname} onChange={setFirstname} onEnter={submit} placeholder={t('users:firstName')} />
+        <Input value={username} onChange={setUsername} onEnter={submit} placeholder={t('users:username')} />
+        <Input
+          value={password}
+          onChange={setPassword}
+          onEnter={submit}
+          placeholder={t('users:password')}
+          type="password"
+        />
+        <Input
+          value={passwordConfirmation}
+          onChange={setPasswordConfirmation}
+          onEnter={submit}
+          placeholder={t('users:password.confirmation')}
+          type="password"
+        />
+      </div>
       <Link href={'/login'} className={styles.link}>
-        Vous avez déjà un compte ? Connectez-vous !
+        {t('auth:alreadyHaveAccount')}
       </Link>
       <Button onClick={submit} className={styles.button}>
-        Créer un compte
+        {t('auth:create')}
       </Button>
     </div>
   );

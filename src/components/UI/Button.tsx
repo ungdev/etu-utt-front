@@ -8,6 +8,7 @@ export default function Button({
   disabled = false,
   noStyle = false,
   background = 'blue',
+  noTab = false,
 }: {
   children?: ReactNode;
   onClick?: () => void;
@@ -15,12 +16,14 @@ export default function Button({
   disabled?: boolean;
   noStyle?: boolean;
   background?: 'blue' | 'white';
+  noTab?: boolean;
 }) {
   return (
     <button
       onClick={onClick}
       className={`${styles.button} ${className} ${noStyle ? styles.noStyle : ''} ${styles[`background-${background}`]}`}
-      disabled={disabled}>
+      disabled={disabled}
+      tabIndex={noTab ? -1 : undefined}>
       {children}
     </button>
   );

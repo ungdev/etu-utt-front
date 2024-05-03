@@ -1,5 +1,5 @@
-import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import { AppDispatch, AppThunk } from '@/lib/store';
+import { type Action, createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import { AppDispatch, RootState, AppThunk } from '@/lib/store';
 import { LoginRequestDto, LoginResponseDto } from '@/api/auth/login';
 import { StatusCodes } from 'http-status-codes';
 import { RegisterRequestDto, RegisterResponseDto } from '@/api/auth/register';
@@ -26,7 +26,7 @@ export const sessionSlice = createSlice({
   initialState: { logged: false, token: null } as SessionSlice,
 });
 
-const { setToken } = sessionSlice.actions;
+export const { setToken } = sessionSlice.actions;
 
 export const login =
   (api: API, login: string, password: string): AppThunk =>
@@ -50,10 +50,18 @@ export const register =
         login,
         password,
         sex: 'OTHER',
-        role: 'STUDENT',
+        type: 'STUDENT',
         birthday: new Date(2003, 1, 28),
       })
       .on('success', (body) => dispatch(setToken(body.access_token)));
+
+export const logout = () =>
+  ((dispatch: AppDispatch) => {
+    dispatch(setToken(''));
+    dispatch(setUser(null));
+  }) as unknown as Action;
+
+export const isLoggedIn = (state: RootState) => state.session.logged;
 
 export const autoLogin = (api: API) => async (dispatch: AppDispatch) => {
   const token = dispatch(getCookie(CookieNames.TOKEN));

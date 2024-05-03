@@ -1,0 +1,14 @@
+@import '@/variables.scss';
+
+.filter {
+  .title {
+    color: $ung-light-grey;
+    margin-bottom: 0.75rem;
+  }
+
+  .input {
+    display: flex;
+    border-radius: 10px;
+    width: max-content;
+  }
+}

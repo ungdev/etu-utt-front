@@ -13,6 +13,7 @@ import EditableText from '@/components/EditableText';
 import { editCommentReply } from '@/api/commentReply/editCommentReply';
 import { useAPI } from '@/api/api';
 import { sendCommentReply } from '@/api/commentReply/sendCommentReply';
+import { usePageSettings } from '@/module/pageSettings';
 
 function CommentEditorFooter(originalComment: string, onUpdate: (text: string) => void, t: TFunction) {
   return function CommentEditorFooter({ text, disable }: { text: string; disable: () => void }) {
@@ -30,7 +31,8 @@ function CommentEditorFooter(originalComment: string, onUpdate: (text: string) =
   };
 }
 
-export default function CommentDetails() {
+export default function CommentDetailsPage() {
+  usePageSettings({});
   const { t } = useAppTranslation();
   const params = useParams<{ code: string; commentId: string }>();
   const [comment, setComment] = useUEComment(params.commentId);
@@ -106,12 +108,12 @@ export default function CommentDetails() {
       <div className={styles.buttonWrapper}>
         <Button
           className={styles.button}
-          onClick={async () => {
-            const res = await sendCommentReply(api, params.commentId, answer).toPromise();
-            if (!res) return;
-            setAnswer('');
-            setComment({ ...comment, answers: [...(comment?.answers ?? []), res] });
-          }}>
+          onClick={() =>
+            sendCommentReply(api, params.commentId, answer).on('success', (newAnswer) => {
+              setComment({ ...comment, answers: [...(comment?.answers ?? []), newAnswer] });
+              setAnswer('');
+            })
+          }>
           {t('ues:detailed.comments.answers.answerButton')}
         </Button>
       </div>

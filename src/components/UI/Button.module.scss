@@ -1,24 +1,26 @@
 @import '@/variables';
 
-.button {
+.button.noStyle {
+  background: none;
   border: none;
   padding: 0;
+}
 
-  &:not(.noStyle) {
-    border-radius: 5px;
-    padding: 10px;
-    background-color: var(--background);
-    color: var(--color);
+.button:not(.noStyle) {
+  border: none;
+  border-radius: 5px;
+  padding: 10px;
+  background-color: var(--background);
+  color: var(--color);
 
-    &.background-blue {
-      --background: #{$ung-light-blue};
-      --color: white;
-    }
+  &.background-blue {
+    --background: #{$ung-light-blue};
+    --color: white;
+  }
 
-    &.background-white {
-      --background: white;
-      --color: #{$ung-dark-grey};
-    }
+  &.background-white {
+    --background: white;
+    --color: #{$ung-dark-grey};
   }
 
   &:hover {

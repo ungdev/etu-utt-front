@@ -1,0 +1,14 @@
+@import '@/variables';
+
+.filtersBar {
+  h2 {
+    text-transform: uppercase;
+    color: $ung-dark-grey;
+    font-weight: 900;
+  }
+
+  .filter {
+    margin: 2rem 0;
+    overflow-y: scroll;
+  }
+}

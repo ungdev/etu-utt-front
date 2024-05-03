@@ -130,12 +130,13 @@ async function internalRequestAPI<RequestType, ResponseType>(
   body: RequestType | null,
   timeoutMillis: number,
   version: string,
+  isFile: boolean,
 ): Promise<APIResponse<ResponseType>> {
   // Generate headers
   const token = getAuthorizationToken();
   const headers = new Headers();
   headers.append('Authorization', token ? `Bearer ${token}` : '');
-  headers.append('Content-Type', 'application/json');
+  if (!isFile) headers.append('Content-Type', 'application/json');
 
   // Add timeout to the request
   const abortController = new AbortController();
@@ -152,7 +153,10 @@ async function internalRequestAPI<RequestType, ResponseType>(
       {
         method,
         headers,
-        body: method === 'GET' || method === 'DELETE' ? undefined : JSON.stringify(body),
+        body: (method === 'GET' || method === 'DELETE' ? undefined : isFile ? body : JSON.stringify(body)) as
+          | BodyInit
+          | null
+          | undefined,
         cache: 'no-cache',
         signal: abortController.signal,
       },
@@ -202,9 +206,13 @@ function requestAPI<RequestType, ResponseType>(
   method: string,
   route: string,
   body: RequestType | null = null,
-  { timeoutMillis = apiTimeout, version = apiVersion }: { timeoutMillis?: number; version?: string } = {},
+  {
+    timeoutMillis = apiTimeout,
+    version = apiVersion,
+    isFile = false,
+  }: { timeoutMillis?: number; version?: string; isFile?: boolean } = {},
 ): ResponseHandler<ResponseType> {
-  return new ResponseHandler(internalRequestAPI(method, route, body, timeoutMillis, version));
+  return new ResponseHandler(internalRequestAPI(method, route, body, timeoutMillis, version, isFile));
 }
 
 // Set the authorization header with the given token for next requests
@@ -222,17 +230,17 @@ export function useAPI() {
     post: <RequestType, ResponseType = never>(
       route: string,
       body = {} as RequestType,
-      options: { version?: string } = {},
+      options: { version?: string; isFile?: boolean } = {},
     ) => applyDefaultHandler(requestAPI<RequestType, ResponseType>('POST', route, body, options)),
     put: <RequestType, ResponseType = never>(
       route: string,
       body = {} as RequestType,
-      options: { version?: string } = {},
+      options: { version?: string; isFile?: boolean } = {},
     ) => applyDefaultHandler(requestAPI<RequestType, ResponseType>('PUT', route, body, options)),
     patch: <RequestType, ResponseType = never>(
       route: string,
       body = {} as RequestType,
-      options: { version?: string } = {},
+      options: { version?: string; isFile?: boolean } = {},
     ) => applyDefaultHandler(requestAPI<RequestType, ResponseType>('PATCH', route, body, options)),
     delete: <ResponseType = never>(route: string, options: { version?: string } = {}) =>
       applyDefaultHandler(requestAPI<never, ResponseType>('DELETE', route, null, options)),

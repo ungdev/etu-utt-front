@@ -1,0 +1,38 @@
+/* eslint-disable */
+// For more information, check the common.json.ts file
+
+export default {
+  "filter.search.title": "Générique",
+  "filter.search.placeholder": "Recherche générique",
+  "filter.firstName.title": "Prénom",
+  "filter.firstName.placeholder": "Recherche par prénom",
+  "filter.lastName.title": "Nom de famille",
+  "filter.lastName.placeholder": "Recherche par nom de famille",
+  "filter.nickname.title": "Surnom",
+  "filter.nickname.placeholder": "Recherche par surnom",
+  "nickname": "Surnom",
+  "sex": "Sexe",
+  "mailUTT": "Mail UTT",
+  "mailPersonal": "Mail personnel",
+  "facebook": "Facebook",
+  "phone": "Téléphone",
+  "website": "Site web",
+  "passions": "Passions",
+  "birthday": "Date de naissance",
+  "branch": "Branche",
+  "semester": "Semestre",
+  "branchOption": "Filière",
+  "generalInfo.tabName": "Informations",
+  "generalInfo.title": "Informations générales sur l'utilisateur",
+  "assos.tabName": "Associatif",
+  "assos.title": "Associations de {{name}}",
+  "assos.noAssos": "Cet utilisateur n'est membre d'aucune association.",
+  "profile.title": "Profil",
+  "firstName": "Prénom",
+  "lastName": "Nom",
+  "username": "Nom d'utilisateur",
+  "mail": "Adresse mail",
+  "password": "Mot de passe",
+  "password.confirmation": "Confirmation de mot de passe",
+} as const;
+
