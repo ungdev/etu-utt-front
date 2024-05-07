@@ -18,7 +18,7 @@ export const sessionSlice = createSlice({
   name: 'session',
   reducers: {
     setToken: (state, action: PayloadAction<string>) => {
-      setCookie('etuutt-token', action.payload);
+      setCookie(CookieNames.TOKEN, action.payload);
       state.token = action.payload;
       state.logged = !!action.payload;
     },

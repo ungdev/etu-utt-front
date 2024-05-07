@@ -31,7 +31,9 @@ export default {
   "filter.all": "Tous",
   "filters": "Filtres",
   "results": "résultats",
-  "cookie.message": "Nous utilisons des cookies pour vous authentifier automatiquement. <br />Cliquez sur \"Autoriser\" pour autoriser ces cookies",
-  "cookie.authorize": "Autoriser",
-  "cookie.refuse": "Refuser",
+  "cookie.message": "Notre site permet de stocker vos préférences de navigation à l'aide de traceurs (LocalStorage).<br/>Vous avez le choix entre refuser tous ces traceurs, tous les accepter, ou personnaliser votre choix.",
+  "cookie.learnMore": "En savoir plus",
+  "cookie.authorize": "Tout autoriser",
+  "cookie.refuse": "Tout refuser",
+  "cookie.personalize": "Personnaliser",
 } as const;
