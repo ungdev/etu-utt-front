@@ -1,4 +1,4 @@
-import { type Action, createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import { AppDispatch } from 'src/lib/store';
 import { DependencyList, ReactNode, useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
@@ -32,8 +32,7 @@ export const pageSettingsSlice = createSlice({
       return { ...state, ...defaultPageSettings, ...action.payload };
     },
     setPageParams(state, action: PayloadAction<URLSearchParams>) {
-      state.searchParams = action.payload as unknown as Map<string, string | null>; // Ok, did not get why it does not like the Map<string, string | null> type
-      return state;
+      return { ...state, searchParams: action.payload };
     },
   },
   initialState: { ...defaultPageSettings, page: '', searchParams: new ReadonlyURLSearchParams() } as PageSettingsSlice,
@@ -50,10 +49,9 @@ export function usePageSettings(settings?: Partial<PageSettings>, deps: Dependen
   if (settings) {
     const dispatch = useAppDispatch();
     useEffect(() => {
-      dispatch(((dispatch: AppDispatch) =>
-        dispatch(
-          setPageSettings({ ...settings, page: pathname, searchParams: new ReadonlyURLSearchParams() }),
-        )) as unknown as Action);
+      dispatch((dispatch: AppDispatch) =>
+        dispatch(setPageSettings({ ...settings, page: pathname, searchParams: new ReadonlyURLSearchParams() })),
+      );
     }, deps);
   } else {
     let pageSettings = useAppSelector((state) => state.pageSettings);

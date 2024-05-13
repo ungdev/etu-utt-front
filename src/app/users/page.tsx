@@ -44,7 +44,7 @@ export default function SearchUserPage() {
   const [users, totalUsers, updateUsers] = useUsers();
   return (
     <div className={styles.searchUserPage}>
-      <h1 className={styles.title}>Trombinoscope</h1>
+      <h1>Trombinoscope</h1>
       <div className={styles.content}>
         <FilteredSearch<FilterNames, FiltersType> filtersData={filtersData} updateSearch={updateUsers} />
         <div className={styles.results}>

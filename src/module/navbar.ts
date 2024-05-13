@@ -1,8 +1,8 @@
 import { MenuItem } from '@/components/Navbar';
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import { AppThunk, RootState } from 'src/lib/store';
-import { isClientSide } from '@/utils/environment';
 import Icons from '@/icons';
+import { CookieNames, setCookie } from '@/module/cookies';
 
 export const userSlice = createSlice({
   name: 'navbar',
@@ -62,12 +62,8 @@ export const userSlice = createSlice({
     moveSeparator: (state, action: PayloadAction<number>) => {
       if (action.payload >= 0 && action.payload <= state.items.length) state.seperator = action.payload;
     },
-    setCollapse: (state, action: PayloadAction<boolean>) => {
-      localStorage.setItem('navbarCollapsed', `${action.payload}`);
-      state.collapsed = action.payload;
-    },
   },
-  initialState: <{ items: MenuItem[]; seperator: number; collapsed: boolean }>{
+  initialState: <{ items: MenuItem[]; seperator: number }>{
     items: [
       {
         icon: Icons.Home,
@@ -139,11 +135,10 @@ export const userSlice = createSlice({
       },
     ],
     seperator: 4,
-    collapsed: isClientSide() && localStorage.getItem('navbarCollapsed') === 'true',
   },
 });
 
-const { addItem, replaceItem, removeItem, moveSeparator, setCollapse } = userSlice.actions;
+const { addItem, replaceItem, removeItem, moveSeparator } = userSlice.actions;
 
 export const addMenuItem =
   (
@@ -187,7 +182,8 @@ export const getMenu = (state: RootState) => state.navbar;
 
 export const setCollapsed =
   (collapse: boolean): AppThunk =>
-  (dispatch) =>
-    dispatch(setCollapse(collapse));
+  (dispatch) => {
+    dispatch(setCookie(CookieNames.NAVBAR_COLLAPSED, collapse ? 'true' : 'false'));
+  };
 
 export default userSlice.reducer;

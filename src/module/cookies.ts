@@ -1,12 +1,18 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import { useAppDispatch, useAppSelector } from '@/lib/hooks';
+import { useAppSelector } from '@/lib/hooks';
 import { AppThunk } from '@/lib/store';
-import { isClientSide } from '@/utils/environment';
-import { useEffect } from 'react';
 
 export enum CookieNames {
   TOKEN = 'etuutt-token',
+  LANG = 'etuutt-lang',
+  NAVBAR_COLLAPSED = 'etuutt-navbar-collapsed',
 }
+
+const DEFAULT_VALUES = {
+  [CookieNames.TOKEN]: null,
+  [CookieNames.LANG]: 'fr',
+  [CookieNames.NAVBAR_COLLAPSED]: 'false',
+} satisfies { [K in CookieNames]: string | null };
 
 interface CookiesSlice {
   cookiesAccepted: { [K in CookieNames]: boolean } | null;
@@ -41,9 +47,6 @@ export const cookiesSlice = createSlice({
       for (const name of Object.values(CookieNames)) {
         if (state.cookiesAccepted[name]) {
           localStorage.setItem(name, state.cookies[name]);
-          console.log(state.cookies[name]);
-          console.log(Object.values(state.cookies));
-          console.log(name);
         } else {
           localStorage.removeItem(name);
         }
@@ -52,7 +55,7 @@ export const cookiesSlice = createSlice({
   },
   initialState: {
     cookiesAccepted: null,
-    cookies: Object.fromEntries(Object.values(CookieNames).map((name) => [name, ''])),
+    cookies: Object.fromEntries(Object.values(CookieNames).map((name) => [name, DEFAULT_VALUES[name] ?? ''])),
   } as CookiesSlice,
 });
 
@@ -83,7 +86,6 @@ export function initCookies(): AppThunk {
   return (dispatch) => {
     const cookiesAccepted = {} as { [K in CookieNames]: boolean };
     const cookies = {} as { [K in CookieNames]: string };
-    if (localStorage.length === 2) return; // User has not accepted nor refused cookies yet.
     for (const name of Object.values(CookieNames)) {
       const value = localStorage.getItem(name);
       if (value !== null) {
@@ -92,6 +94,10 @@ export function initCookies(): AppThunk {
       } else {
         cookiesAccepted[name] = false;
       }
+    }
+    if (Object.keys(cookies).length === 0) {
+      // For all we know, user has not accepted nor refused cookies yet.
+      return;
     }
     dispatch(setCachedCookies(cookies));
     dispatch(setCookiesAcceptance(cookiesAccepted));

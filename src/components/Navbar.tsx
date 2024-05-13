@@ -5,13 +5,13 @@ import styles from './Navbar.module.scss';
 import { FC, useState } from 'react';
 import { getMenu, setCollapsed } from '@/module/navbar';
 import Link from 'next/link';
-import { type NotParameteredTranslationKey } from '@/lib/i18n';
-import { useAppTranslation } from '@/lib/i18n';
+import { type NotParameteredTranslationKey, useAppTranslation } from '@/lib/i18n';
 import Icons from '@/icons';
 import { isLoggedIn, logout } from '@/module/session';
 import Button from './UI/Button';
 import { usePageSettings } from '@/module/pageSettings';
 import { usePathname, useRouter } from 'next/navigation';
+import { CookieNames, setCookie, useCookie } from '@/module/cookies';
 
 /**
  * The type defining all possible properties for a menu item
@@ -71,6 +71,7 @@ export default function Navbar() {
   const pathname = usePathname();
   const [selectedMenuName, setSelectedMenuName] = useState<string>('');
   const menuItems = useAppSelector(getMenu);
+  const collapsed = useCookie(CookieNames.NAVBAR_COLLAPSED) === 'true';
   const loggedIn = useAppSelector(isLoggedIn);
   const user = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
@@ -91,7 +92,7 @@ export default function Navbar() {
 
   /** Toggles the collapse mode */
   const toggleCollapsed = () => {
-    dispatch(setCollapsed(!menuItems.collapsed));
+    dispatch(setCollapsed(!collapsed));
   };
 
   /** Logs out the user */
@@ -102,7 +103,7 @@ export default function Navbar() {
   /** Change the language */
   const changeLanguage = (lang: string) => {
     i18n.changeLanguage(lang);
-    localStorage.setItem('etu-utt-lang', lang);
+    dispatch(setCookie(CookieNames.LANG, lang));
     setLanguage(lang);
     setLanguageSelectorOpen(false);
   };
@@ -146,7 +147,7 @@ export default function Navbar() {
 
   // Based on : https://codepen.io/guled10/pen/zYqVqed
   return (
-    <div className={`${styles.navigation} ${menuItems.collapsed ? styles.collapsed : ''}`}>
+    <div className={`${styles.navigation} ${collapsed ? styles.collapsed : ''}`}>
       {/* LOGO ETUUTT */}
       <div className={styles.navigationHeader}>
         <Link href="/" className={`${styles.navigationLogo}`}>
@@ -225,7 +226,7 @@ export default function Navbar() {
         {/* NOT LOGGED IN */}
         {!loggedIn && (
           <div className={styles.guest}>
-            <Link className={styles.navigationLink} href="/login">
+            <Link className={styles.navigationLink} href={'/login'}>
               <Icons.Login />
               <span>Connexion</span>
             </Link>
@@ -236,6 +237,17 @@ export default function Navbar() {
           </div>
         )}
       </div>
+
+      {!collapsed && (
+        <div className={styles.legalStuff}>
+          <Link className={styles.legal} href={'/legal'}>
+            Mentions légales
+          </Link>
+          <Link className={styles.cookies} href={'/cookies'}>
+            Traceurs
+          </Link>
+        </div>
+      )}
     </div>
   );
 }
