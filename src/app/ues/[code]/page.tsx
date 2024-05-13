@@ -20,7 +20,7 @@ import { useAPI } from '@/api/api';
 import { usePageSettings } from '@/module/pageSettings';
 
 export default function UEDetailsPage() {
-  usePageSettings({});
+  usePageSettings({ instantLoading: true });
   const params = useParams<{ code: string }>();
   const { t } = useAppTranslation();
   const logged = useAppSelector((state) => state.session.logged);

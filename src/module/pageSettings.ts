@@ -10,9 +10,10 @@ interface PageSettingsSlice {
   permissions: string;
   hasNavbar: boolean;
   navbarAdditionalComponent: (() => ReactNode) | null;
+  loaded: boolean;
 }
 
-type InternalPageSettingsKeys = 'page' | 'searchParams';
+type InternalPageSettingsKeys = 'page' | 'searchParams' | 'loaded';
 
 type PageSettings = Omit<PageSettingsSlice, InternalPageSettingsKeys>;
 
@@ -35,23 +36,35 @@ export const pageSettingsSlice = createSlice({
       state.searchParams = action.payload;
       return state;
     },
+    setLoaded(state, action: PayloadAction<boolean>) {
+      state.loaded = action.payload;
+      return state;
+    },
   },
   initialState: { ...defaultPageSettings, page: '', searchParams: {} } as PageSettingsSlice,
 });
 
-const { setPageSettings, setPageParams } = pageSettingsSlice.actions;
+const { setPageSettings, setPageParams, setLoaded } = pageSettingsSlice.actions;
 export { setPageParams };
 
 export function usePageSettings(): PageSettingsSlice;
-export function usePageSettings(settings: Partial<PageSettings>, deps?: DependencyList): void;
-export function usePageSettings(settings?: Partial<PageSettings>, deps: DependencyList = []): PageSettingsSlice | void {
+export function usePageSettings(
+  settings: Partial<PageSettings & { instantLoading: boolean }>,
+  deps?: DependencyList,
+): void;
+export function usePageSettings(
+  settings?: Partial<PageSettings & { instantLoading: boolean }>,
+  deps: DependencyList = [],
+): PageSettingsSlice | void {
   /* eslint-disable react-hooks/rules-of-hooks */
   const pathname = usePathname();
   if (settings) {
     const dispatch = useAppDispatch();
     useEffect(() => {
       dispatch(((dispatch: AppDispatch) =>
-        dispatch(setPageSettings({ ...settings, page: pathname, searchParams: {} }))) as unknown as Action);
+        dispatch(
+          setPageSettings({ ...settings, page: pathname, searchParams: {}, loaded: !!settings.instantLoading }),
+        )) as unknown as Action);
     }, deps);
   } else {
     let pageSettings = useAppSelector((state) => state.pageSettings);
@@ -67,11 +80,21 @@ export function usePageSettings(settings?: Partial<PageSettings>, deps: Dependen
       }
     }, [initialized]);
     if (pageSettings.page !== pathname) {
-      pageSettings = { page: pathname, searchParams: {}, ...defaultPageSettings };
+      pageSettings = { page: pathname, searchParams: {}, loaded: false, ...defaultPageSettings };
     }
     return pageSettings;
   }
   /* eslint-enable react-hooks/rules-of-hooks */
+}
+
+export function usePageLoaded(instantlyLoaded: boolean = false) {
+  const dispatch = useAppDispatch();
+  useEffect(() => {
+    if (instantlyLoaded) {
+      dispatch(setLoaded(true));
+    }
+  }, []);
+  return () => dispatch(setLoaded(true));
 }
 
 export default pageSettingsSlice.reducer;

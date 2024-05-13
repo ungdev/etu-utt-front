@@ -6,7 +6,7 @@ import { useAPI } from '@/api/api';
 import { useAppTranslation } from '@/lib/i18n';
 
 export default function ProfilePage() {
-  usePageSettings({});
+  usePageSettings({ instantLoading: true });
   // const user = useConnectedUser();
   const api = useAPI();
   const { t } = useAppTranslation();

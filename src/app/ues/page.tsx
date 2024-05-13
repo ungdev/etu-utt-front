@@ -74,7 +74,7 @@ const ueFilters = Object.freeze({
 } satisfies FiltersDataType<FilterNames, UEFiltersType>);
 
 export default function Page() {
-  usePageSettings({});
+  usePageSettings({ instantLoading: true });
   const { t } = useAppTranslation();
   const [ues, totalUesCount, updateUEs] = useUEs();
   return (

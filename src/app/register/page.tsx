@@ -4,7 +4,7 @@ import styles from '@/app/login/style.module.scss';
 import { usePageSettings } from '@/module/pageSettings';
 
 export default function RegisterPage() {
-  usePageSettings({ hasNavbar: false, permissions: 'public' });
+  usePageSettings({ hasNavbar: false, permissions: 'public', instantLoading: true });
   return (
     <div id="register-page" className={styles.loginPage}>
       <RegisterForm />
