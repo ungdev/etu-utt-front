@@ -19,11 +19,15 @@ export function ResultsList<T extends object>({
   onEndReached,
   loading,
 }: {
-  data: T[];
+  data: (T | null)[];
   totalResults: number;
   baseRedirectUrl: string;
   getItemId?: (item: T) => string;
-  itemFactory: FC<{ item: T }>;
+  /**
+   * A {@link React.FunctionComponent FC} that turns data passed into FC's `item` property.
+   * This data may be `null` if the data source has not been loaded yet (in such cases, consider data is loading)
+   */
+  itemFactory: FC<{ item: T | null }>;
   onEndReached?: () => void;
   loading?: boolean;
 }) {

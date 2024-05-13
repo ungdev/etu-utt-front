@@ -3,7 +3,7 @@ import { useAPI } from './api';
 import { Pagination } from './api.interface';
 
 type PaginationHook<T> = {
-  items: T[];
+  items: (T | null)[];
   total: number;
   updateFilters: (query: Record<string, string>) => void;
   fetchNextItems: () => void;
