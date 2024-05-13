@@ -2,13 +2,13 @@ import { useState, useRef } from 'react';
 import { useAPI } from './api';
 import { Pagination } from './api.interface';
 
-type PaginationHook<T> = [
-  items: T[],
-  count: number,
-  isLoading: boolean,
-  updateFilters: (query: Record<string, string>) => void,
-  fetchNextItems: () => void,
-];
+type PaginationHook<T> = {
+  items: T[];
+  total: number;
+  isLoading: boolean;
+  updateFilters: (query: Record<string, string>) => void;
+  fetchNextItems: () => void;
+};
 
 /**
  * Use this hook to load paginated data for a `ResultsList`
@@ -26,7 +26,6 @@ export function usePaginationLoader<T>(path: string): PaginationHook<T> {
     if (isSearching) return;
     else setSearching(true);
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { page, ...queryData } = query;
     api
       .get<Pagination<T>>(`${path}?${new URLSearchParams(query)}`)
@@ -58,5 +57,5 @@ export function usePaginationLoader<T>(path: string): PaginationHook<T> {
       .on('error', () => setSearching(false))
       .on('failure', () => setSearching(false));
   };
-  return [items, total, isSearching, updateItems, fetchNextPage];
+  return { items, total, isLoading: isSearching, updateFilters: updateItems, fetchNextItems: fetchNextPage };
 }

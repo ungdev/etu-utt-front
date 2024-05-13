@@ -41,7 +41,13 @@ const filtersData = Object.freeze({
 
 export default function SearchUserPage() {
   usePageSettings({});
-  const [users, totalUsers, isSearching, updateUsers, fetchNextPage] = useUsers();
+  const {
+    items: users,
+    total: totalUsers,
+    isLoading: isSearching,
+    updateFilters: updateUsers,
+    fetchNextItems: fetchNextPage,
+  } = useUsers();
   return (
     <div className={styles.searchUserPage}>
       <h1 className={styles.title}>Trombinoscope</h1>
