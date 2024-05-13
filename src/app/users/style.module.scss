@@ -47,7 +47,7 @@
             border-radius: 1em;
             height: 0.8em;
             margin: 0.1em 0 0.1em 0;
-            width: 12em;
+            width: 16ch;
             background-position: left top;
             background-size: 115% 0.8em;
             background-repeat: repeat space;
@@ -58,14 +58,17 @@
             );
             animation: lazy-text infinite cubic-bezier(0.5, 0, 0, 1) 1.8s;
 
+            &:nth-child(2) {
+              width: 8ch;
+            }
             &:nth-of-type(2) {
-              width: 8em;
+              width: 18ch;
             }
             &:nth-of-type(3) {
-              width: 10em;
+              width: 15ch;
             }
             &:nth-of-type(4) {
-              width: 6em;
+              width: 10ch;
             }
           }
           @keyframes lazy-text {

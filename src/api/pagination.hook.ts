@@ -46,7 +46,8 @@ export function usePaginationLoader<T>(path: string): PaginationHook<T> {
     if (searching.current || items.length >= total) return;
     else searching.current = true;
 
-    setItems((prev) => [...prev, ...Array(itemsPerPage.current).fill(null)]);
+    const pendingItemCount = Math.min(itemsPerPage.current, total - items.length);
+    setItems((prev) => [...prev, ...Array(pendingItemCount).fill(null)]);
     api
       .get<Pagination<T>>(
         `${path}?${new URLSearchParams({ ...lastSearch.current, page: String(pageIndex.current + 1) })}`,
@@ -54,7 +55,7 @@ export function usePaginationLoader<T>(path: string): PaginationHook<T> {
       .on('success', (body) => {
         pageIndex.current++;
         setTotal(body.itemCount);
-        setItems((prev) => [...prev.slice(0, prev.length - itemsPerPage.current), ...body.items]);
+        setItems((prev) => [...prev.slice(0, prev.length - pendingItemCount), ...body.items]);
         searching.current = false;
       })
       .on('error', () => (searching.current = false))

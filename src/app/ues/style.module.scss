@@ -21,7 +21,7 @@
     > * {
       background-color: white;
       border-radius: 15px;
-      border: #E7E7E7 solid 1px;
+      border: #e7e7e7 solid 1px;
       padding: 1rem;
       overflow-y: scroll;
     }
@@ -29,6 +29,45 @@
     .results {
       flex-grow: 1;
       height: 100%;
+
+      .glimmer {
+        p,
+        h2 {
+          display: block;
+          opacity: 0.2;
+          border-radius: 1em;
+          height: 0.8em;
+          margin: 0.1em 0 0.1em 0;
+          width: 4ch;
+          box-sizing: border-box;
+          background-position: left top;
+          background-size: 115% 0.8em;
+          background-repeat: repeat space;
+          background-image: linear-gradient(
+            to right,
+            $ung-light-grey 92%,
+            color-mix(in lch, transparent, $ung-light-grey 60%)
+          );
+          animation: lazy-text infinite cubic-bezier(0.5, 0, 0, 1) 1.8s;
+
+          &:nth-child(2) {
+            width: 24ch;
+          }
+        }
+        h2 {
+          height: 1.02em;
+          margin: 0.1em 0 0.2em 0;
+          background-size: 115% 1.02em;
+        }
+        @keyframes lazy-text {
+          from {
+            background-position-x: 0px;
+          }
+          to {
+            background-position-x: calc(-23% * 32);
+          }
+        }
+      }
     }
   }
 }
