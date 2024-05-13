@@ -41,13 +41,7 @@ const filtersData = Object.freeze({
 
 export default function SearchUserPage() {
   usePageSettings({});
-  const {
-    items: users,
-    total: totalUsers,
-    isLoading: isSearching,
-    updateFilters: updateUsers,
-    fetchNextItems: fetchNextPage,
-  } = useUsers();
+  const { items: users, total: totalUsers, updateFilters: updateUsers, fetchNextItems: fetchNextPage } = useUsers();
   return (
     <div className={styles.searchUserPage}>
       <h1 className={styles.title}>Trombinoscope</h1>
@@ -59,22 +53,34 @@ export default function SearchUserPage() {
             totalResults={totalUsers}
             baseRedirectUrl={'/users'}
             onEndReached={fetchNextPage}
-            loading={isSearching}
-            itemFactory={({ item }) => (
-              <div className={styles.user}>
-                <img src={item.avatar || defaultAvatar.src} alt="avatar" />
-                <div className={styles.userInfo}>
-                  <h2>
-                    {item.firstName} {item.lastName}
-                    {item.nickname && <span className={styles.nickname}>{item.nickname}</span>}
-                  </h2>
-                  {item.branch && <p>{item.branch}</p>}
-                  <p>{item.mailUTT}</p>
-                  {item.mailPersonal && <p>{item.mailPersonal}</p>}
-                  {item.phone && <p>{item.phone}</p>}
+            itemFactory={({ item }) =>
+              !item ? (
+                <div className={`${styles.user} ${styles.glimmer}`}>
+                  <img />
+                  <div className={styles.userInfo}>
+                    <h2></h2>
+                    <p></p>
+                    <p></p>
+                    <p></p>
+                    <p></p>
+                  </div>
                 </div>
-              </div>
-            )}
+              ) : (
+                <div className={styles.user}>
+                  <img src={item.avatar || defaultAvatar.src} alt="avatar" />
+                  <div className={styles.userInfo}>
+                    <h2>
+                      {item.firstName} {item.lastName}
+                      {item.nickname && <span className={styles.nickname}>{item.nickname}</span>}
+                    </h2>
+                    {item.branch && <p>{item.branch}</p>}
+                    <p>{item.mailUTT}</p>
+                    {item.mailPersonal && <p>{item.mailPersonal}</p>}
+                    {item.phone && <p>{item.phone}</p>}
+                  </div>
+                </div>
+              )
+            }
           />
         </div>
       </div>

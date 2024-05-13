@@ -5,7 +5,6 @@ import { Pagination } from './api.interface';
 type PaginationHook<T> = {
   items: T[];
   total: number;
-  isLoading: boolean;
   updateFilters: (query: Record<string, string>) => void;
   fetchNextItems: () => void;
 };
@@ -16,34 +15,38 @@ type PaginationHook<T> = {
 export function usePaginationLoader<T>(path: string): PaginationHook<T> {
   const [items, setItems] = useState<T[]>([]);
   const [total, setTotal] = useState(0);
-  const [isSearching, setSearching] = useState(false);
+  const searching = useRef(false);
   const lastSearch = useRef<Record<string, string>>({});
+  const itemsPerPage = useRef(0);
   const pageIndex = useRef(1);
 
   const api = useAPI();
 
   const updateItems = (query: Record<string, string>) => {
-    if (isSearching) return;
-    else setSearching(true);
+    if (searching.current) return;
+    else searching.current = true;
 
+    setItems([...Array(itemsPerPage.current || 20).fill(null)]);
     const { page, ...queryData } = query;
     api
       .get<Pagination<T>>(`${path}?${new URLSearchParams(query)}`)
       .on('success', (body) => {
         setTotal(body.itemCount);
         setItems(body.items);
+        itemsPerPage.current = body.itemsPerPage;
         lastSearch.current = queryData;
-        setSearching(false);
+        searching.current = false;
         pageIndex.current = (page && Number(page)) || 1;
       })
-      .on('error', () => setSearching(false))
-      .on('failure', () => setSearching(false));
+      .on('error', () => (searching.current = false))
+      .on('failure', () => (searching.current = false));
   };
 
   const fetchNextPage = () => {
-    if (isSearching || items.length >= total) return;
-    else setSearching(true);
+    if (searching.current || items.length >= total) return;
+    else searching.current = true;
 
+    setItems((prev) => [...prev, ...Array(itemsPerPage.current).fill(null)]);
     api
       .get<Pagination<T>>(
         `${path}?${new URLSearchParams({ ...lastSearch.current, page: String(pageIndex.current + 1) })}`,
@@ -51,11 +54,11 @@ export function usePaginationLoader<T>(path: string): PaginationHook<T> {
       .on('success', (body) => {
         pageIndex.current++;
         setTotal(body.itemCount);
-        setItems((prev) => [...prev, ...body.items]);
-        setSearching(false);
+        setItems((prev) => [...prev.slice(0, prev.length - itemsPerPage.current), ...body.items]);
+        searching.current = false;
       })
-      .on('error', () => setSearching(false))
-      .on('failure', () => setSearching(false));
+      .on('error', () => (searching.current = false))
+      .on('failure', () => (searching.current = false));
   };
-  return { items, total, isLoading: isSearching, updateFilters: updateItems, fetchNextItems: fetchNextPage };
+  return { items, total, updateFilters: updateItems, fetchNextItems: fetchNextPage };
 }

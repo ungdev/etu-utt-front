@@ -32,7 +32,7 @@ export function ResultsList<T extends object>({
   const visibilityTrigger = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (onEndReached) {
+    if (onEndReached && data[data.length - 1]) {
       const intersectionObserver = new IntersectionObserver(
         ([entry]) => {
           if (entry.isIntersecting) {
@@ -58,10 +58,10 @@ export function ResultsList<T extends object>({
       <div className={styles.results}>
         {data.map((item, index) => (
           <div
-            key={getItemId(item)}
+            key={index}
             ref={index === data.length - 1 ? visibilityTrigger : undefined}
             className={styles.result}
-            onClick={() => router.push(`${baseRedirectUrl}/${getItemId(item)}`)}>
+            onClick={() => item && router.push(`${baseRedirectUrl}/${getItemId(item)}`)}>
             <ItemFactory item={item} />
           </div>
         ))}
