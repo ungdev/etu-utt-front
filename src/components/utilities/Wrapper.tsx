@@ -12,12 +12,8 @@ export default function Wrapper({ children }: { children: ReactNode }) {
     <>
       <GoTo />
       {hasNavbar && <Navbar />}
-
-      {/*{!loaded && <Loader />}*/}
-      <div className={styles.page}>
-        {!loaded && <Loader />}
-        {children}
-      </div>
+      {!loaded && <Loader />}
+      <div className={styles.page}>{children}</div>
     </>
   );
 }

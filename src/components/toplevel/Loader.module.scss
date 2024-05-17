@@ -11,30 +11,43 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  animation: appearDelay 0.5s;
 
   .icon {
     width: 100px;
     height: 100px;
     transform-origin: 50% 65%;
-    stroke: $ung-light-grey;
-    stroke-width: 0.5px;
-    fill: #083240;
-
-    path {
-      stroke-dasharray: 50;
-      animation: dash 2.5s both cubic-bezier(0.35, 0.04, 0.63, 0.95) infinite,
-                appear 0.5s;
-    }
+    fill: $ung-dark-grey;
+    animation: pulse 0.5s infinite alternate 0.5s,
+               appearSmooth 0.5s;
   }
 }
 
-@keyframes dash {
+@keyframes pulse {
+  from {
+    scale: 1;
+  }
   to {
-    stroke-dashoffset: 100;
+    scale: 1.15;
   }
 }
 
-@keyframes appear {
+@keyframes appearDelay {
+  from {
+    opacity: 0;
+  }
+  10% {
+    opacity: 0;
+  }
+  11% {
+    opacity: 1;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes appearSmooth {
   from {
     opacity: 0;
   }

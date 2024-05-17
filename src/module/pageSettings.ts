@@ -63,7 +63,12 @@ export function usePageSettings(
     useEffect(() => {
       dispatch(((dispatch: AppDispatch) =>
         dispatch(
-          setPageSettings({ ...settings, page: pathname, searchParams: {}, loaded: !!settings.instantLoading }),
+          setPageSettings({
+            ...settings,
+            page: pathname,
+            searchParams: {},
+            loaded: !!settings.instantLoading,
+          }),
         )) as unknown as Action);
     }, deps);
   } else {
