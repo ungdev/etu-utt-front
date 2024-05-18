@@ -3,27 +3,30 @@
 .widget {
   padding: 15px 10px;
   border: 2px #E7E7E7 solid;
-  border-radius: 30px;
+  border-radius: 15px;
   background-color: #FAFBFC;
 
-  .resizableWrapper {
-    width: 100%;
-    height: 100%;
+  .title {
+    color: $ung-dark-grey;
+    font-family: $lexend;
+    font-weight: 800;
+    font-size: 1.2rem;
+    text-transform: uppercase;
+  }
+
+  .subtitle {
+    color: $ung-light-blue;
+    font-family: $lexend;
+    font-weight: 800;
+    margin-bottom: 20px;
+    margin-top: 5px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .child {
     transform-origin: 0 0;
-
-    .title {
-      color: $ung-dark-grey;
-      font-family: $lexend;
-      font-weight: 800;
-      font-size: 2rem;
-      text-transform: uppercase;
-    }
-
-    .subtitle {
-      color: $ung-light-blue;
-      font-family: $lexend;
-      font-weight: 800;
-      margin-bottom: 20px;
-    }
   }
 }

@@ -12,38 +12,35 @@ export function WidgetLayout({
   children?: ReactNode;
   className?: string;
 }) {
-  const ref = useRef<HTMLDivElement>();
-  useEffect(() => {
-    if (!ref.current) return;
-    if (title !== 'Trombinoscope') return;
-    console.log(ref.current);
-    //for (let i = 0; i < ref.current?.childElementCount; i++) {
-    //  ref.current?.childNodes[i].scale = `${ref.current.clientWidth / ref.current.scrollWidth}`;
-    //}
-    // ref.current.style.scale = `${ref.current?.clientWidth / ref.current?.scrollWidth}`;
-  }, [ref.current]);
+  const childRef = useRef<HTMLDivElement>(null);
+  const titleRef = useRef<HTMLHeadingElement>(null);
+  const subtitleRef = useRef<HTMLParagraphElement>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const currentScale = useRef<number>(1);
 
   useEffect(() => {
     const resizeObserver = new ResizeObserver(() => {
-      const scaleX = ref.current!.clientWidth / ref.current!.scrollWidth;
-      const scaleY = ref.current!.clientHeight / ref.current!.scrollHeight;
-      if (scaleX < scaleY) {
-        ref.current!.style.width = `${(scaleY / scaleX) * 100}%`;
-        ref.current!.style.height = '';
-      } else {
-        ref.current!.style.height = `${(scaleX / scaleY) * 100}%`;
-        ref.current!.style.width = '';
-      }
-      ref.current!.style.scale = `${Math.min(ref.current!.clientWidth / ref.current!.scrollWidth, ref.current!.clientHeight / ref.current!.scrollHeight)}`;
+      const scale =
+        Math.min(
+          childRef.current!.clientWidth / childRef.current!.scrollWidth,
+          (rootRef.current!.clientHeight - titleRef.current!.clientHeight - subtitleRef.current!.clientHeight - 55) /
+            childRef.current!.scrollHeight,
+          1 / currentScale.current,
+        ) * currentScale.current;
+      childRef.current!.style.scale = `${scale}`;
     });
-    resizeObserver.observe(ref.current!);
+    resizeObserver.observe(rootRef.current!);
     return () => resizeObserver.disconnect();
   }, []);
   return (
-    <div className={styles.widget}>
-      <div className={styles.resizableWrapper} ref={ref}>
-        <h2 className={styles.title}>{title}</h2>
-        <p className={styles.subtitle}>{subtitle}</p>
+    <div className={styles.widget} ref={rootRef}>
+      <h2 className={styles.title} ref={titleRef}>
+        {title}
+      </h2>
+      <p className={styles.subtitle} ref={subtitleRef}>
+        {subtitle}
+      </p>
+      <div className={styles.child} ref={childRef}>
         <div className={className}>{children}</div>
       </div>
     </div>

@@ -216,10 +216,10 @@ export default function WidgetRenderer({
   };
   // Positions an element at a certain position in the grid
   const positionTile = (element: HTMLElement, position: BoundingBox) => {
-    const tileWidth = (homepageSize.current!.width - (gridSize[0] + 1) * GAP_SIZE) / gridSize[0];
-    const tileHeight = (homepageSize.current!.height - (gridSize[1] + 1) * GAP_SIZE) / gridSize[1];
-    element.style.left = `${(tileWidth + GAP_SIZE) * position.x + GAP_SIZE}px`;
-    element.style.top = `${(tileHeight + GAP_SIZE) * position.y + GAP_SIZE}px`;
+    const tileWidth = (homepageSize.current!.width - (gridSize[0] - 1) * GAP_SIZE) / gridSize[0];
+    const tileHeight = (homepageSize.current!.height - (gridSize[1] - 1) * GAP_SIZE) / gridSize[1];
+    element.style.left = `${(tileWidth + GAP_SIZE) * position.x}px`;
+    element.style.top = `${(tileHeight + GAP_SIZE) * position.y}px`;
     element.style.width = `${tileWidth * position.width + (position.width - 1) * GAP_SIZE}px`;
     element.style.height = `${tileHeight * position.height + (position.height - 1) * GAP_SIZE}px`;
   };
