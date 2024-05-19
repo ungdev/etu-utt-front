@@ -20,18 +20,19 @@ export function WidgetLayout({
 
   useEffect(() => {
     const resizeObserver = new ResizeObserver(() => {
+      if (!childRef.current) return;
       const scale =
         Math.min(
-          childRef.current!.clientWidth / childRef.current!.scrollWidth,
+          childRef.current.clientWidth / childRef.current.scrollWidth,
           (rootRef.current!.clientHeight - titleRef.current!.clientHeight - subtitleRef.current!.clientHeight - 55) /
-            childRef.current!.scrollHeight,
+            childRef.current.scrollHeight,
           1 / currentScale.current,
         ) * currentScale.current;
       childRef.current!.style.scale = `${scale}`;
     });
     resizeObserver.observe(rootRef.current!);
     return () => resizeObserver.disconnect();
-  }, []);
+  }, [childRef.current]);
   return (
     <div className={styles.widget} ref={rootRef}>
       <h2 className={styles.title} ref={titleRef}>
