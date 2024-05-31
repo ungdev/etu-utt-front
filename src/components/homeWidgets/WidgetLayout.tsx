@@ -17,22 +17,21 @@ export function WidgetLayout({
   const titleRef = useRef<HTMLHeadingElement>(null);
   const subtitleRef = useRef<HTMLParagraphElement>(null);
   const rootRef = useRef<HTMLDivElement>(null);
-  const subrootRef = useRef<HTMLDivElement>(null);
+  const resizableRef = useRef<HTMLDivElement>(null);
   const currentScale = useRef<number>(1);
   const observer = useMemo<ResizeObserver | undefined>(
     () =>
       isClientSide()
         ? new ResizeObserver(function () {
-            if (!rootRef.current || !subrootRef.current) {
+            if (!rootRef.current || !resizableRef.current) {
               return;
             }
-            const scaleX = (rootRef.current.clientWidth - 20) / subrootRef.current.scrollWidth;
-            const scaleY = (rootRef.current.clientHeight - 30) / subrootRef.current.scrollHeight;
-            console.log(scaleX, scaleY);
+            const scaleX = (rootRef.current.clientWidth - 20) / resizableRef.current.scrollWidth;
+            const scaleY = (rootRef.current.clientHeight - 30) / resizableRef.current.scrollHeight;
             currentScale.current = Math.min(scaleX, scaleY);
-            subrootRef.current.style.width = `${(rootRef.current.clientWidth - 20) / scaleY}px`;
-            subrootRef.current.style.height = `${(rootRef.current.clientHeight - 30) / scaleX}px`;
-            subrootRef.current.style.scale = `${currentScale.current}`;
+            resizableRef.current.style.width = `${(rootRef.current.clientWidth - 20) / scaleY}px`;
+            resizableRef.current.style.height = `${(rootRef.current.clientHeight - 30) / scaleX}px`;
+            resizableRef.current.style.scale = `${currentScale.current}`;
           })
         : undefined,
     [isClientSide()],
@@ -46,7 +45,7 @@ export function WidgetLayout({
   }, [rootRef.current, observer]);
   return (
     <div className={styles.widget} ref={rootRef}>
-      <div className={styles.inside} ref={subrootRef}>
+      <div className={styles.resizable} ref={resizableRef}>
         <h2 className={styles.title} ref={titleRef}>
           {title}
         </h2>
