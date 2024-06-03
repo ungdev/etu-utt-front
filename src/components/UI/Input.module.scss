@@ -4,37 +4,39 @@
 .inputWrapper {
   display: flex;
   border-radius: 10px;
+  border: 3px solid #D3D3D3;
+  background-color: #F0F0F2;
 
   input {
     background-color: #F0F0F2;
     color: #444C5F;
-    border-radius: 10px;
+    border-radius: 7px;
     padding: 10px 15px;
-    border: 3px solid #D3D3D3;
+    border: none;
     width: 100%;
 
     &:focus {
-      border-color: $ung-light-blue;
       outline: none;
     }
   }
 
   svg {
     height: 100%;
-    width: 54px;
-    padding: 3px;
+    width: 40px;
+    padding: 5px 8px 5px 11px;
     color: $ung-light-blue;
   }
 
   &:focus-within {
     background-color: $ung-light-blue;
+    border-color: $ung-light-blue;
 
     input {
       color: $ung-light-blue;
     }
 
     svg {
-      color: white;
+      color: #F0F0F2;
     }
   }
 }
