@@ -1,5 +1,5 @@
 import styles from './WidgetRenderer.module.scss';
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from "react";
 import { isClientSide } from '@/utils/environment';
 import { BoundingBox, collidesWith, gridSize, WidgetInstance, WIDGETS } from '@/module/homepage';
 import Menu from '@/icons/Menu';
@@ -44,6 +44,7 @@ export default function WidgetRenderer({
   // If there is currently no dragging, it is null.
   const draggingInfo = useRef<{ x: number; y: number } | null>(null);
   const homepageSize = useRef<{ width: number; height: number } | null>(null); // The size in pixels of the homepage (the page minus the navbar)
+  const [initialized, setInitialized] = useState(false);
   // Define an observer that will look for 2 things : widget resizing and page resizing.
   // When the page is resized, we need to update the widget's absolute position and size and the homepage size
   // When the widget is resized, we need to update the fake element's size and position
@@ -60,6 +61,7 @@ export default function WidgetRenderer({
               };
               isUserResizing.current = false;
               positionTile(resizerRef.current, widgetRef.current);
+              setInitialized(true);
               return;
             }
             if (!isUserResizing.current) return; // If the user is not the source of this resizing (here the element being snapped), we skip the event
@@ -216,10 +218,10 @@ export default function WidgetRenderer({
   };
   // Positions an element at a certain position in the grid
   const positionTile = (element: HTMLElement, position: BoundingBox) => {
-    const tileWidth = (homepageSize.current!.width - (gridSize[0] + 1) * GAP_SIZE) / gridSize[0];
-    const tileHeight = (homepageSize.current!.height - (gridSize[1] + 1) * GAP_SIZE) / gridSize[1];
-    element.style.left = `${(tileWidth + GAP_SIZE) * position.x + GAP_SIZE}px`;
-    element.style.top = `${(tileHeight + GAP_SIZE) * position.y + GAP_SIZE}px`;
+    const tileWidth = (homepageSize.current!.width - (gridSize[0] - 1) * GAP_SIZE) / gridSize[0];
+    const tileHeight = (homepageSize.current!.height - (gridSize[1] - 1) * GAP_SIZE) / gridSize[1];
+    element.style.left = `${(tileWidth + GAP_SIZE) * position.x}px`;
+    element.style.top = `${(tileHeight + GAP_SIZE) * position.y}px`;
     element.style.width = `${tileWidth * position.width + (position.width - 1) * GAP_SIZE}px`;
     element.style.height = `${tileHeight * position.height + (position.height - 1) * GAP_SIZE}px`;
   };
