@@ -89,7 +89,7 @@ export default function Page() {
             baseRedirectUrl={'/ues'}
             onEndReached={fetchNextItems}
             itemFactory={({ item }) => (
-              <div className={!item ? styles.glimmer : undefined}>
+              <div className={!item ? styles.glimmer : ''}>
                 <h2>{item?.code}</h2>
                 <p>{item?.name}</p>
               </div>

@@ -52,7 +52,7 @@ export function ResultsList<T extends object>({
       if (visibilityTrigger.current) intersectionObserver.observe(visibilityTrigger.current);
       return () => intersectionObserver.disconnect();
     }
-  }, [data, onEndReached]);
+  }, [data]);
 
   return (
     <div className={styles.resultsList}>

@@ -1,4 +1,5 @@
 @import '@/variables.scss';
+@import '@/components/glimmer.scss';
 
 .searchUserPage {
   height: 100%;
@@ -42,21 +43,8 @@
           }
           p,
           h2 {
-            display: block;
-            opacity: 0.2;
-            border-radius: 1em;
-            height: 0.8em;
-            margin: 0.1em 0 0.1em 0;
+            @extend .glimmer-animated;
             width: 16ch;
-            background-position: left top;
-            background-size: 115% 0.8em;
-            background-repeat: repeat space;
-            background-image: linear-gradient(
-              to right,
-              $ung-light-grey 92%,
-              color-mix(in lch, transparent, $ung-light-grey 60%)
-            );
-            animation: lazy-text infinite cubic-bezier(0.5, 0, 0, 1) 1.8s;
 
             &:nth-child(2) {
               width: 8ch;
@@ -69,14 +57,6 @@
             }
             &:nth-of-type(4) {
               width: 10ch;
-            }
-          }
-          @keyframes lazy-text {
-            from {
-              background-position-x: 0px;
-            }
-            to {
-              background-position-x: calc(-23% * 32);
             }
           }
         }
