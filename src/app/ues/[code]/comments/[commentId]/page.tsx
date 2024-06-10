@@ -32,7 +32,7 @@ function CommentEditorFooter(originalComment: string, onUpdate: (text: string) =
 }
 
 export default function CommentDetailsPage() {
-  usePageSettings({ instantLoading: true });
+  usePageSettings({});
   const { t } = useAppTranslation();
   const params = useParams<{ code: string; commentId: string }>();
   const [comment, setComment] = useUEComment(params.commentId);

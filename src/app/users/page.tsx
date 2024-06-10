@@ -40,7 +40,7 @@ const filtersData = Object.freeze({
 } satisfies FiltersDataType<FilterNames, FiltersType>);
 
 export default function SearchUserPage() {
-  usePageSettings({ instantLoading: true });
+  usePageSettings({});
   const [users, totalUsers, updateUsers] = useUsers();
   return (
     <div className={styles.searchUserPage}>

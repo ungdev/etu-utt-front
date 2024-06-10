@@ -21,7 +21,7 @@ function AdditionalNavbarComponent({
   onModify: () => void;
   onDone: () => void;
 }) {
-  usePageSettings({});
+  //usePageSettings({});
   const [widgetToAdd /*, setWidgetToAdd*/] = useState<keyof typeof WIDGETS>('ueBrowserWidget');
   return (
     <>
@@ -58,6 +58,7 @@ export default function HomePage() {
               onAdd={(widget) => dispatch(addWidget(widget))}
             />
           ),
+      needsLoading: true,
     },
     [modifyingLayout, isSmallScreen],
   );

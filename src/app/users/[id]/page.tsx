@@ -19,7 +19,7 @@ function userData(data: string | number | undefined | null, label: string) {
 }
 
 export default function UserPage() {
-  usePageSettings({ instantLoading: true });
+  usePageSettings({});
   const { id: userId } = useParams<{ id: string }>();
   const user = useUser(userId);
   const { t } = useAppTranslation();

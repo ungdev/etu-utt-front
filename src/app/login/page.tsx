@@ -15,7 +15,7 @@ import { useAppTranslation } from '@/lib/i18n';
 import { Trans } from 'react-i18next';
 
 export default function LoginPage() {
-  usePageSettings({ hasNavbar: false, permissions: 'public', instantLoading: true });
+  usePageSettings({ hasNavbar: false, permissions: 'public' });
   const params = useSearchParams(); // TODO : replace it with useAppSelector(state => state.pageSettings.searchParams) (and verify it works)
   const router = useRouter();
   const dispatch = useAppDispatch();

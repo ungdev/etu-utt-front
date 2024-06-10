@@ -49,11 +49,11 @@ export { setPageParams };
 
 export function usePageSettings(): PageSettingsSlice;
 export function usePageSettings(
-  settings: Partial<PageSettings & { instantLoading: boolean }>,
+  settings: Partial<PageSettings & { needsLoading: boolean }>,
   deps?: DependencyList,
 ): void;
 export function usePageSettings(
-  settings?: Partial<PageSettings & { instantLoading: boolean }>,
+  settings?: Partial<PageSettings & { needsLoading: boolean }>,
   deps: DependencyList = [],
 ): PageSettingsSlice | void {
   /* eslint-disable react-hooks/rules-of-hooks */
@@ -61,15 +61,14 @@ export function usePageSettings(
   if (settings) {
     const dispatch = useAppDispatch();
     useEffect(() => {
-      dispatch(((dispatch: AppDispatch) =>
-        dispatch(
-          setPageSettings({
-            ...settings,
-            page: pathname,
-            searchParams: {},
-            loaded: !!settings.instantLoading,
-          }),
-        )) as unknown as Action);
+      dispatch(
+        setPageSettings({
+          ...settings,
+          page: pathname,
+          searchParams: {},
+          loaded: !settings.needsLoading,
+        }),
+      );
     }, deps);
   } else {
     let pageSettings = useAppSelector((state) => state.pageSettings);
