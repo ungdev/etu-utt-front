@@ -1,6 +1,14 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import { useAppSelector } from '@/lib/hooks';
 
+export const enum UserType {
+  STUDENT = 'STUDENT',
+  FORMER_STUDENT = 'FORMER_STUDENT',
+  TEACHER = 'TEACHER',
+  EMPLOYEE = 'EMPLOYEE',
+  OTHER = 'OTHER',
+}
+
 interface UserSlice {
   id: string;
   login: string;
@@ -12,6 +20,7 @@ interface UserSlice {
   passions: string;
   website: string;
   birthday: Date;
+  type: UserType;
 }
 
 export const userSlice = createSlice({

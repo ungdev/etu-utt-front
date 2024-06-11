@@ -18,17 +18,22 @@ import { useState } from 'react';
 import sendComment from '@/api/comment/sendComment';
 import { useAPI } from '@/api/api';
 import { usePageSettings } from '@/module/pageSettings';
+import useAnnals, { getAnnalURL } from '@/api/annals/fetchAnnals';
+import { UserType } from '@/module/user';
 
 export default function UEDetailsPage() {
   usePageSettings({});
   const params = useParams<{ code: string }>();
   const { t } = useAppTranslation();
   const logged = useAppSelector((state) => state.session.logged);
+  const type = useAppSelector((state) => state.user?.type);
   const [ue, refreshUE] = useUE(params.code as string);
   const criteria = useUERateCriteria();
   const [myRates, setMyRates] = useGetRate(params.code);
   const [writtingComment, setWrittingComment] = useState<string>('');
+  const [annals, updateAnnal] = useAnnals(params.code);
   const api = useAPI();
+
   if (!ue || !criteria || (!myRates && logged)) {
     return false;
   }
@@ -106,6 +111,22 @@ export default function UEDetailsPage() {
           {ue.info.requirements.length === 0 ? t('ues:detailed.requirements.none') : ue.info.requirements.toString()}
         </div>
       </div>
+      {(type === UserType.STUDENT || type === UserType.FORMER_STUDENT) && (
+        <div>
+          <h2>Annales</h2>
+          <div>
+            {annals?.length
+              ? annals.map((annal) => (
+                  <div key={annal.id}>
+                    <a href={getAnnalURL(annal.id)} target="_blank">
+                      {annal.type.name} ({annal.semesterId})
+                    </a>
+                  </div>
+                ))
+              : t('ues:detailed.noAnnals')}
+          </div>
+        </div>
+      )}
       <div className={styles.thoughts}>
         <h2>Avis des étudiants</h2>
         <div className={styles.rates}>
