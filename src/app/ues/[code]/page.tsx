@@ -14,12 +14,14 @@ import doUERate from '@/api/ueRate/doUERate';
 import deleteUERate from '@/api/ueRate/deleteUERate';
 import StarRating from '@/components/StarRating';
 import TextArea from '@/components/UI/TextArea';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import sendComment from '@/api/comment/sendComment';
 import { useAPI } from '@/api/api';
 import { usePageSettings } from '@/module/pageSettings';
-import useAnnals, { getAnnalURL } from '@/api/annals/fetchAnnals';
+import useAnnals, { openAnnalInNewTab } from '@/api/annals/fetchAnnals';
 import { UserType } from '@/module/user';
+import useAnnalMetadata from '@/api/annals/fetchMetadata';
+import { createAnnal } from '@/api/annals/createAnnal';
 
 export default function UEDetailsPage() {
   usePageSettings({});
@@ -31,8 +33,18 @@ export default function UEDetailsPage() {
   const criteria = useUERateCriteria();
   const [myRates, setMyRates] = useGetRate(params.code);
   const [writtingComment, setWrittingComment] = useState<string>('');
-  const [annals, updateAnnal] = useAnnals(params.code);
+  const [annals, , addAnnal] = useAnnals(params.code);
+  const [annalTypes, annalSemesters] = useAnnalMetadata(params.code);
+  const [annalType, setAnnalType] = useState<string>();
+  const [annalSemester, setAnnalSemester] = useState<string>();
+  const [fileRotation, setFileRotation] = useState<number>(0);
+  const fileRef = useRef<File>();
   const api = useAPI();
+
+  useEffect(() => {
+    if (annalTypes?.length) setAnnalType(annalTypes[0].id);
+    if (annalSemesters?.length) setAnnalSemester(annalSemesters[0]);
+  }, [annalTypes, annalSemesters]);
 
   if (!ue || !criteria || (!myRates && logged)) {
     return false;
@@ -118,12 +130,54 @@ export default function UEDetailsPage() {
             {annals?.length
               ? annals.map((annal) => (
                   <div key={annal.id}>
-                    <a href={getAnnalURL(annal.id)} target="_blank">
+                    <a
+                      onClick={(event) => {
+                        event.preventDefault();
+                        openAnnalInNewTab(api, annal.id);
+                      }}>
                       {annal.type.name} ({annal.semesterId})
                     </a>
                   </div>
                 ))
               : t('ues:detailed.noAnnals')}
+          </div>
+          <div>
+            <h3>Envoyer une annale</h3>
+            <select onChange={(event) => setAnnalType(event.target.value)} value={annalType}>
+              {annalTypes &&
+                annalTypes.map((type) => (
+                  <option key={type.id} value={type.id}>
+                    {type.name}
+                  </option>
+                ))}
+            </select>
+            <select onChange={(event) => setAnnalSemester(event.target.value)} value={annalSemester}>
+              {annalSemesters &&
+                annalSemesters.map((semester) => (
+                  <option key={semester} value={semester}>
+                    {semester}
+                  </option>
+                ))}
+            </select>
+            <input type="file" onChange={(event) => (fileRef.current = event.target.files?.item(0) || undefined)} />
+            <input
+              type="number"
+              value={fileRotation}
+              onChange={(event) => setFileRotation(parseInt(event.target.value))}
+            />
+            <button
+              onClick={async () => {
+                if (!fileRef.current || !annalSemester || !annalType) return;
+                const createdAnnal = await createAnnal(api, {
+                  file: fileRef.current!,
+                  semester: annalSemester,
+                  typeId: annalType,
+                  ueCode: params.code,
+                  rotate: fileRotation,
+                });
+                if (createdAnnal) addAnnal(createdAnnal);
+              }}
+            />
           </div>
         </div>
       )}
