@@ -25,7 +25,7 @@ Vous pouvez trouver vos identifiants sur https://addons.mozilla.org/en-US/develo
 
 ## Différentes commandes
 
-### Lancer le projet en mode développement
+### Lancer en mode développement
 
 ```sh
 pnpm dev
@@ -33,13 +33,13 @@ pnpm dev
 
 Vous pouvez alors aller sur http://localhost:8080. Les modifications que vous ferez au code seront automatiquement appliquées, sans que vous ayez besoin de relancer la commande.
 
-### Build le projet
+### Build
 
 ```sh
 pnpm build
 ```
 
-### Lancer le projet en mode production
+### Lancer en mode production
 
 ```sh
 pnpm start
