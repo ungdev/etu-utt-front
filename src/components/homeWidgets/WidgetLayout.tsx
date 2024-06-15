@@ -26,8 +26,8 @@ export function WidgetLayout({
             if (!rootRef.current || !resizableRef.current) {
               return;
             }
-            const scaleX = (rootRef.current.clientWidth - 20) / resizableRef.current.scrollWidth;
-            const scaleY = (rootRef.current.clientHeight - 30) / resizableRef.current.scrollHeight;
+            const scaleX = Math.min((rootRef.current.clientWidth - 20) / resizableRef.current.scrollWidth, 1);
+            const scaleY = Math.min((rootRef.current.clientHeight - 30) / resizableRef.current.scrollHeight, 1);
             currentScale.current = Math.min(scaleX, scaleY);
             resizableRef.current.style.width = `${(rootRef.current.clientWidth - 20) / scaleY}px`;
             resizableRef.current.style.height = `${(rootRef.current.clientHeight - 30) / scaleX}px`;
