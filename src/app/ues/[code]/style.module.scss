@@ -105,6 +105,10 @@
     }
   }
 
+  .send_button {
+    margin-top: 1em;
+  }
+
   .thoughts {
     & > h2 {
       margin-bottom: 1rem;
@@ -126,6 +130,12 @@
           color: $ung-light-blue;
         }
       }
+    }
+  }
+
+  .send {
+    h2 {
+      margin: 1em 0;
     }
   }
 

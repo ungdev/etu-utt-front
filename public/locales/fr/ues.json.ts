@@ -49,4 +49,5 @@ export default {
   'detailed.annals.entry.status.processing': 'en cours de traitement',
   'detailed.annals.entry.status.unverified': 'en attente de validation',
   'detailed.annals.entry.status.validated': 'validée par la modération',
+  'detailed.annals.send': 'Envoyer un sujet',
 } as const;

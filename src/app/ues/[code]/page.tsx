@@ -28,6 +28,7 @@ import Tooltip from '@/components/UI/Tooltip';
 import Trash from '@/icons/Trash';
 import CircleWarning from '@/icons/CircleWarning';
 import CircleCheck from '@/icons/CircleCheck';
+import FileUpload from '@/components/UI/FileUpload';
 
 function getIcon(status: AnnalStatus) {
   if (status === 'deleted') return <Trash />;
@@ -52,6 +53,7 @@ export default function UEDetailsPage() {
   const [annalType, setAnnalType] = useState<string>();
   const [annalSemester, setAnnalSemester] = useState<string>();
   const [fileRotation, setFileRotation] = useState<number>(0);
+  const [isAnnalUploaderOpen, setAnnalUploaderOpen] = useState(false);
   const fileRef = useRef<File>();
   const api = useAPI();
 
@@ -90,175 +92,189 @@ export default function UEDetailsPage() {
       <h1>{ue.code}</h1>
       <p>{ue.name}</p>
       <div className={styles.divider} />
-      <div className={styles.info}>
-        <div className={styles.generalInfo}>
-          <h2>Informations générales</h2>
-          <p>
-            {t('ues:detailed.description')} : {ue.info.comment}
-            <br />
-            {t('ues:detailed.program')} : {ue.info.program}
-            <br />
-            {t('ues:detailed.objectives')} : {ue.info.objectives}
-            <br />
-            {t('ues:detailed.taughtIn')} : {ue.info.languages}
-            <br />
-            {t('ues:detailed.minors')} : {ue.info.minors}
-            <br />
-            {t('ues:detailed.credits')} :{' '}
-            {ue.credits.map((credits) => `${credits.credits}${credits.category.code}`).join(', ')}
-          </p>
-        </div>
-        <div className={styles.workTime}>
-          <h2>{t('ues:detailed.workTime')}</h2>
-          {ue.workTime ? (
-            <>
-              <p>CM : {ue.workTime.cm}</p>
-              <p>TD : {ue.workTime.td}</p>
-              <p>TP : {ue.workTime.tp}</p>
+      {!isAnnalUploaderOpen ? (
+        <>
+          <div className={styles.info}>
+            <div className={styles.generalInfo}>
+              <h2>Informations générales</h2>
               <p>
-                {t('ues:detailed.workTime.project')} : {ue.workTime.project}
+                {t('ues:detailed.description')} : {ue.info.comment}
+                <br />
+                {t('ues:detailed.program')} : {ue.info.program}
+                <br />
+                {t('ues:detailed.objectives')} : {ue.info.objectives}
+                <br />
+                {t('ues:detailed.taughtIn')} : {ue.info.languages}
+                <br />
+                {t('ues:detailed.minors')} : {ue.info.minors}
+                <br />
+                {t('ues:detailed.credits')} :{' '}
+                {ue.credits.map((credits) => `${credits.credits}${credits.category.code}`).join(', ')}
               </p>
-              <p>THE : {ue.workTime.the}</p>
-            </>
-          ) : (
-            t('ues:detailed.noWorkingTimeInfo')
-          )}
-        </div>
-        <div className={styles.takeUEInfo}>
-          <h2>Information pour faire l'UE</h2>
-          {t('ues:detailed.semester')} :{' '}
-          {ue.openSemester.find((semester) => new Date(semester.start).getTime() > Date.now())?.code ??
-            t('ues:detailed.semester.none')}{' '}
-          <br />
-          {t('ues:detailed.inscriptionCode')} : {ue.inscriptionCode} <br />
-          {t('ues:detailed.branchOptions')} : {ue.branchOption.map((branchOption) => branchOption.code).toString()}{' '}
-          <br />
-          {t('ues:detailed.requirements')} :{' '}
-          {ue.info.requirements.length === 0 ? t('ues:detailed.requirements.none') : ue.info.requirements.toString()}
-        </div>
-      </div>
-      {(type === UserType.STUDENT || type === UserType.FORMER_STUDENT) && (
-        <div className={styles.exams}>
-          <h2>{t('ues:detailed.annals.title')}</h2>
-          <div className={styles.list}>
-            {annals?.length
-              ? Object.entries(Object.groupBy(annals, (annal) => annal.semesterId)).map(([semester, annals]) => (
-                  <div className={styles.semester} key={semester}>
-                    <h3>{semester}</h3>
-                    {annals?.map((annal) => {
-                      const statusIcon = getDisplayedExamStatus(annal.status);
-                      return (
-                        <div
-                          className={styles.entry}
-                          key={annal.id}
-                          data-status={computeExamStatus(annal.status).join(' ')}
-                          onClick={(event) => {
-                            if (annal.status & CommentStatus.PROCESSING) return;
-                            event.preventDefault();
-                            openAnnalInNewTab(api, annal.id);
-                          }}>
-                          <span className={styles.type}>
-                            {annal.type.name}{' '}
-                            {(statusIcon !== 'validated' || annal.sender.id === userId) && (
-                              <Tooltip
-                                content={t(`ues:detailed.annals.entry.status.${statusIcon}`)}
-                                className={styles.status}>
-                                {getIcon(statusIcon)}
-                              </Tooltip>
-                            )}
-                          </span>
-                          <span className={styles.author}>
-                            {t('ues:detailed.annals.entry.author')} {annal.sender.firstName} {annal.sender.lastName}
-                          </span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                ))
-              : t('ues:detailed.annals.empty')}
+            </div>
+            <div className={styles.workTime}>
+              <h2>{t('ues:detailed.workTime')}</h2>
+              {ue.workTime ? (
+                <>
+                  <p>CM : {ue.workTime.cm}</p>
+                  <p>TD : {ue.workTime.td}</p>
+                  <p>TP : {ue.workTime.tp}</p>
+                  <p>
+                    {t('ues:detailed.workTime.project')} : {ue.workTime.project}
+                  </p>
+                  <p>THE : {ue.workTime.the}</p>
+                </>
+              ) : (
+                t('ues:detailed.noWorkingTimeInfo')
+              )}
+            </div>
+            <div className={styles.takeUEInfo}>
+              <h2>Information pour faire l'UE</h2>
+              {t('ues:detailed.semester')} :{' '}
+              {ue.openSemester.find((semester) => new Date(semester.start).getTime() > Date.now())?.code ??
+                t('ues:detailed.semester.none')}{' '}
+              <br />
+              {t('ues:detailed.inscriptionCode')} : {ue.inscriptionCode} <br />
+              {t('ues:detailed.branchOptions')} : {ue.branchOption.map((branchOption) => branchOption.code).toString()}{' '}
+              <br />
+              {t('ues:detailed.requirements')} :{' '}
+              {ue.info.requirements.length === 0
+                ? t('ues:detailed.requirements.none')
+                : ue.info.requirements.toString()}
+            </div>
           </div>
-          <div>
-            <h3>Envoyer une annale</h3>
-            <select onChange={(event) => setAnnalType(event.target.value)} value={annalType}>
-              {annalTypes &&
-                annalTypes.map((type) => (
-                  <option key={type.id} value={type.id}>
-                    {type.name}
-                  </option>
-                ))}
-            </select>
-            <select onChange={(event) => setAnnalSemester(event.target.value)} value={annalSemester}>
-              {annalSemesters &&
-                annalSemesters.map((semester) => (
-                  <option key={semester} value={semester}>
-                    {semester}
-                  </option>
-                ))}
-            </select>
-            <input type="file" onChange={(event) => (fileRef.current = event.target.files?.item(0) || undefined)} />
-            <input
-              type="number"
-              value={fileRotation}
-              onChange={(event) => setFileRotation(parseInt(event.target.value))}
-            />
-            <button
-              onClick={async () => {
-                if (!fileRef.current || !annalSemester || !annalType) return;
-                const createdAnnal = await createAnnal(api, {
-                  file: fileRef.current!,
-                  semester: annalSemester,
-                  typeId: annalType,
-                  ueCode: params.code,
-                  rotate: fileRotation,
-                });
-                if (createdAnnal) addAnnal(createdAnnal);
-              }}
-            />
-          </div>
-        </div>
-      )}
-      <div className={styles.thoughts}>
-        <h2>Avis des étudiants</h2>
-        <div className={styles.rates}>
-          {Object.entries(ue.starVotes).map(([id, value]) => {
-            const myRate = myRates?.find((rate) => rate.criterionId === id);
-            return (
-              <div key={id} className={styles.criterion}>
-                <h3>{criteria.find((criterion): criterion is UERateCriterion => criterion.id === id)?.name}</h3>
-                <StarRating stars={5} value={value} />
-                {myRates && (
-                  <>
-                    <StarRating
-                      stars={5}
-                      value={myRate?.value ?? 0}
-                      onClick={(rate) => onRate(id as string, !!myRate, rate)}
-                    />
-                    {myRate && (
-                      <Button className={styles.deleteRate} onClick={() => deleteRate(id as string)}>
-                        Supprimer mon avis
-                      </Button>
-                    )}
-                  </>
-                )}
+          {(type === UserType.STUDENT || type === UserType.FORMER_STUDENT) && (
+            <div className={styles.exams}>
+              <h2>{t('ues:detailed.annals.title')}</h2>
+              <div className={styles.list}>
+                {annals?.length
+                  ? Object.entries(Object.groupBy(annals, (annal) => annal.semesterId)).map(([semester, annals]) => (
+                      <div className={styles.semester} key={semester}>
+                        <h3>{semester}</h3>
+                        {annals?.map((annal) => {
+                          const statusIcon = getDisplayedExamStatus(annal.status);
+                          return (
+                            <div
+                              className={styles.entry}
+                              key={annal.id}
+                              data-status={computeExamStatus(annal.status).join(' ')}
+                              onClick={(event) => {
+                                if (annal.status & CommentStatus.PROCESSING) return;
+                                event.preventDefault();
+                                openAnnalInNewTab(api, annal.id);
+                              }}>
+                              <span className={styles.type}>
+                                {annal.type.name}{' '}
+                                {(statusIcon !== 'validated' || annal.sender.id === userId) && (
+                                  <Tooltip
+                                    content={t(`ues:detailed.annals.entry.status.${statusIcon}`)}
+                                    className={styles.status}>
+                                    {getIcon(statusIcon)}
+                                  </Tooltip>
+                                )}
+                              </span>
+                              <span className={styles.author}>
+                                {t('ues:detailed.annals.entry.author')} {annal.sender.firstName} {annal.sender.lastName}
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    ))
+                  : t('ues:detailed.annals.empty')}
               </div>
-            );
-          })}
-        </div>
-        {logged ? (
-          <>
-            <div className={styles.writeComment}>
-              {t('ues:detailed.comments.write')}
-              <TextArea value={writtingComment} onChange={setWrittingComment} />
-              <Button onClick={() => sendComment(api, ue.code, writtingComment, false)}>
-                {t('ues:detailed.comments.write.send')}
+              <Button
+                className={styles.send_button}
+                disabled={!annalTypes?.length || !annalSemesters?.length}
+                onClick={() => setAnnalUploaderOpen(true)}>
+                {t('ues:detailed.annals.send')}
               </Button>
             </div>
-            <Comments code={params.code as string} />
-          </>
-        ) : (
-          t('ues:detailed.comments.loginRequired')
-        )}
-      </div>
+          )}
+          <div className={styles.thoughts}>
+            <h2>Avis des étudiants</h2>
+            <div className={styles.rates}>
+              {Object.entries(ue.starVotes).map(([id, value]) => {
+                const myRate = myRates?.find((rate) => rate.criterionId === id);
+                return (
+                  <div key={id} className={styles.criterion}>
+                    <h3>{criteria.find((criterion): criterion is UERateCriterion => criterion.id === id)?.name}</h3>
+                    <StarRating stars={5} value={value} />
+                    {myRates && (
+                      <>
+                        <StarRating
+                          stars={5}
+                          value={myRate?.value ?? 0}
+                          onClick={(rate) => onRate(id as string, !!myRate, rate)}
+                        />
+                        {myRate && (
+                          <Button className={styles.deleteRate} onClick={() => deleteRate(id as string)}>
+                            Supprimer mon avis
+                          </Button>
+                        )}
+                      </>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+            {logged ? (
+              <>
+                <div className={styles.writeComment}>
+                  {t('ues:detailed.comments.write')}
+                  <TextArea value={writtingComment} onChange={setWrittingComment} />
+                  <Button onClick={() => sendComment(api, ue.code, writtingComment, false)}>
+                    {t('ues:detailed.comments.write.send')}
+                  </Button>
+                </div>
+                <Comments code={params.code as string} />
+              </>
+            ) : (
+              t('ues:detailed.comments.loginRequired')
+            )}
+          </div>
+        </>
+      ) : (
+        <div className={styles.send}>
+          <h2>{t('ues:detailed.annals.send')}</h2>
+          <select onChange={(event) => setAnnalType(event.target.value)} value={annalType}>
+            {annalTypes &&
+              annalTypes.map((type) => (
+                <option key={type.id} value={type.id}>
+                  {type.name}
+                </option>
+              ))}
+          </select>
+          <select onChange={(event) => setAnnalSemester(event.target.value)} value={annalSemester}>
+            {annalSemesters &&
+              annalSemesters.map((semester) => (
+                <option key={semester} value={semester}>
+                  {semester}
+                </option>
+              ))}
+          </select>
+          <FileUpload
+            fileRef={fileRef}
+            onFileChange={setFileRotation}
+            placeholder=""
+            fileTypes={['image/png', 'image/jpeg', 'image/webp', 'image/avif', 'image/tiff', 'application/pdf']}
+            supportsPictureRotation={true}
+          />
+          <button
+            onClick={async () => {
+              if (!fileRef.current || !annalSemester || !annalType) return;
+              const createdAnnal = await createAnnal(api, {
+                file: fileRef.current!,
+                semester: annalSemester,
+                typeId: annalType,
+                ueCode: params.code,
+                rotate: fileRotation,
+              });
+              if (createdAnnal) addAnnal(createdAnnal);
+            }}
+          />
+        </div>
+      )}
     </div>
   );
 }

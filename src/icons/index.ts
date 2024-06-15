@@ -19,6 +19,7 @@ import LogoUTT from './LogoUTT';
 import CircleCheck from './CircleCheck';
 import CircleWarning from './CircleWarning';
 import Clock from './Clock';
+import Rotate from './Rotate';
 
 const Icons = {
   Book,
@@ -40,6 +41,7 @@ const Icons = {
   Star,
   Trash,
   RightChevron,
+  Rotate,
   User,
   Users,
 };

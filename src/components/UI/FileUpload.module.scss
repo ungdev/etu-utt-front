@@ -1,0 +1,68 @@
+@import '@/variables';
+
+.dropzone {
+  position: relative;
+  border: 10px dotted #fff;
+  border-radius: 20px;
+  color: white;
+  font: bold 24px/200px arial;
+  height: 200px;
+  margin: 30px auto;
+  text-align: center;
+  width: 200px;
+}
+
+.dropzone.hover {
+  border: 10px solid #fe5;
+  color: #fe5;
+}
+
+.dropzone.dropped {
+  background: #222;
+  border: 10px solid #444;
+}
+
+.dropzone div {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
+.dropzone img {
+  border-radius: 10px;
+  vertical-align: middle;
+  max-width: 95%;
+  max-height: 95%;
+}
+
+.dropzone [type='file'] {
+  cursor: pointer;
+  position: absolute;
+  opacity: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
+.dropzone {
+  position: relative;
+  .toolbar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: rgba($color: $ung-dark-grey, $alpha: 0.6);
+    display: flex;
+    flex-flow: row nowrap;
+    gap: 0.5em;
+
+    .action {
+      width: 2em;
+      border-radius: 50%;
+      color: $light-gray;
+    }
+  }
+}
