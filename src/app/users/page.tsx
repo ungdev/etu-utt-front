@@ -56,7 +56,7 @@ export default function SearchUserPage() {
             itemFactory={({ item }) =>
               !item ? (
                 <div className={`${styles.user} ${styles.glimmer}`}>
-                  <img />
+                  <img alt="Askip il y a une image ici mais j'ai aucune idée d'à quoi elle sert :)" />
                   <div className={styles.userInfo}>
                     <h2></h2>
                     <p></p>
