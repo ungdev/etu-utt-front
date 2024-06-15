@@ -28,13 +28,8 @@ export default function LoginPage() {
     setValidatedToken(true);
     api
       .post<CasLoginRequestDto, CasLoginResponseDto>('auth/signin/cas', {
-<<<<<<< Updated upstream
-        ticket: params.get('ticket')!,
-        service: 'https://etu.assos.utt.fr/login',
-=======
         ticket: ticket,
         service: process.env.NEXT_PUBLIC_CAS_SERVICE!,
->>>>>>> Stashed changes
       })
       .on('success', (body) => {
         if (!body.signedIn) {
