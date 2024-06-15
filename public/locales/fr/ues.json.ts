@@ -50,4 +50,9 @@ export default {
   'detailed.annals.entry.status.unverified': 'en attente de validation',
   'detailed.annals.entry.status.validated': 'validée par la modération',
   'detailed.annals.send': 'Envoyer un sujet',
+  'detailed.annals.send.type': "Type de l'examen",
+  'detailed.annals.send.semester': 'Semestre',
+  'detailed.annals.send.placeholder': 'Déposez votre sujet ici',
+  'detailed.annals.send.back': 'Retour',
+  'detailed.annals.send.sumbit': 'Valider',
 } as const;

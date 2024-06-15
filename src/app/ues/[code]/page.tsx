@@ -54,6 +54,7 @@ export default function UEDetailsPage() {
   const [annalSemester, setAnnalSemester] = useState<string>();
   const [fileRotation, setFileRotation] = useState<number>(0);
   const [isAnnalUploaderOpen, setAnnalUploaderOpen] = useState(false);
+  const [isAnnalSendButtonDisabled, setAnnalSendButtonDisabled] = useState(false);
   const fileRef = useRef<File>();
   const api = useAPI();
 
@@ -65,6 +66,23 @@ export default function UEDetailsPage() {
   if (!ue || !criteria || (!myRates && logged)) {
     return false;
   }
+
+  const onSendExam = async () => {
+    if (!fileRef.current || !annalSemester || !annalType) return;
+    setAnnalSendButtonDisabled(true);
+    const createdAnnal = await createAnnal(api, {
+      file: fileRef.current!,
+      semester: annalSemester,
+      typeId: annalType,
+      ueCode: params.code,
+      rotate: fileRotation,
+    });
+    if (createdAnnal) {
+      addAnnal(createdAnnal);
+      setAnnalUploaderOpen(false);
+    }
+    setAnnalSendButtonDisabled(false);
+  };
 
   const onRate = async (criterionId: string, hasAlreadyRated: boolean, rate: number) => {
     const newRate = await doUERate(api, params.code, criterionId as string, rate).toPromise();
@@ -237,42 +255,41 @@ export default function UEDetailsPage() {
       ) : (
         <div className={styles.send}>
           <h2>{t('ues:detailed.annals.send')}</h2>
-          <select onChange={(event) => setAnnalType(event.target.value)} value={annalType}>
-            {annalTypes &&
-              annalTypes.map((type) => (
-                <option key={type.id} value={type.id}>
-                  {type.name}
-                </option>
-              ))}
-          </select>
-          <select onChange={(event) => setAnnalSemester(event.target.value)} value={annalSemester}>
-            {annalSemesters &&
-              annalSemesters.map((semester) => (
-                <option key={semester} value={semester}>
-                  {semester}
-                </option>
-              ))}
-          </select>
+          <div>
+            {t('ues:detailed.annals.send.type')}
+            <select onChange={(event) => setAnnalType(event.target.value)} value={annalType}>
+              {annalTypes &&
+                annalTypes.map((type) => (
+                  <option key={type.id} value={type.id}>
+                    {type.name}
+                  </option>
+                ))}
+            </select>
+          </div>
+          <div>
+            {t('ues:detailed.annals.send.semester')}
+            <select onChange={(event) => setAnnalSemester(event.target.value)} value={annalSemester}>
+              {annalSemesters &&
+                annalSemesters.map((semester) => (
+                  <option key={semester} value={semester}>
+                    {semester}
+                  </option>
+                ))}
+            </select>
+          </div>
           <FileUpload
             fileRef={fileRef}
             onFileChange={setFileRotation}
-            placeholder=""
+            placeholder={t('ues:detailed.annals.send.placeholder')}
             fileTypes={['image/png', 'image/jpeg', 'image/webp', 'image/avif', 'image/tiff', 'application/pdf']}
             supportsPictureRotation={true}
           />
-          <button
-            onClick={async () => {
-              if (!fileRef.current || !annalSemester || !annalType) return;
-              const createdAnnal = await createAnnal(api, {
-                file: fileRef.current!,
-                semester: annalSemester,
-                typeId: annalType,
-                ueCode: params.code,
-                rotate: fileRotation,
-              });
-              if (createdAnnal) addAnnal(createdAnnal);
-            }}
-          />
+          <div className={styles.actionbar}>
+            <Button onClick={onSendExam} disabled={isAnnalSendButtonDisabled}>
+              {t('ues:detailed.annals.send.sumbit')}
+            </Button>
+            <Button onClick={() => setAnnalUploaderOpen(false)}>{t('ues:detailed.annals.send.back')}</Button>
+          </div>
         </div>
       )}
     </div>

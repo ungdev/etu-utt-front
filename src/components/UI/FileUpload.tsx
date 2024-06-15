@@ -26,6 +26,7 @@ export default function FileUpload({
   supportsPictureRotation?: boolean;
 }) {
   const [dataURL, setDataURL] = useState<string | undefined>();
+  const [filename, setFilename] = useState<string | undefined>();
   const [rotation, setRotation] = useState(0);
 
   useEffect(() => {
@@ -38,11 +39,11 @@ export default function FileUpload({
         <img
           className={styles.cover}
           src={dataURL}
-          alt={placeholder}
+          alt={filename ?? placeholder}
           style={{ transform: `rotate(${90 * rotation}deg)` }}
         />
       ) : (
-        placeholder
+        filename ?? placeholder
       )}
       <input
         type="file"
@@ -50,25 +51,31 @@ export default function FileUpload({
         disabled={disabled}
         onChange={(event) => {
           fileRef.current = event.target.files?.item(0) || undefined;
+          setFilename(fileRef.current?.name);
           let url: string | undefined = undefined;
           if (fileRef.current && isPicture(fileRef.current.name)) {
             const reader = new FileReader();
             reader.readAsDataURL(fileRef.current);
-            reader.onload = function (event) {
+            reader.onload = (event) => {
               if (typeof event.target?.result === 'string') url = event.target?.result;
+              setDataURL(url);
+              setRotation(0);
             };
+          } else {
+            setDataURL(url);
+            setRotation(0);
           }
-          setDataURL(url);
-          setRotation(0);
         }}
       />
-      <div className={styles.toolbar}>
-        {supportsPictureRotation && (
-          <div className={styles.action} onClick={() => setRotation((rotation + 1) % 4)}>
-            <Rotate />
-          </div>
-        )}
-      </div>
+      {dataURL && (
+        <div className={styles.toolbar}>
+          {supportsPictureRotation && (
+            <div className={styles.action} onClick={() => setRotation((rotation + 1) % 4)}>
+              <Rotate />
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
