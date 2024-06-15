@@ -10,14 +10,14 @@ import { fetchProfile } from '@/api/profile/fetchProfile';
 
 interface SessionSlice {
   logged: boolean;
-  token: string;
+  token: string | null;
 }
 
 export const sessionSlice = createSlice({
   name: 'session',
   reducers: {
-    setToken: (state, action: PayloadAction<string>) => {
-      localStorage.setItem('etuutt-token', action.payload);
+    setToken: (state, action: PayloadAction<string | null>) => {
+      localStorage.setItem('etuutt-token', action.payload ?? '');
       state.token = action.payload;
       state.logged = !!action.payload;
     },
@@ -25,16 +25,13 @@ export const sessionSlice = createSlice({
   initialState: { logged: false } as SessionSlice,
 });
 
-export const { setToken } = sessionSlice.actions;
+const { setToken: _setToken } = sessionSlice.actions;
 
 export const login = (api: API, login: string, password: string) =>
   ((dispatch: AppDispatch) =>
     api
       .post<LoginRequestDto, LoginResponseDto>('/auth/signin', { login, password })
-      .on('success', async (body) => {
-        dispatch(setToken(body.access_token));
-        dispatch(setUser((await fetchProfile(api).toPromise()) ?? null));
-      })
+      .on('success', async (body) => dispatch(setToken(body.access_token, api)))
       .on(StatusCodes.UNAUTHORIZED, (body) => console.error('Wrong credentials', body))
       .on(StatusCodes.BAD_REQUEST, (body) => console.error('Bad request', body))) as unknown as Action;
 
@@ -50,11 +47,11 @@ export const register = (api: API, lastName: string, firstName: string, login: s
         type: 'STUDENT',
         birthday: new Date(2003, 1, 28),
       })
-      .on('success', (body) => dispatch(setToken(body.access_token)))) as unknown as Action;
+      .on('success', (body) => dispatch(setToken(body.access_token, api)))) as unknown as Action;
 
 export const logout = () =>
   ((dispatch: AppDispatch) => {
-    dispatch(setToken(''));
+    dispatch(setToken(null));
     dispatch(setUser(null));
   }) as unknown as Action;
 
@@ -68,10 +65,23 @@ export const autoLogin = (api: API) =>
     }
     api.get<IsLoggedInResponseDto>('/auth/signin').on('success', async (body) => {
       if (body.valid) {
-        dispatch(setToken(token));
-        dispatch(setUser((await fetchProfile(api).toPromise()) ?? null));
+        dispatch(setToken(token, api));
       }
     });
   }) as unknown as Action;
+
+export function setToken(token: null): Action;
+export function setToken(token: string, api: API): Action;
+export function setToken(token: string | null, api?: API) {
+  return (async (dispatch: AppDispatch) => {
+    dispatch(_setToken(token));
+    if (token === null) {
+      setUser(null);
+      return;
+    }
+    const user = await fetchProfile(api!).toPromise();
+    dispatch(setUser(user ?? null));
+  }) as unknown as Action;
+}
 
 export default sessionSlice.reducer;

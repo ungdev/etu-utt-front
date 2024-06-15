@@ -101,4 +101,8 @@ export function usePageLoaded(instantlyLoaded: boolean = false) {
   return () => dispatch(setLoaded(true));
 }
 
+export function useSearchParam(param: string): string | undefined {
+  return useAppSelector((state) => state.pageSettings.searchParams[param]);
+}
+
 export default pageSettingsSlice.reducer;

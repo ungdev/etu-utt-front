@@ -7,8 +7,13 @@ export default function useComments(code: string): [Comment[] | null, (index: nu
   const [comments, setComments] = useState<Comment[] | null>(null);
   const api = useAPI();
   useEffect(() => {
+<<<<<<< Updated upstream
     api.get<Pagination<Comment>>(`/ue/${code}/comments`).on('success', (body) => setComments(body.items));
   });
+=======
+    api.get<Pagination<Comment>>(`/ue/comments?ueCode=${code}`).on('success', (body) => setComments(body.items));
+  }, []);
+>>>>>>> Stashed changes
   return [
     comments,
     (index, comment) =>

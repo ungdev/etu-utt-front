@@ -1,12 +1,12 @@
 'use client';
 import styles from './style.module.scss';
 import LoginForm from '@/components/auth/LoginForm';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { CasLoginRequestDto, CasLoginResponseDto } from '@/api/auth/casLogin';
 import { setToken } from '@/module/session';
 import { useAppDispatch } from '@/lib/hooks';
 import { useEffect, useState } from 'react';
-import { usePageSettings } from '@/module/pageSettings';
+import { usePageSettings, useSearchParam } from '@/module/pageSettings';
 import Button from '@/components/UI/Button';
 import { RegisterResponseDto } from '@/api/auth/register';
 import { CasRegisterRequestDto } from '@/api/auth/casRegister';
@@ -16,7 +16,7 @@ import { Trans } from 'react-i18next';
 
 export default function LoginPage() {
   usePageSettings({ hasNavbar: false, permissions: 'public' });
-  const params = useSearchParams(); // TODO : replace it with useAppSelector(state => state.pageSettings.searchParams) (and verify it works)
+  const ticket = useSearchParam('ticket');
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { t } = useAppTranslation();
@@ -24,12 +24,17 @@ export default function LoginPage() {
   const [validatedToken, setValidatedToken] = useState(false);
   const api = useAPI();
   useEffect(() => {
-    if (!params.get('ticket') || validatedToken) return;
+    if (!ticket || validatedToken) return;
     setValidatedToken(true);
     api
       .post<CasLoginRequestDto, CasLoginResponseDto>('auth/signin/cas', {
+<<<<<<< Updated upstream
         ticket: params.get('ticket')!,
         service: 'https://etu.assos.utt.fr/login',
+=======
+        ticket: ticket,
+        service: process.env.NEXT_PUBLIC_CAS_SERVICE!,
+>>>>>>> Stashed changes
       })
       .on('success', (body) => {
         if (!body.signedIn) {
@@ -37,11 +42,11 @@ export default function LoginPage() {
           router.replace('/login');
           return;
         }
-        dispatch(setToken(body.access_token));
+        dispatch(setToken(body.access_token, api));
         router.push('/');
       });
-  }, []);
-  if (params.get('ticket') && !registerToken) {
+  }, [ticket]);
+  if (ticket && !registerToken) {
     return <div>{t('login:connecting')}</div>;
   }
   if (registerToken) {
@@ -64,7 +69,7 @@ export default function LoginPage() {
                   registerToken,
                 })
                 .on('success', (body) => {
-                  dispatch(setToken(body.access_token));
+                  dispatch(setToken(body.access_token, api));
                   router.push('/');
                 })
             }>
