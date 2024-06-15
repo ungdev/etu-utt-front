@@ -1,4 +1,5 @@
 @import '@/variables.scss';
+@import '@/components/glimmer.scss';
 
 .page {
   height: 100%;
@@ -21,7 +22,7 @@
     > * {
       background-color: white;
       border-radius: 15px;
-      border: #E7E7E7 solid 1px;
+      border: #e7e7e7 solid 1px;
       padding: 1rem;
       overflow-y: scroll;
     }
@@ -29,6 +30,21 @@
     .results {
       flex-grow: 1;
       height: 100%;
+
+      .glimmer {
+        p,
+        h2 {
+          @extend .glimmer-animated;
+          &:nth-child(2) {
+            width: 24ch;
+          }
+        }
+        h2 {
+          height: 1.02em;
+          margin: 0.1em 0 0.2em 0;
+          background-size: 115% 1.02em;
+        }
+      }
     }
   }
 }

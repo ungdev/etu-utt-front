@@ -10,6 +10,7 @@ import Trash from '@/icons/Trash';
 import LeftChevron from '@/icons/LeftChevron';
 import LeftArrow from '@/icons/LeftArrow';
 import RightChevron from '@/icons/RightChevron';
+import Loader from './Loader';
 import Logout from './Logout';
 import Login from './Login';
 import Language from './Language';
@@ -25,6 +26,7 @@ const Icons = {
   Language,
   LeftArrow,
   LeftChevron,
+  Loader,
   Login,
   LogoEtu,
   LogoUNG,
