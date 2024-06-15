@@ -20,6 +20,8 @@ export default function LoginForm() {
   const { t } = useAppTranslation();
   const connectionText = t('login:login.connection');
 
+  console.log("hey ?")
+  console.log(process.env.NEXT_PUBLIC_CAS_SERVICE)
   return (
     <div className={styles.authForm}>
       <Icons.LogoUNG className={styles.logo} />
@@ -29,7 +31,7 @@ export default function LoginForm() {
       </div>
       <a
         href={`https://cas.utt.fr/cas/login?${new URLSearchParams({
-          service: 'https://etu.assos.utt.fr/login',
+          service: process.env.NEXT_PUBLIC_CAS_SERVICE!,
         }).toString()}`}
         className={styles.cas}>
         <Icons.LogoUTT />
