@@ -22,6 +22,19 @@ import useAnnals, { openAnnalInNewTab } from '@/api/annals/fetchAnnals';
 import { UserType } from '@/module/user';
 import useAnnalMetadata from '@/api/annals/fetchMetadata';
 import { createAnnal } from '@/api/annals/createAnnal';
+import { AnnalStatus, CommentStatus, computeExamStatus, getDisplayedExamStatus } from '@/api/annals/annal.interface';
+import Clock from '@/icons/Clock';
+import Tooltip from '@/components/UI/Tooltip';
+import Trash from '@/icons/Trash';
+import CircleWarning from '@/icons/CircleWarning';
+import CircleCheck from '@/icons/CircleCheck';
+
+function getIcon(status: AnnalStatus) {
+  if (status === 'deleted') return <Trash />;
+  if (status === 'processing') return <Clock />;
+  if (status === 'unverified') return <CircleWarning />;
+  return <CircleCheck />;
+}
 
 export default function UEDetailsPage() {
   usePageSettings({});
@@ -29,6 +42,7 @@ export default function UEDetailsPage() {
   const { t } = useAppTranslation();
   const logged = useAppSelector((state) => state.session.logged);
   const type = useAppSelector((state) => state.user?.type);
+  const userId = useAppSelector((state) => state.user?.id);
   const [ue, refreshUE] = useUE(params.code as string);
   const criteria = useUERateCriteria();
   const [myRates, setMyRates] = useGetRate(params.code);
@@ -124,22 +138,44 @@ export default function UEDetailsPage() {
         </div>
       </div>
       {(type === UserType.STUDENT || type === UserType.FORMER_STUDENT) && (
-        <div>
-          <h2>Annales</h2>
-          <div>
+        <div className={styles.exams}>
+          <h2>{t('ues:detailed.annals.title')}</h2>
+          <div className={styles.list}>
             {annals?.length
-              ? annals.map((annal) => (
-                  <div key={annal.id}>
-                    <a
-                      onClick={(event) => {
-                        event.preventDefault();
-                        openAnnalInNewTab(api, annal.id);
-                      }}>
-                      {annal.type.name} ({annal.semesterId})
-                    </a>
+              ? Object.entries(Object.groupBy(annals, (annal) => annal.semesterId)).map(([semester, annals]) => (
+                  <div className={styles.semester} key={semester}>
+                    <h3>{semester}</h3>
+                    {annals?.map((annal) => {
+                      const statusIcon = getDisplayedExamStatus(annal.status);
+                      return (
+                        <div
+                          className={styles.entry}
+                          key={annal.id}
+                          data-status={computeExamStatus(annal.status).join(' ')}
+                          onClick={(event) => {
+                            if (annal.status & CommentStatus.PROCESSING) return;
+                            event.preventDefault();
+                            openAnnalInNewTab(api, annal.id);
+                          }}>
+                          <span className={styles.type}>
+                            {annal.type.name}{' '}
+                            {(statusIcon !== 'validated' || annal.sender.id === userId) && (
+                              <Tooltip
+                                content={t(`ues:detailed.annals.entry.status.${statusIcon}`)}
+                                className={styles.status}>
+                                {getIcon(statusIcon)}
+                              </Tooltip>
+                            )}
+                          </span>
+                          <span className={styles.author}>
+                            {t('ues:detailed.annals.entry.author')} {annal.sender.firstName} {annal.sender.lastName}
+                          </span>
+                        </div>
+                      );
+                    })}
                   </div>
                 ))
-              : t('ues:detailed.noAnnals')}
+              : t('ues:detailed.annals.empty')}
           </div>
           <div>
             <h3>Envoyer une annale</h3>
