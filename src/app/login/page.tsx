@@ -29,7 +29,7 @@ export default function LoginPage() {
     api
       .post<CasLoginRequestDto, CasLoginResponseDto>('auth/signin/cas', {
         ticket: params.get('ticket')!,
-        service: 'https://etu.assos.utt.fr/login',
+        service: process.env.NEXT_PUBLIC_CAS_SERVICE!,
       })
       .on('success', (body) => {
         if (!body.signedIn) {
