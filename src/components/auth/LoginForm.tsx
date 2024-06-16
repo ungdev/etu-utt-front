@@ -20,8 +20,6 @@ export default function LoginForm() {
   const { t } = useAppTranslation();
   const connectionText = t('login:login.connection');
 
-  console.log('hey ?');
-  console.log(process.env.NEXT_PUBLIC_CAS_SERVICE);
   return (
     <div className={styles.authForm}>
       <Icons.LogoUNG className={styles.logo} />
