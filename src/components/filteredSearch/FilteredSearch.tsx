@@ -121,18 +121,18 @@ export default function FilteredSearch<
 
   // Update the value of filters when the URL parameters.
   useEffect(() => {
-    for (const [key, value] of Object.entries(searchParams)) {
+    Object.entries(searchParams).forEach(([value, key]) => {
       const [filterName] = Object.entries(filtersData).find(([, filter]) => filter.parameterName === key) ?? [
         undefined,
       ];
-      if (filterName === undefined) continue;
+      if (filterName === undefined) return;
       const index = filters.findIndex((filter) => filter.filter === filterName);
       if (index >= 0) {
         updateFilter(index, { forcedValue: value });
       } else {
         addFilter(filterName, value);
       }
-    }
+    });
   }, [searchParams]);
 
   // When filters are modified, update the search after 1 second.

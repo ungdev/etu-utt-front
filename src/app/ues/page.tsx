@@ -79,7 +79,7 @@ export default function Page() {
   const { items: ues, total: totalUesCount, updateFilters: updateUEs, fetchNextItems } = useUEs();
   return (
     <div className={styles.page}>
-      <h1 className={styles.title}>{t('ues:browser')}</h1>
+      <h1>{t('ues:browser')}</h1>
       <div className={styles.content}>
         <FilteredSearch<FilterNames, UEFiltersType> filtersData={ueFilters} updateSearch={updateUEs} />
         <div className={styles.results}>
