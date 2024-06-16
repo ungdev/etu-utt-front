@@ -6,10 +6,13 @@ import { UERateCriterion } from '@/api/ueRate/ueRateCriterion.interface';
 import { useAPI } from '@/api/api';
 import { Branch } from '@/api/branch/branch.interface';
 import { fetchBranches } from '@/api/branch/fetchBranches';
+import { CreditCategory } from '@/api/credit/credit.interface';
+import { fetchCreditCategories } from '@/api/credit/fetchCreditCategories';
 
 interface ConstantDataSlice {
   ueRateCriteria: UERateCriterion[] | null;
   branches: Branch[] | null;
+  creditCategories: CreditCategory[] | null;
 }
 
 export const constantDataSlice = createSlice({
@@ -20,12 +23,15 @@ export const constantDataSlice = createSlice({
     },
     setBranches: (state, action: PayloadAction<Branch[] | null>) => {
       return { ...state, branches: action.payload };
+    },
+    setCreditCategories: (state, action: PayloadAction<CreditCategory[] | null>) => {
+      return { ...state, creditCategories: action.payload };
     }
   },
-  initialState: { ueRateCriteria: null, branches: null } as ConstantDataSlice,
+  initialState: { ueRateCriteria: null, branches: null, creditCategories: null } as ConstantDataSlice,
 });
 
-const { setCriteria, setBranches } = constantDataSlice.actions;
+const { setCriteria, setBranches, setCreditCategories } = constantDataSlice.actions;
 
 export function useUERateCriteria(): UERateCriterion[] | null {
   const ueRateCriteria = useAppSelector((state) => state.constantData.ueRateCriteria);
@@ -34,7 +40,6 @@ export function useUERateCriteria(): UERateCriterion[] | null {
   useEffect(() => {
     if (ueRateCriteria === null) {
       fetchUERateCriteria(api)
-        .toPromise()
         .then((criteria) => criteria && dispatch(setCriteria(criteria)));
     }
   }, []);
@@ -52,6 +57,20 @@ export function useBranches(): Branch[] | null {
     }
   }, []);
   return branches;
+}
+
+export function useCreditCategories(): CreditCategory[] | null {
+  const creditCategories = useAppSelector((state) => state.constantData.creditCategories);
+  const dispatch = useAppDispatch();
+  const api = useAPI();
+  useEffect(() => {
+    console.log("on rentre ici ?")
+    if (creditCategories === null) {
+      fetchCreditCategories(api)
+        .then((creditCategories) => creditCategories && dispatch(setCreditCategories(creditCategories)));
+    }
+  }, []);
+  return creditCategories;
 }
 
 export default constantDataSlice.reducer;

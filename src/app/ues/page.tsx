@@ -9,15 +9,16 @@ import { ResultsList } from '@/components/ResultsList';
 import { usePageSettings } from '@/module/pageSettings';
 import { useAppTranslation } from '@/lib/i18n';
 import { Branch } from '@/api/branch/branch.interface';
-import { useBranches } from '@/module/constantData';
+import { useBranches, useCreditCategories } from '@/module/constantData';
 import { useMemo } from 'react';
+import { CreditCategory } from '@/api/credit/credit.interface';
 
 /**
  * The different filters that exist.
  */
 interface UEFiltersType extends GenericFiltersType<FilterNames> {
   name: { dependsOn: []; value: string };
-  creditType: { dependsOn: []; value: 'CS' | 'TM' };
+  creditType: { dependsOn: []; value: string };
   branch: { dependsOn: []; value: string };
   branchOption: { dependsOn: ['branch']; value: string };
   semester: { dependsOn: []; value: 'A' | 'P' };
@@ -28,7 +29,7 @@ type FilterNames = 'name' | 'creditType' | 'branch' | 'branchOption' | 'semester
 /**
  * The definition of the filters. They can then be used in JavaScript code to get the filter component, the name of the filter, ...
  */
-function useUeFilters(creditTypeOptions: Array<'CS' | 'TM'>, branches: Branch[] | null) {
+function useUeFilters(creditCategories: CreditCategory[] | null, branches: Branch[] | null) {
   return useMemo(() => {
     return Object.freeze({
       name: {
@@ -37,7 +38,7 @@ function useUeFilters(creditTypeOptions: Array<'CS' | 'TM'>, branches: Branch[] 
         updateDelayed: true,
       }, // This one does not need a name as it will never be displayed
       creditType: {
-        component: createSelectFilter(creditTypeOptions, 'ues:filter.creditType.title'),
+        component: createSelectFilter(creditCategories?.map((creditCategory) => creditCategory.code) ?? [], 'ues:filter.creditType.title'),
         parameterName: 'creditType',
         updateDelayed: false,
       },
@@ -68,7 +69,7 @@ function useUeFilters(creditTypeOptions: Array<'CS' | 'TM'>, branches: Branch[] 
         updateDelayed: false,
       },
     } as const satisfies FiltersDataType<FilterNames, UEFiltersType>);
-  }, [creditTypeOptions?.length ?? 0, branches?.length ?? 0]);
+  }, [creditCategories?.length ?? 0, branches?.length ?? 0]);
 }
 
 export default function Page() {
@@ -76,7 +77,8 @@ export default function Page() {
   const { t } = useAppTranslation();
   const { items: ues, total: totalUesCount, updateFilters: updateUEs, fetchNextItems } = useUEs();
   const branches = useBranches();
-  const ueFilters = useUeFilters(['CS', 'TM'], branches);
+  const creditCategories = useCreditCategories();
+  const ueFilters = useUeFilters(creditCategories, branches);
   if (!branches) return 'Chargement';
   return (
     <div className={styles.page}>
