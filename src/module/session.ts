@@ -1,4 +1,4 @@
-import { type Action, createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import { AppDispatch, RootState, AppThunk } from '@/lib/store';
 import { LoginRequestDto, LoginResponseDto } from '@/api/auth/login';
 import { StatusCodes } from 'http-status-codes';
@@ -55,11 +55,10 @@ export const register =
       })
       .on('success', (body) => dispatch(setToken(body.access_token)));
 
-export const logout = () =>
-  ((dispatch: AppDispatch) => {
-    dispatch(setToken(''));
-    dispatch(setUser(null));
-  }) as unknown as Action;
+export const logout = () => (dispatch: AppDispatch) => {
+  dispatch(setToken(''));
+  dispatch(setUser(null));
+};
 
 export const isLoggedIn = (state: RootState) => state.session.logged;
 

@@ -33,7 +33,7 @@ export default function RegisterForm() {
       </div>
       <a
         href={`https://cas.utt.fr/cas/login?${new URLSearchParams({
-          service: 'https://etu.assos.utt.fr/login',
+          service: process.env.NEXT_PUBLIC_CAS_SERVICE!,
         }).toString()}`}
         className={styles.cas}>
         <Icons.LogoUTT />

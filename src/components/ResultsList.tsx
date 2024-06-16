@@ -1,7 +1,8 @@
 import styles from './ResultsList.module.scss';
 import { useRouter } from 'next/navigation';
-import { FC } from 'react';
+import { FC, useEffect, useRef } from 'react';
 import { useAppTranslation } from '@/lib/i18n';
+import Loader from '@/icons/Loader';
 
 export function ResultsList<T extends object>({
   data,
@@ -15,30 +16,66 @@ export function ResultsList<T extends object>({
           return '';
         })(),
   itemFactory: ItemFactory,
+  onEndReached,
+  loading,
 }: {
-  data: T[];
+  data: (T | null)[];
   totalResults: number;
   baseRedirectUrl: string;
   getItemId?: (item: T) => string;
-  itemFactory: FC<{ item: T }>;
+  /**
+   * A {@link React.FunctionComponent FC} that turns data passed into FC's `item` property.
+   * This data may be `null` if the data source has not been loaded yet (in such cases, consider data is loading)
+   */
+  itemFactory: FC<{ item: T | null }>;
+  onEndReached?: () => void;
+  loading?: boolean;
 }) {
   const router = useRouter();
   const { t } = useAppTranslation();
+  const visibilityTrigger = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (onEndReached && data[data.length - 1]) {
+      const intersectionObserver = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            intersectionObserver.disconnect();
+            onEndReached();
+          }
+        },
+        {
+          threshold: 0.1,
+          root: null,
+        },
+      );
+      if (visibilityTrigger.current) intersectionObserver.observe(visibilityTrigger.current);
+      return () => intersectionObserver.disconnect();
+    }
+  }, [data]);
+
   return (
     <div className={styles.resultsList}>
       <div className={styles.totalResults}>
         {totalResults} {t('common:results')}
       </div>
       <div className={styles.results}>
-        {data.map((item) => (
+        {data.map((item, index) => (
           <div
-            key={getItemId(item)}
+            key={index}
+            ref={index === data.length - 1 ? visibilityTrigger : undefined}
             className={styles.result}
-            onClick={() => router.push(`${baseRedirectUrl}/${getItemId(item)}`)}>
+            onClick={() => item && router.push(`${baseRedirectUrl}/${getItemId(item)}`)}>
             <ItemFactory item={item} />
           </div>
         ))}
       </div>
+      {loading && (
+        <div className={styles.loader}>
+          <Loader />
+          {t('common:loading')}
+        </div>
+      )}
     </div>
   );
 }

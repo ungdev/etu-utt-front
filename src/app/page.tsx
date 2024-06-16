@@ -2,7 +2,7 @@
 
 import styles from './style.module.scss';
 import WidgetRenderer from '@/components/homeWidgets/WidgetRenderer';
-import { usePageSettings } from '@/module/pageSettings';
+import { usePageLoaded, usePageSettings } from '@/module/pageSettings';
 import Button from '@/components/UI/Button';
 import { useStateWithReference } from '@/utils/hooks';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
@@ -21,7 +21,7 @@ function AdditionalNavbarComponent({
   onModify: () => void;
   onDone: () => void;
 }) {
-  usePageSettings({});
+  //usePageSettings({});
   const [widgetToAdd /*, setWidgetToAdd*/] = useState<keyof typeof WIDGETS>('ueBrowserWidget');
   return (
     <>
@@ -43,6 +43,7 @@ function AdditionalNavbarComponent({
 }
 
 export default function HomePage() {
+  const setLoaded = usePageLoaded();
   const [isSmallScreen, setIsSmallScreen] = useState(false);
   const [modifyingLayout, setModifyingLayout, modifyingLayoutRef] = useStateWithReference(false);
   usePageSettings(
@@ -57,6 +58,7 @@ export default function HomePage() {
               onAdd={(widget) => dispatch(addWidget(widget))}
             />
           ),
+      needsLoading: true,
     },
     [modifyingLayout, isSmallScreen],
   );
@@ -93,6 +95,7 @@ export default function HomePage() {
                   .map((w) => ({ x: w.x, y: w.y, width: w.width, height: w.height }))}
                 changeBB={(newWidget) => dispatch(modifyBB(i, { ...widget, ...newWidget }))}
                 remove={() => dispatch(removeWidget(i))}
+                onLoaded={setLoaded}
               />
             );
           })

@@ -14,7 +14,7 @@ export default function UEBrowserWidget() {
       <Input
         value={search}
         onChange={setSearch}
-        icon={Icons.User}
+        icon={Icons.Book}
         placeholder={t('homepage:ueBrowser.searchBar.placeholder')}
         onEnter={() => router.push(`/ues?q=${search}`)}
       />

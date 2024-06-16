@@ -1,0 +1,60 @@
+@import '@/variables.scss';
+
+.loader {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: $very-light-gray;
+  z-index: 1100;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: appearDelay 0.5s;
+
+  .icon {
+    width: 100px;
+    height: 100px;
+    transform-origin: 50% 65%;
+    fill: $ung-dark-grey;
+    animation: pulse 0.5s infinite alternate 0.5s,
+               appearSmooth 0.5s;
+  }
+}
+
+@keyframes pulse {
+  from {
+    scale: 1;
+  }
+  to {
+    scale: 1.15;
+  }
+}
+
+@keyframes appearDelay {
+  from {
+    opacity: 0;
+  }
+  10% {
+    opacity: 0;
+  }
+  11% {
+    opacity: 1;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes appearSmooth {
+  from {
+    opacity: 0;
+  }
+  10% {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

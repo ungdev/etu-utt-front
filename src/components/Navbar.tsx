@@ -120,7 +120,7 @@ export default function Navbar() {
       <li key={item.name}>
         <Link
           href={item.path as string}
-          className={`${styles.navigationLink} ${pathname.startsWith(item.path as string) ? styles.active : ''}`}>
+          className={`${styles.navigationLink} ${(item.path !== '/' || pathname === item.path) && pathname.startsWith(item.path as string) ? styles.active : ''}`}>
           {'icon' in item ? (item as MenuItem<true>).icon({}) : ''}
           <span>{item.translate ? t(item.name as NotParameteredTranslationKey) : item.name}</span>
         </Link>

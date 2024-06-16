@@ -24,12 +24,12 @@ export default function LoginPage() {
   const [validatedToken, setValidatedToken] = useState(false);
   const api = useAPI();
   useEffect(() => {
-    if (!params.get('ticket') || validatedToken) return;
+    if (!params['ticket'] || validatedToken) return;
     setValidatedToken(true);
     api
       .post<CasLoginRequestDto, CasLoginResponseDto>('auth/signin/cas', {
-        ticket: params.get('ticket')!,
-        service: 'https://etu.assos.utt.fr/login',
+        ticket: params['ticket']!,
+        service: process.env.NEXT_PUBLIC_CAS_SERVICE!,
       })
       .on('success', (body) => {
         if (!body.signedIn) {
@@ -41,7 +41,7 @@ export default function LoginPage() {
         router.push('/');
       });
   }, []);
-  if (params.get('ticket') && !registerToken) {
+  if (params['ticket'] && !registerToken) {
     return <div>{t('login:connecting')}</div>;
   }
   if (registerToken) {

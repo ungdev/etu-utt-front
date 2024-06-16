@@ -4,8 +4,7 @@ import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import { CookieNames, setCookiesAcceptance } from '@/module/cookies';
 import { usePageSettings } from '@/module/pageSettings';
 import { useEffect, useState } from 'react';
-import { NotParameteredTranslationKey, TranslationKey, useAppTranslation } from '@/lib/i18n';
-import Icons from '@/icons';
+import { NotParameteredTranslationKey, useAppTranslation } from '@/lib/i18n';
 
 const DEFAULT_COOKIES = Object.fromEntries(Object.values(CookieNames).map((name) => [name, true])) as {
   [K in CookieNames]: boolean;

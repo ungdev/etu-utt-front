@@ -6,9 +6,10 @@ import { usePageSettings } from '@/module/pageSettings';
 import GoTo from '@/components/toplevel/GoTo';
 import { useAppDispatch } from '@/lib/hooks';
 import { initCookies } from '@/module/cookies';
+import Loader from '@/components/toplevel/Loader';
 
 export default function Wrapper({ children }: { children: ReactNode }) {
-  const { hasNavbar } = usePageSettings();
+  const { hasNavbar, loaded } = usePageSettings();
   const dispatch = useAppDispatch();
   useEffect(() => {
     dispatch(initCookies());
@@ -17,6 +18,7 @@ export default function Wrapper({ children }: { children: ReactNode }) {
     <>
       <GoTo />
       {hasNavbar && <Navbar />}
+      {!loaded && <Loader />}
       <div className={styles.page}>{children}</div>
     </>
   );

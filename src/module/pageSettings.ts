@@ -1,18 +1,18 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import { AppDispatch } from 'src/lib/store';
 import { DependencyList, ReactNode, useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
-import { ReadonlyURLSearchParams, usePathname } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 
 interface PageSettingsSlice {
   page: string; // Needed to verify the page has correctly called the hook
-  searchParams: URLSearchParams;
+  searchParams: Record<string, string>;
   permissions: string;
   hasNavbar: boolean;
   navbarAdditionalComponent: (() => ReactNode) | null;
+  loaded: boolean;
 }
 
-type InternalPageSettingsKeys = 'page' | 'searchParams';
+type InternalPageSettingsKeys = 'page' | 'searchParams' | 'loaded';
 
 type PageSettings = Omit<PageSettingsSlice, InternalPageSettingsKeys>;
 
@@ -31,26 +31,42 @@ export const pageSettingsSlice = createSlice({
     ) {
       return { ...state, ...defaultPageSettings, ...action.payload };
     },
-    setPageParams(state, action: PayloadAction<URLSearchParams>) {
-      return { ...state, searchParams: action.payload };
+    setPageParams(state, action: PayloadAction<Record<string, string>>) {
+      state.searchParams = action.payload;
+      return state;
+    },
+    setLoaded(state, action: PayloadAction<boolean>) {
+      state.loaded = action.payload;
+      return state;
     },
   },
-  initialState: { ...defaultPageSettings, page: '', searchParams: new ReadonlyURLSearchParams() } as PageSettingsSlice,
+  initialState: { ...defaultPageSettings, page: '', searchParams: {} } as PageSettingsSlice,
 });
 
-const { setPageSettings, setPageParams } = pageSettingsSlice.actions;
+const { setPageSettings, setPageParams, setLoaded } = pageSettingsSlice.actions;
 export { setPageParams };
 
 export function usePageSettings(): PageSettingsSlice;
-export function usePageSettings(settings: Partial<PageSettings>, deps?: DependencyList): void;
-export function usePageSettings(settings?: Partial<PageSettings>, deps: DependencyList = []): PageSettingsSlice | void {
+export function usePageSettings(
+  settings: Partial<PageSettings & { needsLoading: boolean }>,
+  deps?: DependencyList,
+): void;
+export function usePageSettings(
+  settings?: Partial<PageSettings & { needsLoading: boolean }>,
+  deps: DependencyList = [],
+): PageSettingsSlice | void {
   /* eslint-disable react-hooks/rules-of-hooks */
   const pathname = usePathname();
   if (settings) {
     const dispatch = useAppDispatch();
     useEffect(() => {
-      dispatch((dispatch: AppDispatch) =>
-        dispatch(setPageSettings({ ...settings, page: pathname, searchParams: new ReadonlyURLSearchParams() })),
+      dispatch(
+        setPageSettings({
+          ...settings,
+          page: pathname,
+          searchParams: {},
+          loaded: !settings.needsLoading,
+        }),
       );
     }, deps);
   } else {
@@ -67,11 +83,21 @@ export function usePageSettings(settings?: Partial<PageSettings>, deps: Dependen
       }
     }, [initialized]);
     if (pageSettings.page !== pathname) {
-      pageSettings = { page: pathname, searchParams: new ReadonlyURLSearchParams(), ...defaultPageSettings };
+      pageSettings = { page: pathname, searchParams: {}, loaded: false, ...defaultPageSettings };
     }
     return pageSettings;
   }
   /* eslint-enable react-hooks/rules-of-hooks */
+}
+
+export function usePageLoaded(instantlyLoaded: boolean = false) {
+  const dispatch = useAppDispatch();
+  useEffect(() => {
+    if (instantlyLoaded) {
+      dispatch(setLoaded(true));
+    }
+  }, []);
+  return () => dispatch(setLoaded(true));
 }
 
 export default pageSettingsSlice.reducer;
