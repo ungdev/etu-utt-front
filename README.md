@@ -13,6 +13,7 @@ cp .env.dist .env.prod
 ```
 
 Les 2 fichiers d'environnement sont alors `.env.dev` et `.env.prod`, pour respectivement l'environnement de développement et l'environnement de production.
+Modifiez les fichiers pour mettre les bonnes valeurs pour votre environnement. Les différentes variables sont documentées dedans.
 
 ## Installation de l'add-on
 
