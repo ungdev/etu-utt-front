@@ -64,7 +64,6 @@ export function useCreditCategories(): CreditCategory[] | null {
   const dispatch = useAppDispatch();
   const api = useAPI();
   useEffect(() => {
-    console.log("on rentre ici ?")
     if (creditCategories === null) {
       fetchCreditCategories(api)
         .then((creditCategories) => creditCategories && dispatch(setCreditCategories(creditCategories)));
