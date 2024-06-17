@@ -1,8 +1,7 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import { DependencyList, ReactNode, useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
-import { usePathname, useSearchParams } from 'next/navigation';
-import { AppThunk } from '@/lib/store';
+import { usePathname } from 'next/navigation';
 
 interface PageSettingsSlice {
   page: string; // Needed to verify the page has correctly called the hook
@@ -43,7 +42,13 @@ export const pageSettingsSlice = createSlice({
       return state;
     },
   },
-  initialState: { ...defaultPageSettings, page: '', searchParams: {}, loaded: false, internallyLoaded: false } as PageSettingsSlice,
+  initialState: {
+    ...defaultPageSettings,
+    page: '',
+    searchParams: {},
+    loaded: false,
+    internallyLoaded: false,
+  } as PageSettingsSlice,
 });
 
 const { setPageSettings, setPageParams, setLoaded } = pageSettingsSlice.actions;
@@ -87,7 +92,13 @@ export function usePageSettings(
       }
     }, [initialized]);
     if (pageSettings.page !== pathname) {
-      pageSettings = { page: pathname, searchParams: {}, loaded: false, internallyLoaded: false, ...defaultPageSettings };
+      pageSettings = {
+        page: pathname,
+        searchParams: {},
+        loaded: false,
+        internallyLoaded: false,
+        ...defaultPageSettings,
+      };
     }
     return pageSettings;
   }
@@ -102,7 +113,7 @@ export function usePageLoaded(instantlyLoaded: boolean = false) {
       dispatch(setLoaded(true));
     }
   }, []);
-  return {internallyLoaded: internallyLoaded, markPageLoaded: () => dispatch(setLoaded(true))};
+  return { internallyLoaded: internallyLoaded, markPageLoaded: () => dispatch(setLoaded(true)) };
 }
 
 export function useSearchParam(param: string): string | undefined {
