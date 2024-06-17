@@ -4,9 +4,9 @@ import LoginForm from '@/components/auth/LoginForm';
 import { useRouter } from 'next/navigation';
 import { CasLoginRequestDto, CasLoginResponseDto } from '@/api/auth/casLogin';
 import { setToken } from '@/module/session';
-import { useAppDispatch, useAppSelector } from '@/lib/hooks';
+import { useAppDispatch } from '@/lib/hooks';
 import { useEffect, useState } from 'react';
-import { usePageSettings } from '@/module/pageSettings';
+import { usePageLoaded, usePageSettings, useSearchParam } from '@/module/pageSettings';
 import Button from '@/components/UI/Button';
 import { RegisterResponseDto } from '@/api/auth/register';
 import { CasRegisterRequestDto } from '@/api/auth/casRegister';
@@ -15,8 +15,9 @@ import { useAppTranslation } from '@/lib/i18n';
 import { Trans } from 'react-i18next';
 
 export default function LoginPage() {
-  usePageSettings({ hasNavbar: false, permissions: 'public' });
-  const params = useAppSelector((state) => state.pageSettings.searchParams);
+  usePageSettings({ hasNavbar: false, permissions: 'public', needsLoading: true });
+  const { internallyLoaded, markPageLoaded } = usePageLoaded();
+  const ticket = useSearchParam('ticket');
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { t } = useAppTranslation();
@@ -24,11 +25,11 @@ export default function LoginPage() {
   const [validatedToken, setValidatedToken] = useState(false);
   const api = useAPI();
   useEffect(() => {
-    if (!params['ticket'] || validatedToken) return;
+    if (!ticket || validatedToken) return;
     setValidatedToken(true);
     api
       .post<CasLoginRequestDto, CasLoginResponseDto>('auth/signin/cas', {
-        ticket: params['ticket']!,
+        ticket: ticket,
         service: process.env.NEXT_PUBLIC_CAS_SERVICE!,
       })
       .on('success', (body) => {
@@ -37,12 +38,17 @@ export default function LoginPage() {
           router.replace('/login');
           return;
         }
-        dispatch(setToken(body.access_token));
+        dispatch(setToken(body.access_token, api));
         router.push('/');
       });
-  }, []);
-  if (params['ticket'] && !registerToken) {
-    return <div>{t('login:connecting')}</div>;
+  }, [ticket]);
+  useEffect(() => {
+    if ((!ticket || registerToken) && internallyLoaded) {
+      markPageLoaded();
+    }
+  }, [internallyLoaded]);
+  if (ticket && !registerToken) {
+    return null;
   }
   if (registerToken) {
     return (
@@ -64,7 +70,7 @@ export default function LoginPage() {
                   registerToken,
                 })
                 .on('success', (body) => {
-                  dispatch(setToken(body.access_token));
+                  dispatch(setToken(body.access_token, api));
                   router.push('/');
                 })
             }>

@@ -8,75 +8,83 @@ import { createSelectFilter, SelectFilter } from '@/components/filteredSearch/Se
 import { ResultsList } from '@/components/ResultsList';
 import { usePageSettings } from '@/module/pageSettings';
 import { useAppTranslation } from '@/lib/i18n';
+import { Branch } from '@/api/branch/branch.interface';
+import { useBranches, useCreditCategories } from '@/module/constantData';
+import { useMemo } from 'react';
+import { CreditCategory } from '@/api/credit/credit.interface';
 
 /**
  * The different filters that exist.
  */
 interface UEFiltersType extends GenericFiltersType<FilterNames> {
   name: { dependsOn: []; value: string };
-  creditType: { dependsOn: []; value: 'CS' | 'TM' };
-  branch: { dependsOn: []; value: 'RT' | 'ISI' | 'SN' };
-  branchOption: { dependsOn: ['branch']; value: 'HEUUU' | 'JE CONNAIS PAS' };
+  creditType: { dependsOn: []; value: string };
+  branch: { dependsOn: []; value: string };
+  branchOption: { dependsOn: ['branch']; value: string };
   semester: { dependsOn: []; value: 'A' | 'P' };
 }
 
 type FilterNames = 'name' | 'creditType' | 'branch' | 'branchOption' | 'semester';
 
-type BranchType = 'RT' | 'ISI' | 'SN';
-const branchOptions = {
-  RT: ['HEUUU'],
-  ISI: ['JE CONNAIS PAS'],
-  SN: ['HEUUU', 'JE CONNAIS PAS'],
-} as const satisfies {
-  [key in BranchType]: string[];
-};
-
 /**
  * The definition of the filters. They can then be used in JavaScript code to get the filter component, the name of the filter, ...
  */
-const ueFilters = Object.freeze({
-  name: {
-    component: createInputFilter('ues:filter.search', 'ues:filter.search.title', Icons.Book),
-    parameterName: 'q',
-    updateDelayed: true,
-  }, // This one does not need a name as it will never be displayed
-  creditType: {
-    component: createSelectFilter(['CS', 'TM'], 'ues:filter.creditType.title'),
-    parameterName: 'creditType',
-    updateDelayed: false,
-  },
-  branch: {
-    component: createSelectFilter(['RT', 'ISI', 'SN'], 'ues:filter.branch.title'),
-    parameterName: 'branch',
-    updateDelayed: false,
-  },
-  branchOption: {
-    component: ({ onUpdate, forcedValue, branch }) => (
-      <SelectFilter
-        onUpdate={onUpdate}
-        forcedValue={forcedValue}
-        choices={branchOptions[branch]}
-        title={'ues:filter.branchOption.title'}
-      />
-    ),
-    dependsOn: ['branch'],
-    parameterName: 'branchOption',
-    updateDelayed: false,
-  },
-  semester: {
-    component: createSelectFilter(['A', 'P'], 'ues:filter.semester.title', {
-      A: 'ues:filter.semester.autumn',
-      P: 'ues:filter.semester.spring',
-    }),
-    parameterName: 'semester',
-    updateDelayed: false,
-  },
-} satisfies FiltersDataType<FilterNames, UEFiltersType>);
+function useUeFilters(creditCategories: CreditCategory[] | null, branches: Branch[] | null) {
+  return useMemo(() => {
+    return Object.freeze({
+      name: {
+        component: createInputFilter('ues:filter.search', 'ues:filter.search.title', Icons.Book),
+        parameterName: 'q',
+        updateDelayed: true,
+      }, // This one does not need a name as it will never be displayed
+      creditType: {
+        component: createSelectFilter(
+          creditCategories?.map((creditCategory) => creditCategory.code) ?? [],
+          'ues:filter.creditType.title',
+        ),
+        parameterName: 'creditType',
+        updateDelayed: false,
+      },
+      branch: {
+        component: createSelectFilter(branches?.map((branch) => branch.code) ?? [], 'ues:filter.branch.title'),
+        parameterName: 'branch',
+        updateDelayed: false,
+      },
+      branchOption: {
+        component: ({ onUpdate, forcedValue, branch }) => (
+          <SelectFilter
+            onUpdate={onUpdate}
+            forcedValue={forcedValue}
+            choices={
+              branches?.find((b) => b.code === branch)?.branchOptions?.map((branchOption) => branchOption.code) ?? []
+            }
+            title={'ues:filter.branchOption.title'}
+          />
+        ),
+        dependsOn: ['branch'],
+        parameterName: 'branchOption',
+        updateDelayed: false,
+      },
+      semester: {
+        component: createSelectFilter(['A', 'P'], 'ues:filter.semester.title', {
+          A: 'ues:filter.semester.autumn',
+          P: 'ues:filter.semester.spring',
+        }),
+        parameterName: 'semester',
+        updateDelayed: false,
+      },
+    } as const satisfies FiltersDataType<FilterNames, UEFiltersType>);
+  }, [creditCategories?.length ?? 0, branches?.length ?? 0]);
+}
 
 export default function Page() {
   usePageSettings({});
   const { t } = useAppTranslation();
   const { items: ues, total: totalUesCount, updateFilters: updateUEs, fetchNextItems } = useUEs();
+  const branches = useBranches();
+  const creditCategories = useCreditCategories();
+  const ueFilters = useUeFilters(creditCategories, branches);
+  if (!branches) return 'Chargement';
   return (
     <div className={styles.page}>
       <h1>{t('ues:browser')}</h1>

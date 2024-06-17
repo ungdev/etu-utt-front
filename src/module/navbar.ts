@@ -163,23 +163,23 @@ export const removeMenuItem =
     dispatch(removeItem(pathToItem));
   };
 
-export const getMenuItem = (...pathToItem: string[]): AppThunk<MenuItem | null> => (_, state) => {
-  let list: MenuItem[] | null = state().navbar.items;
-  for (let i = 0; i < pathToItem.length - 1; i++) {
-    const index: number = list.findIndex(
-      ({ name, submenus }) => name === pathToItem[i] && submenus != null,
-    );
+export const getMenuItem =
+  (...pathToItem: string[]): AppThunk<MenuItem | null> =>
+  (_, state) => {
+    let list: MenuItem[] | null = state().navbar.items;
+    for (let i = 0; i < pathToItem.length - 1; i++) {
+      const index: number = list.findIndex(({ name, submenus }) => name === pathToItem[i] && submenus != null);
+      if (index < 0) {
+        return null;
+      }
+      list = list[index].submenus!;
+    }
+    const index = list.findIndex(({ name }) => name === pathToItem[pathToItem.length - 1]);
     if (index < 0) {
       return null;
     }
-    list = list[index].submenus!;
-  }
-  const index = list.findIndex(({ name }) => name === pathToItem[pathToItem.length - 1]);
-  if (index < 0) {
-    return null;
-  }
-  return list[index];
-};
+    return list[index];
+  };
 
 export const setAlwaysVisibleCount =
   (count: number): AppThunk =>

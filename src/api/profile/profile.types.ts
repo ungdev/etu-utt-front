@@ -1,3 +1,5 @@
+import { UserType } from '@/module/user';
+
 export interface Profile {
   id: string;
   login: string;
@@ -9,4 +11,5 @@ export interface Profile {
   passions: string;
   website: string;
   birthday: Date;
+  type: UserType;
 }

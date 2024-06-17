@@ -1,11 +1,18 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import { useAppSelector } from '@/lib/hooks';
-import { AppDispatch, AppThunk } from '@/lib/store';
+import { AppThunk } from '@/lib/store';
 import { addMenuItem, getMenuItem, removeMenuItem } from '@/module/navbar';
-import Icons from '@/icons';
 import { fetchMyUes } from '@/api/ue/fetchMyUes';
 import { useAPI } from '@/api/api';
 import { MenuItem } from '@/components/Navbar';
+
+export const enum UserType {
+  STUDENT = 'STUDENT',
+  FORMER_STUDENT = 'FORMER_STUDENT',
+  TEACHER = 'TEACHER',
+  EMPLOYEE = 'EMPLOYEE',
+  OTHER = 'OTHER',
+}
 
 interface UserSlice {
   id: string;
@@ -18,6 +25,7 @@ interface UserSlice {
   passions: string;
   website: string;
   birthday: Date;
+  type: UserType;
 }
 
 export const userSlice = createSlice({
@@ -33,13 +41,13 @@ const { setUser: _setUser } = userSlice.actions;
 export function setUser(user: UserSlice | null): AppThunk {
   return async (dispatch) => {
     dispatch(_setUser(user));
-    const menuItem = dispatch(getMenuItem("common:navbar.myUEs"));
+    const menuItem = dispatch(getMenuItem('common:navbar.myUEs'));
     if (!menuItem || !menuItem.submenus) {
       console.error('Cannot find the menu item "common:navbar.myUEs"');
       return;
     }
     for (const submenu of menuItem.submenus) {
-      dispatch(removeMenuItem("common:navbar.myUEs", submenu.name));
+      dispatch(removeMenuItem('common:navbar.myUEs', submenu.name));
     }
     if (!user) {
       return;
@@ -48,10 +56,11 @@ export function setUser(user: UserSlice | null): AppThunk {
     if (!ues) return;
     ues.forEach((ue) => {
       dispatch(
-        addMenuItem(
-          { name: ue.code, path: `/ues/${ue.code}` } as MenuItem<false>,
-          { parents: 'common:navbar.myUEs', before: undefined, after: undefined }
-        ),
+        addMenuItem({ name: ue.code, path: `/ues/${ue.code}` } as MenuItem<false>, {
+          parents: 'common:navbar.myUEs',
+          before: undefined,
+          after: undefined,
+        }),
       );
     });
   };
