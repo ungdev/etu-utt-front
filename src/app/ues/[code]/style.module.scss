@@ -27,8 +27,9 @@
     flex-wrap: wrap;
     margin: 5rem 0;
 
-
-    .generalInfo, .workTime, .takeUEInfo {
+    .generalInfo,
+    .workTime,
+    .takeUEInfo {
       border: $ung-dark-grey 3px solid;
       border-radius: 20px;
       padding: 3rem;

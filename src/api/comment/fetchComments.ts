@@ -8,7 +8,7 @@ export default function useComments(code: string): [Comment[] | null, (index: nu
   const api = useAPI();
   useEffect(() => {
     api.get<Pagination<Comment>>(`/ue/comments?ueCode=${code}`).on('success', (body) => setComments(body.items));
-  });
+  }, []);
   return [
     comments,
     (index, comment) =>
