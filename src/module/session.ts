@@ -5,7 +5,7 @@ import { StatusCodes } from 'http-status-codes';
 import { RegisterRequestDto, RegisterResponseDto } from '@/api/auth/register';
 import { IsLoggedInResponseDto } from '@/api/auth/isLoggedIn';
 import { setUser } from '@/module/user';
-import { API } from '@/api/api';
+import { API, setAuthorizationToken } from '@/api/api';
 import { fetchProfile } from '@/api/profile/fetchProfile';
 import { CookieNames, getCookie, setCookie } from '@/module/cookies';
 
@@ -19,6 +19,7 @@ export const sessionSlice = createSlice({
   reducers: {
     setToken: (state, action: PayloadAction<string>) => {
       setCookie(CookieNames.TOKEN, action.payload);
+      setAuthorizationToken(action.payload);
       state.token = action.payload;
       state.logged = !!action.payload;
     },
