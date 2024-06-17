@@ -4,7 +4,7 @@ import navbar from './navbar';
 import session from './session';
 import pageSettings from './pageSettings';
 import homepage from './homepage';
-import ueRateCriterion from '@/module/ueRateCriterion';
+import constantData from '@/module/constantData';
 import cookies from '@/module/cookies';
 
-export default combineReducers({ user, navbar, session, pageSettings, homepage, ueRateCriterion, cookies });
+export default combineReducers({ user, navbar, session, pageSettings, homepage, constantData, cookies });

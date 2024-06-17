@@ -1,7 +1,7 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import { DependencyList, ReactNode, useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
-import { usePathname } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 
 interface PageSettingsSlice {
   page: string; // Needed to verify the page has correctly called the hook
@@ -98,6 +98,11 @@ export function usePageLoaded(instantlyLoaded: boolean = false) {
     }
   }, []);
   return () => dispatch(setLoaded(true));
+}
+
+export function useSearchParam(param: string): string | undefined {
+  const searchParams = useSearchParams();
+  return useAppSelector((state) => state.pageSettings.searchParams[param]) ?? searchParams.get(param);
 }
 
 export default pageSettingsSlice.reducer;

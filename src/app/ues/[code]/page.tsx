@@ -6,7 +6,7 @@ import useUE from '@/api/ue/fetchUEs';
 import { useAppSelector } from '@/lib/hooks';
 import Comments from '@/app/ues/[code]/Comments';
 import { useAppTranslation } from '@/lib/i18n';
-import { useUERateCriteria } from '@/module/ueRateCriterion';
+import { useUERateCriteria } from '@/module/constantData';
 import { UERateCriterion } from '@/api/ueRate/ueRateCriterion.interface';
 import Button from '@/components/UI/Button';
 import useGetRate from '@/api/ueRate/getUERate';
