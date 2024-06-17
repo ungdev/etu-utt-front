@@ -3,7 +3,7 @@
 
 export default {
   "browser": "UTT Travail",
-  "filter.search": "Recherche dans le guide des UEs",
-  "filter.search.title": "Recherche dans le guide des UEs"
+  "filter.search": "Recherche dans le guide des assos",
+  "filter.search.title": "Recherche dans le guide des assos"
 } as const;
 
