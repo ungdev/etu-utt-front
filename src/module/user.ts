@@ -49,7 +49,7 @@ export function setUser(user: UserSlice | null): AppThunk {
     ues.forEach((ue) => {
       dispatch(
         addMenuItem(
-          { name: ue.code, path: `/ue/${ue.code}` } as MenuItem<false>,
+          { name: ue.code, path: `/ues/${ue.code}` } as MenuItem<false>,
           { parents: 'common:navbar.myUEs', before: undefined, after: undefined }
         ),
       );

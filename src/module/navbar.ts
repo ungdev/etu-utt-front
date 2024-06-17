@@ -122,16 +122,7 @@ export const userSlice = createSlice({
         name: 'common:navbar.myAssociations',
         translate: true,
         needLogin: true,
-        submenus: [
-          {
-            name: 'UNG',
-            path: '/assos/ung',
-          },
-          {
-            name: 'BDE',
-            path: '/assos/bde',
-          },
-        ],
+        submenus: [],
       },
     ],
     seperator: 4,
