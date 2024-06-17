@@ -41,74 +41,6 @@
     }
   }
 
-  .exams {
-    background-color: $light-gray;
-    border-radius: 20px;
-    padding: 2rem;
-
-    h2 {
-      margin-bottom: 1rem;
-    }
-
-    .list {
-      display: flex;
-      flex-flow: column nowrap;
-      gap: 0.8rem;
-
-      .semester {
-        display: flex;
-        flex-flow: column nowrap;
-        gap: 0.1rem;
-
-        .entry {
-          padding: 0.25rem;
-          border-radius: 0.25rem;
-          background-color: $very-light-gray;
-          cursor: pointer;
-          display: flex;
-          flex-flow: row nowrap;
-          justify-content: space-between;
-          gap: 2ch;
-
-          &[data-status~='unverified'] {
-            background-color: $gray-pastel-color;
-          }
-
-          &[data-status~='processing'] {
-            cursor: not-allowed;
-            background-color: $orange-pastel-color;
-          }
-
-          &[data-status~='deleted'] {
-            background-color: $red-pastel-color;
-          }
-
-          .type,
-          .author {
-            user-select: none;
-
-            .status {
-              display: inline-block;
-              vertical-align: sub;
-              width: 1em;
-            }
-          }
-
-          .author {
-            color: $ung-light-grey;
-            text-overflow: ellipsis;
-            overflow: hidden;
-            white-space: nowrap;
-          }
-        }
-      }
-    }
-  }
-
-  .send_button {
-    margin-top: 1em;
-  }
-
   .thoughts {
     & > h2 {
       margin-bottom: 1rem;
@@ -130,22 +62,6 @@
           color: $ung-light-blue;
         }
       }
-    }
-  }
-
-  .send {
-    display: flex;
-    flex-flow: column nowrap;
-    gap: 1em;
-    padding-top: 1em;
-
-    div > select {
-      margin-left: 1ch;
-    }
-
-    .actionbar {
-      display: flex;
-      gap: 0.5em;
     }
   }
 

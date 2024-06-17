@@ -2,7 +2,7 @@
 // For more information, check the common.json.ts file
 
 export default {
-  browser: 'Guide des UEs',
+  'browser': 'Guide des UEs',
   'filter.search': 'Recherche dans le guide des UEs',
   'filter.search.title': 'Recherche dans le guide des UEs',
   'filter.creditType.title': 'Type de crédits',
@@ -44,7 +44,7 @@ export default {
   'detailed.comments.write.send': 'Envoyer le commentaire',
   'detailed.annals.title': 'Annales',
   'detailed.annals.empty': 'Aucune annale disponible',
-  'detailed.annals.entry.author': 'déposé par',
+  'detailed.annals.entry.author': 'déposée par',
   'detailed.annals.entry.status.deleted': 'supprimée',
   'detailed.annals.entry.status.processing': 'en cours de traitement',
   'detailed.annals.entry.status.unverified': 'en attente de validation',

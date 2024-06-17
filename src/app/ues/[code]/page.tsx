@@ -14,75 +14,32 @@ import doUERate from '@/api/ueRate/doUERate';
 import deleteUERate from '@/api/ueRate/deleteUERate';
 import StarRating from '@/components/StarRating';
 import TextArea from '@/components/UI/TextArea';
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import sendComment from '@/api/comment/sendComment';
 import { useAPI } from '@/api/api';
 import { usePageSettings } from '@/module/pageSettings';
-import useAnnals, { openAnnalInNewTab } from '@/api/annals/fetchAnnals';
-import { UserType } from '@/module/user';
+import useAnnals from '@/api/annals/fetchAnnals';
 import useAnnalMetadata from '@/api/annals/fetchMetadata';
-import { createAnnal } from '@/api/annals/createAnnal';
-import { AnnalStatus, CommentStatus, computeExamStatus, getDisplayedExamStatus } from '@/api/annals/annal.interface';
-import Clock from '@/icons/Clock';
-import Tooltip from '@/components/UI/Tooltip';
-import Trash from '@/icons/Trash';
-import CircleWarning from '@/icons/CircleWarning';
-import CircleCheck from '@/icons/CircleCheck';
-import FileUpload from '@/components/UI/FileUpload';
-
-function getIcon(status: AnnalStatus) {
-  if (status === 'deleted') return <Trash />;
-  if (status === 'processing') return <Clock />;
-  if (status === 'unverified') return <CircleWarning />;
-  return <CircleCheck />;
-}
+import ExamList from '@/components/ues/ExamList';
+import ExamSender from '@/components/ues/ExamSender';
 
 export default function UEDetailsPage() {
   usePageSettings({});
   const params = useParams<{ code: string }>();
   const { t } = useAppTranslation();
   const logged = useAppSelector((state) => state.session.logged);
-  const type = useAppSelector((state) => state.user?.type);
-  const userId = useAppSelector((state) => state.user?.id);
   const [ue, refreshUE] = useUE(params.code as string);
   const criteria = useUERateCriteria();
   const [myRates, setMyRates] = useGetRate(params.code);
   const [writtingComment, setWrittingComment] = useState<string>('');
   const [annals, , addAnnal] = useAnnals(params.code);
   const [annalTypes, annalSemesters] = useAnnalMetadata(params.code);
-  const [annalType, setAnnalType] = useState<string>();
-  const [annalSemester, setAnnalSemester] = useState<string>();
-  const [fileRotation, setFileRotation] = useState<number>(0);
   const [isAnnalUploaderOpen, setAnnalUploaderOpen] = useState(false);
-  const [isAnnalSendButtonDisabled, setAnnalSendButtonDisabled] = useState(false);
-  const fileRef = useRef<File>();
   const api = useAPI();
-
-  useEffect(() => {
-    if (annalTypes?.length) setAnnalType(annalTypes[0].id);
-    if (annalSemesters?.length) setAnnalSemester(annalSemesters[0]);
-  }, [annalTypes, annalSemesters]);
 
   if (!ue || !criteria || (!myRates && logged)) {
     return false;
   }
-
-  const onSendExam = async () => {
-    if (!fileRef.current || !annalSemester || !annalType) return;
-    setAnnalSendButtonDisabled(true);
-    const createdAnnal = await createAnnal(api, {
-      file: fileRef.current!,
-      semester: annalSemester,
-      typeId: annalType,
-      ueCode: params.code,
-      rotate: fileRotation,
-    });
-    if (createdAnnal) {
-      addAnnal(createdAnnal);
-      setAnnalUploaderOpen(false);
-    }
-    setAnnalSendButtonDisabled(false);
-  };
 
   const onRate = async (criterionId: string, hasAlreadyRated: boolean, rate: number) => {
     const newRate = await doUERate(api, params.code, criterionId as string, rate).toPromise();
@@ -161,54 +118,12 @@ export default function UEDetailsPage() {
                 : ue.info.requirements.toString()}
             </div>
           </div>
-          {(type === UserType.STUDENT || type === UserType.FORMER_STUDENT) && (
-            <div className={styles.exams}>
-              <h2>{t('ues:detailed.annals.title')}</h2>
-              <div className={styles.list}>
-                {annals?.length
-                  ? Object.entries(Object.groupBy(annals, (annal) => annal.semesterId)).map(([semester, annals]) => (
-                      <div className={styles.semester} key={semester}>
-                        <h3>{semester}</h3>
-                        {annals?.map((annal) => {
-                          const statusIcon = getDisplayedExamStatus(annal.status);
-                          return (
-                            <div
-                              className={styles.entry}
-                              key={annal.id}
-                              data-status={computeExamStatus(annal.status).join(' ')}
-                              onClick={(event) => {
-                                if (annal.status & CommentStatus.PROCESSING) return;
-                                event.preventDefault();
-                                openAnnalInNewTab(api, annal.id);
-                              }}>
-                              <span className={styles.type}>
-                                {annal.type.name}{' '}
-                                {(statusIcon !== 'validated' || annal.sender.id === userId) && (
-                                  <Tooltip
-                                    content={t(`ues:detailed.annals.entry.status.${statusIcon}`)}
-                                    className={styles.status}>
-                                    {getIcon(statusIcon)}
-                                  </Tooltip>
-                                )}
-                              </span>
-                              <span className={styles.author}>
-                                {t('ues:detailed.annals.entry.author')} {annal.sender.firstName} {annal.sender.lastName}
-                              </span>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    ))
-                  : t('ues:detailed.annals.empty')}
-              </div>
-              <Button
-                className={styles.send_button}
-                disabled={!annalTypes?.length || !annalSemesters?.length}
-                onClick={() => setAnnalUploaderOpen(true)}>
-                {t('ues:detailed.annals.send')}
-              </Button>
-            </div>
-          )}
+          <ExamList
+            annals={annals}
+            setAnnalUploaderOpen={setAnnalUploaderOpen}
+            annalSemesters={annalSemesters}
+            annalTypes={annalTypes}
+          />
           <div className={styles.thoughts}>
             <h2>Avis des étudiants</h2>
             <div className={styles.rates}>
@@ -253,44 +168,13 @@ export default function UEDetailsPage() {
           </div>
         </>
       ) : (
-        <div className={styles.send}>
-          <h2>{t('ues:detailed.annals.send')}</h2>
-          <div>
-            {t('ues:detailed.annals.send.type')}
-            <select onChange={(event) => setAnnalType(event.target.value)} value={annalType}>
-              {annalTypes &&
-                annalTypes.map((type) => (
-                  <option key={type.id} value={type.id}>
-                    {type.name}
-                  </option>
-                ))}
-            </select>
-          </div>
-          <div>
-            {t('ues:detailed.annals.send.semester')}
-            <select onChange={(event) => setAnnalSemester(event.target.value)} value={annalSemester}>
-              {annalSemesters &&
-                annalSemesters.map((semester) => (
-                  <option key={semester} value={semester}>
-                    {semester}
-                  </option>
-                ))}
-            </select>
-          </div>
-          <FileUpload
-            fileRef={fileRef}
-            onFileChange={setFileRotation}
-            placeholder={t('ues:detailed.annals.send.placeholder')}
-            fileTypes={['image/png', 'image/jpeg', 'image/webp', 'image/avif', 'image/tiff', 'application/pdf']}
-            supportsPictureRotation={true}
-          />
-          <div className={styles.actionbar}>
-            <Button onClick={onSendExam} disabled={isAnnalSendButtonDisabled}>
-              {t('ues:detailed.annals.send.sumbit')}
-            </Button>
-            <Button onClick={() => setAnnalUploaderOpen(false)}>{t('ues:detailed.annals.send.back')}</Button>
-          </div>
-        </div>
+        <ExamSender
+          ueCode={params.code}
+          addAnnal={addAnnal}
+          setAnnalUploaderOpen={setAnnalUploaderOpen}
+          annalSemesters={annalSemesters}
+          annalTypes={annalTypes}
+        />
       )}
     </div>
   );
