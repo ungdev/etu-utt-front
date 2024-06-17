@@ -25,7 +25,7 @@ i18n
       useSuspense: true,
     },
     supportedLngs,
-    ns: ['common', 'login', 'ues', 'homepage', 'users', 'goTo', 'auth', 'cookies'],
+    ns: ['common', 'login', 'ues', 'homepage', 'users', 'goTo', 'auth', 'assos', 'cookies'],
     preload: ['fr'],
     nsSeparator: ':',
     defaultNS: 'common',
