@@ -122,16 +122,7 @@ export const userSlice = createSlice({
         name: 'common:navbar.myAssociations',
         translate: true,
         needLogin: true,
-        submenus: [
-          {
-            name: 'UNG',
-            path: '/assos/ung',
-          },
-          {
-            name: 'BDE',
-            path: '/assos/bde',
-          },
-        ],
+        submenus: [],
       },
     ],
     seperator: 4,
@@ -170,6 +161,24 @@ export const removeMenuItem =
   (...pathToItem: string[]): AppThunk =>
   (dispatch) => {
     dispatch(removeItem(pathToItem));
+  };
+
+export const getMenuItem =
+  (...pathToItem: string[]): AppThunk<MenuItem | null> =>
+  (_, state) => {
+    let list: MenuItem[] | null = state().navbar.items;
+    for (let i = 0; i < pathToItem.length - 1; i++) {
+      const index: number = list.findIndex(({ name, submenus }) => name === pathToItem[i] && submenus != null);
+      if (index < 0) {
+        return null;
+      }
+      list = list[index].submenus!;
+    }
+    const index = list.findIndex(({ name }) => name === pathToItem[pathToItem.length - 1]);
+    if (index < 0) {
+      return null;
+    }
+    return list[index];
   };
 
 export const setAlwaysVisibleCount =

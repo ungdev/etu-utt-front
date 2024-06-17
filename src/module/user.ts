@@ -1,5 +1,10 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import { useAppSelector } from '@/lib/hooks';
+import { AppThunk } from '@/lib/store';
+import { addMenuItem, getMenuItem, removeMenuItem } from '@/module/navbar';
+import { fetchMyUes } from '@/api/ue/fetchMyUes';
+import { useAPI } from '@/api/api';
+import { MenuItem } from '@/components/Navbar';
 
 export const enum UserType {
   STUDENT = 'STUDENT',
@@ -31,7 +36,35 @@ export const userSlice = createSlice({
   initialState: null as UserSlice | null,
 });
 
-export const { setUser } = userSlice.actions;
+const { setUser: _setUser } = userSlice.actions;
+
+export function setUser(user: UserSlice | null): AppThunk {
+  return async (dispatch) => {
+    dispatch(_setUser(user));
+    const menuItem = dispatch(getMenuItem('common:navbar.myUEs'));
+    if (!menuItem || !menuItem.submenus) {
+      console.error('Cannot find the menu item "common:navbar.myUEs"');
+      return;
+    }
+    for (const submenu of menuItem.submenus) {
+      dispatch(removeMenuItem('common:navbar.myUEs', submenu.name));
+    }
+    if (!user) {
+      return;
+    }
+    const ues = await fetchMyUes(useAPI());
+    if (!ues) return;
+    ues.forEach((ue) => {
+      dispatch(
+        addMenuItem({ name: ue.code, path: `/ues/${ue.code}` } as MenuItem<false>, {
+          parents: 'common:navbar.myUEs',
+          before: undefined,
+          after: undefined,
+        }),
+      );
+    });
+  };
+}
 
 export const useConnectedUser = () => useAppSelector((state) => state.user);
 

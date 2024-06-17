@@ -1,11 +1,11 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import { AppDispatch, RootState, AppThunk } from '@/lib/store';
+import { RootState, AppThunk } from '@/lib/store';
 import { LoginRequestDto, LoginResponseDto } from '@/api/auth/login';
 import { StatusCodes } from 'http-status-codes';
 import { RegisterRequestDto, RegisterResponseDto } from '@/api/auth/register';
 import { IsLoggedInResponseDto } from '@/api/auth/isLoggedIn';
 import { setUser } from '@/module/user';
-import { API } from '@/api/api';
+import { API, setAuthorizationToken } from '@/api/api';
 import { fetchProfile } from '@/api/profile/fetchProfile';
 import { CookieNames, getCookie, setCookie } from '@/module/cookies';
 
@@ -18,7 +18,7 @@ export const sessionSlice = createSlice({
   name: 'session',
   reducers: {
     setToken: (state, action: PayloadAction<string | null>) => {
-      setCookie(CookieNames.TOKEN, action.payload ?? '');
+      setAuthorizationToken(action.payload ?? '');
       state.token = action.payload;
       state.logged = !!action.payload;
     },
@@ -56,12 +56,14 @@ export const logout = (): AppThunk => (dispatch) => dispatch(setToken(null));
 
 export const isLoggedIn = (state: RootState) => state.session.logged;
 
-export const autoLogin = (api: API): AppThunk =>
+export const autoLogin =
+  (api: API): AppThunk =>
   async (dispatch) => {
     const token = dispatch(getCookie(CookieNames.TOKEN));
     if (!token) {
       return;
     }
+    setAuthorizationToken(token);
     api.get<IsLoggedInResponseDto>('/auth/signin').on('success', async (body) => {
       if (body.valid) {
         dispatch(setToken(token, api));
@@ -73,6 +75,7 @@ export function setToken(token: null): AppThunk;
 export function setToken(token: string, api: API): AppThunk;
 export function setToken(token: string | null, api?: API): AppThunk {
   return async (dispatch) => {
+    dispatch(setCookie(CookieNames.TOKEN, token ?? ''));
     dispatch(_setToken(token));
     if (token === null) {
       setUser(null);

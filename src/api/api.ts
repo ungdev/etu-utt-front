@@ -150,9 +150,8 @@ async function internalRequestAPI<RequestType, ResponseType>(
   isFile: boolean,
 ): Promise<APIResponse<ResponseType | Blob>> {
   // Generate headers
-  const token = getAuthorizationToken();
   const headers = new Headers();
-  headers.append('Authorization', token ? `Bearer ${token}` : '');
+  headers.append('Authorization', authorizationToken ? `Bearer ${authorizationToken}` : '');
   if (!isFile) headers.append('Content-Type', 'application/json');
 
   // Add timeout to the request
@@ -246,7 +245,10 @@ function requestAPI<RequestType, ResponseType>(
 }
 
 // Set the authorization header with the given token for next requests
-const getAuthorizationToken = () => localStorage.getItem('etuutt-token');
+let authorizationToken: string = '';
+export const setAuthorizationToken = (token: string) => {
+  authorizationToken = token;
+};
 
 /**
  * A hook that returns a set of functions to make requests to the API.

@@ -38,7 +38,10 @@ function useUeFilters(creditCategories: CreditCategory[] | null, branches: Branc
         updateDelayed: true,
       }, // This one does not need a name as it will never be displayed
       creditType: {
-        component: createSelectFilter(creditCategories?.map((creditCategory) => creditCategory.code) ?? [], 'ues:filter.creditType.title'),
+        component: createSelectFilter(
+          creditCategories?.map((creditCategory) => creditCategory.code) ?? [],
+          'ues:filter.creditType.title',
+        ),
         parameterName: 'creditType',
         updateDelayed: false,
       },
@@ -52,7 +55,9 @@ function useUeFilters(creditCategories: CreditCategory[] | null, branches: Branc
           <SelectFilter
             onUpdate={onUpdate}
             forcedValue={forcedValue}
-            choices={branches?.find((b) => b.code === branch)?.branchOptions?.map((branchOption) => branchOption.code) ?? []}
+            choices={
+              branches?.find((b) => b.code === branch)?.branchOptions?.map((branchOption) => branchOption.code) ?? []
+            }
             title={'ues:filter.branchOption.title'}
           />
         ),

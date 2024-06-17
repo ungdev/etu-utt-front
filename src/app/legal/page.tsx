@@ -23,7 +23,7 @@ export default function LegalPage() {
   return (
     <div id="legal" className={styles.legal}>
       <div className={styles.container}>
-        <h1>Mentions légales</h1>
+        Cette page a été mise à jour le {LAST_TERMS_UPDATE}.<h1>Mentions légales</h1>
         <p>
           Le site web EtuUTT est développé, maintenu et hébergé par :<br />
           <br />
@@ -41,9 +41,7 @@ export default function LegalPage() {
           <br />
           Directeur de la publication : {PUBLICATION_DIRECTOR}
         </p>
-
         <h1>Conditions Générales d'Utilisation (CGU)</h1>
-
         {/* <h2 className={styles.articleTitle}>Collecte des données</h2>
         <p>
           Le site collecte certaines données personnelles renseignées par l’Utilisateur sur le site telles que le nom et
@@ -69,7 +67,6 @@ export default function LegalPage() {
           Ces données seront conservées jusqu'à ce que l'Utilisateur décide de les supprimer, ou qu'il ait terminé ses
           études à l'Université de Technologie de Troyes et n'ait pas demandé la conservation de son compte.
         </p> */}
-
         <h2 className={styles.articleTitle}>Propriété intellectuelle</h2>
         <p>
           Le contenu du site internet reste la propriété de l'association ASS UTT NET GROUP, seul titulaire des droits
@@ -78,7 +75,6 @@ export default function LegalPage() {
           strictement interdite et est susceptible de constituer un délit de contrefaçon. Les utilisateurs peuvent
           toutefois s'inspirer du code source, disponible publiquement sur notre page GitHub.
         </p>
-
         <h1>Politique de confidentialité</h1>
         <h2 className={styles.articleTitle}>1. Préambule</h2>
         <p>
@@ -104,11 +100,9 @@ export default function LegalPage() {
           <br />
           Cette politique complète les mentions légales et les Conditions Générales d’Utilisation.
         </p>
-
         <h2 className={styles.articleTitle}>
           2. Principes relatifs à la collecte et au traitement des données personnelles
         </h2>
-
         <p>
           Conformément à l’article 5 du Règlement européen 2016/679, les données à caractère personnel sont :
           <ul>
@@ -166,11 +160,9 @@ export default function LegalPage() {
             </li>
           </ul>
         </p>
-
         <h2 className={styles.articleTitle}>
           3. Données à caractère personnel collectées et traitées dans le cadre de la navigation sur le site
         </h2>
-
         {/* <p>
           Les données à caractère personnel collectées sur le site sont les suivantes :
           <ul>
@@ -200,24 +192,12 @@ export default function LegalPage() {
             <li>Fonctionnement des fonctionnalités internes au site telles que le trombinoscope et le cumul d'emploi du temps ;</li>
           </ul>
         </p> */}
-
         <h3 className={styles.subArticleTitle}>3.1. Données collectées</h3>
-        <p>
-          {/** TODO: Add Data collected */}
-        </p>
-
-
+        <p>{/** TODO: Add Data collected */}</p>
         <h3 className={styles.subArticleTitle}>3.2. Mode de collecte des données</h3>
-        <p>
-          {/** TODO: Add Data Collection Mode */}
-        </p>
-
-
+        <p>{/** TODO: Add Data Collection Mode */}</p>
         <h3 className={styles.subArticleTitle}>3.3. Transmissions des données à un tier</h3>
-        <p>
-          {/** TODO: Add Matomo and Sentry here */}
-        </p>
-
+        <p>{/** TODO: Add Matomo and Sentry here */}</p>
         <h3 className={styles.subArticleTitle}>3.4. Informations relatives aux cookies</h3>
         <p>
           Nous utilisons des cookies afin d'obtenir des statistiques sur notre site web. Ces informations ne seront en
@@ -229,13 +209,10 @@ export default function LegalPage() {
           avez la possibilité d'accepter ou refuser ces cookies. Sans ces cookies, vous n'aurez pas accès aux
           fonctionnalités de connexion automatique.
         </p>
-
         <h2 className={styles.articleTitle}>
           4. Responsable du traitement des données et délégué à la protection des données
         </h2>
-
         <h3 className={styles.subArticleTitle}>4.1. Le responsable du traitement des données</h3>
-
         <p>
           Les données à caractère personnelles sont collectées par {ASSOCIATION_NAME}, association loi 1901, dont le
           numéro RNA est {ASSOCIATION_RNA} et le numéro d'immatriculation RCS est {ASSOCIATION_RCS}.
@@ -249,9 +226,7 @@ export default function LegalPage() {
             </li>
           </ul>
         </p>
-
         <h3 className={styles.subArticleTitle}>4.2. Délégué à la protection des données</h3>
-
         <p>
           Le délégué à la protection des données de l'association est :
           <ul>
@@ -263,11 +238,9 @@ export default function LegalPage() {
           Si vous estimez, après nous avoir contactés, que vos droits “Informatique et Libertés”, ne sont pas respectés,
           vous pouvez adresser une information à la CNIL.
         </p>
-
         <h2 className={styles.articleTitle}>
           5. Les droits de l'utilisateur en matière de collecte et de traitement des données
         </h2>
-
         <p>
           Tout utilisateur concerné par le traitement de ses données personnelles peut se prévaloir des droits suivants,
           en application du règlement européen 2016/679 et de la Loi Informatique et Liberté (Loi 78-17 du 6 janvier
@@ -300,9 +273,7 @@ export default function LegalPage() {
           <br />
           Consultez le site <a href="https://cnil.fr">cnil.fr</a> pour plus d’informations sur vos droits.
         </p>
-
         <h2 className={styles.articleTitle}>6. Conditions de modification de la politique de confidentialité</h2>
-
         <p>
           L’éditeur du site EtuUTT se réserve le droit de pouvoir modifier la présente Politique à tout moment afin
           d’assurer aux utilisateurs du site sa conformité avec le droit en vigueur.

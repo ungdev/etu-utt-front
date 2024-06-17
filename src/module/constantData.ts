@@ -26,7 +26,7 @@ export const constantDataSlice = createSlice({
     },
     setCreditCategories: (state, action: PayloadAction<CreditCategory[] | null>) => {
       return { ...state, creditCategories: action.payload };
-    }
+    },
   },
   initialState: { ueRateCriteria: null, branches: null, creditCategories: null } as ConstantDataSlice,
 });
@@ -39,8 +39,7 @@ export function useUERateCriteria(): UERateCriterion[] | null {
   const api = useAPI();
   useEffect(() => {
     if (ueRateCriteria === null) {
-      fetchUERateCriteria(api)
-        .then((criteria) => criteria && dispatch(setCriteria(criteria)));
+      fetchUERateCriteria(api).then((criteria) => criteria && dispatch(setCriteria(criteria)));
     }
   }, []);
   return ueRateCriteria;
@@ -52,8 +51,7 @@ export function useBranches(): Branch[] | null {
   const api = useAPI();
   useEffect(() => {
     if (branches === null) {
-      fetchBranches(api)
-        .then((branches) => branches && dispatch(setBranches(branches)));
+      fetchBranches(api).then((branches) => branches && dispatch(setBranches(branches)));
     }
   }, []);
   return branches;
@@ -65,8 +63,9 @@ export function useCreditCategories(): CreditCategory[] | null {
   const api = useAPI();
   useEffect(() => {
     if (creditCategories === null) {
-      fetchCreditCategories(api)
-        .then((creditCategories) => creditCategories && dispatch(setCreditCategories(creditCategories)));
+      fetchCreditCategories(api).then(
+        (creditCategories) => creditCategories && dispatch(setCreditCategories(creditCategories)),
+      );
     }
   }, []);
   return creditCategories;

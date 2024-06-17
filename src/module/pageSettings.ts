@@ -2,6 +2,7 @@ import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import { DependencyList, ReactNode, useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import { usePathname, useSearchParams } from 'next/navigation';
+import { AppThunk } from '@/lib/store';
 
 interface PageSettingsSlice {
   page: string; // Needed to verify the page has correctly called the hook
@@ -10,9 +11,10 @@ interface PageSettingsSlice {
   hasNavbar: boolean;
   navbarAdditionalComponent: (() => ReactNode) | null;
   loaded: boolean;
+  internallyLoaded: boolean;
 }
 
-type InternalPageSettingsKeys = 'page' | 'searchParams' | 'loaded';
+type InternalPageSettingsKeys = 'page' | 'searchParams' | 'loaded' | 'internallyLoaded';
 
 type PageSettings = Omit<PageSettingsSlice, InternalPageSettingsKeys>;
 
@@ -33,6 +35,7 @@ export const pageSettingsSlice = createSlice({
     },
     setPageParams(state, action: PayloadAction<Record<string, string>>) {
       state.searchParams = action.payload;
+      state.internallyLoaded = true;
       return state;
     },
     setLoaded(state, action: PayloadAction<boolean>) {
@@ -40,7 +43,7 @@ export const pageSettingsSlice = createSlice({
       return state;
     },
   },
-  initialState: { ...defaultPageSettings, page: '', searchParams: {} } as PageSettingsSlice,
+  initialState: { ...defaultPageSettings, page: '', searchParams: {}, loaded: false, internallyLoaded: false } as PageSettingsSlice,
 });
 
 const { setPageSettings, setPageParams, setLoaded } = pageSettingsSlice.actions;
@@ -66,6 +69,7 @@ export function usePageSettings(
           page: pathname,
           searchParams: {},
           loaded: !settings.needsLoading,
+          internallyLoaded: false,
         }),
       );
     }, deps);
@@ -83,7 +87,7 @@ export function usePageSettings(
       }
     }, [initialized]);
     if (pageSettings.page !== pathname) {
-      pageSettings = { page: pathname, searchParams: {}, loaded: false, ...defaultPageSettings };
+      pageSettings = { page: pathname, searchParams: {}, loaded: false, internallyLoaded: false, ...defaultPageSettings };
     }
     return pageSettings;
   }
@@ -92,17 +96,17 @@ export function usePageSettings(
 
 export function usePageLoaded(instantlyLoaded: boolean = false) {
   const dispatch = useAppDispatch();
+  const internallyLoaded = useAppSelector((state) => state.pageSettings.internallyLoaded);
   useEffect(() => {
     if (instantlyLoaded) {
       dispatch(setLoaded(true));
     }
   }, []);
-  return () => dispatch(setLoaded(true));
+  return {internallyLoaded: internallyLoaded, markPageLoaded: () => dispatch(setLoaded(true))};
 }
 
 export function useSearchParam(param: string): string | undefined {
-  const searchParams = useSearchParams();
-  return useAppSelector((state) => state.pageSettings.searchParams[param]) ?? searchParams.get(param);
+  return useAppSelector((state) => state.pageSettings.searchParams[param]);
 }
 
 export default pageSettingsSlice.reducer;

@@ -16,7 +16,7 @@ import { Trans } from 'react-i18next';
 
 export default function LoginPage() {
   usePageSettings({ hasNavbar: false, permissions: 'public', needsLoading: true });
-  const onPageLoaded = usePageLoaded();
+  const { internallyLoaded, markPageLoaded } = usePageLoaded();
   const ticket = useSearchParam('ticket');
   const router = useRouter();
   const dispatch = useAppDispatch();
@@ -43,10 +43,10 @@ export default function LoginPage() {
       });
   }, [ticket]);
   useEffect(() => {
-    if (!ticket || registerToken) {
-      onPageLoaded();
+    if ((!ticket || registerToken) && internallyLoaded) {
+      markPageLoaded();
     }
-  }, [ticket, registerToken]);
+  }, [internallyLoaded]);
   if (ticket && !registerToken) {
     return null;
   }
