@@ -1,0 +1,39 @@
+@import '@/variables';
+
+.tooltipContainer {
+  position: relative;
+  display: inline-block;
+
+  & > .tooltip {
+    display: none;
+    background-color: $ung-dark-grey;
+    position: absolute;
+    left: calc(100% + 6px);
+    top: 0.65em;
+    transform: translateY(-50%);
+    border-radius: 4px;
+    padding: 1px 4px;
+    text-transform: uppercase;
+    font-size: small;
+    font-weight: bold;
+    color: $light-gray;
+    text-wrap: nowrap;
+
+    &::before {
+      content: '';
+      width: 0;
+      height: 0;
+      border-top: 5px solid transparent;
+      border-right: 7px solid $ung-dark-grey;
+      border-bottom: 5px solid transparent;
+      left: -6px;
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+  }
+
+  &:hover > .tooltip {
+    display: inline-block;
+  }
+}

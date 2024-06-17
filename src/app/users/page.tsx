@@ -44,7 +44,7 @@ export default function SearchUserPage() {
   const { items: users, total: totalUsers, updateFilters: updateUsers, fetchNextItems: fetchNextPage } = useUsers();
   return (
     <div className={styles.searchUserPage}>
-      <h1 className={styles.title}>Trombinoscope</h1>
+      <h1>Trombinoscope</h1>
       <div className={styles.content}>
         <FilteredSearch<FilterNames, FiltersType> filtersData={filtersData} updateSearch={updateUsers} />
         <div className={styles.results}>
@@ -56,7 +56,7 @@ export default function SearchUserPage() {
             itemFactory={({ item }) =>
               !item ? (
                 <div className={`${styles.user} ${styles.glimmer}`}>
-                  <img />
+                  <img alt="Askip il y a une image ici mais j'ai aucune idée d'à quoi elle sert :)" />
                   <div className={styles.userInfo}>
                     <h2></h2>
                     <p></p>

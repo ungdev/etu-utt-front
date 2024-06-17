@@ -5,11 +5,12 @@ import homepage from '../../public/locales/fr/homepage.json';
 import users from '../../public/locales/fr/users.json';
 import goTo from '../../public/locales/fr/goTo.json';
 import auth from '../../public/locales/fr/auth.json';
+import cookies from '../../public/locales/fr/cookies.json';
 import { type InitOptions } from 'i18next';
 
 declare module 'i18next' {
   interface CustomTypeOptions extends InitOptions {
-    ns: ['common', 'login', 'ues', 'homepage', 'users', 'goTo', 'auth'];
+    ns: ['common', 'login', 'ues', 'homepage', 'users', 'goTo', 'auth', 'cookies'];
     nsSeparator: ':';
     defaultNS: 'common';
     // custom resources type
@@ -21,6 +22,7 @@ declare module 'i18next' {
       users: typeof users;
       goTo: typeof goTo;
       auth: typeof auth;
+      cookies: typeof cookies;
     };
   }
 }

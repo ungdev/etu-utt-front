@@ -6,12 +6,6 @@
   display: flex;
   flex-direction: column;
 
-  .title {
-    text-transform: uppercase;
-    color: $ung-dark-grey;
-    font-weight: 900;
-  }
-
   .content {
     display: flex;
     gap: 30px;

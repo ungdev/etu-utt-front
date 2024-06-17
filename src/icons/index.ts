@@ -17,10 +17,17 @@ import Language from './Language';
 import LogoEtu from './LogoEtu';
 import LogoUNG from './LogoUNG';
 import LogoUTT from './LogoUTT';
+import CircleCheck from './CircleCheck';
+import CircleWarning from './CircleWarning';
+import Clock from './Clock';
+import Rotate from './Rotate';
 
 const Icons = {
   Book,
   Caret,
+  CircleCheck,
+  CircleWarning,
+  Clock,
   Collapse,
   Home,
   Language,
@@ -36,6 +43,7 @@ const Icons = {
   Star,
   Trash,
   RightChevron,
+  Rotate,
   User,
   Users,
 };

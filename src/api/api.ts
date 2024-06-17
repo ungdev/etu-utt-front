@@ -39,8 +39,8 @@ type RawResponseType<T> = T extends Date
  * It allows you to define what to do when the request is successful, when it returns an error (an API error), when it fails (a request error), or when it returns a specific status code or specific failure.
  *
  * @example
- * export const login = (login: string, password: string) =>
- *   (async (dispatch: AppDispatch) => {
+ * export const login = (login: string, password: string): AppThunk =>
+ *   async (dispatch: AppDispatch) => {
  *     API.post<LoginRequestDto, LoginResponseDto>('/auth/signin', { login, password })
  *       .on(StatusCodes.OK, (body) => {
  *         dispatch(setToken(body.access_token));
@@ -49,7 +49,7 @@ type RawResponseType<T> = T extends Date
  *       .on(StatusCodes.UNAUTHORIZED, (body) => console.error('Wrong credentials', body))
  *       .on(StatusCodes.BAD_REQUEST, (body) => console.error('Bad request', body))
  *       .on('error', () => console.error('An error occured'));
- *   }) as unknown as Action;
+ *   };
  *
  * @example
  * export default async function sendComment(ueCode: string, body: string, isAnonymous: boolean) {
@@ -124,6 +124,15 @@ function formatResponse<T>(rawResponse: RawResponseType<T>): T {
  * @param timeoutMillis The timeout of the request.
  * @param version The version of the API to use : v1, v2, ...
  */
+
+async function internalRequestAPI<RequestType>(
+  method: 'GET',
+  route: string,
+  body: RequestType | null,
+  timeoutMillis: number,
+  version: string,
+  isFile: true,
+): Promise<APIResponse<Blob>>;
 async function internalRequestAPI<RequestType, ResponseType>(
   method: string,
   route: string,
@@ -131,7 +140,15 @@ async function internalRequestAPI<RequestType, ResponseType>(
   timeoutMillis: number,
   version: string,
   isFile: boolean,
-): Promise<APIResponse<ResponseType>> {
+): Promise<APIResponse<ResponseType>>;
+async function internalRequestAPI<RequestType, ResponseType>(
+  method: string,
+  route: string,
+  body: RequestType | null,
+  timeoutMillis: number,
+  version: string,
+  isFile: boolean,
+): Promise<APIResponse<ResponseType | Blob>> {
   // Generate headers
   const token = getAuthorizationToken();
   const headers = new Headers();
@@ -165,6 +182,7 @@ async function internalRequestAPI<RequestType, ResponseType>(
     if (response.status === StatusCodes.NO_CONTENT) {
       return { code: response.status, body: null as ResponseType };
     }
+    if (isFile && method === 'GET') return { code: response.status, body: await response.blob() };
     if (!response.headers.get('content-type')?.includes('application/json')) return { error: ResponseError.not_json };
 
     try {
@@ -202,6 +220,18 @@ async function internalRequestAPI<RequestType, ResponseType>(
  * @param timeoutMillis The timeout of the request, in milliseconds. Defaults to 10000 milliseconds (10 seconds).
  * @param version The version of the API to use : v1, v2, ... Defaults to the environment variable `NEXT_PUBLIC_API_VERSION`.
  */
+function requestAPI<RequestType>(
+  method: 'GET',
+  route: string,
+  body: RequestType | null,
+  params: { timeoutMillis?: number; version?: string; isFile: true },
+): ResponseHandler<Blob>;
+function requestAPI<RequestType, ResponseType>(
+  method: string,
+  route: string,
+  body: RequestType | null,
+  params: { timeoutMillis?: number; version?: string; isFile?: boolean },
+): ResponseHandler<ResponseType>;
 function requestAPI<RequestType, ResponseType>(
   method: string,
   route: string,
@@ -223,10 +253,12 @@ const getAuthorizationToken = () => localStorage.getItem('etuutt-token');
  * This hook uses the page settings stored in Redux to set the default handlers.
  */
 // TODO : wellll, implement that page settings thingy once it's merged.
-export function useAPI() {
+export function useAPI(): API {
   return {
-    get: <ResponseType = never>(route: string, options: { version?: string } = {}) =>
-      applyDefaultHandler(requestAPI<never, ResponseType>('GET', route, null, options)),
+    get: <ResponseType = never>(
+      route: string,
+      options: { timeoutMillis?: number; version?: string; isFile?: boolean } = {},
+    ) => applyDefaultHandler(requestAPI<never, ResponseType>('GET', route, null, options)),
     post: <RequestType, ResponseType = never>(
       route: string,
       body = {} as RequestType,
@@ -247,7 +279,32 @@ export function useAPI() {
   };
 }
 
-export type API = ReturnType<typeof useAPI>;
+export interface API {
+  get(route: string, options: { timeoutMillis?: number; version?: string; isFile: true }): ResponseHandler<Blob>;
+  get<ResponseType = never>(
+    route: string,
+    options?: { timeoutMillis?: number; version?: string; isFile?: boolean },
+  ): ResponseHandler<ResponseType, ResponseType | void | undefined>;
+  post<RequestType, ResponseType = never>(
+    route: string,
+    body?: RequestType,
+    options?: { version?: string; isFile?: boolean },
+  ): ResponseHandler<ResponseType, ResponseType | void | undefined>;
+  put<RequestType, ResponseType = never>(
+    route: string,
+    body?: RequestType,
+    options?: { version?: string; isFile?: boolean },
+  ): ResponseHandler<ResponseType, ResponseType | void | undefined>;
+  patch: <RequestType, ResponseType = never>(
+    route: string,
+    body?: RequestType,
+    options?: { version?: string; isFile?: boolean },
+  ) => ResponseHandler<ResponseType, ResponseType | void | undefined>;
+  delete<ResponseType = never>(
+    route: string,
+    options?: { version?: string },
+  ): ResponseHandler<ResponseType, ResponseType | void | undefined>;
+}
 
 /**
  * Apply the default handler to a response handler.
