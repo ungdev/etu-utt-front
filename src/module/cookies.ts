@@ -46,7 +46,7 @@ export const cookiesSlice = createSlice({
       state.cookiesAccepted = { ...state.cookiesAccepted, ...action.payload };
       for (const name of Object.values(CookieNames)) {
         if (state.cookiesAccepted[name]) {
-          localStorage.setItem(name, state.cookies[name]);
+          localStorage.setItem(name, state.cookies[name] ?? '');
         } else {
           localStorage.removeItem(name);
         }

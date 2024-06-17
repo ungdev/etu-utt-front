@@ -18,7 +18,6 @@ export const sessionSlice = createSlice({
   name: 'session',
   reducers: {
     setToken: (state, action: PayloadAction<string>) => {
-      setCookie(CookieNames.TOKEN, action.payload);
       setAuthorizationToken(action.payload);
       state.token = action.payload;
       state.logged = !!action.payload;
@@ -27,7 +26,12 @@ export const sessionSlice = createSlice({
   initialState: { logged: false, token: null } as SessionSlice,
 });
 
-export const { setToken } = sessionSlice.actions;
+const { setToken: _setToken } = sessionSlice.actions;
+
+export const setToken = (token: string): AppThunk => (dispatch) => {
+  dispatch(setCookie(CookieNames.TOKEN, token));
+  dispatch(_setToken(token));
+}
 
 export const login =
   (api: API, login: string, password: string): AppThunk =>
@@ -68,6 +72,7 @@ export const autoLogin = (api: API) => async (dispatch: AppDispatch) => {
   if (!token) {
     return;
   }
+  setAuthorizationToken(token);
   api.get<IsLoggedInResponseDto>('/auth/signin').on('success', async (body) => {
     if (body.valid) {
       dispatch(setToken(token));

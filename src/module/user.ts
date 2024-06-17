@@ -46,7 +46,6 @@ export function setUser(user: UserSlice | null): AppThunk {
     }
     const ues = await fetchMyUes(useAPI());
     if (!ues) return;
-    console.log(ues);
     ues.forEach((ue) => {
       dispatch(
         addMenuItem(
