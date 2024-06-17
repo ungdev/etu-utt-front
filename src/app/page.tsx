@@ -43,7 +43,7 @@ function AdditionalNavbarComponent({
 }
 
 export default function HomePage() {
-  const setLoaded = usePageLoaded();
+  const { markPageLoaded } = usePageLoaded();
   const [isSmallScreen, setIsSmallScreen] = useState(false);
   const [modifyingLayout, setModifyingLayout, modifyingLayoutRef] = useStateWithReference(false);
   usePageSettings(
@@ -95,7 +95,7 @@ export default function HomePage() {
                   .map((w) => ({ x: w.x, y: w.y, width: w.width, height: w.height }))}
                 changeBB={(newWidget) => dispatch(modifyBB(i, { ...widget, ...newWidget }))}
                 remove={() => dispatch(removeWidget(i))}
-                onLoaded={setLoaded}
+                onLoaded={markPageLoaded}
               />
             );
           })

@@ -5,6 +5,7 @@ import { initReactI18next, useTranslation } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import resourcesToBackend from 'i18next-resources-to-backend';
 import './i18n.d';
+import { CookieNames, useCookie } from '@/module/cookies';
 
 export const supportedLngs = ['fr', 'en'];
 
@@ -24,7 +25,7 @@ i18n
       useSuspense: true,
     },
     supportedLngs,
-    ns: ['common', 'login', 'ues', 'homepage', 'users', 'goTo', 'auth', 'assos'],
+    ns: ['common', 'login', 'ues', 'homepage', 'users', 'goTo', 'auth', 'assos', 'cookies'],
     preload: ['fr'],
     nsSeparator: ':',
     defaultNS: 'common',
@@ -42,6 +43,14 @@ export function useAppTranslation() {
     t: t as unknown as TFunction,
     i18n,
   };
+}
+
+export function useLanguage() {
+  const lang = useCookie(CookieNames.LANG) || 'fr';
+  if (!supportedLngs.some((lng) => lng === lang)) {
+    return 'fr';
+  }
+  return lang;
 }
 
 export interface TFunction {

@@ -1,11 +1,12 @@
 import '@/global.scss';
 import Providers from '@/lib/Providers';
-import React, { ReactNode } from 'react';
+import React, { ReactNode, Suspense } from 'react';
 import Redirecter from '@/components/utilities/Redirecter';
 import AutoLogin from '@/components/utilities/AutoLogin';
 import Wrapper from '@/components/utilities/Wrapper';
 import PageSearchParams from '@/components/utilities/PageSearchParams';
 import { Lexend } from 'next/font/google';
+import { CookiePopup } from '@/components/CookiePopup';
 
 const lexend = Lexend({
   weight: ['400', '600', '700', '800'],
@@ -26,8 +27,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <Providers>
         <Redirecter />
         <AutoLogin />
-        <PageSearchParams />
+        <Suspense>
+          <PageSearchParams />
+        </Suspense>
         <body>
+          <CookiePopup />
           <Wrapper>{children}</Wrapper>
         </body>
       </Providers>

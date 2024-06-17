@@ -44,8 +44,8 @@ export default function Page() {
             baseRedirectUrl={'/assos'}
             itemFactory={({ item }) => (
               <div>
-                <h2>{item.name}</h2>
-                <p>{item.descriptionShortTranslation}</p>
+                <h2>{item?.name}</h2>
+                <p>{item?.descriptionShortTranslation}</p>
               </div>
             )}
             getItemId={(asso) => asso.id}

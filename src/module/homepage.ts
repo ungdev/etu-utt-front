@@ -32,7 +32,6 @@ export const pageSettingsSlice = createSlice({
             widget.y > action.payload.widget.y ||
             (widget.y === action.payload.widget.y && widget.x >= action.payload.widget.x),
         );
-        console.log(`updating widget, with index = ${action.payload.index}, newIndex = ${newIndex}`);
         if (newIndex === -1) {
           return [
             ...state.slice(0, action.payload.index),
@@ -48,10 +47,6 @@ export const pageSettingsSlice = createSlice({
             ...state.slice(action.payload.index + 1),
           ];
         }
-        console.log(state.slice(0, action.payload.index));
-        console.log(state.slice(action.payload.index + 1, newIndex));
-        console.log(action.payload.widget);
-        console.log(state.slice(action.payload.index));
         if (newIndex > action.payload.index) {
           return [
             ...state.slice(0, action.payload.index),

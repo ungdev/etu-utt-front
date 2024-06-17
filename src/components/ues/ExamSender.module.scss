@@ -1,0 +1,15 @@
+.send {
+  display: flex;
+  flex-flow: column nowrap;
+  gap: 1em;
+  padding-top: 1em;
+
+  div > select {
+    margin-left: 1ch;
+  }
+
+  .actionbar {
+    display: flex;
+    gap: 0.5em;
+  }
+}

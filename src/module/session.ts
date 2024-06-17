@@ -1,45 +1,45 @@
-import { type Action, createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import { AppDispatch, RootState } from '@/lib/store';
+import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import { RootState, AppThunk } from '@/lib/store';
 import { LoginRequestDto, LoginResponseDto } from '@/api/auth/login';
 import { StatusCodes } from 'http-status-codes';
 import { RegisterRequestDto, RegisterResponseDto } from '@/api/auth/register';
 import { IsLoggedInResponseDto } from '@/api/auth/isLoggedIn';
 import { setUser } from '@/module/user';
-import { API } from '@/api/api';
+import { API, setAuthorizationToken } from '@/api/api';
 import { fetchProfile } from '@/api/profile/fetchProfile';
+import { CookieNames, getCookie, setCookie } from '@/module/cookies';
 
 interface SessionSlice {
   logged: boolean;
-  token: string;
+  token: string | null;
 }
 
 export const sessionSlice = createSlice({
   name: 'session',
   reducers: {
-    setToken: (state, action: PayloadAction<string>) => {
-      localStorage.setItem('etuutt-token', action.payload);
+    setToken: (state, action: PayloadAction<string | null>) => {
+      setAuthorizationToken(action.payload ?? '');
       state.token = action.payload;
       state.logged = !!action.payload;
     },
   },
-  initialState: { logged: false } as SessionSlice,
+  initialState: { logged: false, token: null } as SessionSlice,
 });
 
-export const { setToken } = sessionSlice.actions;
+const { setToken: _setToken } = sessionSlice.actions;
 
-export const login = (api: API, login: string, password: string) =>
-  ((dispatch: AppDispatch) =>
+export const login =
+  (api: API, login: string, password: string): AppThunk =>
+  (dispatch) =>
     api
       .post<LoginRequestDto, LoginResponseDto>('/auth/signin', { login, password })
-      .on('success', async (body) => {
-        dispatch(setToken(body.access_token));
-        dispatch(setUser((await fetchProfile(api).toPromise()) ?? null));
-      })
+      .on('success', async (body) => dispatch(setToken(body.access_token, api)))
       .on(StatusCodes.UNAUTHORIZED, (body) => console.error('Wrong credentials', body))
-      .on(StatusCodes.BAD_REQUEST, (body) => console.error('Bad request', body))) as unknown as Action;
+      .on(StatusCodes.BAD_REQUEST, (body) => console.error('Bad request', body));
 
-export const register = (api: API, lastName: string, firstName: string, login: string, password: string) =>
-  (async (dispatch: AppDispatch) =>
+export const register =
+  (api: API, lastName: string, firstName: string, login: string, password: string): AppThunk =>
+  async (dispatch) =>
     api
       .post<RegisterRequestDto, RegisterResponseDto>('/auth/signup', {
         lastName,
@@ -50,28 +50,40 @@ export const register = (api: API, lastName: string, firstName: string, login: s
         type: 'STUDENT',
         birthday: new Date(2003, 1, 28),
       })
-      .on('success', (body) => dispatch(setToken(body.access_token)))) as unknown as Action;
+      .on('success', (body) => dispatch(setToken(body.access_token, api)));
 
-export const logout = () =>
-  ((dispatch: AppDispatch) => {
-    dispatch(setToken(''));
-    dispatch(setUser(null));
-  }) as unknown as Action;
+export const logout = (): AppThunk => (dispatch) => dispatch(setToken(null));
 
 export const isLoggedIn = (state: RootState) => state.session.logged;
 
-export const autoLogin = (api: API) =>
-  (async (dispatch: AppDispatch) => {
-    const token = localStorage.getItem('etuutt-token');
+export const autoLogin =
+  (api: API): AppThunk =>
+  async (dispatch) => {
+    const token = dispatch(getCookie(CookieNames.TOKEN));
     if (!token) {
       return;
     }
+    setAuthorizationToken(token);
     api.get<IsLoggedInResponseDto>('/auth/signin').on('success', async (body) => {
       if (body.valid) {
-        dispatch(setToken(token));
-        dispatch(setUser((await fetchProfile(api).toPromise()) ?? null));
+        dispatch(setToken(token, api));
       }
     });
-  }) as unknown as Action;
+  };
+
+export function setToken(token: null): AppThunk;
+export function setToken(token: string, api: API): AppThunk;
+export function setToken(token: string | null, api?: API): AppThunk {
+  return async (dispatch) => {
+    dispatch(setCookie(CookieNames.TOKEN, token ?? ''));
+    dispatch(_setToken(token));
+    if (token === null) {
+      setUser(null);
+      return;
+    }
+    const user = await fetchProfile(api!).toPromise();
+    dispatch(setUser(user ?? null));
+  };
+}
 
 export default sessionSlice.reducer;

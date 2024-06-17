@@ -1,8 +1,8 @@
 import { MenuItem } from '@/components/Navbar';
-import { type Action, createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import { AppDispatch, RootState } from 'src/lib/store';
-import { isClientSide } from '@/utils/environment';
+import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import { AppThunk, RootState } from 'src/lib/store';
 import Icons from '@/icons';
+import { CookieNames, setCookie } from '@/module/cookies';
 
 export const userSlice = createSlice({
   name: 'navbar',
@@ -62,12 +62,8 @@ export const userSlice = createSlice({
     moveSeparator: (state, action: PayloadAction<number>) => {
       if (action.payload >= 0 && action.payload <= state.items.length) state.seperator = action.payload;
     },
-    setCollapse: (state, action: PayloadAction<boolean>) => {
-      localStorage.setItem('navbarCollapsed', `${action.payload}`);
-      state.collapsed = action.payload;
-    },
   },
-  initialState: <{ items: MenuItem[]; seperator: number; collapsed: boolean }>{
+  initialState: <{ items: MenuItem[]; seperator: number }>{
     items: [
       {
         icon: Icons.Home,
@@ -126,34 +122,25 @@ export const userSlice = createSlice({
         name: 'common:navbar.myAssociations',
         translate: true,
         needLogin: true,
-        submenus: [
-          {
-            name: 'UNG',
-            path: '/assos/ung',
-          },
-          {
-            name: 'BDE',
-            path: '/assos/bde',
-          },
-        ],
+        submenus: [],
       },
     ],
     seperator: 4,
-    collapsed: isClientSide() && localStorage.getItem('navbarCollapsed') === 'true',
   },
 });
 
-const { addItem, replaceItem, removeItem, moveSeparator, setCollapse } = userSlice.actions;
+const { addItem, replaceItem, removeItem, moveSeparator } = userSlice.actions;
 
-export const addMenuItem = (
-  item: MenuItem,
-  options?: {
-    parents?: string;
-    before?: string;
-    after?: string;
-  },
-) =>
-  ((dispatch: AppDispatch) => {
+export const addMenuItem =
+  (
+    item: MenuItem,
+    options?: {
+      parents?: string;
+      before?: string;
+      after?: string;
+    },
+  ): AppThunk =>
+  (dispatch) => {
     dispatch(
       addItem({
         item,
@@ -162,26 +149,50 @@ export const addMenuItem = (
         after: options?.after || null,
       }),
     );
-  }) as unknown as Action;
+  };
 
-export const replaceMenuItem = (item: MenuItem, ...replacedItemName: string[]) =>
-  ((dispatch: AppDispatch) => {
+export const replaceMenuItem =
+  (item: MenuItem, ...replacedItemName: string[]): AppThunk =>
+  (dispatch) => {
     dispatch(replaceItem({ item, search: replacedItemName }));
-  }) as unknown as Action;
+  };
 
-export const removeMenuItem = (...pathToItem: string[]) =>
-  ((dispatch: AppDispatch) => {
+export const removeMenuItem =
+  (...pathToItem: string[]): AppThunk =>
+  (dispatch) => {
     dispatch(removeItem(pathToItem));
-  }) as unknown as Action;
+  };
 
-export const setAlwaysVisibleCount = (count: number) =>
-  ((dispatch: AppDispatch) => {
+export const getMenuItem =
+  (...pathToItem: string[]): AppThunk<MenuItem | null> =>
+  (_, state) => {
+    let list: MenuItem[] | null = state().navbar.items;
+    for (let i = 0; i < pathToItem.length - 1; i++) {
+      const index: number = list.findIndex(({ name, submenus }) => name === pathToItem[i] && submenus != null);
+      if (index < 0) {
+        return null;
+      }
+      list = list[index].submenus!;
+    }
+    const index = list.findIndex(({ name }) => name === pathToItem[pathToItem.length - 1]);
+    if (index < 0) {
+      return null;
+    }
+    return list[index];
+  };
+
+export const setAlwaysVisibleCount =
+  (count: number): AppThunk =>
+  (dispatch) => {
     dispatch(moveSeparator(count));
-  }) as unknown as Action;
+  };
 
 export const getMenu = (state: RootState) => state.navbar;
 
-export const setCollapsed = (collapse: boolean) =>
-  ((dispatch: AppDispatch) => dispatch(setCollapse(collapse))) as unknown as Action;
+export const setCollapsed =
+  (collapse: boolean): AppThunk =>
+  (dispatch) => {
+    dispatch(setCookie(CookieNames.NAVBAR_COLLAPSED, collapse ? 'true' : 'false'));
+  };
 
 export default userSlice.reducer;
