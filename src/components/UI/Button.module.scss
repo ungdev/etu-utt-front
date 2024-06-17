@@ -8,13 +8,23 @@
 
 .button:not(.noStyle) {
   border: none;
-  background-color: $ung-light-blue;
   border-radius: 5px;
   padding: 10px;
-  color: white;
+  background-color: var(--background);
+  color: var(--color);
+
+  &.background-blue {
+    --background: #{$ung-light-blue};
+    --color: white;
+  }
+
+  &.background-white {
+    --background: white;
+    --color: #{$ung-dark-grey};
+  }
 
   &:hover {
-    background-color: mix($ung-light-blue, black, 90%);
+    background-color: color-mix(in srgb, var(--background) 90%, black);
     cursor: pointer;
   }
 

@@ -39,8 +39,8 @@ type RawResponseType<T> = T extends Date
  * It allows you to define what to do when the request is successful, when it returns an error (an API error), when it fails (a request error), or when it returns a specific status code or specific failure.
  *
  * @example
- * export const login = (login: string, password: string) =>
- *   (async (dispatch: AppDispatch) => {
+ * export const login = (login: string, password: string): AppThunk =>
+ *   async (dispatch: AppDispatch) => {
  *     API.post<LoginRequestDto, LoginResponseDto>('/auth/signin', { login, password })
  *       .on(StatusCodes.OK, (body) => {
  *         dispatch(setToken(body.access_token));
@@ -49,7 +49,7 @@ type RawResponseType<T> = T extends Date
  *       .on(StatusCodes.UNAUTHORIZED, (body) => console.error('Wrong credentials', body))
  *       .on(StatusCodes.BAD_REQUEST, (body) => console.error('Bad request', body))
  *       .on('error', () => console.error('An error occured'));
- *   }) as unknown as Action;
+ *   };
  *
  * @example
  * export default async function sendComment(ueCode: string, body: string, isAnonymous: boolean) {

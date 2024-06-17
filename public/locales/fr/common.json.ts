@@ -28,7 +28,13 @@ export default {
   "navbar.myUEs": "Mes matières",
   "input.editableText.modify": "Modifier",
   "or": "Ou",
+  "loading": "Chargement",
   "filter.all": "Tous",
   "filters": "Filtres",
   "results": "résultats",
+  "cookie.message": "Notre site permet de stocker vos préférences de navigation à l'aide de traceurs (LocalStorage).<br/>Vous avez le choix entre refuser tous ces traceurs, tous les accepter, ou personnaliser votre choix.",
+  "cookie.learnMore": "En savoir plus",
+  "cookie.authorize": "Tout autoriser",
+  "cookie.refuse": "Tout refuser",
+  "cookie.personalize": "Personnaliser",
 } as const;

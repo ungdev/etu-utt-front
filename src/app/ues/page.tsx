@@ -76,10 +76,10 @@ const ueFilters = Object.freeze({
 export default function Page() {
   usePageSettings({});
   const { t } = useAppTranslation();
-  const [ues, totalUesCount, updateUEs] = useUEs();
+  const { items: ues, total: totalUesCount, updateFilters: updateUEs, fetchNextItems } = useUEs();
   return (
     <div className={styles.page}>
-      <h1 className={styles.title}>{t('ues:browser')}</h1>
+      <h1>{t('ues:browser')}</h1>
       <div className={styles.content}>
         <FilteredSearch<FilterNames, UEFiltersType> filtersData={ueFilters} updateSearch={updateUEs} />
         <div className={styles.results}>
@@ -87,10 +87,11 @@ export default function Page() {
             data={ues}
             totalResults={totalUesCount}
             baseRedirectUrl={'/ues'}
+            onEndReached={fetchNextItems}
             itemFactory={({ item }) => (
-              <div>
-                <h2>{item.code}</h2>
-                <p>{item.name}</p>
+              <div className={!item ? styles.glimmer : ''}>
+                <h2>{item?.code}</h2>
+                <p>{item?.name}</p>
               </div>
             )}
             getItemId={(ue) => ue.code}

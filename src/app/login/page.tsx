@@ -1,10 +1,10 @@
 'use client';
 import styles from './style.module.scss';
 import LoginForm from '@/components/auth/LoginForm';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { CasLoginRequestDto, CasLoginResponseDto } from '@/api/auth/casLogin';
 import { setToken } from '@/module/session';
-import { useAppDispatch } from '@/lib/hooks';
+import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import { useEffect, useState } from 'react';
 import { usePageSettings } from '@/module/pageSettings';
 import Button from '@/components/UI/Button';
@@ -16,7 +16,7 @@ import { Trans } from 'react-i18next';
 
 export default function LoginPage() {
   usePageSettings({ hasNavbar: false, permissions: 'public' });
-  const params = useSearchParams(); // TODO : replace it with useAppSelector(state => state.pageSettings.searchParams) (and verify it works)
+  const params = useAppSelector((state) => state.pageSettings.searchParams);
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { t } = useAppTranslation();
@@ -24,12 +24,12 @@ export default function LoginPage() {
   const [validatedToken, setValidatedToken] = useState(false);
   const api = useAPI();
   useEffect(() => {
-    if (!params.get('ticket') || validatedToken) return;
+    if (!params['ticket'] || validatedToken) return;
     setValidatedToken(true);
     api
       .post<CasLoginRequestDto, CasLoginResponseDto>('auth/signin/cas', {
-        ticket: params.get('ticket')!,
-        service: 'https://etu.assos.utt.fr/login',
+        ticket: params['ticket']!,
+        service: process.env.NEXT_PUBLIC_CAS_SERVICE!,
       })
       .on('success', (body) => {
         if (!body.signedIn) {
@@ -41,7 +41,7 @@ export default function LoginPage() {
         router.push('/');
       });
   }, []);
-  if (params.get('ticket') && !registerToken) {
+  if (params['ticket'] && !registerToken) {
     return <div>{t('login:connecting')}</div>;
   }
   if (registerToken) {

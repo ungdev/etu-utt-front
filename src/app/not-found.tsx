@@ -1,6 +1,6 @@
 'use client';
 
-import { usePageSettings } from "@/module/pageSettings";
+import { usePageSettings } from '@/module/pageSettings';
 
 export default function PageNotFound() {
   usePageSettings({});

@@ -1,15 +1,10 @@
 @import '@/variables.scss';
+@import '@/components/glimmer.scss';
 
 .searchUserPage {
   height: 100%;
   display: flex;
   flex-direction: column;
-
-  .title {
-    text-transform: uppercase;
-    color: $ung-dark-grey;
-    font-weight: 900;
-  }
 
   .content {
     display: flex;
@@ -21,7 +16,7 @@
     > * {
       background-color: white;
       border-radius: 15px;
-      border: #E7E7E7 solid 1px;
+      border: #e7e7e7 solid 1px;
       padding: 1rem;
       overflow-y: scroll;
     }
@@ -34,6 +29,31 @@
         display: flex;
         gap: 1rem;
         padding: 5px;
+
+        &.glimmer {
+          img {
+            background-color: $ung-light-grey;
+            opacity: 0.2;
+          }
+          p,
+          h2 {
+            @extend .glimmer-animated;
+            width: 16ch;
+
+            &:nth-child(2) {
+              width: 8ch;
+            }
+            &:nth-of-type(2) {
+              width: 18ch;
+            }
+            &:nth-of-type(3) {
+              width: 15ch;
+            }
+            &:nth-of-type(4) {
+              width: 10ch;
+            }
+          }
+        }
 
         img {
           width: 80px;
