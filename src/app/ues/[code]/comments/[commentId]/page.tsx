@@ -14,6 +14,7 @@ import { editCommentReply } from '@/api/commentReply/editCommentReply';
 import { useAPI } from '@/api/api';
 import { sendCommentReply } from '@/api/commentReply/sendCommentReply';
 import { usePageSettings } from '@/module/pageSettings';
+import Enter from '@/icons/Enter';
 
 function CommentEditorFooter(originalComment: string, onUpdate: (text: string) => void, t: TFunction) {
   return function CommentEditorFooter({ text, disable }: { text: string; disable: () => void }) {
@@ -69,32 +70,37 @@ export default function CommentDetailsPage() {
       <div className={styles.comments}>
         {comment.answers.map((answer, i) => (
           <div key={answer.id} className={styles.comment}>
-            <p className={styles.author}>
-              {answer.author
-                ? `${answer.author.firstName} ${answer.author.lastName}`
-                : t('ues:detailed.comments.author.deleted')}
-            </p>
-            <p className={styles.date}>
-              {t('ues:detailed.comments.writtenDate', { date: answer.createdAt.toLocaleDateString() })}
-            </p>
-            <EditableText
-              className={styles.body}
-              text={answer.body}
-              EditingFooter={CommentEditorFooter(
-                answer.body,
-                async (body) => {
-                  const newAnswer = await editCommentReply(api, answer.id, body).toPromise();
-                  if (!newAnswer) return false;
-                  setComment({
-                    ...comment,
-                    answers: [...comment.answers.slice(0, i), newAnswer, ...comment.answers.slice(i + 1)],
-                  });
-                  return true;
-                },
-                t,
-              )}
-              enabled={answer.author.id === user.id}
-            />
+            <div className={styles.sideIcon}>
+              <Enter className={styles.answerIcon} />
+            </div>
+            <div>
+              <p className={styles.author}>
+                {answer.author
+                  ? `${answer.author.firstName} ${answer.author.lastName}`
+                  : t('ues:detailed.comments.author.deleted')}
+              </p>
+              <p className={styles.date}>
+                {t('ues:detailed.comments.writtenDate', { date: answer.createdAt.toLocaleDateString() })}
+              </p>
+              <EditableText
+                className={styles.body}
+                text={answer.body}
+                EditingFooter={CommentEditorFooter(
+                  answer.body,
+                  async (body) => {
+                    const newAnswer = await editCommentReply(api, answer.id, body).toPromise();
+                    if (!newAnswer) return false;
+                    setComment({
+                      ...comment,
+                      answers: [...comment.answers.slice(0, i), newAnswer, ...comment.answers.slice(i + 1)],
+                    });
+                    return true;
+                  },
+                  t,
+                )}
+                enabled={answer.author.id === user.id}
+              />
+            </div>
           </div>
         ))}
       </div>

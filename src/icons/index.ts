@@ -21,6 +21,7 @@ import CircleCheck from './CircleCheck';
 import CircleWarning from './CircleWarning';
 import Clock from './Clock';
 import Rotate from './Rotate';
+import Enter from './Enter';
 
 const Icons = {
   Book,
@@ -29,6 +30,7 @@ const Icons = {
   CircleWarning,
   Clock,
   Collapse,
+  Enter,
   Home,
   Language,
   LeftArrow,
