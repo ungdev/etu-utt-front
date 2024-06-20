@@ -24,12 +24,14 @@ import ExamList from '@/components/ues/ExamList';
 import ExamSender from '@/components/ues/ExamSender';
 import Tooltip from '@/components/UI/Tooltip';
 import Link from '@/components/UI/Link';
+import { UserType } from '@/module/user';
 
 export default function UEDetailsPage() {
   usePageSettings({});
   const params = useParams<{ code: string }>();
   const { t } = useAppTranslation();
   const logged = useAppSelector((state) => state.session.logged);
+  const type = useAppSelector((state) => state.user?.type);
   const [ue, refreshUE] = useUE(params.code as string);
   const criteria = useUERateCriteria();
   const [myRates, setMyRates] = useGetRate(params.code);
@@ -192,50 +194,54 @@ export default function UEDetailsPage() {
             annalSemesters={annalSemesters}
             annalTypes={annalTypes}
           />
-          <div className={styles.thoughts}>
-            <h2>{t('ues:detailed.rates.title')}</h2>
-            <div className={[styles.rates, !criteria && styles.error].filter((c) => c).join(' ')}>
-              {criteria
-                ? Object.entries(ue.starVotes).map(([id, value]) => {
-                    const myRate = myRates?.find((rate) => rate.criterionId === id);
-                    return (
-                      <div key={id} className={styles.criterion}>
-                        <h3>{criteria.find((criterion): criterion is UERateCriterion => criterion.id === id)?.name}</h3>
-                        <StarRating stars={5} value={value} />
-                        {myRates && (
-                          <>
-                            <StarRating
-                              stars={5}
-                              value={myRate?.value ?? 0}
-                              onClick={(rate) => onRate(id as string, !!myRate, rate)}
-                            />
-                            {myRate && (
-                              <Button className={styles.deleteRate} onClick={() => deleteRate(id as string)}>
-                                {t('ues:detailed.rates.delete')}
-                              </Button>
-                            )}
-                          </>
-                        )}
-                      </div>
-                    );
-                  })
-                : t('ues:detailed.rates.error')}
+          {logged && (type === UserType.STUDENT || type === UserType.FORMER_STUDENT) && (
+            <div className={styles.thoughts}>
+              <h2>{t('ues:detailed.rates.title')}</h2>
+              <div className={[styles.rates, !criteria && styles.error].filter((c) => c).join(' ')}>
+                {criteria && ue.starVotes
+                  ? Object.entries(ue.starVotes).map(([id, value]) => {
+                      const myRate = myRates?.find((rate) => rate.criterionId === id);
+                      return (
+                        <div key={id} className={styles.criterion}>
+                          <h3>
+                            {criteria.find((criterion): criterion is UERateCriterion => criterion.id === id)?.name}
+                          </h3>
+                          <StarRating stars={5} value={value} />
+                          {myRates && (
+                            <>
+                              <StarRating
+                                stars={5}
+                                value={myRate?.value ?? 0}
+                                onClick={(rate) => onRate(id as string, !!myRate, rate)}
+                              />
+                              {myRate && (
+                                <Button className={styles.deleteRate} onClick={() => deleteRate(id as string)}>
+                                  {t('ues:detailed.rates.delete')}
+                                </Button>
+                              )}
+                            </>
+                          )}
+                        </div>
+                      );
+                    })
+                  : t('ues:detailed.rates.error')}
+              </div>
+              {logged && (type === UserType.STUDENT || type === UserType.FORMER_STUDENT) ? (
+                <>
+                  <div className={styles.writeComment}>
+                    {t('ues:detailed.comments.write')}
+                    <TextArea value={writtingComment} onChange={setWrittingComment} />
+                    <Button onClick={() => sendComment(api, ue.code, writtingComment, false)}>
+                      {t('ues:detailed.comments.write.send')}
+                    </Button>
+                  </div>
+                  <Comments code={params.code} />
+                </>
+              ) : (
+                t('ues:detailed.comments.loginRequired')
+              )}
             </div>
-            {logged ? (
-              <>
-                <div className={styles.writeComment}>
-                  {t('ues:detailed.comments.write')}
-                  <TextArea value={writtingComment} onChange={setWrittingComment} />
-                  <Button onClick={() => sendComment(api, ue.code, writtingComment, false)}>
-                    {t('ues:detailed.comments.write.send')}
-                  </Button>
-                </div>
-                <Comments code={params.code as string} />
-              </>
-            ) : (
-              t('ues:detailed.comments.loginRequired')
-            )}
-          </div>
+          )}
         </>
       ) : (
         <ExamSender
