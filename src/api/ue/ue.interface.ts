@@ -3,7 +3,7 @@ export interface UE {
   inscriptionCode: string;
   name: string;
   info: {
-    requirements: Array<{ code: string }>;
+    requirements: Array<string>;
     comment: string;
     degree: string;
     languages: string;

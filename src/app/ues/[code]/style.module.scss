@@ -1,6 +1,47 @@
 @import '@/variables';
 
 .page {
+  .header {
+    display: flex;
+    flex-flow: row nowrap;
+    gap: 1em;
+    justify-content: space-between;
+
+    .worktime {
+      display: flex;
+      flex-flow: row nowrap;
+      gap: 0.5rem;
+
+      & > * {
+        width: 4rem;
+        display: flex;
+        flex-flow: column nowrap;
+        justify-content: center;
+        align-items: center;
+        font-weight: bold;
+
+        & > :nth-child(1) {
+          font-size: 2em;
+
+          span {
+            font-size: 0.5em;
+          }
+        }
+
+        & > :nth-child(2) {
+          text-transform: uppercase;
+          color: $ung-light-grey;
+        }
+      }
+
+      .noWorkingTimeInfo {
+        width: auto;
+        font-style: italic;
+        color: $ung-light-grey;
+      }
+    }
+  }
+
   h1 {
     color: $ung-light-blue;
     font-size: 2.5rem;
@@ -20,28 +61,46 @@
     margin-top: 10px;
   }
 
+  .info,
+  .takeUEInfo {
+    padding: 1rem 0;
+  }
+
+  .takeUEInfo .info {
+    grid-template-columns: 20ch 1fr;
+
+    .clipboardCopy {
+      cursor: pointer;
+      display: inline-block;
+    }
+  }
+
   .info {
-    display: flex;
-    gap: 2rem;
-    justify-content: center;
-    flex-wrap: wrap;
-    margin: 5rem 0;
+    display: grid;
+    grid-template-columns: 15ch 1fr;
+    gap: 8px;
 
-    .generalInfo,
-    .workTime,
-    .takeUEInfo {
-      border: $ung-dark-grey 3px solid;
-      border-radius: 20px;
-      padding: 3rem;
+    .empty {
+      color: $ung-light-grey;
+      font-style: italic;
+    }
 
-      & > h2 {
-        text-align: center;
-        margin-bottom: 0.5rem;
-      }
+    & > :nth-child(2n + 1) {
+      font-weight: bold;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    & > :nth-child(2n) {
+      text-align: justify;
     }
   }
 
   .thoughts {
+    position: relative;
+    padding: 2rem 0;
+
     & > h2 {
       margin-bottom: 1rem;
       color: $ung-light-blue;
@@ -52,6 +111,12 @@
       flex-wrap: wrap;
       gap: 10%;
       justify-content: center;
+
+      &.error {
+        display: block;
+        font-style: italic;
+        color: $ung-light-grey;
+      }
 
       .criterion {
         margin-top: 30px;

@@ -3,6 +3,7 @@
 .tooltipContainer {
   position: relative;
   display: inline-block;
+  cursor: help;
 
   & > .tooltip {
     display: none;
@@ -18,6 +19,8 @@
     font-weight: bold;
     color: $light-gray;
     text-wrap: nowrap;
+    z-index: 100;
+    pointer-events: none;
 
     &::before {
       content: '';
