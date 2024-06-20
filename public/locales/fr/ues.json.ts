@@ -46,10 +46,9 @@ export default {
   'detailed.comments.writtenDate': 'Écrit le {{date}}',
   'detailed.comments.conversation.see': 'Voir la conversation ({{responseCount}} réponses)',
   'detailed.comments.conversation.see.empty': 'Répondre',
-  'detailed.comments.resume':
-    "Commentaire de {{authorFirstName}} {{authorLastName}} sur l'UE {{ue}} au semestre {{semester}} ({{date}})",
+  'detailed.comments.resume': "Commentaire sur l'UE {{ue}}",
+  'detailed.comments.semester': 'Semestre {{semester}}',
   'detailed.comments.updatedAt': 'Mis à jour le {{date}}',
-  'detailed.comments.resume.anonymous': "Commentaire anonyme sur l'UE {{ue}} au semestre {{semester}} ({{date}})",
   'detailed.comments.answers.answerTitle': 'Répondre dans ce fil de discussion',
   'detailed.comments.answers.answerButton': 'Envoyer',
   'detailed.comments.answers.answerEntry': 'Tapez votre réponse ici',

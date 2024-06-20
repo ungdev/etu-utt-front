@@ -9,8 +9,19 @@
     color: $ung-light-blue;
   }
 
-  & > .body {
-    margin-top: 1.5rem;
+  .meta {
+    margin: 1rem 0;
+
+    svg {
+      width: 1em;
+      height: 1.1em;
+      vertical-align: bottom;
+    }
+    & > * {
+      display: flex;
+      flex-flow: row nowrap;
+      gap: 5px;
+    }
   }
 
   .updateDate {

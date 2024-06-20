@@ -15,6 +15,10 @@ import { useAPI } from '@/api/api';
 import { sendCommentReply } from '@/api/commentReply/sendCommentReply';
 import { usePageSettings } from '@/module/pageSettings';
 import Enter from '@/icons/Enter';
+import User from '@/icons/User';
+import Comment from '@/icons/Comment';
+import Clock from '@/icons/Clock';
+import Link from '@/components/UI/Link';
 
 function CommentEditorFooter(originalComment: string, onUpdate: (text: string) => void, t: TFunction) {
   return function CommentEditorFooter({ text, disable }: { text: string; disable: () => void }) {
@@ -47,25 +51,33 @@ export default function CommentDetailsPage() {
   return (
     <div className={styles.page}>
       <h1>
-        {comment.isAnonymous
-          ? t('ues:detailed.comments.resume.anonymous', {
-              ue: ue.code,
-              semester: comment.semester.code,
-              date: comment.createdAt.toLocaleDateString(),
-            })
-          : t('ues:detailed.comments.resume', {
-              authorFirstName: comment.author.firstName,
-              authorLastName: comment.author.lastName,
-              ue: ue.code,
-              semester: comment.semester.code,
-              date: comment.createdAt.toLocaleDateString(),
-            })}
+        {t('ues:detailed.comments.resume', {
+          ue: ue.code,
+        })}
       </h1>
-      {comment.updatedAt && (
-        <p className={styles.updateDate}>
-          {t('ues:detailed.comments.updatedAt', { date: comment.updatedAt.toLocaleDateString() })}
-        </p>
-      )}
+      <div className={styles.meta}>
+        {!comment.isAnonymous && (
+          <div>
+            <User />
+            <Link href={`/users/${comment.author.id}`} noStyle>
+              {comment.author.firstName} {comment.author.lastName}
+            </Link>
+          </div>
+        )}
+        <div>
+          <Comment />
+          {t('ues:detailed.comments.semester', { semester: comment.semester.code })}
+        </div>
+        <div>
+          <Clock />
+          <div>
+            <div>{t('ues:detailed.comments.writtenDate', { date: comment.createdAt.toLocaleDateString() })}</div>
+            {comment.updatedAt && (
+              <div>{t('ues:detailed.comments.updatedAt', { date: comment.updatedAt.toLocaleDateString() })}</div>
+            )}
+          </div>
+        </div>
+      </div>
       <p className={styles.body}>{comment.body}</p>
       <div className={styles.comments}>
         {comment.answers.map((answer, i) => (
@@ -75,9 +87,13 @@ export default function CommentDetailsPage() {
             </div>
             <div>
               <p className={styles.author}>
-                {answer.author
-                  ? `${answer.author.firstName} ${answer.author.lastName}`
-                  : t('ues:detailed.comments.author.deleted')}
+                {answer.author ? (
+                  <Link href={`/users/${answer.author.id}`} noStyle>
+                    {answer.author.firstName} {answer.author.lastName}
+                  </Link>
+                ) : (
+                  t('ues:detailed.comments.author.deleted')
+                )}
               </p>
               <p className={styles.date}>
                 {t('ues:detailed.comments.writtenDate', { date: answer.createdAt.toLocaleDateString() })}
