@@ -34,10 +34,12 @@ export const constantDataSlice = createSlice({
 const { setCriteria, setBranches, setCreditCategories } = constantDataSlice.actions;
 
 export function useUERateCriteria(): UERateCriterion[] | null {
+  const logged = useAppSelector((state) => state.session.logged);
   const ueRateCriteria = useAppSelector((state) => state.constantData.ueRateCriteria);
   const dispatch = useAppDispatch();
   const api = useAPI();
   useEffect(() => {
+    if (!logged) return;
     if (ueRateCriteria === null) {
       fetchUERateCriteria(api).then((criteria) => criteria && dispatch(setCriteria(criteria)));
     }

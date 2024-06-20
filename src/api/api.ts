@@ -1,5 +1,6 @@
 import { apiTimeout, apiUrl, apiVersion } from '@/utils/environment';
 import { StatusCodes } from 'http-status-codes';
+import { notFound } from "next/navigation";
 
 /**
  * The type of error that can be produced while making a request to the API.

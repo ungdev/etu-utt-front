@@ -31,13 +31,13 @@ export default function UEDetailsPage() {
   const [ue, refreshUE] = useUE(params.code as string);
   const criteria = useUERateCriteria();
   const [myRates, setMyRates] = useGetRate(params.code);
-  const [writtingComment, setWrittingComment] = useState<string>('');
+  const [writingComment, setWritingComment] = useState<string>('');
   const [annals, , addAnnal] = useAnnals(params.code);
   const [annalTypes, annalSemesters] = useAnnalMetadata(params.code);
   const [isAnnalUploaderOpen, setAnnalUploaderOpen] = useState(false);
   const api = useAPI();
 
-  if (!ue || !criteria || (!myRates && logged)) {
+  if (!ue || (logged && !criteria && !myRates && !annals && !annalTypes && !annalSemesters)) {
     return false;
   }
 
@@ -131,7 +131,7 @@ export default function UEDetailsPage() {
                 const myRate = myRates?.find((rate) => rate.criterionId === id);
                 return (
                   <div key={id} className={styles.criterion}>
-                    <h3>{criteria.find((criterion): criterion is UERateCriterion => criterion.id === id)?.name}</h3>
+                    <h3>{(criteria as UERateCriterion[]).find((criterion) => criterion.id === id)?.name}</h3>
                     <StarRating stars={5} value={value} />
                     {myRates && (
                       <>
@@ -155,8 +155,8 @@ export default function UEDetailsPage() {
               <>
                 <div className={styles.writeComment}>
                   {t('ues:detailed.comments.write')}
-                  <TextArea value={writtingComment} onChange={setWrittingComment} />
-                  <Button onClick={() => sendComment(api, ue.code, writtingComment, false)}>
+                  <TextArea value={writingComment} onChange={setWritingComment} />
+                  <Button onClick={() => sendComment(api, ue.code, writingComment, false)}>
                     {t('ues:detailed.comments.write.send')}
                   </Button>
                 </div>

@@ -1,16 +1,19 @@
 import { useEffect, useState } from 'react';
 import { API, useAPI } from '@/api/api';
 import { Annal } from '@/api/annals/annal.interface';
+import { useAppSelector } from "@/lib/hooks";
 
 export default function useAnnals(
   code: string,
 ): [Annal[] | null, (index: number, exam: Annal) => void, (exam: Annal) => void] {
+  const logged = useAppSelector((state) => state.session.logged)
   const [annals, setAnnals] = useState<Annal[] | null>(null);
   const api = useAPI();
 
   useEffect(() => {
+    if (!logged) return;
     api.get<Annal[]>(`/ue/annals?ueCode=${code}`, { timeoutMillis: 15 * 1000 }).on('success', setAnnals);
-  }, []);
+  }, [logged]);
 
   return [
     annals,
