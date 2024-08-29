@@ -2,6 +2,7 @@ import styles from './SelectFilter.module.scss';
 import { FC, useEffect, useRef, useState } from 'react';
 import { NotParameteredTranslationKey, useAppTranslation } from '@/lib/i18n';
 import { BaseFilterProps } from '@/components/filteredSearch/FilteredSearch';
+import Select from '@/components/UI/Select';
 
 export function SelectFilter<Choices extends string>({
   onUpdate,
@@ -27,22 +28,17 @@ export function SelectFilter<Choices extends string>({
   return (
     <div className={styles.filter}>
       <h3 className={styles.title}>{t(title)}</h3>
-      <label key={'all'} className={styles.option}>
-        <input type={'radio'} name={title} value={'all'} onChange={() => setValue('all')} checked={value === 'all'} />
-        {t('common:filter.all')}
-      </label>
-      {choices.map((choice) => (
-        <label key={choice} className={styles.option}>
-          <input
-            type={'radio'}
-            name={title}
-            value={choice}
-            onChange={() => setValue(choice)}
-            checked={value === choice}
-          />
-          {humanReadableMapping ? t(humanReadableMapping[choice]) : choice}
-        </label>
-      ))}
+      <Select<Choices | 'all'>
+        options={[
+          { id: 'all', name: t('common:filter.all') },
+          ...choices.map((choice) => ({
+            id: choice,
+            name: humanReadableMapping ? t(humanReadableMapping[choice]) : choice,
+          })),
+        ]}
+        onSelect={setValue}
+        value={value}
+      />
     </div>
   );
 }
