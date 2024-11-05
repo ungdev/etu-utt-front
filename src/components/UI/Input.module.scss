@@ -1,15 +1,14 @@
 @import '@/variables';
 
-
 .inputWrapper {
   display: flex;
   border-radius: 10px;
   border: 3px solid #D3D3D3;
-  background-color: #F0F0F2;
+  background-color: $light-gray;
 
   input {
-    background-color: #F0F0F2;
-    color: #444C5F;
+    background-color: $light-gray;
+    color: $ung-light-grey;
     border-radius: 7px;
     padding: 10px 15px;
     border: none;
@@ -36,7 +35,7 @@
     }
 
     svg {
-      color: #F0F0F2;
+      color: $light-gray;
     }
   }
 }
