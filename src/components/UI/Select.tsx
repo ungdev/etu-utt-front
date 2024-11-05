@@ -14,10 +14,7 @@ export default function Select<Choices extends string = string>({
   return (
     <select
       value={value}
-      onChange={(event) => {
-        console.log(event.currentTarget.value);
-        onSelect(event.currentTarget.value as Choices);
-      }}
+      onChange={(event) => onSelect(event.currentTarget.value as Choices)}
       className={`${styles.select} ${className}`}>
       {options.map((option) => (
         <option key={option.id} value={option.id}>
