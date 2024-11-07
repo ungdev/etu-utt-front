@@ -2,7 +2,7 @@
 
 import styles from './style.module.scss';
 import { useParams } from 'next/navigation';
-import useUE from '@/api/ue/fetchUEs';
+import useUe from '@/api/ue/fetchUe';
 import { useAppSelector } from '@/lib/hooks';
 import Comments from '@/app/ues/[code]/Comments';
 import { useAppTranslation } from '@/lib/i18n';
@@ -28,10 +28,10 @@ export default function UEDetailsPage() {
   const params = useParams<{ code: string }>();
   const { t } = useAppTranslation();
   const logged = useAppSelector((state) => state.session.logged);
-  const [ue, refreshUE] = useUE(params.code as string);
+  const [ue, refreshUE] = useUe(params.code);
   const criteria = useUERateCriteria();
   const [myRates, setMyRates] = useGetRate(params.code);
-  const [writtingComment, setWrittingComment] = useState<string>('');
+  const [writingComment, setWritingComment] = useState<string>('');
   const [annals, , addAnnal] = useAnnals(params.code);
   const [annalTypes, annalSemesters] = useAnnalMetadata(params.code);
   const [isAnnalUploaderOpen, setAnnalUploaderOpen] = useState(false);
@@ -155,8 +155,8 @@ export default function UEDetailsPage() {
               <>
                 <div className={styles.writeComment}>
                   {t('ues:detailed.comments.write')}
-                  <TextArea value={writtingComment} onChange={setWrittingComment} />
-                  <Button onClick={() => sendComment(api, ue.code, writtingComment, false)}>
+                  <TextArea value={writingComment} onChange={setWritingComment} />
+                  <Button onClick={() => sendComment(api, ue.code, writingComment, false)}>
                     {t('ues:detailed.comments.write.send')}
                   </Button>
                 </div>

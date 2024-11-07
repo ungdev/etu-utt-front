@@ -1,5 +1,6 @@
 import { apiTimeout, apiUrl, apiVersion } from '@/utils/environment';
 import { StatusCodes } from 'http-status-codes';
+import { useSetNotFound } from '@/module/pageSettings';
 
 /**
  * The type of error that can be produced while making a request to the API.
@@ -256,28 +257,29 @@ export const setAuthorizationToken = (token: string) => {
  */
 // TODO : wellll, implement that page settings thingy once it's merged.
 export function useAPI(): API {
+  const setNotFound = useSetNotFound();
   return {
     get: <ResponseType = never>(
       route: string,
       options: { timeoutMillis?: number; version?: string; isFile?: boolean } = {},
-    ) => applyDefaultHandler(requestAPI<never, ResponseType>('GET', route, null, options)),
+    ) => applyDefaultHandler(requestAPI<never, ResponseType>('GET', route, null, options), setNotFound),
     post: <RequestType, ResponseType = never>(
       route: string,
       body = {} as RequestType,
       options: { version?: string; isFile?: boolean } = {},
-    ) => applyDefaultHandler(requestAPI<RequestType, ResponseType>('POST', route, body, options)),
+    ) => applyDefaultHandler(requestAPI<RequestType, ResponseType>('POST', route, body, options), setNotFound),
     put: <RequestType, ResponseType = never>(
       route: string,
       body = {} as RequestType,
       options: { version?: string; isFile?: boolean } = {},
-    ) => applyDefaultHandler(requestAPI<RequestType, ResponseType>('PUT', route, body, options)),
+    ) => applyDefaultHandler(requestAPI<RequestType, ResponseType>('PUT', route, body, options), setNotFound),
     patch: <RequestType, ResponseType = never>(
       route: string,
       body = {} as RequestType,
       options: { version?: string; isFile?: boolean } = {},
-    ) => applyDefaultHandler(requestAPI<RequestType, ResponseType>('PATCH', route, body, options)),
+    ) => applyDefaultHandler(requestAPI<RequestType, ResponseType>('PATCH', route, body, options), setNotFound),
     delete: <ResponseType = never>(route: string, options: { version?: string } = {}) =>
-      applyDefaultHandler(requestAPI<never, ResponseType>('DELETE', route, null, options)),
+      applyDefaultHandler(requestAPI<never, ResponseType>('DELETE', route, null, options), setNotFound),
   };
 }
 
@@ -311,10 +313,12 @@ export interface API {
 /**
  * Apply the default handler to a response handler.
  * @param handler The response handler we need to apply the default handler to.
+ * @param setNotFound A function that can be called to set the current route as "not found".
  */
-function applyDefaultHandler<T>(handler: ResponseHandler<T>) {
+function applyDefaultHandler<T>(handler: ResponseHandler<T>, setNotFound: () => void) {
   return handler
     .on('success', (body) => body)
     .on('failure', () => console.log('Failed to make request'))
-    .on('error', () => console.log('Error !'));
+    .on('error', () => console.log('Error !'))
+    .on(404, setNotFound);
 }
