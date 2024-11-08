@@ -11,7 +11,7 @@ export default function TodaysBirthdaysWidget() {
       title={t('homepage:todaysBirthdays.title')}
       subtitle={t('homepage:todaysBirthdays.subtitle')}
       className={styles.widget}>
-      {users !== null
+      {users
         ? users.length === 0
           ? t('homepage:todaysBirthdays.noBirthdays')
           : users.map((user) => (

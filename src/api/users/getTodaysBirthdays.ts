@@ -1,12 +1,18 @@
 import { useEffect, useState } from 'react';
 import { useAPI } from '@/api/api';
 import { User } from '@/api/users/user.interface';
+import { useLoggedIn } from '@/module/session';
 
-export default function useTodaysBirthdays(): User[] | null {
-  const [users, setUsers] = useState<User[] | null>(null);
+export default function useTodaysBirthdays(): User[] | null | undefined {
+  const [users, setUsers] = useState<User[] | null | undefined>(undefined);
   const api = useAPI();
+  const logged = useLoggedIn();
   useEffect(() => {
-    api.get<User[]>('/users/birthdays/today').on('success', setUsers);
+    if (logged && !users) {
+      api.get<User[]>('/users/birthdays/today').on('success', setUsers);
+    } else if (!logged) {
+      setUsers(null);
+    }
   }, []);
   return users;
 }

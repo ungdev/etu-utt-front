@@ -34,8 +34,8 @@ export default function ExamList({
 }: {
   annals: Annal[] | null;
   setAnnalUploaderOpen: (opened: boolean) => void;
-  annalTypes: AnnalType[] | null;
-  annalSemesters: string[] | null;
+  annalTypes: AnnalType[];
+  annalSemesters: string[];
 }) {
   const type = useAppSelector((state) => state.user?.type);
   const userId = useAppSelector((state) => state.user?.id);

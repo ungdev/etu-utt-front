@@ -1,15 +1,21 @@
 import { useEffect, useState } from 'react';
 import { API, useAPI } from '@/api/api';
 import { Annal } from '@/api/annals/annal.interface';
+import { useLoggedIn } from '@/module/session';
 
 export default function useAnnals(
   code: string,
-): [Annal[] | null, (index: number, exam: Annal) => void, (exam: Annal) => void] {
-  const [annals, setAnnals] = useState<Annal[] | null>(null);
+): [Annal[] | null | undefined, (index: number, exam: Annal) => void, (exam: Annal) => void] {
+  const [annals, setAnnals] = useState<Annal[] | null | undefined>(undefined);
   const api = useAPI();
+  const logged = useLoggedIn();
 
   useEffect(() => {
-    api.get<Annal[]>(`/ue/annals?ueCode=${code}`, { timeoutMillis: 15 * 1000 }).on('success', setAnnals);
+    if (logged && !annals) {
+      api.get<Annal[]>(`/ue/annals?ueCode=${code}`, { timeoutMillis: 15 * 1000 }).on('success', setAnnals);
+    } else if (!logged) {
+      setAnnals(null);
+    }
   }, []);
 
   return [

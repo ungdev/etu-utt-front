@@ -15,8 +15,8 @@ export default function ExamSender({
   setAnnalUploaderOpen,
 }: {
   ueCode: string;
-  annalTypes: AnnalType[] | null;
-  annalSemesters: string[] | null;
+  annalTypes: AnnalType[];
+  annalSemesters: string[];
   addAnnal: (annal: Annal) => void;
   setAnnalUploaderOpen: (open: boolean) => void;
 }) {

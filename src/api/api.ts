@@ -326,7 +326,9 @@ export interface API {
 function applyDefaultHandler<T>(handler: ResponseHandler<T>, setNotFound: () => void) {
   return handler
     .on('success', (body) => body)
-    .on('failure', () => toast.error('Could not connect to the API'))
+    .on('failure', () => {
+      toast.error('Could not connect to the API');
+    })
     .on('error', () => {
       toast.error('Request resulted in an error');
     })

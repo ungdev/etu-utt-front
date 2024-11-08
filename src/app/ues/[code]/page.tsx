@@ -3,7 +3,6 @@
 import styles from './style.module.scss';
 import { useParams } from 'next/navigation';
 import useUe from '@/api/ue/fetchUe';
-import { useAppSelector } from '@/lib/hooks';
 import Comments from '@/app/ues/[code]/Comments';
 import { useAppTranslation } from '@/lib/i18n';
 import { useUERateCriteria } from '@/module/constantData';
@@ -22,12 +21,13 @@ import useAnnals from '@/api/annals/fetchAnnals';
 import useAnnalMetadata from '@/api/annals/fetchMetadata';
 import ExamList from '@/components/ues/ExamList';
 import ExamSender from '@/components/ues/ExamSender';
+import { useLoggedIn } from '@/module/session';
 
 export default function UEDetailsPage() {
   usePageSettings({});
   const params = useParams<{ code: string }>();
   const { t } = useAppTranslation();
-  const logged = useAppSelector((state) => state.session.logged);
+  const logged = useLoggedIn();
   const [ue, refreshUE] = useUe(params.code);
   const criteria = useUERateCriteria();
   const [myRates, setMyRates] = useGetRate(params.code);
@@ -37,7 +37,7 @@ export default function UEDetailsPage() {
   const [isAnnalUploaderOpen, setAnnalUploaderOpen] = useState(false);
   const api = useAPI();
 
-  if (!ue || !criteria || (!myRates && logged)) {
+  if (!ue || !criteria || myRates === undefined) {
     return false;
   }
 
@@ -118,12 +118,14 @@ export default function UEDetailsPage() {
                 : ue.info.requirements.toString()}
             </div>
           </div>
-          <ExamList
-            annals={annals}
-            setAnnalUploaderOpen={setAnnalUploaderOpen}
-            annalSemesters={annalSemesters}
-            annalTypes={annalTypes}
-          />
+          {annals && annalSemesters && annalTypes && (
+            <ExamList
+              annals={annals}
+              setAnnalUploaderOpen={setAnnalUploaderOpen}
+              annalSemesters={annalSemesters}
+              annalTypes={annalTypes}
+            />
+          )}
           <div className={styles.thoughts}>
             <h2>Avis des étudiants</h2>
             <div className={styles.rates}>
@@ -168,13 +170,16 @@ export default function UEDetailsPage() {
           </div>
         </>
       ) : (
-        <ExamSender
-          ueCode={params.code}
-          addAnnal={addAnnal}
-          setAnnalUploaderOpen={setAnnalUploaderOpen}
-          annalSemesters={annalSemesters}
-          annalTypes={annalTypes}
-        />
+        annalSemesters &&
+        annalTypes && (
+          <ExamSender
+            ueCode={params.code}
+            addAnnal={addAnnal}
+            setAnnalUploaderOpen={setAnnalUploaderOpen}
+            annalSemesters={annalSemesters}
+            annalTypes={annalTypes}
+          />
+        )
       )}
     </div>
   );

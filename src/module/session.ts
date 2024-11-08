@@ -8,6 +8,7 @@ import { setUser } from '@/module/user';
 import { API, setAuthorizationToken } from '@/api/api';
 import { fetchProfile } from '@/api/profile/fetchProfile';
 import { CookieNames, getCookie, setCookie } from '@/module/cookies';
+import { useAppSelector } from '@/lib/hooks';
 
 interface SessionSlice {
   logged: boolean;
@@ -84,6 +85,10 @@ export function setToken(token: string | null, api?: API): AppThunk {
     const user = await fetchProfile(api!).toPromise();
     dispatch(setUser(user ?? null));
   };
+}
+
+export function useLoggedIn() {
+  return useAppSelector((state) => state.session.logged);
 }
 
 export default sessionSlice.reducer;
