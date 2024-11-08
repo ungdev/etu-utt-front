@@ -1,6 +1,7 @@
 import { apiTimeout, apiUrl, apiVersion } from '@/utils/environment';
 import { StatusCodes } from 'http-status-codes';
 import { useSetNotFound } from '@/module/pageSettings';
+import { toast } from 'react-toastify';
 
 /**
  * The type of error that can be produced while making a request to the API.
@@ -60,11 +61,12 @@ type RawResponseType<T> = T extends Date
  * }
  */
 export class ResponseHandler<T, R = undefined> {
-  private readonly handlers: { [status: number]: (body: T) => R | void } & Partial<{
-    [status in ResponseError | 'success' | 'error' | 'failure']: status extends 'success'
-      ? (body: T) => R | void
-      : () => R | void;
-  }> = {};
+  private readonly handlers: Partial<Record<number | 'success', (body: T) => R | void>> &
+    Partial<{
+      success: (body: T) => R | void;
+    }> &
+    Partial<{ failure: (error: number) => R | void }> &
+    Partial<Record<ResponseError | 'success' | 'error' | 'failure', () => R | void>> = {};
   private readonly promise: Promise<R | void>;
 
   constructor(rawResponse: Promise<APIResponse<T>>) {
@@ -77,7 +79,7 @@ export class ResponseHandler<T, R = undefined> {
             : undefined;
       }
       if (response.code in this.handlers) {
-        return this.handlers[response.code](response.body);
+        return this.handlers[response.code]!(response.body);
       }
       if (response.code < 400) {
         return 'success' in this.handlers ? this.handlers.success!(response.body) : undefined;
@@ -88,9 +90,14 @@ export class ResponseHandler<T, R = undefined> {
 
   on<E, P extends number | ResponseError | 'success' | 'error' | 'failure'>(
     statusCode: P,
-    handler: P extends number | 'success' ? (body: T) => E | void : () => E | void,
+    handler: P extends number | 'success'
+      ? (body: T) => E | void
+      : P extends 'failure'
+        ? (error: number) => E | void
+        : () => E | void,
   ): ResponseHandler<T, R | E> {
-    this.handlers[statusCode] = handler as (body?: T) => R | void;
+    // @ts-expect-error TS2322
+    this.handlers[statusCode] = handler;
     return this;
   }
 
@@ -124,6 +131,7 @@ function formatResponse<T>(rawResponse: RawResponseType<T>): T {
  * @param body The body of the request.
  * @param timeoutMillis The timeout of the request.
  * @param version The version of the API to use : v1, v2, ...
+ * @param isFile If what we are sending/fetching is a file.
  */
 
 async function internalRequestAPI<RequestType>(
@@ -318,7 +326,9 @@ export interface API {
 function applyDefaultHandler<T>(handler: ResponseHandler<T>, setNotFound: () => void) {
   return handler
     .on('success', (body) => body)
-    .on('failure', () => console.log('Failed to make request'))
-    .on('error', () => console.log('Error !'))
+    .on('failure', () => toast.error('Could not connect to the API'))
+    .on('error', () => {
+      toast.error('Request resulted in an error');
+    })
     .on(404, setNotFound);
 }
