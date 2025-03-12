@@ -25,6 +25,50 @@
       flex-grow: 1;
       height: 100%;
 
+      .container {
+        width: 100%;
+      }
+
+      .headerLayout {
+        width: 100%;
+        display: flex;
+        flex-flow: row wrap;
+        justify-content: space-between;
+
+        .metaContainer {
+          display: flex;
+          flex-flow: column wrap;
+
+          .sideData {
+            width: 100%;
+            display: flex;
+            gap: 1ch;
+            flex-flow: row wrap;
+            justify-content: end;
+          }
+
+          .label {
+            text-transform: uppercase;
+            font-size: 0.8em;
+            color: $ung-light-grey;
+          }
+
+          .credits,
+          .languages,
+          .minors,
+          .requirements {
+            display: flex;
+            flex-flow: row wrap;
+            gap: 0.5ch;
+            align-items: baseline;
+
+            .categoryLabel {
+              margin-left: 0.2ch;
+            }
+          }
+        }
+      }
+
       .glimmer {
         p,
         h2 {

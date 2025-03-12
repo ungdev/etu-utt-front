@@ -103,7 +103,7 @@ export class ResponseHandler<T, R = undefined> {
  * @param rawResponse The raw response from the API.
  */
 function formatResponse<T>(rawResponse: RawResponseType<T>): T {
-  if (typeof rawResponse === 'string' && !isNaN(Date.parse(rawResponse))) {
+  if (typeof rawResponse === 'string' && rawResponse.search(/^\d{4}(?:-\d{2}){2}T(?:\d{2}:){2}\d{2}\.\d{3}Z$/) === 0) {
     return new Date(rawResponse) as T;
   } else if (Array.isArray(rawResponse)) {
     return rawResponse.map(formatResponse) as T;

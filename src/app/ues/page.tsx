@@ -12,6 +12,7 @@ import { Branch } from '@/api/branch/branch.interface';
 import { useBranches, useCreditCategories } from '@/module/constantData';
 import { useMemo } from 'react';
 import { CreditCategory } from '@/api/credit/credit.interface';
+import Tooltip from '@/components/UI/Tooltip';
 
 /**
  * The different filters that exist.
@@ -97,8 +98,53 @@ export default function Page() {
             baseRedirectUrl={'/ues'}
             onEndReached={fetchNextItems}
             itemFactory={({ item }) => (
-              <div className={!item ? styles.glimmer : ''}>
-                <h2>{item?.code}</h2>
+              <div className={!item ? styles.glimmer : styles.container}>
+                <div className={styles.headerLayout}>
+                  <h2>{item?.code}</h2>
+                  <div className={styles.metaContainer}>
+                    <div className={styles.sideData}>
+                      <div className={styles.credits}>
+                        <span className={styles.label}>{t('ues:overview.credits')}</span>
+                        {item?.credits
+                          ?.sort((a, b) => a.category.name > b.category.name)
+                          .map((credit) => (
+                            <div key={credit.category.code}>
+                              {credit.credits}
+                              <span className={styles.categoryLabel}>
+                                <Tooltip content={credit.category.name}>{credit.category.code}</Tooltip>
+                              </span>
+                            </div>
+                          ))}
+                      </div>
+                      <div className={styles.languages}>
+                        <span className={[styles.taughtIn, styles.label].join(' ')}>{t('ues:overview.taughtIn')}</span>
+                        {item?.info.languages.map((language) => <span key={language}>{language}</span>)}
+                      </div>
+                    </div>
+                    <div className={styles.sideData}>
+                      {item?.info.minors.length ? (
+                        <div className={styles.minors}>
+                          <span className={[styles.label, styles.categoryLabel].join(' ')}>
+                            {t('ues:overview.minors')}
+                          </span>
+                          {item?.info.minors.map((minor) => <span key={minor}>{minor}</span>)}
+                        </div>
+                      ) : (
+                        ''
+                      )}
+                      {item?.info?.requirements?.length ? (
+                        <div className={[styles.requirements, styles.categoryLabel].join(' ')}>
+                          <Tooltip content={item?.info?.requirements?.join(', ')}>
+                            {item?.info?.requirements?.length}{' '}
+                            <span className={styles.label}>{t('ues:overview.requirements')}</span>
+                          </Tooltip>
+                        </div>
+                      ) : (
+                        ''
+                      )}
+                    </div>
+                  </div>
+                </div>
                 <p>{item?.name}</p>
               </div>
             )}
