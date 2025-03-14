@@ -8,6 +8,7 @@ import { StatusCodes } from 'http-status-codes';
 export enum ResponseError {
   'not_json',
   'timeout',
+  'aborted',
   'unknown',
 }
 
@@ -65,8 +66,10 @@ export class ResponseHandler<T, R = undefined> {
       : () => R | void;
   }> = {};
   private readonly promise: Promise<R | void>;
+  public readonly abortController: AbortController;
 
-  constructor(rawResponse: Promise<APIResponse<T>>) {
+  constructor(rawResponse: Promise<APIResponse<T>>, abortController: AbortController) {
+    this.abortController = abortController;
     this.promise = rawResponse.then((response) => {
       if ('error' in response) {
         return this.handlers[response.error]
@@ -132,6 +135,7 @@ async function internalRequestAPI<RequestType>(
   timeoutMillis: number,
   version: string,
   isFile: true,
+  abortController: AbortController,
 ): Promise<APIResponse<Blob>>;
 async function internalRequestAPI<RequestType, ResponseType>(
   method: string,
@@ -140,6 +144,7 @@ async function internalRequestAPI<RequestType, ResponseType>(
   timeoutMillis: number,
   version: string,
   isFile: boolean,
+  abortController: AbortController,
 ): Promise<APIResponse<ResponseType>>;
 async function internalRequestAPI<RequestType, ResponseType>(
   method: string,
@@ -148,6 +153,7 @@ async function internalRequestAPI<RequestType, ResponseType>(
   timeoutMillis: number,
   version: string,
   isFile: boolean,
+  abortController: AbortController,
 ): Promise<APIResponse<ResponseType | Blob>> {
   // Generate headers
   const headers = new Headers();
@@ -155,7 +161,6 @@ async function internalRequestAPI<RequestType, ResponseType>(
   if (!isFile) headers.append('Content-Type', 'application/json');
 
   // Add timeout to the request
-  const abortController = new AbortController();
   const timeout = setTimeout(() => {
     abortController.abort();
   }, timeoutMillis);
@@ -194,6 +199,7 @@ async function internalRequestAPI<RequestType, ResponseType>(
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
+    if (error === 'query-update') return { error: ResponseError.aborted };
     if (error instanceof Error && error.name === 'AbortError') {
       console.error('Request timed out');
       return { error: ResponseError.timeout };
@@ -241,7 +247,11 @@ function requestAPI<RequestType, ResponseType>(
     isFile = false,
   }: { timeoutMillis?: number; version?: string; isFile?: boolean } = {},
 ): ResponseHandler<ResponseType> {
-  return new ResponseHandler(internalRequestAPI(method, route, body, timeoutMillis, version, isFile));
+  const abortController = new AbortController();
+  return new ResponseHandler(
+    internalRequestAPI(method, route, body, timeoutMillis, version, isFile, abortController),
+    abortController,
+  );
 }
 
 // Set the authorization header with the given token for next requests

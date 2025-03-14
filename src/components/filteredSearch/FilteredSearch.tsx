@@ -135,7 +135,7 @@ export default function FilteredSearch<
     });
   }, [searchParams]);
 
-  // When filters are modified, update the search after 1 second.
+  // When filters are modified, update the search after 1/3 second.
   useEffect(() => {
     const now = Date.now();
     switch (updateType.current) {
@@ -149,7 +149,7 @@ export default function FilteredSearch<
           if (lastUpdate.value === now) {
             callUpdateSearch();
           }
-        }, 300);
+        }, 333);
         break;
     }
     updateType.current = FilterUpdateType.NoUpdate;

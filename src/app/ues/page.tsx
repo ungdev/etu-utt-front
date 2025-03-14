@@ -107,8 +107,8 @@ export default function Page() {
                         <span className={styles.label}>{t('ues:overview.credits')}</span>
                         {item?.credits
                           ?.sort((a, b) => a.category.name > b.category.name)
-                          .map((credit) => (
-                            <div key={credit.category.code}>
+                          .map((credit, i) => (
+                            <div key={`${credit.category.code}-${i}`}>
                               {credit.credits}
                               <span className={styles.categoryLabel}>
                                 <Tooltip position="below" content={credit.category.name}>
