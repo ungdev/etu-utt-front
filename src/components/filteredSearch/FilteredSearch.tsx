@@ -103,9 +103,11 @@ export default function FilteredSearch<
 >({
   filtersData,
   updateSearch,
+  invalidateItems,
 }: {
   filtersData: FiltersDataType<FilterNames, FiltersType>;
   updateSearch: (filters: Record<string, string>) => void;
+  invalidateItems: () => void;
 }) {
   // The filters currently used.
   const [filters, _setFilters] = useState<Array<FilterInstance<FilterNames, FiltersType>>>(
@@ -138,6 +140,7 @@ export default function FilteredSearch<
   // When filters are modified, update the search after 1/3 second.
   useEffect(() => {
     const now = Date.now();
+    invalidateItems();
     switch (updateType.current) {
       case FilterUpdateType.Instant:
         lastUpdate.value = now;

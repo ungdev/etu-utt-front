@@ -7,6 +7,7 @@ type PaginationHook<T> = {
   total: number;
   updateFilters: (query: Record<string, string>) => void;
   fetchNextItems: () => void;
+  invalidateItems: () => void;
 };
 
 /**
@@ -23,10 +24,12 @@ export function usePaginationLoader<T>(path: string): PaginationHook<T> {
 
   const api = useAPI();
 
-  const updateItems = (query: Record<string, string>) => {
+  const invalidateItems = () => {
     searching.current = true;
-
     setItems([...Array(itemsPerPage.current || 20).fill(null)]);
+  };
+
+  const updateItems = (query: Record<string, string>) => {
     const { page, ...queryData } = query;
     if (abortController?.signal?.aborted === false) abortController.abort('query-update');
     setAbortController(
@@ -46,9 +49,8 @@ export function usePaginationLoader<T>(path: string): PaginationHook<T> {
   };
 
   const fetchNextPage = () => {
-    if (searching.current || items.length >= total) return;
-    else searching.current = true;
-
+    if (items.length >= total) return;
+    searching.current = true;
     const pendingItemCount = Math.min(itemsPerPage.current, total - items.length);
     setItems((prev) => [...prev, ...Array(pendingItemCount).fill(null)]);
     setAbortController(
@@ -66,5 +68,11 @@ export function usePaginationLoader<T>(path: string): PaginationHook<T> {
         .on('failure', () => (searching.current = false)).abortController,
     );
   };
-  return { items, total, updateFilters: updateItems, fetchNextItems: fetchNextPage };
+  return {
+    items,
+    total,
+    updateFilters: updateItems,
+    fetchNextItems: fetchNextPage,
+    invalidateItems,
+  };
 }

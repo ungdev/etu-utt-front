@@ -81,7 +81,13 @@ function useUeFilters(creditCategories: CreditCategory[] | null, branches: Branc
 export default function Page() {
   usePageSettings({});
   const { t } = useAppTranslation();
-  const { items: ues, total: totalUesCount, updateFilters: updateUEs, fetchNextItems } = useUEs();
+  const {
+    items: ues,
+    total: totalUesCount,
+    updateFilters: updateUEs,
+    fetchNextItems,
+    invalidateItems: invalidateItems,
+  } = useUEs();
   const branches = useBranches();
   const creditCategories = useCreditCategories();
   const ueFilters = useUeFilters(creditCategories, branches);
@@ -90,7 +96,11 @@ export default function Page() {
     <div className={styles.page}>
       <h1>{t('ues:browser')}</h1>
       <div className={styles.content}>
-        <FilteredSearch<FilterNames, UEFiltersType> filtersData={ueFilters} updateSearch={updateUEs} />
+        <FilteredSearch<FilterNames, UEFiltersType>
+          filtersData={ueFilters}
+          updateSearch={updateUEs}
+          invalidateItems={invalidateItems}
+        />
         <div className={styles.results}>
           <ResultsList
             data={ues}
