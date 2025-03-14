@@ -111,7 +111,9 @@ export default function Page() {
                             <div key={credit.category.code}>
                               {credit.credits}
                               <span className={styles.categoryLabel}>
-                                <Tooltip content={credit.category.name}>{credit.category.code}</Tooltip>
+                                <Tooltip position="below" content={credit.category.name}>
+                                  {credit.category.code}
+                                </Tooltip>
                               </span>
                             </div>
                           ))}
@@ -134,7 +136,7 @@ export default function Page() {
                       )}
                       {item?.info?.requirements?.length ? (
                         <div className={[styles.requirements, styles.categoryLabel].join(' ')}>
-                          <Tooltip content={item?.info?.requirements?.join(', ')}>
+                          <Tooltip position="left" content={item?.info?.requirements?.join(', ')}>
                             {item?.info?.requirements?.length}{' '}
                             <span className={styles.label}>{t('ues:overview.requirements')}</span>
                           </Tooltip>
