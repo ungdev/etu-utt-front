@@ -29,6 +29,7 @@ export default {
   'detailed.worktime.the': 'THE',
   'detailed.worktime.the.tooltip': 'Travail hors encadrement',
   'detailed.worktime.project': 'Projet',
+  'detailed.worktime.internship': 'stage',
   'detailed.semester': 'Ouvert en',
   'detailed.semester.none': "Pas de semestre d'ouverture prévu",
   'detailed.description': 'Description',

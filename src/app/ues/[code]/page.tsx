@@ -75,21 +75,17 @@ export default function UEDetailsPage() {
 
   return (
     <div className={styles.page}>
+      <div className={styles.tabs}>
+        {ue.ueofs.map((ueof, index) => (
+          <div className={styles.tab} data-active={index == ueofIndex} key={ueof.code} onClick={() => setUeof(index)}>
+            {ueof.code}
+          </div>
+        ))}
+      </div>
       <div className={styles.header}>
         <div>
           <h1>{ue.code}</h1>
           <p>{ue.ueofs[ueofIndex].name}</p>
-          <div className={styles.tabs}>
-            {ue.ueofs.map((ueof, index) => (
-              <div
-                className={styles.tab}
-                data-active={index == ueofIndex}
-                key={ueof.code}
-                onClick={() => setUeof(index)}>
-                {ueof.code}
-              </div>
-            ))}
-          </div>
         </div>
         <div className={styles.worktime}>
           {ue.ueofs[ueofIndex].workTime ? (
@@ -146,6 +142,17 @@ export default function UEDetailsPage() {
               ) : (
                 <></>
               )}
+              {ue.ueofs[ueofIndex].workTime.internship ? (
+                <div>
+                  <div>
+                    {ue.ueofs[ueofIndex].workTime.internship}
+                    <span>{t('ues:detailed.worktime.hour')}</span>
+                  </div>
+                  <div>{t('ues:detailed.worktime.internship')}</div>
+                </div>
+              ) : (
+                <></>
+              )}
               {ue.ueofs[ueofIndex].workTime.project ? (
                 <div>
                   <div>{Number(ue.ueofs[ueofIndex].workTime.project)}</div>
@@ -178,7 +185,9 @@ export default function UEDetailsPage() {
             </div>
             <div>{t('ues:detailed.credits')}</div>
             <div>
-              {ue.ueofs[ueofIndex].credits.map((credits) => `${credits.credits}${credits.category.code}`).join(', ')}
+              {Array.from(
+                new Set(ue.ueofs[ueofIndex].credits.map((credits) => `${credits.credits} ${credits.category.code}`)),
+              ).join(', ')}
             </div>
           </div>
           <div className={styles.takeUEInfo}>
@@ -215,9 +224,9 @@ export default function UEDetailsPage() {
               </div>
               <div>{t('ues:detailed.branchOptions')}</div>
               <div>
-                {ue.ueofs[ueofIndex].credits.flatMap((credit) =>
-                  credit.branchOptions.map((branchOption) => branchOption.code).join(', '),
-                )}
+                {ue.ueofs[ueofIndex].credits
+                  .flatMap((credit) => credit.branchOptions.map((branchOption) => branchOption.code))
+                  .join(', ')}
               </div>
               <div>{t('ues:detailed.requirements')}</div>
               <div>

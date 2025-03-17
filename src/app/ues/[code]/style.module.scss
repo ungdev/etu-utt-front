@@ -1,6 +1,8 @@
 @import '@/variables';
 
 .page {
+  margin-top: 2em;
+
   .header {
     display: flex;
     flex-flow: row nowrap;
@@ -31,6 +33,7 @@
         & > :nth-child(2) {
           text-transform: uppercase;
           color: $ung-light-grey;
+          text-align: center;
         }
       }
 
@@ -59,22 +62,42 @@
   }
 
   .tabs {
-    display: inline-block;
-    margin: 0.6em 0 2px 0;
-    border-radius: 3px;
-    overflow: hidden;
+    position: absolute;
+    width: 100%;
+    left: 0;
+    top: 0;
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: stretch;
+    margin: 0 0 2px 0;
     justify-content: stretch;
     user-select: none;
+    border-bottom: 2px solid $ung-dark-grey;
 
     .tab {
-      padding: 3px 6px;
+      flex: 1 0 200px;
+      text-align: center;
+      padding: 10px 8px 8px;
       display: inline-block;
+      position: relative;
       cursor: pointer;
+      border-bottom: 4px solid $ung-dark-grey;
       background-color: $ung-light-grey;
       color: $light-gray;
 
       &[data-active='true'] {
         background-color: $ung-light-blue;
+        border-bottom-color: $light-gray;
+        &::before {
+          content: '';
+          position: absolute;
+          bottom: 0;
+          left: 50%;
+          transform: translateX(-50%);
+          border-left: 6px solid transparent;
+          border-bottom: 5px solid $light-gray;
+          border-right: 6px solid transparent;
+        }
       }
     }
   }
