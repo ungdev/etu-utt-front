@@ -23,6 +23,7 @@ import Clock from './Clock';
 import Rotate from './Rotate';
 import Enter from './Enter';
 import Comment from './Comment';
+import ExternalLink from './ExternalLink';
 
 const Icons = {
   Book,
@@ -33,6 +34,7 @@ const Icons = {
   Collapse,
   Comment,
   Enter,
+  ExternalLink,
   Home,
   Language,
   LeftArrow,

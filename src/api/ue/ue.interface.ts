@@ -35,13 +35,15 @@ export interface DetailedUE {
   ueofs: Array<{
     name: string;
     code: string;
+    siepId: string;
+    inscriptionCode: string;
     credits: Array<{
       credits: number;
       category: {
         code: string;
         name: string;
       };
-      branchOption: Array<{
+      branchOptions: Array<{
         code: string;
         name: string;
         branch: {

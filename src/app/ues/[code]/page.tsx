@@ -33,6 +33,7 @@ export default function UEDetailsPage() {
   const logged = useAppSelector((state) => state.session.logged);
   const type = useAppSelector((state) => state.user?.type);
   const [ue, refreshUE] = useUE(params.code as string);
+  const [ueofIndex, setUeofIndex] = useState(0);
   const criteria = useUERateCriteria();
   const [myRates, setMyRates] = useGetRate(params.code);
   const [writtingComment, setWrittingComment] = useState<string>('');
@@ -68,68 +69,90 @@ export default function UEDetailsPage() {
     navigator.clipboard.writeText(text);
   };
 
+  const setUeof = (ueof: number | string) => {
+    if (typeof ueof === 'number') setUeofIndex(ueof);
+  };
+
   return (
     <div className={styles.page}>
       <div className={styles.header}>
         <div>
           <h1>{ue.code}</h1>
-          <p>{ue.name}</p>
+          <p>{ue.ueofs[ueofIndex].name}</p>
+          <div className={styles.tabs}>
+            {ue.ueofs.map((ueof, index) => (
+              <div
+                className={styles.tab}
+                data-active={index == ueofIndex}
+                key={ueof.code}
+                onClick={() => setUeof(index)}>
+                {ueof.code}
+              </div>
+            ))}
+          </div>
         </div>
         <div className={styles.worktime}>
-          {ue.workTime ? (
+          {ue.ueofs[ueofIndex].workTime ? (
             <>
-              {ue.workTime.cm && (
+              {ue.ueofs[ueofIndex].workTime.cm ? (
                 <div>
                   <div>
-                    {ue.workTime.cm}
+                    {ue.ueofs[ueofIndex].workTime.cm}
                     <span>{t('ues:detailed.worktime.hour')}</span>
                   </div>
                   <Tooltip content={t('ues:detailed.worktime.cm.tooltip')}>
                     <div>{t('ues:detailed.worktime.cm')}</div>
                   </Tooltip>
                 </div>
+              ) : (
+                <></>
               )}
-              {ue.workTime.td && (
+              {ue.ueofs[ueofIndex].workTime.td ? (
                 <div>
                   <div>
-                    {ue.workTime.td}
+                    {ue.ueofs[ueofIndex].workTime.td}
                     <span>{t('ues:detailed.worktime.hour')}</span>
                   </div>
                   <Tooltip content={t('ues:detailed.worktime.td.tooltip')}>
                     <div>{t('ues:detailed.worktime.td')}</div>
                   </Tooltip>
                 </div>
+              ) : (
+                <></>
               )}
-              {ue.workTime.tp && (
+              {ue.ueofs[ueofIndex].workTime.tp ? (
                 <div>
                   <div>
-                    {ue.workTime.tp}
+                    {ue.ueofs[ueofIndex].workTime.tp}
                     <span>{t('ues:detailed.worktime.hour')}</span>
                   </div>
                   <Tooltip content={t('ues:detailed.worktime.tp.tooltip')}>
                     <div>{t('ues:detailed.worktime.tp')}</div>
                   </Tooltip>
                 </div>
+              ) : (
+                <></>
               )}
-              {ue.workTime.project && (
+              {ue.ueofs[ueofIndex].workTime.the ? (
                 <div>
                   <div>
-                    {ue.workTime.project}
-                    <span>{t('ues:detailed.worktime.hour')}</span>
-                  </div>
-                  <div>{t('ues:detailed.worktime.project')}</div>
-                </div>
-              )}
-              {ue.workTime.the && (
-                <div>
-                  <div>
-                    {ue.workTime.the}
+                    {ue.ueofs[ueofIndex].workTime.the}
                     <span>{t('ues:detailed.worktime.hour')}</span>
                   </div>
                   <Tooltip content={t('ues:detailed.worktime.the.tooltip')}>
                     <div>{t('ues:detailed.worktime.the')}</div>
                   </Tooltip>
                 </div>
+              ) : (
+                <></>
+              )}
+              {ue.ueofs[ueofIndex].workTime.project ? (
+                <div>
+                  <div>{Number(ue.ueofs[ueofIndex].workTime.project)}</div>
+                  <div>{t('ues:detailed.worktime.project')}</div>
+                </div>
+              ) : (
+                <></>
               )}
             </>
           ) : (
@@ -141,44 +164,66 @@ export default function UEDetailsPage() {
       {!isAnnalUploaderOpen ? (
         <>
           <div className={styles.info}>
-            <div>{t('ues:detailed.description')}</div>
-            <div>{ue.info.comment}</div>
             <div>{t('ues:detailed.program')}</div>
-            <div>{ue.info.program}</div>
+            <div>{ue.ueofs[ueofIndex].info.program}</div>
             <div>{t('ues:detailed.objectives')}</div>
-            <div>{ue.info.objectives}</div>
+            <div>{ue.ueofs[ueofIndex].info.objectives}</div>
             <div>{t('ues:detailed.taughtIn')}</div>
-            <div>{ue.info.languages}</div>
+            <div>{ue.ueofs[ueofIndex].info.language}</div>
             <div>{t('ues:detailed.minors')}</div>
-            <div className={(!ue.info.minors && styles.empty) || ''}>
-              {ue.info.minors || t('ues:detailed.minors.none')}
+            <div className={(!ue.ueofs[ueofIndex].info.minors.length && styles.empty) || ''}>
+              {ue.ueofs[ueofIndex].info.minors.length
+                ? ue.ueofs[ueofIndex].info.minors.join(', ')
+                : t('ues:detailed.minors.none')}
             </div>
             <div>{t('ues:detailed.credits')}</div>
-            <div>{ue.credits.map((credits) => `${credits.credits}${credits.category.code}`).join(', ')}</div>
+            <div>
+              {ue.ueofs[ueofIndex].credits.map((credits) => `${credits.credits}${credits.category.code}`).join(', ')}
+            </div>
           </div>
           <div className={styles.takeUEInfo}>
             <h2>{t('ues:detailed.dfpdata')}</h2>
             <div className={styles.info}>
               <div>{t('ues:detailed.semester')}</div>
               <div>
-                {ue.openSemester.find((semester) => new Date(semester.start).getTime() > Date.now())?.code ??
-                  t('ues:detailed.semester.none')}{' '}
+                {ue.ueofs[ueofIndex].openSemester
+                  .filter((semester) => new Date(semester.end).getTime() > Date.now())
+                  .map((semester) => semester.code)
+                  .join(', ') || t('ues:detailed.semester.none')}{' '}
+              </div>
+              <div>{t('ues:detailed.siepLink')}</div>
+              <div>
+                <Link
+                  external={true}
+                  href={`https://siep.utt.fr/faces/AccesDirectNonAuth.xhtml?ir=942854&io=${ue.ueofs[ueofIndex].siepId}`}>
+                  {ue.ueofs[ueofIndex].code}
+                </Link>
               </div>
               <div>{t('ues:detailed.inscriptionCode')}</div>
-              <div>
-                <Tooltip content={t('ues:detailed.inscriptionCode.copy')}>
-                  <span className={styles.clipboardCopy} onClick={() => clipboardCopy(ue.inscriptionCode)}>
-                    {ue.inscriptionCode}
-                  </span>
-                </Tooltip>
+              <div className={ue.ueofs[ueofIndex].inscriptionCode ? '' : styles.empty}>
+                {ue.ueofs[ueofIndex].inscriptionCode ? (
+                  <Tooltip content={t('ues:detailed.inscriptionCode.copy')}>
+                    <span
+                      className={styles.clipboardCopy}
+                      onClick={() => clipboardCopy(ue.ueofs[ueofIndex].inscriptionCode)}>
+                      {ue.ueofs[ueofIndex].inscriptionCode}
+                    </span>
+                  </Tooltip>
+                ) : (
+                  t('ues:detailed.inscriptionCode.empty')
+                )}
               </div>
               <div>{t('ues:detailed.branchOptions')}</div>
-              <div>{ue.branchOption.map((branchOption) => branchOption.code).join(', ')}</div>
+              <div>
+                {ue.ueofs[ueofIndex].credits.flatMap((credit) =>
+                  credit.branchOptions.map((branchOption) => branchOption.code).join(', '),
+                )}
+              </div>
               <div>{t('ues:detailed.requirements')}</div>
               <div>
-                {ue.info.requirements.length === 0
+                {ue.ueofs[ueofIndex].info.requirements.length === 0
                   ? t('ues:detailed.requirements.none')
-                  : ue.info.requirements
+                  : ue.ueofs[ueofIndex].info.requirements
                       .map((req) => (
                         <Link key={req} href={`/ues/${req}`}>
                           {req}
