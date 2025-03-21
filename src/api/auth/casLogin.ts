@@ -5,5 +5,5 @@ export interface CasLoginRequestDto {
 
 export interface CasLoginResponseDto {
   signedIn: boolean;
-  access_token: string;
+  token: string;
 }

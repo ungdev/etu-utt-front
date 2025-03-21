@@ -10,13 +10,23 @@ import Link from '@/components/UI/Link';
 import { useAPI } from '@/api/api';
 import { useAppTranslation } from '@/lib/i18n';
 import Icons from '@/icons';
+import { useRouter } from 'next/navigation';
 
-export default function LoginForm() {
+export default function LoginForm({ application }: { application: string | undefined }) {
   const dispatch = useAppDispatch();
   const api = useAPI();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const submit = () => dispatch(sessionModule.login(api, username, password));
+  const router = useRouter();
+  const submit = async () => {
+    const res = await dispatch(sessionModule.login(api, username, password, application));
+    if (!res) return;
+    if (!res.signedIn)
+      router.push(
+        `/login/external/create?${new URLSearchParams({ token: res.token, application: application! }).toString()}`,
+      );
+    if (res.redirectUrl) router.push(res.redirectUrl);
+  };
   const { t } = useAppTranslation();
   const connectionText = t('login:login.connection');
 

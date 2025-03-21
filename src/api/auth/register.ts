@@ -9,5 +9,5 @@ export interface RegisterRequestDto {
 }
 
 export interface RegisterResponseDto {
-  access_token: string;
+  token: string;
 }

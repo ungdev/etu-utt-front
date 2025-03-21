@@ -1,0 +1,58 @@
+@import '@/variables.scss';
+
+.applicationsPage {
+  .applicationsList {
+    //width: 50%;
+
+    .application {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+
+      .trash {
+        margin-left: 2rem;
+
+        .icon {
+          align-self: flex-end;
+          width: 1rem;
+        }
+      }
+    }
+  }
+
+  .tokenPopupWrapper {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .popupContent {
+      width: 60%;
+      margin: auto;
+      background-color: $light-gray;
+      word-break: break-all;
+      padding: 2rem;
+      border: 1px solid black;
+      border-radius: 5px;
+
+      .buttons {
+        margin-top: 1rem;
+        display: flex;
+        justify-content: flex-end;
+        gap: 2rem;
+        width: 100%;
+
+        svg {
+          width: 1rem;
+          height: 1rem;
+          color: white;
+        }
+      }
+    }
+  }
+}

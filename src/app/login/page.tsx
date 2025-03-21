@@ -13,17 +13,24 @@ import { CasRegisterRequestDto } from '@/api/auth/casRegister';
 import { useAPI } from '@/api/api';
 import { useAppTranslation } from '@/lib/i18n';
 import { Trans } from 'react-i18next';
+import { etuuttWebApplicationId } from '@/utils/environment';
 
 export default function LoginPage() {
   usePageSettings({ hasNavbar: false, permissions: 'public', needsLoading: true });
   const { internallyLoaded, markPageLoaded } = usePageLoaded();
   const ticket = useSearchParam('ticket');
+  const application = useSearchParam('application');
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { t } = useAppTranslation();
   const [registerToken, setRegisterToken] = useState<string | null>(null);
   const [validatedToken, setValidatedToken] = useState(false);
   const api = useAPI();
+  useEffect(() => {
+    if (application == etuuttWebApplicationId) {
+      router.replace('/login');
+    }
+  }, []);
   useEffect(() => {
     if (!ticket || validatedToken) return;
     setValidatedToken(true);
@@ -34,11 +41,11 @@ export default function LoginPage() {
       })
       .on('success', (body) => {
         if (!body.signedIn) {
-          setRegisterToken(body.access_token);
+          setRegisterToken(body.token);
           router.replace('/login');
           return;
         }
-        dispatch(setToken(body.access_token, api));
+        dispatch(setToken(body.token, api));
         router.push('/');
       });
   }, [ticket]);
@@ -70,7 +77,7 @@ export default function LoginPage() {
                   registerToken,
                 })
                 .on('success', (body) => {
-                  dispatch(setToken(body.access_token, api));
+                  dispatch(setToken(body.token, api));
                   router.push('/');
                 })
             }>
@@ -86,9 +93,10 @@ export default function LoginPage() {
       </div>
     );
   }
+
   return (
     <div id="login-page" className={styles.loginPage}>
-      <LoginForm />
+      <LoginForm application={application} />
     </div>
   );
 }

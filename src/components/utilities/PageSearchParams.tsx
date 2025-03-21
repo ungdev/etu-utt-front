@@ -11,10 +11,13 @@ export default function PageSearchParams() {
   const dispatch = useAppDispatch();
   const router = useRouter();
   useEffect(() => {
+    //console.log(pathname)
     if (pathname !== realPathname) return;
+    console.log(params);
     dispatch(setPageParams(Object.fromEntries(params)));
+    console.log(Object.fromEntries(params));
     if (!params.size) return;
     router.replace(pathname);
-  }, [params, pathname]);
+  }, [pathname]);
   return false;
 }

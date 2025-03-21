@@ -5,3 +5,4 @@ export const apiVersion = process.env.NEXT_PUBLIC_API_VERSION || 'v0';
 export const apiTimeout = Number(process.env.NEXT_PUBLIC_API_REQUEST_TIMEOUT || 0);
 export const isServerSide = () => typeof window === 'undefined';
 export const isClientSide = () => typeof window !== 'undefined';
+export const etuuttWebApplicationId = process.env.NEXT_PUBLIC_ETUUTT_WEB_APPLICATION_ID as string;

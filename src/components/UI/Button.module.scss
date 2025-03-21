@@ -12,6 +12,9 @@
   padding: 10px;
   background-color: var(--background);
   color: var(--color);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 
   &.background-blue {
     --background: #{$ung-light-blue};
