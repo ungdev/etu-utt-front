@@ -9,6 +9,7 @@ import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import { addWidget, modifyBB, removeWidget, WIDGETS } from '@/module/homepage';
 import { useEffect, useMemo, useState } from 'react';
 import { isClientSide } from '@/utils/environment';
+import Page from '@/components/utilities/Page';
 
 function AdditionalNavbarComponent({
   modifyingLayout,
@@ -46,22 +47,16 @@ export default function HomePage() {
   const { markPageLoaded } = usePageLoaded();
   const [isSmallScreen, setIsSmallScreen] = useState(false);
   const [modifyingLayout, setModifyingLayout, modifyingLayoutRef] = useStateWithReference(false);
-  usePageSettings(
-    {
-      navbarAdditionalComponent: isSmallScreen
-        ? null
-        : () => (
-            <AdditionalNavbarComponent
-              modifyingLayout={modifyingLayoutRef.current}
-              onModify={() => setModifyingLayout(true)}
-              onDone={() => setModifyingLayout(false)}
-              onAdd={(widget) => dispatch(addWidget(widget))}
-            />
-          ),
-      needsLoading: true,
-    },
-    [modifyingLayout, isSmallScreen],
-  );
+  const navbarAdditionalComponent = isSmallScreen
+    ? null
+    : () => (
+        <AdditionalNavbarComponent
+          modifyingLayout={modifyingLayoutRef.current}
+          onModify={() => setModifyingLayout(true)}
+          onDone={() => setModifyingLayout(false)}
+          onAdd={(widget) => dispatch(addWidget(widget))}
+        />
+      );
   const resizeObserver = useMemo(
     () =>
       isClientSide()
@@ -82,7 +77,7 @@ export default function HomePage() {
     return () => resizeObserver.disconnect();
   }, [resizeObserver]);
   return (
-    <div className={styles.page}>
+    <Page needsLoading={true} navbarAdditionalComponent={navbarAdditionalComponent} className={styles.page}>
       {!isSmallScreen
         ? widgets.map((widget, i) => {
             return (
@@ -103,6 +98,6 @@ export default function HomePage() {
             const Widget = WIDGETS[widget.widget].component;
             return <Widget key={widget.id} />;
           })}
-    </div>
+    </Page>
   );
 }

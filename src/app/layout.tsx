@@ -7,6 +7,8 @@ import Wrapper from '@/components/utilities/Wrapper';
 import PageSearchParams from '@/components/utilities/PageSearchParams';
 import { Lexend } from 'next/font/google';
 import { CookiePopup } from '@/components/CookiePopup';
+import PageSettingsReseter from "@/components/utilities/PageSettingsReseter";
+import PageSettingsInitializer from "@/components/utilities/PageSettingsReseter";
 
 const lexend = Lexend({
   weight: ['400', '600', '700', '800'],
@@ -27,6 +29,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <Providers>
         <Redirecter />
         <AutoLogin />
+        <PageSettingsInitializer />
         <Suspense>
           <PageSearchParams />
         </Suspense>
