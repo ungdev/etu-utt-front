@@ -13,8 +13,7 @@ import EditableText from '@/components/EditableText';
 import { editCommentReply } from '@/api/commentReply/editCommentReply';
 import { useAPI } from '@/api/api';
 import { sendCommentReply } from '@/api/commentReply/sendCommentReply';
-import { usePageSettings } from '@/module/pageSettings';
-import Page from "@/components/utilities/Page";
+import Page from '@/components/utilities/Page';
 
 function CommentEditorFooter(originalComment: string, onUpdate: (text: string) => void, t: TFunction) {
   return function CommentEditorFooter({ text, disable }: { text: string; disable: () => void }) {

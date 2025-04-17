@@ -2,9 +2,8 @@
 import styles from './style.module.scss';
 import { useParams } from 'next/navigation';
 import { useUser } from '@/api/users/getUser';
-import { usePageSettings } from '@/module/pageSettings';
 import { useAppTranslation } from '@/lib/i18n';
-import Page from "@/components/utilities/Page";
+import Page from '@/components/utilities/Page';
 
 function userData(data: string | number | undefined | null, label: string) {
   return (

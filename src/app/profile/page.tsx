@@ -1,10 +1,10 @@
 'use client';
-import { usePageSettings } from '@/module/pageSettings';
+
 // import { useConnectedUser } from '@/module/user';
 import { setProfilePicture } from '@/api/profile/setProfilePicture';
 import { useAPI } from '@/api/api';
 import { useAppTranslation } from '@/lib/i18n';
-import Page from "@/components/utilities/Page";
+import Page from '@/components/utilities/Page';
 
 export default function ProfilePage() {
   // const user = useConnectedUser();

@@ -43,5 +43,9 @@ export default function Page({
       }),
     );
   }, [hasNavbar, needsLoading]);
-  return <div id={id} className={className}>{children}</div>;
+  return (
+    <div id={id} className={className}>
+      {children}
+    </div>
+  );
 }

@@ -4,9 +4,8 @@ import FilteredSearch, { FiltersDataType, GenericFiltersType } from '@/component
 import { createInputFilter } from '@/components/filteredSearch/InputFilter';
 import { useUsers } from '@/api/users/searchUsers.hook';
 import { ResultsList } from '@/components/ResultsList';
-import { usePageSettings } from '@/module/pageSettings';
 import defaultAvatar from '@/../public/images/default-avatar.jpg';
-import Page from "@/components/utilities/Page";
+import Page from '@/components/utilities/Page';
 
 type FilterNames = 'name' | 'firstName' | 'lastName' | 'nickname';
 

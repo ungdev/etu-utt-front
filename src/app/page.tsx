@@ -2,7 +2,7 @@
 
 import styles from './style.module.scss';
 import WidgetRenderer from '@/components/homeWidgets/WidgetRenderer';
-import { usePageLoaded, usePageSettings } from '@/module/pageSettings';
+import { usePageLoaded } from '@/module/pageSettings';
 import Button from '@/components/UI/Button';
 import { useStateWithReference } from '@/utils/hooks';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';

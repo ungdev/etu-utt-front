@@ -4,10 +4,9 @@ import { createInputFilter } from '@/components/filteredSearch/InputFilter';
 import FilteredSearch, { FiltersDataType, GenericFiltersType } from '@/components/filteredSearch/FilteredSearch';
 import Icons from '@/icons';
 import { ResultsList } from '@/components/ResultsList';
-import { usePageSettings } from '@/module/pageSettings';
 import { useAppTranslation } from '@/lib/i18n';
 import { useAssos } from '@/api/assos/searchAssos.hook';
-import Page from "@/components/utilities/Page";
+import Page from '@/components/utilities/Page';
 
 /**
  * The different filters that exist.

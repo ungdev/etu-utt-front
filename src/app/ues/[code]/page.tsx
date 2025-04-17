@@ -17,12 +17,11 @@ import TextArea from '@/components/UI/TextArea';
 import { useState } from 'react';
 import sendComment from '@/api/comment/sendComment';
 import { useAPI } from '@/api/api';
-import { usePageSettings } from '@/module/pageSettings';
 import useAnnals from '@/api/annals/fetchAnnals';
 import useAnnalMetadata from '@/api/annals/fetchMetadata';
 import ExamList from '@/components/ues/ExamList';
 import ExamSender from '@/components/ues/ExamSender';
-import Page from "@/components/utilities/Page";
+import Page from '@/components/utilities/Page';
 
 export default function UEDetailsPage() {
   const params = useParams<{ code: string }>();

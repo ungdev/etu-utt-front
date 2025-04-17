@@ -32,7 +32,7 @@ export const getInitialState = () =>
     searchParams: {},
     internalLoading: {
       searchParamsLoaded: false,
-      permissionsVerified: true,  // TODO: verify them properly
+      permissionsVerified: true, // TODO: verify them properly
       settingsLoaded: false,
     },
   }) as PageSettingsSlice;
@@ -55,7 +55,7 @@ export const pageSettingsSlice = createSlice({
       };
     },
     setSearchParams(state, action: PayloadAction<Record<string, string>>) {
-      console.log("setSearchParams")
+      console.log('setSearchParams');
       state.searchParams = action.payload;
       state.internalLoading.searchParamsLoaded = true;
       return state;
@@ -86,7 +86,7 @@ export function usePageLoaded() {
   const dispatch = useAppDispatch();
   const pageSettings = useAppSelector((state) => state.pageSettings);
   const internallyLoaded = Object.values(pageSettings.internalLoading).every((value) => value);
-  console.log("int loaded : ", internallyLoaded)
+  console.log('int loaded : ', internallyLoaded);
   return {
     ...pageSettings.internalLoading,
     internallyLoaded,
