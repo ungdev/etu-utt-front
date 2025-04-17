@@ -1,8 +1,8 @@
 'use client';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { useEffect } from "react";
+import { useEffect } from 'react';
 import { useAppDispatch } from '@/lib/hooks';
-import { setSearchParams, usePageLoaded } from "@/module/pageSettings";
+import { setSearchParams, usePageLoaded } from '@/module/pageSettings';
 
 export default function PageSearchParams() {
   const pathname = usePathname();

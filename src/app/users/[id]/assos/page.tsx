@@ -4,9 +4,9 @@ import { useParams } from 'next/navigation';
 import { usePageSettings } from '@/module/pageSettings';
 import { useUser } from '@/api/users/getUser';
 import { useAppTranslation } from '@/lib/i18n';
+import Page from "@/components/utilities/Page";
 
 export default function AssociativePage() {
-  usePageSettings({});
   const { id: userId } = useParams<{ id: string }>();
   const associations = useAssosOfUser(userId);
   const user = useUser(userId);
@@ -15,7 +15,7 @@ export default function AssociativePage() {
     return false;
   }
   return (
-    <>
+    <Page>
       <h1>{t('users:assos.title', { name: `${user?.firstName} ${user?.lastName}` })}</h1>
       {associations.length
         ? associations.map((asso) => (
@@ -25,6 +25,6 @@ export default function AssociativePage() {
             </div>
           ))
         : t('users:assos.noAssos')}
-    </>
+    </Page>
   );
 }

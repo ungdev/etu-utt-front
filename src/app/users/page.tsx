@@ -6,6 +6,7 @@ import { useUsers } from '@/api/users/searchUsers.hook';
 import { ResultsList } from '@/components/ResultsList';
 import { usePageSettings } from '@/module/pageSettings';
 import defaultAvatar from '@/../public/images/default-avatar.jpg';
+import Page from "@/components/utilities/Page";
 
 type FilterNames = 'name' | 'firstName' | 'lastName' | 'nickname';
 
@@ -40,10 +41,9 @@ const filtersData = Object.freeze({
 } satisfies FiltersDataType<FilterNames, FiltersType>);
 
 export default function SearchUserPage() {
-  usePageSettings({});
   const { items: users, total: totalUsers, updateFilters: updateUsers, fetchNextItems: fetchNextPage } = useUsers();
   return (
-    <div className={styles.searchUserPage}>
+    <Page className={styles.searchUserPage}>
       <h1>Trombinoscope</h1>
       <div className={styles.content}>
         <FilteredSearch<FilterNames, FiltersType> filtersData={filtersData} updateSearch={updateUsers} />
@@ -84,6 +84,6 @@ export default function SearchUserPage() {
           />
         </div>
       </div>
-    </div>
+    </Page>
   );
 }

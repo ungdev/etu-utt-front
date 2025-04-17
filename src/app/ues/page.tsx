@@ -79,7 +79,6 @@ function useUeFilters(creditCategories: CreditCategory[] | null, branches: Branc
 }
 
 export default function UesPage() {
-  usePageSettings({});
   const { t } = useAppTranslation();
   const { items: ues, total: totalUesCount, updateFilters: updateUEs, fetchNextItems } = useUEs();
   const branches = useBranches();

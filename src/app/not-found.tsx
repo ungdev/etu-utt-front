@@ -1,8 +1,7 @@
 'use client';
 
-import { usePageSettings } from '@/module/pageSettings';
+import Page from "@/components/utilities/Page";
 
 export default function PageNotFound() {
-  usePageSettings({});
-  return <h1>404 - Page not found</h1>;
+  return <Page><h1>404 - Page not found</h1></Page>;
 }

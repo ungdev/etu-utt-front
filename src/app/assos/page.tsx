@@ -7,6 +7,7 @@ import { ResultsList } from '@/components/ResultsList';
 import { usePageSettings } from '@/module/pageSettings';
 import { useAppTranslation } from '@/lib/i18n';
 import { useAssos } from '@/api/assos/searchAssos.hook';
+import Page from "@/components/utilities/Page";
 
 /**
  * The different filters that exist.
@@ -28,12 +29,11 @@ const assoFilters = Object.freeze({
   }, // This one does not need a name as it will never be displayed
 } satisfies FiltersDataType<FilterNames, AssoFiltersType>);
 
-export default function Page() {
-  usePageSettings({});
+export default function AssoPage() {
   const { t } = useAppTranslation();
   const [assos, totalAssosCount, updateAssos] = useAssos();
   return (
-    <div className={styles.page}>
+    <Page className={styles.page}>
       <h1 className={styles.title}>{t('assos:browser')}</h1>
       <div className={styles.content}>
         <FilteredSearch<FilterNames, AssoFiltersType> filtersData={assoFilters} updateSearch={updateAssos} />
@@ -52,6 +52,6 @@ export default function Page() {
           />
         </div>
       </div>
-    </div>
+    </Page>
   );
 }

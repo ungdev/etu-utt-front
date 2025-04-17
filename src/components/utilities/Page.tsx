@@ -7,15 +7,19 @@ import { defaultPageSettings, initPageSettings, updatePageSettings } from '@/mod
 export type PageProps = {
   hasNavbar?: boolean;
   navbarAdditionalComponent?: FC<Record<string, never>> | null;
+  permissions?: string;
   needsLoading?: boolean;
   className?: string;
+  id?: string;
 };
 
 export default function Page({
   hasNavbar = defaultPageSettings.hasNavbar,
   navbarAdditionalComponent = defaultPageSettings.navbarAdditionalComponent,
+  permissions = defaultPageSettings.permissions,
   needsLoading = false,
   className,
+  id,
   children,
 }: PageProps & {
   children: ReactNode;
@@ -34,10 +38,10 @@ export default function Page({
       updatePageSettings({
         navbarAdditionalComponent,
         hasNavbar,
-        permissions: 'user',
+        permissions,
         needsLoading: needsLoading,
       }),
     );
   }, [hasNavbar, needsLoading]);
-  return <div className={className}>{children}</div>;
+  return <div id={id} className={className}>{children}</div>;
 }

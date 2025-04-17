@@ -22,7 +22,6 @@ function AdditionalNavbarComponent({
   onModify: () => void;
   onDone: () => void;
 }) {
-  //usePageSettings({});
   const [widgetToAdd /*, setWidgetToAdd*/] = useState<keyof typeof WIDGETS>('ueBrowserWidget');
   return (
     <>

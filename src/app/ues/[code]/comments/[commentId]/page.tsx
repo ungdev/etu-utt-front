@@ -14,6 +14,7 @@ import { editCommentReply } from '@/api/commentReply/editCommentReply';
 import { useAPI } from '@/api/api';
 import { sendCommentReply } from '@/api/commentReply/sendCommentReply';
 import { usePageSettings } from '@/module/pageSettings';
+import Page from "@/components/utilities/Page";
 
 function CommentEditorFooter(originalComment: string, onUpdate: (text: string) => void, t: TFunction) {
   return function CommentEditorFooter({ text, disable }: { text: string; disable: () => void }) {
@@ -32,7 +33,6 @@ function CommentEditorFooter(originalComment: string, onUpdate: (text: string) =
 }
 
 export default function CommentDetailsPage() {
-  usePageSettings({});
   const { t } = useAppTranslation();
   const params = useParams<{ code: string; commentId: string }>();
   const [comment, setComment] = useUEComment(params.commentId);
@@ -44,7 +44,7 @@ export default function CommentDetailsPage() {
     return;
   }
   return (
-    <div className={styles.page}>
+    <Page className={styles.page}>
       <h1>
         {comment.isAnonymous
           ? t('ues:detailed.comments.resume.anonymous', {
@@ -117,6 +117,6 @@ export default function CommentDetailsPage() {
           {t('ues:detailed.comments.answers.answerButton')}
         </Button>
       </div>
-    </div>
+    </Page>
   );
 }
