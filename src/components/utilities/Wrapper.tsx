@@ -10,16 +10,17 @@ import Loader from '@/components/toplevel/Loader';
 
 export default function Wrapper({ children }: { children: ReactNode }) {
   const { hasNavbar, pageComponentReady } = usePageSettings();
-  const { internallyLoaded } = usePageLoaded();
+  const { loaded } = usePageLoaded();
   const dispatch = useAppDispatch();
   useEffect(() => {
     dispatch(initCookies());
   }, []);
+  console.log(loaded)
   return (
     <>
       <GoTo />
       {hasNavbar && <Navbar />}
-      {(!pageComponentReady || !internallyLoaded) && <Loader />}
+      {(!loaded) && <Loader />}
       <div className={styles.page}>{children}</div>
     </>
   );

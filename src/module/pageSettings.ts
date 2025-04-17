@@ -9,13 +9,13 @@ interface PageSettingsSlice {
   searchParams: Record<string, string>;
   pageComponentReady: boolean;
   internalLoading: {
-    pageParamsLoaded: boolean;
+    searchParamsLoaded: boolean;
     permissionsVerified: boolean;
     settingsLoaded: boolean;
   };
 }
 
-type InternalPageSettingsKeys = 'searchParams' | 'loaded' | 'internalLoading';
+type InternalPageSettingsKeys = 'searchParams' | 'pageComponentReady' | 'internalLoading';
 
 type PageSettings = Omit<PageSettingsSlice, InternalPageSettingsKeys>;
 
@@ -31,8 +31,8 @@ export const getInitialState = () =>
     pageComponentReady: false,
     searchParams: {},
     internalLoading: {
-      pageParamsLoaded: false,
-      permissionsVerified: false,
+      searchParamsLoaded: false,
+      permissionsVerified: true,  // TODO: verify them properly
       settingsLoaded: false,
     },
   }) as PageSettingsSlice;
@@ -51,13 +51,13 @@ export const pageSettingsSlice = createSlice({
         internalLoading: {
           ...state.internalLoading,
           settingsLoaded: true,
-          permissionsVerified: true, // TODO: verify them properly :eyes:
         },
       };
     },
-    setPageParams(state, action: PayloadAction<Record<string, string>>) {
+    setSearchParams(state, action: PayloadAction<Record<string, string>>) {
+      console.log("setSearchParams")
       state.searchParams = action.payload;
-      state.internalLoading.pageParamsLoaded = true;
+      state.internalLoading.searchParamsLoaded = true;
       return state;
     },
     setLoaded(state, action: PayloadAction<boolean>) {
@@ -68,8 +68,8 @@ export const pageSettingsSlice = createSlice({
   initialState: getInitialState(),
 });
 
-const { initPageSettings, updatePageSettings, setPageParams, setLoaded } = pageSettingsSlice.actions;
-export { setPageParams, initPageSettings, updatePageSettings };
+const { initPageSettings, updatePageSettings, setSearchParams, setLoaded } = pageSettingsSlice.actions;
+export { setSearchParams, initPageSettings, updatePageSettings };
 
 export function usePageSettings(): PageSettingsSlice {
   return useAppSelector((state) => state.pageSettings);
@@ -86,6 +86,7 @@ export function usePageLoaded() {
   const dispatch = useAppDispatch();
   const pageSettings = useAppSelector((state) => state.pageSettings);
   const internallyLoaded = Object.values(pageSettings.internalLoading).every((value) => value);
+  console.log("int loaded : ", internallyLoaded)
   return {
     ...pageSettings.internalLoading,
     internallyLoaded,
