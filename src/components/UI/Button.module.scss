@@ -1,4 +1,4 @@
-@import '@/variables';
+@use '@/themes' as theme;
 
 .button.noStyle {
   background: none;
@@ -11,25 +11,24 @@
   border-radius: 5px;
   padding: 10px;
   background-color: var(--background);
-  color: var(--color);
+  color: var(--foreground);
 
   &.background-blue {
-    --background: #{$ung-light-blue};
-    --color: white;
+    @include theme.variable('blue');
   }
 
   &.background-white {
-    --background: white;
-    --color: #{$ung-dark-grey};
+    @include theme.variable('white');
   }
 
   &:hover {
-    background-color: color-mix(in srgb, var(--background) 90%, black);
+    @include theme.variable('dark');
+    background-color: color-mix(in srgb, var(--background) 90%, var(--dark));
     cursor: pointer;
   }
 
   &:disabled {
-    background-color: grayscale($ung-light-blue);
+    @include theme.disabled;
     cursor: not-allowed;
   }
 }

@@ -1,4 +1,4 @@
-@import '@/variables';
+@use '@/themes' as theme;
 
 .link .icon {
   display: inline-block;
@@ -13,10 +13,10 @@
 }
 
 .link:not(.noStyle) {
-  color: $ung-light-blue;
+  @include theme.text-blue;
   text-decoration: none;
 
   span {
-    border-bottom: 1px solid $ung-light-blue;
+    border-bottom: 1px solid currentColor;
   }
 }

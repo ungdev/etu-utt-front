@@ -1,4 +1,7 @@
+@use '@/themes' as theme;
+
 .glimmer-animated {
+  @include theme.variable('grey');
   display: block;
   opacity: 0.2;
   border-radius: 1em;
@@ -8,7 +11,7 @@
   background-position: left top;
   background-size: 115% 0.8em;
   background-repeat: repeat space;
-  background-image: linear-gradient(to right, $ung-light-grey 92%, color-mix(in lch, transparent, $ung-light-grey 60%));
+  background-image: linear-gradient(to right, var(--grey) 92%, color-mix(in lch, transparent, var(--grey) 60%));
   animation: lazy-text infinite cubic-bezier(0.5, 0, 0, 1) 1.8s;
 }
 @keyframes lazy-text {

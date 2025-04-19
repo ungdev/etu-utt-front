@@ -1,14 +1,13 @@
-@import '@/variables';
+@use '@/themes' as theme;
 
 .inputWrapper {
+  @include theme.grey-n-white;
+  @include theme.border(3px solid);
   display: flex;
   border-radius: 10px;
-  border: 3px solid #D3D3D3;
-  background-color: $light-gray;
 
   input {
-    background-color: $light-gray;
-    color: $ung-light-grey;
+    @include theme.grey-n-white;
     border-radius: 7px;
     padding: 10px 15px;
     border: none;
@@ -20,23 +19,23 @@
   }
 
   svg {
+    @include theme.text-blue;
     height: 100%;
     width: 40px;
     padding: 5px 8px 5px 11px;
-    color: $ung-light-blue;
   }
 
   &:focus-within {
-    background-color: $ung-light-blue;
-    border-color: $ung-light-blue;
+    @include theme.text-blue;
+    background-color: currentColor;
+    border-color: currentColor;
 
     input {
-      color: $ung-light-blue;
+      color: currentColor;
     }
 
     svg {
-      color: $light-gray;
+      @include theme.text-white;
     }
   }
 }
-

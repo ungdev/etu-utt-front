@@ -1,4 +1,4 @@
-@import '@/variables';
+@use '@/themes' as theme;
 
 .dailyTimetable {
   display: flex;
@@ -52,11 +52,12 @@
         position: relative;
 
         &:after {
+          @include theme.text-dark;
           content: '';
           position: absolute;
           width: 100%;
           height: 1px;
-          background-color: $ung-dark-grey;
+          background-color: currentColor;
           top: calc(50% - 1px);
           left: 0;
         }

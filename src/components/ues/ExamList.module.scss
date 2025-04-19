@@ -1,7 +1,8 @@
-@import '@/variables';
+@use '@/themes' as theme;
 
 .exams {
-  background-color: $light-gray;
+  @include theme.grey-n-white;
+  @include theme.text-dark;
   border-radius: 20px;
   padding: 2rem;
 
@@ -20,9 +21,9 @@
       gap: 0.1rem;
 
       .entry {
+        @include theme.background-light;
         padding: 0.25rem;
         border-radius: 0.25rem;
-        background-color: $very-light-gray;
         cursor: pointer;
         display: flex;
         flex-flow: row nowrap;
@@ -30,16 +31,16 @@
         gap: 2ch;
 
         &[data-status~='unverified'] {
-          background-color: $gray-pastel-color;
+          @include theme.pastel-gray;
         }
 
         &[data-status~='processing'] {
           cursor: not-allowed;
-          background-color: $orange-pastel-color;
+          @include theme.pastel-orange;
         }
 
         &[data-status~='deleted'] {
-          background-color: $red-pastel-color;
+          @include theme.pastel-red;
         }
 
         .type,
@@ -54,7 +55,7 @@
         }
 
         .author {
-          color: $ung-light-grey;
+          @include theme.text-light;
           text-overflow: ellipsis;
           overflow: hidden;
           white-space: nowrap;

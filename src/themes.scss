@@ -1,0 +1,129 @@
+@use '@/variables' as colors;
+
+/***** C O L O R S *****/
+
+@mixin lexend {
+  font-family: colors.$lexend;
+}
+
+@mixin variable($theme) {
+  @if ($theme == 'blue') {
+    --background: #{colors.$ung-light-blue};
+    --foreground: white;
+  } @else if ($theme == 'white') {
+    --background: white;
+    --foreground: #{colors.$ung-dark-grey};
+  } @else if ($theme == 'dark') {
+    --dark: black;
+  } @else if ($theme == 'grey') {
+    --grey: #{colors.$ung-light-grey};
+  }
+}
+
+@mixin black-n-white {
+  background-color: colors.$light-gray;
+  color: colors.$ung-dark-grey;
+}
+
+@mixin black-n-white-select {
+  background-color: mix(white, black, 90%);
+}
+
+@mixin black-n-white-reverse {
+  background-color: colors.$ung-dark-grey;
+  color: colors.$light-gray;
+}
+
+@mixin black-n-white-reverse-select {
+  background-color: mix(colors.$ung-dark-grey, black, 90%);
+}
+
+@mixin grey-n-white {
+  background-color: colors.$light-gray;
+  color: colors.$ung-light-grey;
+}
+
+@mixin grey-n-white-reverse {
+  background-color: colors.$ung-light-grey;
+  color: colors.$light-gray;
+}
+
+@mixin grey-n-white-reverse-select {
+  background-color: mix(colors.$ung-light-grey, black, 90%);
+}
+
+@mixin disabled {
+  background-color: grayscale(colors.$ung-light-blue);
+  color: white;
+}
+
+@mixin shadow($shadow) {
+  box-shadow: $shadow #d0d0d0;
+}
+
+@mixin border-dark($border) {
+  border: $border colors.$ung-dark-grey;
+  color: colors.$ung-dark-grey;
+}
+
+@mixin border-light($border) {
+  border: $border colors.$ung-light-grey;
+  color: colors.$ung-light-grey;
+}
+
+@mixin border-lighter($border) {
+  border: $border mix(colors.$navigation-link-color, colors.$light-gray);
+}
+
+@mixin border($border) {
+  border: $border colors.$gray-pastel-color;
+  color: colors.$gray-pastel-color;
+}
+
+@mixin background-light {
+  background-color: colors.$very-light-gray;
+}
+
+@mixin background-dark-alpha($alpha: 0.6) {
+  background-color: rgba($color: colors.$ung-dark-grey, $alpha: $alpha);
+}
+
+@mixin text-blue {
+  color: colors.$ung-light-blue;
+}
+
+@mixin text-dark {
+  color: colors.$ung-dark-grey;
+}
+
+@mixin text-light {
+  color: colors.$ung-light-grey;
+}
+
+@mixin text-lighter {
+  color: colors.$navigation-link-color;
+}
+
+@mixin text-white {
+  color: colors.$light-gray;
+}
+
+@mixin pastel-gray {
+  background-color: colors.$gray-pastel-color;
+  @include text-dark;
+}
+
+@mixin pastel-orange {
+  background-color: colors.$orange-pastel-color;
+  @include text-dark;
+}
+
+@mixin pastel-red {
+  background-color: colors.$red-pastel-color;
+  @include text-dark;
+}
+
+@mixin gold {
+  fill: gold;
+  stroke: black;
+}

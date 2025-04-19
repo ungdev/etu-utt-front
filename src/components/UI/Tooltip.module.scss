@@ -1,4 +1,4 @@
-@import '@/variables';
+@use '@/themes' as theme;
 
 .tooltipContainer {
   position: relative;
@@ -6,15 +6,14 @@
   cursor: help;
 
   & > .tooltip {
+    @include theme.black-n-white-reverse;
     display: none;
-    background-color: $ung-dark-grey;
     position: absolute;
     border-radius: 4px;
     padding: 1px 4px;
     text-transform: uppercase;
     font-size: small;
     font-weight: bold;
-    color: $light-gray;
     text-wrap: nowrap;
     z-index: 100;
     pointer-events: none;
@@ -22,11 +21,12 @@
     &.left {
       right: calc(100% + 6px);
       &::before {
+        @include theme.text-dark;
         right: -6px;
         top: 50%;
         transform: translateY(-50%);
         border-top: 5px solid transparent;
-        border-left: 7px solid $ung-dark-grey;
+        border-left: 7px solid currentColor;
         border-bottom: 5px solid transparent;
       }
     }
@@ -36,11 +36,12 @@
       left: 50%;
       transform: translateX(-50%);
       &::before {
+        @include theme.text-dark;
         bottom: -6px;
         left: 50%;
         transform: translateX(-50%);
         border-left: 5px solid transparent;
-        border-top: 7px solid $ung-dark-grey;
+        border-top: 7px solid currentColor;
         border-right: 5px solid transparent;
       }
     }
@@ -50,11 +51,12 @@
       top: 0.65em;
       transform: translateY(-50%);
       &::before {
+        @include theme.text-dark;
         left: -6px;
         top: 50%;
         transform: translateY(-50%);
         border-top: 5px solid transparent;
-        border-right: 7px solid $ung-dark-grey;
+        border-right: 7px solid currentColor;
         border-bottom: 5px solid transparent;
       }
     }
@@ -64,11 +66,12 @@
       left: 50%;
       transform: translateX(-50%);
       &::before {
+        @include theme.text-dark;
         top: -6px;
         left: 50%;
         transform: translateX(-50%);
         border-left: 5px solid transparent;
-        border-bottom: 7px solid $ung-dark-grey;
+        border-bottom: 7px solid currentColor;
         border-right: 5px solid transparent;
       }
     }

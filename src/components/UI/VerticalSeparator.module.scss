@@ -1,4 +1,6 @@
+@use '@/themes' as theme;
+
 .separator {
+  @include black-n-white-reverse;
   width: 2px;
-  background-color: black;
 }

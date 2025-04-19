@@ -1,15 +1,14 @@
-@import '@/variables.scss';
+@use '@/themes' as theme;
 
 .navigation {
-  background-color: $ung-dark-grey;
-  color: $navigation-text-color;
+  @include theme.black-n-white-reverse;
   height: 100dvh;
   width: clamp(350px, 20%, 400px);
   padding: 16px;
   padding-bottom: 8px;
   display: flex;
   flex-direction: column;
-  transition: all 300ms cubic-bezier(0.230, 1.000, 0.320, 1.000);
+  transition: all 300ms cubic-bezier(0.23, 1, 0.32, 1);
 
   ul {
     list-style: none;
@@ -152,8 +151,8 @@
       width: calc(100% - 7.75rem);
 
       > .name {
+        @include theme.text-white;
         font-weight: 500;
-        color: white;
         text-overflow: ellipsis;
         white-space: nowrap;
         overflow: hidden;
@@ -161,7 +160,7 @@
 
       > .role {
         font-size: 0.825rem;
-        color: $navigation-link-color;
+        @include theme.text-lighter;
       }
     }
 
@@ -172,13 +171,13 @@
 
       .language {
         position: relative;
-        
+
         .languageSelector {
+          @include theme.grey-n-white-reverse;
           position: absolute;
           bottom: 100%;
           left: 50%;
           transform: translateX(-50%);
-          background-color: $ung-light-grey;
           border-radius: 0.5rem;
           margin-bottom: 1rem;
           padding: 0.5rem;
@@ -196,12 +195,13 @@
 
           // Bottom arrow
           &::before {
+            @include theme.text-light;
             content: '';
             width: 0;
             height: 0;
             border-left: 5px solid transparent;
             border-right: 5px solid transparent;
-            border-top: 5px solid $ung-light-grey;
+            border-top: 5px solid currentColor;
             position: absolute;
             bottom: -5px;
             left: 50%;
@@ -228,7 +228,7 @@
               transition: all 200ms ease-in-out;
 
               &:hover {
-                background-color: $ung-light-grey;
+                @include theme.grey-n-white-reverse-select;
               }
             }
           }
@@ -244,7 +244,7 @@
 }
 
 .navigationHeader {
-  color: $navigation-text-color;
+  @include theme.text-white;
   text-decoration: none;
   font-size: 24px;
   font-weight: 500;
@@ -315,8 +315,9 @@
 }
 
 .separator {
+  @include theme.text-lighter;
   height: 1px;
-  background-color: $navigation-link-color;
+  background-color: currentColor;
   border-radius: 1rem;
   margin: 1rem 0.75rem;
 
@@ -326,7 +327,7 @@
 }
 
 .navigationLink {
-  color: $navigation-link-color;
+  @include theme.text-lighter;
   display: flex;
   align-items: center;
   padding: 0 0.5rem;
@@ -343,18 +344,18 @@
   }
 
   &.active {
-    background-color: $ung-light-grey;
-    color: $navigation-text-color;
+    @include theme.grey-n-white-reverse;
+    @include theme.text-white;
   }
 
   > span {
     margin-left: 0.5rem;
 
     .collapsed & {
+      @include theme.text-white;
       padding: 0.5rem;
       line-height: 1;
       border-radius: 0.425rem;
-      color: $navigation-item-tooltip-color;
       transition: all 100ms ease-in;
       box-shadow:
         0 20px 25px -5px rgba(0, 0, 0, 0.1),
@@ -365,10 +366,11 @@
       opacity: 0;
 
       &::before {
+        @include theme.text-white;
         width: 0;
         height: 0;
         border-top: 5px solid transparent;
-        border-right: 7px solid $navigation-text-color;
+        border-right: 7px solid currentColor;
         border-bottom: 5px solid transparent;
         left: -6px;
         position: absolute;
@@ -379,15 +381,15 @@
   }
 
   &:hover {
-    background-color: $ung-light-grey;
-    color: $navigation-text-color;
+    @include theme.grey-n-white-reverse;
+    @include theme.text-white;
 
     .collapsed & > span {
+      @include theme.black-n-white;
       position: absolute;
       opacity: 1 !important;
       font-size: 0.875rem;
       transform: translateX(4px);
-      background: $navigation-text-color;
       left: 60px;
 
       &::before {

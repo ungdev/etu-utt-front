@@ -1,14 +1,15 @@
-@import '@/variables';
+@use '@/themes' as theme;
 
 .input {
-  background-color: #F0F0F2;
-  color: #444C5F;
+  @include theme.grey-n-white();
+  @include theme.border(3px solid);
+  @include theme.text-dark;
   border-radius: 10px;
   padding: 10px 15px;
-  border: 2px solid #D3D3D3;
 
   &:focus {
-    border-color: $ung-light-blue;
+    @include theme.text-blue;
+    border-color: currentColor;
     outline: none;
   }
 }

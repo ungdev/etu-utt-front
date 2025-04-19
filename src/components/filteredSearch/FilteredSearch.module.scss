@@ -1,9 +1,9 @@
-@import '@/variables';
+@use '@/themes' as theme;
 
 .filtersBar {
   h2 {
+    @include theme.text-dark;
     text-transform: uppercase;
-    color: $ung-dark-grey;
     font-weight: 900;
   }
 

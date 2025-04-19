@@ -1,9 +1,9 @@
-@import '@/variables';
+@use '@/themes' as theme;
 
 .authForm {
+  @include theme.black-n-white;
   justify-content: center;
   padding: 50px 50px 30px;
-  background-color: white;
   border-radius: 20px;
 
   > * {
@@ -15,18 +15,18 @@
   }
 
   .title {
+    @include theme.text-dark;
     margin-top: 20px;
     margin-bottom: 20px;
     font-size: 2rem;
-    color: $ung-dark-grey;
 
     .bluePart {
-      color: $ung-light-blue;
+      @include theme.text-blue;
     }
   }
 
   .cas {
-    border: 1px solid gray;
+    @include theme.border-dark(1px solid);
     border-radius: 5px;
     padding: 0.5rem 1rem;
     display: flex;
@@ -37,10 +37,11 @@
     svg {
       width: 1.5rem;
       height: 1.5rem;
+      fill: currentColor;
     }
 
     &:hover {
-      background-color: #f1f1f1;
+      @include theme.background-light;
       transition: all 0.2s ease-in-out;
     }
   }

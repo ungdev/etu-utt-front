@@ -1,3 +1,5 @@
+@use '@/themes' as theme;
+
 .icons {
   display: flex;
   justify-content: center;
@@ -9,8 +11,7 @@
       width: 24px;
       height: 24px;
       margin: 3px 3px;
-      stroke: black;
-      fill: gold;
+      @include theme.gold;
       transition: all 0.1s linear;
     }
 
@@ -22,10 +23,11 @@
       height: 100%;
       mix-blend-mode: color;
       width: calc(100% * (1 - var(--filled)));
-      background-color: white;
+      @include theme.background-light;
     }
 
-    &.hoverEffect:hover, &:has(~ .hoverEffect:hover) {
+    &.hoverEffect:hover,
+    &:has(~ .hoverEffect:hover) {
       & > svg {
         width: 30px;
         height: 30px;

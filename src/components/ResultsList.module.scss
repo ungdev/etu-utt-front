@@ -1,4 +1,4 @@
-@import '@/variables.scss';
+@use '@/themes' as theme;
 
 .resultsList {
   height: 100%;
@@ -14,17 +14,16 @@
     padding: 2rem;
 
     .result {
+      @include theme.black-n-white;
+      @include theme.shadow(0 0 13px 0);
       display: flex;
       justify-content: space-between;
       align-items: center;
-      --box-padding: 6px;
-      background-color: white;
-      padding: var(--box-padding);
+      padding: 6px;
       overflow: hidden;
       border-radius: 15px;
       transition: scale 0.2s ease-out;
       cursor: pointer;
-      box-shadow: 0 0 13px 0 #d0d0d0;
 
       &:hover {
         scale: 1.05;
@@ -33,18 +32,17 @@
   }
 
   .loader {
+    @include theme.text-blue;
     display: flex;
     align-items: center;
     flex-flow: column nowrap;
     gap: 5px;
-
-    color: $ung-light-blue;
     text-transform: uppercase;
     font-size: 0.8em;
     font-weight: 700;
 
     circle {
-      stroke: $ung-light-blue;
+      stroke: currentColor;
     }
   }
 }

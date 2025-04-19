@@ -1,9 +1,9 @@
-@import '@/variables';
+@use '@/themes' as theme;
 
 .widget {
   .user {
+    @include theme.shadow(0 0 10px -5px);
     padding: 20px;
-    box-shadow: 0 0 10px -5px black;
     border-radius: 10px;
 
     &:not(:last-child) {
@@ -11,16 +11,16 @@
     }
 
     .name {
+      @include theme.text-dark;
       font-size: 1.5rem;
       font-weight: 900;
-      color: $ung-dark-grey;
       margin-bottom: 0.7rem;
     }
 
     .age {
+      @include theme.text-light;
       font-size: 1.2rem;
       font-weight: 900;
-      color: #5F6982;
     }
   }
 }

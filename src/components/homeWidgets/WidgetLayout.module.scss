@@ -1,10 +1,11 @@
-@import '@/variables';
+@use '@/themes' as theme;
 
 .widget {
+  @include theme.black-n-white;
+  @include theme.background-light;
+  @include theme.border-lighter(2px solid);
   padding: 15px 10px;
-  border: 2px #E7E7E7 solid;
   border-radius: 15px;
-  background-color: #FAFBFC;
 
   .resizable {
     transform-origin: 0 0;
@@ -12,8 +13,8 @@
     width: 100%;
 
     .title {
-      color: $ung-dark-grey;
-      font-family: $lexend;
+      @include theme.text-dark;
+      @include theme.lexend;
       font-weight: 800;
       font-size: 1.2rem;
       text-transform: uppercase;
@@ -23,12 +24,13 @@
     }
 
     .subtitle {
-      color: $ung-light-blue;
-      font-family: $lexend;
+      @include theme.text-blue;
+      @include theme.lexend;
       font-weight: 800;
       margin-bottom: 20px;
       margin-top: 5px;
       display: -webkit-box;
+      line-clamp: 2;
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
