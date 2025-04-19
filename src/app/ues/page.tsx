@@ -6,12 +6,12 @@ import FilteredSearch, { FiltersDataType, GenericFiltersType } from '@/component
 import Icons from '@/icons';
 import { createSelectFilter, SelectFilter } from '@/components/filteredSearch/SelectFilter';
 import { ResultsList } from '@/components/ResultsList';
-import { usePageSettings } from '@/module/pageSettings';
 import { useAppTranslation } from '@/lib/i18n';
 import { Branch } from '@/api/branch/branch.interface';
 import { useBranches, useCreditCategories } from '@/module/constantData';
 import { useMemo } from 'react';
 import { CreditCategory } from '@/api/credit/credit.interface';
+import Page from '@/components/utilities/Page';
 
 /**
  * The different filters that exist.
@@ -77,16 +77,15 @@ function useUeFilters(creditCategories: CreditCategory[] | null, branches: Branc
   }, [creditCategories?.length ?? 0, branches?.length ?? 0]);
 }
 
-export default function Page() {
-  usePageSettings({});
+export default function UesPage() {
   const { t } = useAppTranslation();
   const { items: ues, total: totalUesCount, updateFilters: updateUEs, fetchNextItems } = useUEs();
   const branches = useBranches();
   const creditCategories = useCreditCategories();
   const ueFilters = useUeFilters(creditCategories, branches);
-  if (!branches) return 'Chargement';
+  if (!branches) return <Page>'Chargement'</Page>;
   return (
-    <div className={styles.page}>
+    <Page className={styles.page}>
       <h1>{t('ues:browser')}</h1>
       <div className={styles.content}>
         <FilteredSearch<FilterNames, UEFiltersType> filtersData={ueFilters} updateSearch={updateUEs} />
@@ -106,6 +105,6 @@ export default function Page() {
           />
         </div>
       </div>
-    </div>
+    </Page>
   );
 }

@@ -17,14 +17,13 @@ import TextArea from '@/components/UI/TextArea';
 import { useState } from 'react';
 import sendComment from '@/api/comment/sendComment';
 import { useAPI } from '@/api/api';
-import { usePageSettings } from '@/module/pageSettings';
 import useAnnals from '@/api/annals/fetchAnnals';
 import useAnnalMetadata from '@/api/annals/fetchMetadata';
 import ExamList from '@/components/ues/ExamList';
 import ExamSender from '@/components/ues/ExamSender';
+import Page from '@/components/utilities/Page';
 
 export default function UEDetailsPage() {
-  usePageSettings({});
   const params = useParams<{ code: string }>();
   const { t } = useAppTranslation();
   const logged = useAppSelector((state) => state.session.logged);
@@ -63,7 +62,7 @@ export default function UEDetailsPage() {
   };
 
   return (
-    <div className={styles.page}>
+    <Page className={styles.page}>
       <h1>{ue.code}</h1>
       <p>{ue.name}</p>
       <div className={styles.divider} />
@@ -176,6 +175,6 @@ export default function UEDetailsPage() {
           annalTypes={annalTypes}
         />
       )}
-    </div>
+    </Page>
   );
 }

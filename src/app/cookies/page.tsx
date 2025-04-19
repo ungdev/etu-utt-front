@@ -2,9 +2,9 @@
 import styles from './style.module.scss';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import { CookieNames, setCookiesAcceptance } from '@/module/cookies';
-import { usePageSettings } from '@/module/pageSettings';
 import { useEffect, useState } from 'react';
 import { NotParameteredTranslationKey, useAppTranslation } from '@/lib/i18n';
+import Page from '@/components/utilities/Page';
 
 const DEFAULT_COOKIES = Object.fromEntries(Object.values(CookieNames).map((name) => [name, true])) as {
   [K in CookieNames]: boolean;
@@ -23,7 +23,6 @@ const cookies = [
 }>;
 
 export default function CookiesPage() {
-  usePageSettings({});
   const dispatch = useAppDispatch();
   const cookiesAcceptedFromRedux = useAppSelector((state) => state.cookies.cookiesAccepted);
   const [cookiesAccepted, setCookiesAccepted] = useState(cookiesAcceptedFromRedux ?? DEFAULT_COOKIES);
@@ -41,7 +40,7 @@ export default function CookiesPage() {
   };
 
   return (
-    <div className={styles.cookiesPage}>
+    <Page className={styles.cookiesPage}>
       <h1>{t('cookies:title')}</h1>
       <h2>{t('cookies:whatIsIt.title')}</h2>
       <p>{t('cookies:whatIsIt.text')}</p>
@@ -60,6 +59,6 @@ export default function CookiesPage() {
         ))}
       </div>
       <button onClick={() => dispatch(setCookiesAcceptance(cookiesAccepted))}>{t('cookies:validate')}</button>
-    </div>
+    </Page>
   );
 }

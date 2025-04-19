@@ -6,16 +6,16 @@ import { CasLoginRequestDto, CasLoginResponseDto } from '@/api/auth/casLogin';
 import { setToken } from '@/module/session';
 import { useAppDispatch } from '@/lib/hooks';
 import { useEffect, useState } from 'react';
-import { usePageLoaded, usePageSettings, useSearchParam } from '@/module/pageSettings';
+import { usePageLoaded, useSearchParam } from '@/module/pageSettings';
 import Button from '@/components/UI/Button';
 import { RegisterResponseDto } from '@/api/auth/register';
 import { CasRegisterRequestDto } from '@/api/auth/casRegister';
 import { useAPI } from '@/api/api';
 import { useAppTranslation } from '@/lib/i18n';
 import { Trans } from 'react-i18next';
+import Page from '@/components/utilities/Page';
 
 export default function LoginPage() {
-  usePageSettings({ hasNavbar: false, permissions: 'public', needsLoading: true });
   const { internallyLoaded, markPageLoaded } = usePageLoaded();
   const ticket = useSearchParam('ticket');
   const router = useRouter();
@@ -52,7 +52,7 @@ export default function LoginPage() {
   }
   if (registerToken) {
     return (
-      <div className={styles.confirmRegister}>
+      <Page hasNavbar={true} permissions={'public'} needsLoading={true} className={styles.confirmRegister}>
         <div>
           <Trans
             i18nKey={'login:legal.text'}
@@ -83,12 +83,12 @@ export default function LoginPage() {
             {t('login:legal.dontConnect')}
           </Button>
         </div>
-      </div>
+      </Page>
     );
   }
   return (
-    <div id="login-page" className={styles.loginPage}>
+    <Page hasNavbar={true} permissions={'public'} needsLoading={true} id="login-page" className={styles.loginPage}>
       <LoginForm />
-    </div>
+    </Page>
   );
 }

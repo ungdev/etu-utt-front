@@ -2,8 +2,8 @@
 import styles from './style.module.scss';
 import { useParams } from 'next/navigation';
 import { useUser } from '@/api/users/getUser';
-import { usePageSettings } from '@/module/pageSettings';
 import { useAppTranslation } from '@/lib/i18n';
+import Page from '@/components/utilities/Page';
 
 function userData(data: string | number | undefined | null, label: string) {
   return (
@@ -19,7 +19,6 @@ function userData(data: string | number | undefined | null, label: string) {
 }
 
 export default function UserPage() {
-  usePageSettings({});
   const { id: userId } = useParams<{ id: string }>();
   const user = useUser(userId);
   const { t } = useAppTranslation();
@@ -27,7 +26,7 @@ export default function UserPage() {
     return false;
   }
   return (
-    <div className={styles.page}>
+    <Page className={styles.page}>
       <h2>{t('users:generalInfo.title')}</h2>
       <table>
         {userData(user.nickname, t('users:nickname'))}
@@ -43,6 +42,6 @@ export default function UserPage() {
         {userData(user.semester, t('users:semester'))}
         {userData(user.branchOption, t('users:branchOption'))}
       </table>
-    </div>
+    </Page>
   );
 }
