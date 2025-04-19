@@ -32,7 +32,7 @@ export default function ExamList({
   annalTypes,
   annalSemesters,
 }: {
-  annals: Annal[] | null;
+  annals: Annal[];
   setAnnalUploaderOpen: (opened: boolean) => void;
   annalTypes: AnnalType[];
   annalSemesters: string[];

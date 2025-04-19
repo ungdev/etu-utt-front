@@ -2,6 +2,7 @@ import { apiTimeout, apiUrl, apiVersion } from '@/utils/environment';
 import { StatusCodes } from 'http-status-codes';
 import { useSetNotFound } from '@/module/pageSettings';
 import { toast } from 'react-toastify';
+import { ApiError } from '@/api/api.interface';
 
 /**
  * The type of error that can be produced while making a request to the API.
@@ -20,7 +21,7 @@ export enum ResponseError {
 type APIResponse<ResponseType> =
   | {
       code: number;
-      body: ResponseType;
+      body: ResponseType | ApiError;
     }
   | Record<'error', ResponseError>;
 
@@ -36,6 +37,12 @@ type RawResponseType<T> = T extends Date
       }
     : T;
 
+type StatusCodesSuccess = (typeof StatusCodes)['OK' | 'CREATED' | 'ACCEPTED' | 'NO_CONTENT' | 'NOT_MODIFIED'];
+type StatusCodesError = Exclude<StatusCodes, StatusCodesSuccess>;
+
+type FailureHandler<R> = () => R | void;
+type ErrorHandler<R> = (errorCode: number, error: string) => R | void;
+type SuccessHandler<T, R> = (body: T) => R | void;
 /**
  * The response handler is a class that allows you to handle the response of a request to the API.
  * It allows you to define what to do when the request is successful, when it returns an error (an API error), when it fails (a request error), or when it returns a specific status code or specific failure.
@@ -61,40 +68,58 @@ type RawResponseType<T> = T extends Date
  * }
  */
 export class ResponseHandler<T, R = undefined> {
-  private readonly handlers: Partial<Record<number | 'success', (body: T) => R | void>> &
-    Partial<{
-      success: (body: T) => R | void;
-    }> &
-    Partial<{ failure: (error: number) => R | void }> &
-    Partial<Record<ResponseError | 'success' | 'error' | 'failure', () => R | void>> = {};
+  private readonly handlers: Partial<Record<'success' | StatusCodesSuccess, SuccessHandler<T, R>>> &
+    Partial<Record<'error' | StatusCodesError, ErrorHandler<R>>> &
+    Partial<Record<'failure' | ResponseError, FailureHandler<R>>> = {};
   private readonly promise: Promise<R | void>;
 
   constructor(rawResponse: Promise<APIResponse<T>>) {
     this.promise = rawResponse.then((response) => {
       if ('error' in response) {
-        return this.handlers[response.error]
-          ? this.handlers[response.error]!()
-          : this.handlers.failure
-            ? this.handlers.failure()
-            : undefined;
+        if (this.handlers[response.error]) {
+          return this.handlers[response.error]!();
+        } else if (this.handlers.failure) {
+          return this.handlers.failure();
+        } else {
+          return undefined;
+        }
+      } else if (response.code < 400) {
+        const codeAsSuccess = response.code as StatusCodesSuccess;
+        if (this.handlers[codeAsSuccess]) {
+          return this.handlers[codeAsSuccess]!(response.body as T);
+        } else if (this.handlers.success) {
+          return this.handlers.success(response.body as T);
+        } else {
+          return undefined;
+        }
+      } else {
+        const codeAsError = response.code as StatusCodesError;
+        const bodyAsError = response.body as ApiError;
+        if (this.handlers[codeAsError]) {
+          return this.handlers[codeAsError]!(bodyAsError.errorCode, bodyAsError.error);
+        } else if (this.handlers.error) {
+          return this.handlers.error(bodyAsError.errorCode, bodyAsError.error);
+        } else {
+          return undefined;
+        }
       }
-      if (response.code in this.handlers) {
-        return this.handlers[response.code]!(response.body);
-      }
-      if (response.code < 400) {
-        return 'success' in this.handlers ? this.handlers.success!(response.body) : undefined;
-      }
-      return 'error' in this.handlers ? this.handlers.error!() : undefined;
     });
   }
 
+  /**
+   * @param statusCode number: Status code returned by the API
+   *                   success: Request returned a 200, 201, ...
+   *                   error: The API returned an error
+   *                   failure: An error occurred when making the request
+   * @param handler Callback
+   */
   on<E, P extends number | ResponseError | 'success' | 'error' | 'failure'>(
     statusCode: P,
-    handler: P extends number | 'success'
-      ? (body: T) => E | void
-      : P extends 'failure'
-        ? (error: number) => E | void
-        : () => E | void,
+    handler: P extends 'success' | StatusCodesSuccess
+      ? SuccessHandler<T, E>
+      : P extends 'error' | StatusCodesError
+        ? ErrorHandler<E>
+        : FailureHandler<E>,
   ): ResponseHandler<T, R | E> {
     // @ts-expect-error TS2322
     this.handlers[statusCode] = handler;
