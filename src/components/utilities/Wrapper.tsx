@@ -15,7 +15,6 @@ export default function Wrapper({ children }: { children: ReactNode }) {
   useEffect(() => {
     dispatch(initCookies());
   }, []);
-  console.log(loaded);
   return (
     <>
       <GoTo />

@@ -89,7 +89,7 @@ export default function HomePage() {
                   .map((w) => ({ x: w.x, y: w.y, width: w.width, height: w.height }))}
                 changeBB={(newWidget) => dispatch(modifyBB(i, { ...widget, ...newWidget }))}
                 remove={() => dispatch(removeWidget(i))}
-                onLoaded={() => markPageLoaded()}
+                onLoaded={markPageLoaded}
               />
             );
           })
