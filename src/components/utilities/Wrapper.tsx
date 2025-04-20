@@ -2,7 +2,7 @@
 import styles from './Wrapper.module.scss';
 import Navbar from '@/components/Navbar';
 import React, { ReactNode, useEffect } from 'react';
-import { usePageSettings } from '@/module/pageSettings';
+import { usePageLoaded, usePageSettings } from '@/module/pageSettings';
 import GoTo from '@/components/toplevel/GoTo';
 import { useAppDispatch } from '@/lib/hooks';
 import { initCookies } from '@/module/cookies';
@@ -11,7 +11,8 @@ import { ToastContainer, Zoom } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 export default function Wrapper({ children }: { children: ReactNode }) {
-  const { hasNavbar, loaded, internallyLoaded } = usePageSettings();
+  const { hasNavbar } = usePageSettings();
+  const { loaded } = usePageLoaded();
   const dispatch = useAppDispatch();
   useEffect(() => {
     dispatch(initCookies());
@@ -34,7 +35,7 @@ export default function Wrapper({ children }: { children: ReactNode }) {
       />
       <GoTo />
       {hasNavbar && <Navbar />}
-      {(!loaded || !internallyLoaded) && <Loader />}
+      {!loaded && <Loader />}
       <div className={styles.page}>{children}</div>
     </>
   );

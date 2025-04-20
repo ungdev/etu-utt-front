@@ -1,0 +1,34 @@
+@import '@/variables';
+
+.page {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  .title {
+    text-transform: uppercase;
+    color: $ung-dark-grey;
+    font-weight: 900;
+  }
+
+  .content {
+    display: flex;
+    gap: 30px;
+    margin-top: 5vh;
+    flex-grow: 1;
+    min-height: 0;
+
+    > * {
+      background-color: white;
+      border-radius: 15px;
+      border: #E7E7E7 solid 1px;
+      padding: 1rem;
+      overflow-y: scroll;
+    }
+
+    .results {
+      flex-grow: 1;
+      height: 100%;
+    }
+  }
+}

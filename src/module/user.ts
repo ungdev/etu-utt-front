@@ -3,7 +3,7 @@ import { useAppSelector } from '@/lib/hooks';
 import { AppThunk } from '@/lib/store';
 import { addMenuItem, getMenuItem, removeMenuItem } from '@/module/navbar';
 import { fetchMyUes } from '@/api/ue/fetchMyUes';
-import { useAPI } from '@/api/api';
+import { API, useAPI } from "@/api/api";
 import { MenuItem } from '@/components/Navbar';
 
 export const enum UserType {
@@ -38,7 +38,9 @@ export const userSlice = createSlice({
 
 const { setUser: _setUser } = userSlice.actions;
 
-export function setUser(user: UserSlice | null): AppThunk {
+export function setUser(user: null): AppThunk;
+export function setUser(user: UserSlice, api: API): AppThunk;
+export function setUser(user: UserSlice | null, api?: API): AppThunk {
   return async (dispatch) => {
     dispatch(_setUser(user));
     const menuItem = dispatch(getMenuItem('common:navbar.myUEs'));
@@ -52,7 +54,7 @@ export function setUser(user: UserSlice | null): AppThunk {
     if (!user) {
       return;
     }
-    const ues = await fetchMyUes(useAPI());
+    const ues = await fetchMyUes(api!);
     if (!ues) return;
     ues.forEach((ue) => {
       dispatch(

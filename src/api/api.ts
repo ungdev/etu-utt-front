@@ -187,6 +187,7 @@ async function internalRequestAPI<RequestType, ResponseType>(
   const headers = new Headers();
   headers.append('Authorization', authorizationToken ? `Bearer ${authorizationToken}` : '');
   if (!isFile) headers.append('Content-Type', 'application/json');
+  headers.append('X-Application', '52ce644d-183f-49e9-bd21-d2d4f37e2196');
 
   // Add timeout to the request
   const abortController = new AbortController();

@@ -33,10 +33,14 @@ export const login =
   (api: API, login: string, password: string): AppThunk =>
   (dispatch) =>
     api
-      .post<LoginRequestDto, LoginResponseDto>('/auth/signin', { login, password })
+      .post<LoginRequestDto, LoginResponseDto>('/auth/signin', {
+        login,
+        password,
+        tokenExpiresIn: 99999999,
+      } as unknown as LoginRequestDto)
       .on('success', async (body) => dispatch(setToken(body.access_token, api)))
-      .on(StatusCodes.UNAUTHORIZED, (body) => console.error('Wrong credentials', body))
-      .on(StatusCodes.BAD_REQUEST, (body) => console.error('Bad request', body));
+      .on(StatusCodes.UNAUTHORIZED, (errorCode, error) => console.error(`Wrong credentials: ${errorCode} (${error})`))
+      .on(StatusCodes.BAD_REQUEST, (errorCode, error) => console.error(`Bad request: ${errorCode} (${error})`));
 
 export const register =
   (api: API, lastName: string, firstName: string, login: string, password: string): AppThunk =>
@@ -79,11 +83,16 @@ export function setToken(token: string | null, api?: API): AppThunk {
     dispatch(setCookie(CookieNames.TOKEN, token ?? ''));
     dispatch(_setToken(token));
     if (token === null) {
-      setUser(null);
+      dispatch(setUser(null));
       return;
     }
     const user = await fetchProfile(api!).toPromise();
-    dispatch(setUser(user ?? null));
+    if (!user) {
+      console.error('Could not fetch profile of user');
+      dispatch(setUser(null));
+      return;
+    }
+    dispatch(setUser(user, api!));
   };
 }
 
