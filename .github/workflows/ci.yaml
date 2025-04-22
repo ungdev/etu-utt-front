@@ -41,7 +41,7 @@ jobs:
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
       - run: cp .env.dist .env.prod
-      - run: pnpm build
+      - run: pnpm next build
 
   deploy-dev:
     if: ${{ github.event_name != 'pull_request' && (github.ref == 'refs/heads/dev') }}
