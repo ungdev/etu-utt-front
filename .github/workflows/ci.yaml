@@ -58,6 +58,7 @@ jobs:
           registry: ${{ secrets.REGISTRY_URL }}
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_TOKEN }}
+      - run: cp .env.dist .env.prod
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
@@ -65,8 +66,6 @@ jobs:
           build-args: |
             NODE_ENV=production
             NEXT_PUBLIC_API_URL=https://etu.dev.uttnetgroup.fr/api
-            NEXT_PUBLIC_API_VERSION=v1
-            NEXT_PUBLIC_API_REQUEST_TIMEOUT=10000
             NEXT_PUBLIC_CAS_SERVICE_URL=https://etu.dev.uttnetgroup.fr/login
           tags: |
             ${{ secrets.REGISTRY_URL }}/etuutt/front:dev
@@ -87,6 +86,7 @@ jobs:
           registry: ${{ secrets.REGISTRY_URL }}
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_TOKEN }}
+      - run: cp .env.dist .env.prod
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
@@ -94,8 +94,6 @@ jobs:
           build-args: |
             NODE_ENV=production
             NEXT_PUBLIC_API_URL=https://etu.utt.fr/api
-            NEXT_PUBLIC_API_VERSION=v1
-            NEXT_PUBLIC_API_REQUEST_TIMEOUT=10000
             NEXT_PUBLIC_CAS_SERVICE_URL=https://etu.utt.fr/login
           tags: |
             ${{ secrets.REGISTRY_URL }}/etuutt/front:prod
