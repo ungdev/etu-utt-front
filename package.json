@@ -47,5 +47,10 @@
     "eslint-plugin-react": "^7.34.2",
     "sass": "^1.77.4",
     "typescript": "^5.4.5"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "sharp"
+    ]
   }
 }
