@@ -24,31 +24,11 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm lint
 
-  build:
-    runs-on: self-hosted
-    strategy:
-      matrix:
-        node-version: [18]
-    steps:
-      - uses: actions/checkout@v3
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 9
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node-version }}
-          cache: 'pnpm'
-      - run: pnpm install --frozen-lockfile
-      - run: cp .env.dist .env.prod
-      - run: pnpm next build
-
   deploy-dev:
     if: ${{ github.event_name != 'pull_request' && (github.ref == 'refs/heads/dev') }}
     runs-on: self-hosted
     needs:
       - lint
-      - build
     steps:
       - uses: actions/checkout@v4
       - name: Install docker
@@ -76,7 +56,6 @@ jobs:
     runs-on: self-hosted
     needs:
       - lint
-      - build
     steps:
       - uses: actions/checkout@v4
       - name: Install docker
@@ -104,7 +83,6 @@ jobs:
     runs-on: self-hosted
     needs:
       - lint
-      - build
     steps:
       - uses: actions/checkout@v4
       - name: Install docker
