@@ -46,7 +46,6 @@ jobs:
           push: true
           build-args: |
             NODE_ENV=production
-          env: |
             NEXT_PUBLIC_API_URL=https://etu.dev.uttnetgroup.fr/api
             NEXT_PUBLIC_CAS_SERVICE_URL=https://etu.utt.fr/login
             NEXT_PUBLIC_API_VERSION=v1
@@ -76,7 +75,6 @@ jobs:
           push: true
           build-args: |
             NODE_ENV=production
-          env: |
             NEXT_PUBLIC_API_URL=https://etu.utt.fr/api
             NEXT_PUBLIC_CAS_SERVICE_URL=https://etu.utt.fr/login
             NEXT_PUBLIC_API_VERSION=v1
