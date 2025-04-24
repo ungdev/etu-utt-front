@@ -75,7 +75,7 @@ export default function Navbar() {
   const loggedIn = useAppSelector(isLoggedIn);
   const user = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
-  const { navbarAdditionalComponent } = usePageSettings();
+  const { navbarAdditionalComponent: Additional } = usePageSettings();
 
   const { t, i18n } = useAppTranslation();
   const [language, setLanguage] = useState(i18n.language);
@@ -167,10 +167,10 @@ export default function Navbar() {
         <ul>
           {menuItems.items.slice(0, menuItems.seperator).map((item) => inflateButton(item))}
           {menuItems.items.slice(menuItems.seperator).map((item) => inflateButton(item))}
-          {navbarAdditionalComponent && (
+          {Additional && (
             <>
               <div className={styles.separator} />
-              {navbarAdditionalComponent()}
+              <Additional />
             </>
           )}
         </ul>
