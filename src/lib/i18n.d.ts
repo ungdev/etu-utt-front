@@ -11,7 +11,7 @@ import { type InitOptions } from 'i18next';
 
 declare module 'i18next' {
   interface CustomTypeOptions extends InitOptions {
-    ns: ['common', 'login', 'ues', 'homepage', 'users', 'goTo', 'auth', 'assos', 'cookies'];
+    ns: ['common', 'login', 'ues', 'homepage', 'users', 'goTo', 'auth', 'assos'];
     nsSeparator: ':';
     defaultNS: 'common';
     // custom resources type

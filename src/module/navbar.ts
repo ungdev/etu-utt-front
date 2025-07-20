@@ -2,9 +2,16 @@ import { MenuItem } from '@/components/Navbar';
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import { AppThunk, RootState } from 'src/lib/store';
 import Icons from '@/icons';
-import { CookieNames, setCookie } from '@/module/cookies';
+import { LocalStorageNames } from '@/global';
+import { useAppSelector } from '@/lib/hooks';
 
-export const userSlice = createSlice({
+interface NavbarSlice {
+  items: MenuItem[];
+  seperator: number;
+  collapsed: boolean;
+}
+
+export const navbarSlice = createSlice({
   name: 'navbar',
   reducers: {
     addItem: (
@@ -62,8 +69,12 @@ export const userSlice = createSlice({
     moveSeparator: (state, action: PayloadAction<number>) => {
       if (action.payload >= 0 && action.payload <= state.items.length) state.seperator = action.payload;
     },
+    setCollapsed: (state, action: PayloadAction<boolean>) => {
+      state.collapsed = action.payload;
+      localStorage.setItem(LocalStorageNames.NAVBAR_COLLAPSED, state.collapsed ? 'true' : 'false');
+    },
   },
-  initialState: <{ items: MenuItem[]; seperator: number }>{
+  initialState: {
     items: [
       {
         icon: Icons.Home,
@@ -126,10 +137,17 @@ export const userSlice = createSlice({
       },
     ],
     seperator: 4,
-  },
+    collapsed: false,
+  } as NavbarSlice,
 });
 
-const { addItem, replaceItem, removeItem, moveSeparator } = userSlice.actions;
+const { addItem, replaceItem, removeItem, moveSeparator, setCollapsed } = navbarSlice.actions;
+export { setCollapsed };
+
+export const initNavbar = (): AppThunk => (dispatch) => {
+  const collapsed = localStorage.getItem(LocalStorageNames.NAVBAR_COLLAPSED);
+  dispatch(setCollapsed(collapsed == 'true'));
+};
 
 export const addMenuItem =
   (
@@ -189,10 +207,8 @@ export const setAlwaysVisibleCount =
 
 export const getMenu = (state: RootState) => state.navbar;
 
-export const setCollapsed =
-  (collapse: boolean): AppThunk =>
-  (dispatch) => {
-    dispatch(setCookie(CookieNames.NAVBAR_COLLAPSED, collapse ? 'true' : 'false'));
-  };
+export function useCollapsed() {
+  return useAppSelector((state) => state.navbar.collapsed);
+}
 
-export default userSlice.reducer;
+export default navbarSlice.reducer;

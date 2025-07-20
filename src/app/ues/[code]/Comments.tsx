@@ -17,10 +17,11 @@ import { useAPI } from '@/api/api';
 function CommentEditorFooter(comment: Comment, onUpdate: (text: string, anonymous: boolean) => void, t: TFunction) {
   return function CommentEditorFooter({ text, disable }: { text: string; disable: () => void }) {
     const [anonymous, setAnonymous] = useState<boolean>(comment.isAnonymous);
+    const { t } = useAppTranslation();
     return (
       <div className={styles.commentEditorFooter}>
         <div>
-          Anonyme : <input type={'checkbox'} checked={anonymous} onChange={() => setAnonymous(!anonymous)} />
+          {t('ues:detailed.comments.write.anonymous')} : <input type={'checkbox'} checked={anonymous} onChange={() => setAnonymous(!anonymous)} />
         </div>
         <Button
           className={styles.button}
