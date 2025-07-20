@@ -10,7 +10,7 @@ import { addWidget, modifyBB, removeWidget, WIDGETS } from '@/module/homepage';
 import { useEffect, useMemo, useState } from 'react';
 import { isClientSide } from '@/utils/environment';
 import Page from '@/components/utilities/Page';
-import { useAppTranslation } from "@/lib/i18n";
+import { useAppTranslation } from '@/lib/i18n';
 
 function AdditionalNavbarComponent({
   modifyingLayout,
