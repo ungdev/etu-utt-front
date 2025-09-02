@@ -4,6 +4,7 @@ export interface CasLoginRequestDto {
 }
 
 export interface CasLoginResponseDto {
-  signedIn: boolean;
+  status: 'no_account' | 'no_api_key' | 'ok';
   token: string;
+  redirectUrl: string | null;
 }

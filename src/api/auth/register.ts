@@ -9,5 +9,7 @@ export interface RegisterRequestDto {
 }
 
 export interface RegisterResponseDto {
+  signedIn: boolean;
   token: string;
+  redirectUrl: string;
 }

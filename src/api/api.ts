@@ -228,10 +228,10 @@ async function internalRequestAPI<RequestType, ResponseType>(
  * @param method The HTTP method to use.
  * @param route The route to call.
  * @param body The body of the request. Defaults to `null`.
- * @param timeoutMillis The timeout of the request, in milliseconds. Defaults to 10000 milliseconds (10 seconds).
- * @param version The version of the API to use : v1, v2, ... Defaults to the environment variable `NEXT_PUBLIC_API_VERSION`.
- * @param isFile Set it to true if you are sending a file.
- * @param applicationId Set its value if you are not using the default application to make the request.
+ * @param params * timeoutMillis: The timeout of the request, in milliseconds. Defaults to 10000 milliseconds (10 seconds).
+ *               * version: The version of the API to use : v1, v2, ... Defaults to the environment variable `NEXT_PUBLIC_API_VERSION`.
+ *               * isFile Set it to true if you are sending a file.
+ *               * applicationId Set its value if you are not using the default application to make the request.
  */
 function requestAPI<RequestType>(
   method: 'GET',

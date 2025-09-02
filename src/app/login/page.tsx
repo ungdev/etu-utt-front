@@ -40,7 +40,7 @@ export default function LoginPage() {
         service: process.env.NEXT_PUBLIC_CAS_SERVICE!,
       })
       .on('success', (body) => {
-        if (!body.signedIn) {
+        if (body.status === 'no_api_key') {
           setRegisterToken(body.token);
           router.replace('/login');
           return;
