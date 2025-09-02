@@ -6,6 +6,7 @@ import { useUsers } from '@/api/users/searchUsers.hook';
 import { ResultsList } from '@/components/ResultsList';
 import defaultAvatar from '@/../public/images/default-avatar.jpg';
 import Page from '@/components/utilities/Page';
+import { PagePermission } from '@/module/pageSettings';
 
 type FilterNames = 'name' | 'firstName' | 'lastName' | 'nickname';
 
@@ -42,7 +43,7 @@ const filtersData = Object.freeze({
 export default function SearchUserPage() {
   const { items: users, total: totalUsers, updateFilters: updateUsers, fetchNextItems: fetchNextPage } = useUsers();
   return (
-    <Page className={styles.searchUserPage}>
+    <Page className={styles.searchUserPage} permissions={[PagePermission.CONNECTED]}>
       <h1>Trombinoscope</h1>
       <div className={styles.content}>
         <FilteredSearch<FilterNames, FiltersType> filtersData={filtersData} updateSearch={updateUsers} />

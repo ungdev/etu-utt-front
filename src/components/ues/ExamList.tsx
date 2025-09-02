@@ -11,11 +11,10 @@ import CircleCheck from '@/icons/CircleCheck';
 import CircleWarning from '@/icons/CircleWarning';
 import Clock from '@/icons/Clock';
 import Trash from '@/icons/Trash';
-import { UserType } from '@/module/user';
+import { useConnectedUser, UserType } from '@/module/session';
 import Button from '../UI/Button';
 import Tooltip from '../UI/Tooltip';
 import styles from './ExamList.module.scss';
-import { useAppSelector } from '@/lib/hooks';
 import { useAppTranslation } from '@/lib/i18n';
 import { useAPI } from '@/api/api';
 
@@ -37,8 +36,7 @@ export default function ExamList({
   annalTypes: AnnalType[] | null;
   annalSemesters: string[] | null;
 }) {
-  const type = useAppSelector((state) => state.user?.type);
-  const userId = useAppSelector((state) => state.user?.id);
+  const { type, id: userId } = useConnectedUser() ?? {};
   const { t } = useAppTranslation();
   const api = useAPI();
 
