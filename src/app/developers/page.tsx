@@ -1,7 +1,7 @@
 'use client';
 
-import { usePageSettings } from "@/module/pageSettings";
-import Link from "@/components/UI/Link";
+import { usePageSettings } from '@/module/pageSettings';
+import Link from '@/components/UI/Link';
 
 export default function DeveloperPage() {
   usePageSettings({});

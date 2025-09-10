@@ -18,6 +18,8 @@ export default function LoginForm({ application }: { application: string | undef
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const router = useRouter();
+  const { t } = useAppTranslation();
+
   const submit = async () => {
     const res = await dispatch(sessionModule.login(api, username, password, application));
     if (!res) return;
@@ -27,7 +29,6 @@ export default function LoginForm({ application }: { application: string | undef
       );
     if (res.redirectUrl) router.push(res.redirectUrl);
   };
-  const { t } = useAppTranslation();
   const connectionText = t('login:login.connection');
 
   return (

@@ -3,7 +3,7 @@ import { ApplicationOverview } from '@/api/auth/applications/application.interfa
 import { useEffect, useState } from 'react';
 import { StatusCodes } from 'http-status-codes';
 
-export default function useApplication(applicationId: string | undefined) {
+export default function useApplication(applicationId: string | undefined): ApplicationOverview | undefined {
   const [application, setApplication] = useState<ApplicationOverview | undefined>(undefined);
   const api = useAPI();
   useEffect(() => {
