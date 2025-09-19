@@ -47,7 +47,7 @@ export default function ExamList({
       <div className={styles.exams}>
         <h2>{t('ues:detailed.annals.title')}</h2>
         <div className={styles.list}>
-          {annals?.length
+          {annals.length
             ? Object.entries(Object.groupBy(annals, (annal) => annal.semesterId)).map(([semester, annals]) => (
                 <div className={styles.semester} key={semester}>
                   <h3>{semester}</h3>
@@ -85,7 +85,7 @@ export default function ExamList({
         </div>
         <Button
           className={styles.sendButton}
-          disabled={!annalTypes?.length || !annalSemesters?.length}
+          disabled={!annalTypes.length || !annalSemesters.length}
           onClick={() => setAnnalUploaderOpen(true)}>
           {t('ues:detailed.annals.send')}
         </Button>
