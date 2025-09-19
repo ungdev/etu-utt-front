@@ -26,7 +26,9 @@ export default function CreateExternalAccountPage() {
   }
   return (
     <Page>
-      Créer une application pour {application.id} ({application.name}) ?
+      Créer un droit d'accès pour l'application tierce {application.id} ({application.name}) ? Les opérations faites
+      avec ce droit d'accès seront à votre nom. Vous pourrez gérer les informations auxquelles vous souhaiter donner
+      l'accès dans vos paramètres à tout moment.
       <Button
         onClick={async () => {
           const redirectUrl = await createApiKey(api, applicationId!, apiKeyRegistrationToken!);

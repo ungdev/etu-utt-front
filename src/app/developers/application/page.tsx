@@ -2,7 +2,6 @@
 
 import styles from './style.module.scss';
 import useApplications from '@/api/auth/applications/fetchApplications';
-import { usePageSettings } from '@/module/pageSettings';
 import Trash from '@/icons/Trash';
 import Input from '@/components/UI/Input';
 import { useState } from 'react';
@@ -12,9 +11,9 @@ import { useAPI } from '@/api/api';
 import { useConnectedUser } from '@/module/user';
 import updateApplicationToken from '@/api/auth/applications/updateToken';
 import Icons from '@/icons';
+import Page from '@/components/utilities/Page';
 
 export default function ApplicationsPage() {
-  usePageSettings({});
   const loggedIn = !!useConnectedUser();
   const [applications, setApplications] = useApplications();
   const [newApplicationName, setNewApplicationName] = useState<string>('');
@@ -32,7 +31,7 @@ export default function ApplicationsPage() {
   };
 
   return (
-    <div className={styles.applicationsPage}>
+    <Page className={styles.applicationsPage}>
       <div className={styles.applicationsList}>
         {applications.map((application) => (
           <div key={application.id} className={styles.application}>
@@ -71,14 +70,14 @@ export default function ApplicationsPage() {
           <div className={styles.popupContent}>
             {token}
             <div className={styles.buttons}>
-              <Button onClick={() => navigator.clipboard.writeText(token)}>
-                <Icons.Trash />
+              <Button onClick={() => navigator.clipboard.writeText(token)} disabled>
+                <Icons.Copy />
               </Button>
               <Button onClick={() => setToken(null)}>Ok</Button>
             </div>
           </div>
         </div>
       )}
-    </div>
+    </Page>
   );
 }

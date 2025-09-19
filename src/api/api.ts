@@ -61,7 +61,7 @@ type RawResponseType<T> = T extends Date
 export class ResponseHandler<
   T,
   R extends { [status in StatusCodes]?: any } & { fallback: any } & {
-    [status in ResponseError | 'success' | 'error' | 'failure']?: status extends 'success' ? any : any;
+    [status in ResponseError | 'success' | 'error' | 'failure']?: any;
   } = { fallback: undefined },
 > {
   private readonly handlers = { fallback: () => undefined } as {
@@ -78,7 +78,6 @@ export class ResponseHandler<
             ? this.handlers.failure()
             : undefined;
       }
-      // type C = B extends A ? true : false;
       if (response.code in this.handlers) {
         return this.handlers[response.code]!(response.body);
       }
@@ -98,7 +97,7 @@ export class ResponseHandler<
   }
 
   async toPromise(): Promise<
-    Awaited<Exclude<R[keyof R], void | undefined> | (undefined extends R[keyof R] ? null : never)> // For some reason, void extends undefined
+    Awaited<Exclude<R[keyof R], void | undefined> | (undefined extends R[keyof R] ? null : never)> // For some reason, undefined extends void. See https://github.com/ungdev/etu-utt-front/pull/28/files#r2357325209, Alban got the explanation
   > {
     return ((await this.promise) ?? null) as Awaited<
       Exclude<R[keyof R], void | undefined> | (undefined extends R[keyof R] ? null : never)
