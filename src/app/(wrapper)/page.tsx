@@ -10,6 +10,7 @@ import { addWidget, modifyBB, removeWidget, WIDGETS } from '@/module/homepage';
 import { useEffect, useMemo, useState } from 'react';
 import { isClientSide } from '@/utils/environment';
 import Page from '@/components/utilities/Page';
+import { useAppTranslation } from '@/lib/i18n';
 
 function AdditionalNavbarComponent({
   modifyingLayout,
@@ -23,6 +24,7 @@ function AdditionalNavbarComponent({
   onDone: () => void;
 }) {
   const [widgetToAdd /*, setWidgetToAdd*/] = useState<keyof typeof WIDGETS>('ueBrowserWidget');
+  const { t } = useAppTranslation();
   return (
     <>
       <Button onClick={modifyingLayout ? onDone : onModify}>{modifyingLayout ? 'Terminer' : 'Modifier'}</Button>
@@ -35,7 +37,7 @@ function AdditionalNavbarComponent({
             <option value="widget2">widget2</option>
             <option value="widget3">widget3</option>
           </select>*/}
-          <Button onClick={() => onAdd(widgetToAdd)}>Ajouter</Button>
+          <Button onClick={() => onAdd(widgetToAdd)}>{t('common:navbar.addWidget')}</Button>
         </>
       )}
     </>

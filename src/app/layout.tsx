@@ -4,7 +4,7 @@ import React, { ReactNode, Suspense } from 'react';
 import AutoLogin from '@/components/utilities/AutoLogin';
 import PageSearchParams from '@/components/utilities/PageSearchParams';
 import { Lexend } from 'next/font/google';
-import PageSettingsInitializer from '@/components/utilities/PageSettingsInitializer';
+import ReduxModulesInitializer from '@/components/utilities/ReduxModulesInitializer';
 
 const lexend = Lexend({
   weight: ['400', '600', '700', '800'],
@@ -24,7 +24,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html className={lexend.variable}>
       <Providers>
         <AutoLogin />
-        <PageSettingsInitializer />
+        <ReduxModulesInitializer />
         <Suspense>
           <PageSearchParams />
         </Suspense>
