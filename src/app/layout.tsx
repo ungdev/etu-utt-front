@@ -6,8 +6,7 @@ import AutoLogin from '@/components/utilities/AutoLogin';
 import Wrapper from '@/components/utilities/Wrapper';
 import PageSearchParams from '@/components/utilities/PageSearchParams';
 import { Lexend } from 'next/font/google';
-import { CookiePopup } from '@/components/CookiePopup';
-import PageSettingsInitializer from '@/components/utilities/PageSettingsInitializer';
+import ReduxModulesInitializer from '@/components/utilities/ReduxModulesInitializer';
 
 const lexend = Lexend({
   weight: ['400', '600', '700', '800'],
@@ -28,12 +27,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <Providers>
         <Redirecter />
         <AutoLogin />
-        <PageSettingsInitializer />
+        <ReduxModulesInitializer />
         <Suspense>
           <PageSearchParams />
         </Suspense>
         <body>
-          <CookiePopup />
           <Wrapper>{children}</Wrapper>
         </body>
       </Providers>

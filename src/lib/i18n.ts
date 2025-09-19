@@ -5,7 +5,8 @@ import { initReactI18next, useTranslation } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import resourcesToBackend from 'i18next-resources-to-backend';
 import './i18n.d';
-import { CookieNames, useCookie } from '@/module/cookies';
+import { useLocalStorageVariable } from '@/utils/hooks';
+import { LocalStorageNames } from '@/global';
 
 export const supportedLngs = ['fr', 'en'];
 
@@ -25,7 +26,7 @@ i18n
       useSuspense: true,
     },
     supportedLngs,
-    ns: ['common', 'login', 'ues', 'homepage', 'users', 'goTo', 'auth', 'assos', 'cookies'],
+    ns: ['common', 'login', 'ues', 'homepage', 'users', 'goTo', 'auth', 'assos'],
     preload: ['fr'],
     nsSeparator: ':',
     defaultNS: 'common',
@@ -46,7 +47,7 @@ export function useAppTranslation() {
 }
 
 export function useLanguage() {
-  const lang = useCookie(CookieNames.LANG) || 'fr';
+  const lang = useLocalStorageVariable(LocalStorageNames.LANG) || 'fr';
   if (!supportedLngs.some((lng) => lng === lang)) {
     return 'fr';
   }

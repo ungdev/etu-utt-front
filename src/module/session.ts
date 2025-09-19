@@ -7,7 +7,7 @@ import { IsLoggedInResponseDto } from '@/api/auth/isLoggedIn';
 import { setUser } from '@/module/user';
 import { API, setAuthorizationToken } from '@/api/api';
 import { fetchProfile } from '@/api/profile/fetchProfile';
-import { CookieNames, getCookie, setCookie } from '@/module/cookies';
+import { LocalStorageNames } from '@/global';
 
 interface SessionSlice {
   logged: boolean;
@@ -19,6 +19,7 @@ export const sessionSlice = createSlice({
   reducers: {
     setToken: (state, action: PayloadAction<string | null>) => {
       setAuthorizationToken(action.payload ?? '');
+      localStorage.setItem(LocalStorageNames.TOKEN, action.payload ?? '');
       state.token = action.payload;
       state.logged = !!action.payload;
     },
@@ -68,7 +69,7 @@ export const isLoggedIn = (state: RootState) => state.session.logged;
 export const autoLogin =
   (api: API): AppThunk =>
   async (dispatch) => {
-    const token = dispatch(getCookie(CookieNames.TOKEN));
+    const token = localStorage.getItem(LocalStorageNames.TOKEN);
     if (!token) {
       return;
     }
@@ -84,7 +85,6 @@ export function setToken(token: null): AppThunk;
 export function setToken(token: string, api: API): AppThunk;
 export function setToken(token: string | null, api?: API): AppThunk {
   return async (dispatch) => {
-    dispatch(setCookie(CookieNames.TOKEN, token ?? ''));
     dispatch(_setToken(token));
     if (token === null) {
       setUser(null);
