@@ -2,7 +2,6 @@
 
 import { useAppSelector } from '@/lib/hooks';
 import { usePathname, useRouter } from 'next/navigation';
-import { usePageSettings } from '@/module/pageSettings';
 
 interface RouteConditionState {
   loggedIn: boolean;
@@ -23,13 +22,6 @@ export default function Redirecter() {
   const state = {
     loggedIn: useAppSelector((state) => state.session.logged),
   };
-  const { notFound: pageNotFound } = usePageSettings();
-  if (pageNotFound) {
-    const error = new Error('NEXT_NOT_FOUND'); //notFound();
-    // @ts-expect-error
-    error.digest = 'NEXT_NOT_FOUND';
-    throw error;
-  }
   const rules = redirectionRules[pathname];
   if (!rules) {
     return false;

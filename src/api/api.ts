@@ -1,6 +1,6 @@
 import { apiTimeout, apiUrl, apiVersion } from '@/utils/environment';
 import { StatusCodes } from 'http-status-codes';
-import { useSetNotFound } from '@/module/pageSettings';
+import { useNotFound } from '@/module/pageSettings';
 import { toast } from 'react-toastify';
 import { ApiError } from '@/api/api.interface';
 
@@ -291,7 +291,7 @@ export const setAuthorizationToken = (token: string) => {
  */
 // TODO : wellll, implement that page settings thingy once it's merged.
 export function useAPI(): API {
-  const setNotFound = useSetNotFound();
+  const setNotFound = useNotFound();
   return {
     get: <ResponseType = never>(
       route: string,

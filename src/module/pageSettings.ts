@@ -1,13 +1,13 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
+import { notFound } from 'next/navigation';
 
 interface PageSettingsSlice {
   permissions: string;
   hasNavbar: boolean;
   navbarAdditionalComponent: FC<Record<string, never>> | null;
   searchParams: Record<string, string>;
-  notFound: boolean;
   pageComponentReady: boolean;
   internalLoading: {
     searchParamsLoaded: boolean;
@@ -65,16 +65,12 @@ export const pageSettingsSlice = createSlice({
       state.pageComponentReady = action.payload;
       return state;
     },
-    setNotFound(state, action: PayloadAction<boolean>) {
-      state.notFound = action.payload;
-      return state;
-    },
   },
   initialState: getInitialState(),
 });
 
-const { initPageSettings, updatePageSettings, setSearchParams, setLoaded, setNotFound } = pageSettingsSlice.actions;
-export { setSearchParams, initPageSettings, updatePageSettings, setNotFound }; // TODO: remove setNotFound
+const { initPageSettings, updatePageSettings, setSearchParams, setLoaded } = pageSettingsSlice.actions;
+export { setSearchParams, initPageSettings, updatePageSettings };
 
 export function usePageSettings(): PageSettingsSlice {
   return useAppSelector((state) => state.pageSettings);
@@ -104,9 +100,25 @@ export function useSearchParam(param: string): string | undefined {
   return useAppSelector((state) => state.pageSettings.searchParams[param]);
 }
 
-export function useSetNotFound(): () => void {
-  const dispatch = useAppDispatch();
-  return () => dispatch(setNotFound(true));
+/**
+ * Use this instead of the builtin notFound() if you need to call it outside the body of a component (e.g. in a useEffect block).
+ * @example
+ * function MyComponent() {
+ *   const notFound = useSetNotFound();
+ *   useEffect(() => {
+ *     fetch("https://example.com")
+ *       .then(() => console.log("Request succeeded!")
+ *       .catch(() => notFound());
+ *   }, []);
+ *   return <p>Making a request to https://example.com...</p>;
+ * }
+ */
+export function useNotFound(): () => void {
+  const [wasNotFound, setWasNotFound] = useState(false);
+  if (wasNotFound) {
+    notFound();
+  }
+  return () => setWasNotFound(true);
 }
 
 export default pageSettingsSlice.reducer;
