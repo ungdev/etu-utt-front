@@ -196,18 +196,18 @@ export default function LegalPage() {
         <p>{/** TODO: Add Data collected */}</p>
         <h3 className={styles.subArticleTitle}>3.2. Mode de collecte des données</h3>
         <p>{/** TODO: Add Data Collection Mode */}</p>
-        <h3 className={styles.subArticleTitle}>3.3. Transmissions des données à un tier</h3>
+        <h3 className={styles.subArticleTitle}>{/** 3.3. Transmissions des données à un tier */}</h3>
         <p>{/** TODO: Add Matomo and Sentry here */}</p>
-        <h3 className={styles.subArticleTitle}>3.4. Informations relatives aux cookies</h3>
+        <h3 className={styles.subArticleTitle}>3.3. Informations relatives aux cookies</h3>
         <p>
-          Nous utilisons des cookies afin d'obtenir des statistiques sur notre site web. Ces informations ne seront en
-          aucun cas vendues, échangées ou données. Ces cookies sont anonymisés. Afin d'assurer le fonctionnement du
-          service à l'utilisateur authentifié, des cookies de session sont inscrits sur le navigateur lors de
-          l'authentification sur le site. Ceux-ci ont pour seule fonction d'assurer la persistance de la session
-          authentifiée de l'utilisateur. Ils sont détruits lors de la déconnexion ou à son expiration. Conformément à la
-          directive européenne 2009/136/CE, ces cookies sont indispensables à la fourniture du service sollicité. Vous
-          avez la possibilité d'accepter ou refuser ces cookies. Sans ces cookies, vous n'aurez pas accès aux
-          fonctionnalités de connexion automatique.
+          Afin d'assurer le fonctionnement du service à l'utilisateur authentifié, des cookies de session sont inscrits
+          sur le navigateur :<br />
+          - lors de l'authentification sur le site. Ceux-ci ont pour seule fonction d'assurer la persistance de la
+          session authentifiée de l'utilisateur. Ils sont détruits à la déconnexion ou à leur expiration,
+          <br />- afin de stocker les préférences utilisateurs, comme la langue. Ils sont détruits à leur expiration.
+          Ils resteront strictement sur le navigateur, et ne seront jamais envoyés sur nos serveurs, même anonymement.
+          Conformément à la directive européenne 2009/136/CE, ces cookies sont indispensables à la fourniture du service
+          sollicité.
         </p>
         <h2 className={styles.articleTitle}>
           4. Responsable du traitement des données et délégué à la protection des données

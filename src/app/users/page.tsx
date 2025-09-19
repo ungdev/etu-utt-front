@@ -7,6 +7,7 @@ import { ResultsList } from '@/components/ResultsList';
 import defaultAvatar from '@/../public/images/default-avatar.jpg';
 import Page from '@/components/utilities/Page';
 import { PagePermission } from '@/module/pageSettings';
+import { useAppTranslation } from '@/lib/i18n';
 
 type FilterNames = 'name' | 'firstName' | 'lastName' | 'nickname';
 
@@ -19,7 +20,7 @@ interface FiltersType extends GenericFiltersType<FilterNames> {
 
 const filtersData = Object.freeze({
   name: {
-    component: createInputFilter('users:filter.search.placeholder', 'users:filter.search.title'),
+    component: createInputFilter('users:filter.global.placeholder', 'users:filter.global.title'),
     parameterName: 'q',
     updateDelayed: true,
   },
@@ -42,9 +43,10 @@ const filtersData = Object.freeze({
 
 export default function SearchUserPage() {
   const { items: users, total: totalUsers, updateFilters: updateUsers, fetchNextItems: fetchNextPage } = useUsers();
+  const { t } = useAppTranslation();
   return (
     <Page className={styles.searchUserPage} permissions={[PagePermission.CONNECTED]}>
-      <h1>Trombinoscope</h1>
+      <h1>{t('users:search.title')}</h1>
       <div className={styles.content}>
         <FilteredSearch<FilterNames, FiltersType> filtersData={filtersData} updateSearch={updateUsers} />
         <div className={styles.results}>

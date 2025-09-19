@@ -6,7 +6,7 @@ import { RegisterRequestDto, RegisterResponseDto } from '@/api/auth/register';
 import { IsLoggedInResponseDto } from '@/api/auth/isLoggedIn';
 import { API, setAuthorizationToken, useAPI } from '@/api/api';
 import { fetchProfile } from '@/api/profile/fetchProfile';
-import { CookieNames, getCookie, setCookie } from '@/module/cookies';
+import { LocalStorageNames } from '@/global';
 import { fetchMyPermissions } from '@/api/permissions/fetchMyPermissions';
 import { Permissions } from '@/api/permissions/permissions.interface';
 import { Profile } from '@/api/profile/profile.types';
@@ -89,7 +89,7 @@ export const isLoggedIn = (state: RootState) => state.session.logged;
 export const autoLogin =
   (api: API): AppThunk =>
   async (dispatch) => {
-    const token = dispatch(getCookie(CookieNames.TOKEN));
+    const token = localStorage.getItem(LocalStorageNames.TOKEN);
     if (!token) {
       return;
     }
@@ -105,7 +105,7 @@ export function setToken(token: null): AppThunk;
 export function setToken(token: string, api: API): AppThunk;
 export function setToken(token: string | null, api?: API): AppThunk {
   return async (dispatch) => {
-    dispatch(setCookie(CookieNames.TOKEN, token ?? ''));
+    localStorage.setItem(LocalStorageNames.TOKEN, token ?? '');
     setAuthorizationToken(token ?? '');
     let loggedIn: boolean;
     if (token === null) {
