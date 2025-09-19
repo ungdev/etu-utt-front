@@ -2,8 +2,9 @@
 // For more information, check the common.json.ts file
 
 export default {
-  "filter.search.title": "Générique",
-  "filter.search.placeholder": "Recherche générique",
+  "search.title": "Trombinoscope",
+  "filter.global.title": "Générique",
+  "filter.global.placeholder": "Recherche générique",
   "filter.firstName.title": "Prénom",
   "filter.firstName.placeholder": "Recherche par prénom",
   "filter.lastName.title": "Nom de famille",
