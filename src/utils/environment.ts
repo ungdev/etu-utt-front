@@ -6,3 +6,4 @@ export const apiVersion = process.env.NEXT_PUBLIC_API_VERSION || 'v0';
 export const apiTimeout = Number(process.env.NEXT_PUBLIC_API_REQUEST_TIMEOUT || 0);
 export const isServerSide = () => typeof window === 'undefined';
 export const isClientSide = () => typeof window !== 'undefined';
+export const authorizationTokenExpiresIn = () => Number(process.env.NEXT_PUBLIC_AUTHORIZATION_TOKEN_EXPIRES_IN || 0);

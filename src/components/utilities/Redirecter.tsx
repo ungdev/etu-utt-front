@@ -1,8 +1,8 @@
 'use client';
 
 import { useAppSelector } from '@/lib/hooks';
-import { notFound, usePathname, useRouter } from "next/navigation";
-import { usePageSettings } from "@/module/pageSettings";
+import { usePathname, useRouter } from 'next/navigation';
+import { usePageSettings } from '@/module/pageSettings';
 
 interface RouteConditionState {
   loggedIn: boolean;
@@ -26,7 +26,7 @@ export default function Redirecter() {
   const { notFound: pageNotFound } = usePageSettings();
   if (pageNotFound) {
     const error = new Error('NEXT_NOT_FOUND'); //notFound();
-    // @ts-ignore
+    // @ts-expect-error
     error.digest = 'NEXT_NOT_FOUND';
     throw error;
   }

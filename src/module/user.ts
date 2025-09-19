@@ -3,7 +3,7 @@ import { useAppSelector } from '@/lib/hooks';
 import { AppThunk } from '@/lib/store';
 import { addMenuItem, getMenuItem, removeMenuItem } from '@/module/navbar';
 import { fetchMyUes } from '@/api/ue/fetchMyUes';
-import { API, useAPI } from "@/api/api";
+import { API, useAPI } from '@/api/api';
 import { MenuItem } from '@/components/Navbar';
 
 export const enum UserType {

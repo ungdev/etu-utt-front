@@ -9,6 +9,7 @@ import { API, setAuthorizationToken } from '@/api/api';
 import { fetchProfile } from '@/api/profile/fetchProfile';
 import { useAppSelector } from '@/lib/hooks';
 import { LocalStorageNames } from '@/global';
+import { authorizationTokenExpiresIn } from '@/utils/environment';
 
 interface SessionSlice {
   logged: boolean;
@@ -37,7 +38,7 @@ export const login =
       .post<LoginRequestDto, LoginResponseDto>('/auth/signin', {
         login,
         password,
-        tokenExpiresIn: 99999999,
+        tokenExpiresIn: authorizationTokenExpiresIn(),
       } as unknown as LoginRequestDto)
       .on('success', async (body) => dispatch(setToken(body.access_token, api)))
       .on(StatusCodes.UNAUTHORIZED, (errorCode, error) => console.error(`Wrong credentials: ${errorCode} (${error})`))
