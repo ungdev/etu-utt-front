@@ -41,7 +41,7 @@ export default function ApplicationsPage() {
             <Button className={styles.generateToken} onClick={() => updateToken(application.id)}>
               Générer un nouveau token
             </Button>
-            <Button className={styles.trash}>
+            <Button className={styles.trash} disabled>
               <Trash className={styles.icon} />
             </Button>
           </div>
@@ -70,7 +70,7 @@ export default function ApplicationsPage() {
           <div className={styles.popupContent}>
             {token}
             <div className={styles.buttons}>
-              <Button onClick={() => navigator.clipboard.writeText(token)} disabled>
+              <Button onClick={() => navigator.clipboard.writeText(token)}>
                 <Icons.Copy />
               </Button>
               <Button onClick={() => setToken(null)}>Ok</Button>
