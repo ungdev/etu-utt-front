@@ -22,6 +22,9 @@ import CircleWarning from './CircleWarning';
 import Clock from './Clock';
 import Rotate from './Rotate';
 import Copy from './Copy';
+import Mail from './Mail';
+import Phone from './Phone';
+import LinkExternal from './LinkExternal';
 
 const Icons = {
   Book,
@@ -34,13 +37,16 @@ const Icons = {
   Language,
   LeftArrow,
   LeftChevron,
+  LinkExternal,
   Loader,
   Login,
   LogoEtu,
   LogoUNG,
   LogoUTT,
   Logout,
+  Mail,
   Menu,
+  Phone,
   Star,
   Trash,
   RightChevron,
