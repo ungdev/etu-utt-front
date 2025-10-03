@@ -25,6 +25,7 @@ import Copy from './Copy';
 import Mail from './Mail';
 import Phone from './Phone';
 import LinkExternal from './LinkExternal';
+import Crown from './Crown';
 
 const Icons = {
   Book,
@@ -33,6 +34,7 @@ const Icons = {
   CircleWarning,
   Clock,
   Collapse,
+  Crown,
   Home,
   Language,
   LeftArrow,
