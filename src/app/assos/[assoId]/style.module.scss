@@ -17,6 +17,7 @@
     display: flex;
     text-align: center;
     align-items: center;
+    justify-content: center;
     overflow: hidden;
     flex-shrink: 0;
   }
@@ -26,6 +27,19 @@
     flex-flow: column nowrap;
     gap: 2ch;
     justify-content: space-between;
+
+    h1:empty,
+    div:empty {
+      @extend .glimmer-animated;
+      width: 16ch;
+      height: 0.8em;
+      margin-top: 0.2em;
+      margin-bottom: 0.2em;
+
+      &:nth-child(2) {
+        width: 48ch;
+      }
+    }
 
     .actionRow {
       display: flex;
@@ -37,29 +51,105 @@
         vertical-align: super;
         margin-left: 0.5ch;
       }
+
+      :nth-child(1) div:empty {
+        width: 12ch;
+      }
+      :nth-child(2) div:empty {
+        width: 18ch;
+      }
+      :nth-child(3) div:empty {
+        width: 10ch;
+      }
     }
   }
 
   img {
     background: rgba($color: $ung-light-grey, $alpha: 0.2);
   }
+}
 
-  h1:empty,
-  div:empty {
-    @extend .glimmer-animated;
-    width: 16ch;
+.membersCard {
+  background: white;
+  margin-top: 3ch;
+  padding: 3ch;
+  display: flex;
+  flex-flow: column nowrap;
+  gap: 2ch;
+  border-radius: 1ch;
 
-    &:nth-child(2) {
-      width: 8ch;
+  h2 {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+
+    .toggleOldMembers {
+      font-size: 0.8em;
+      padding: 4px 8px;
+      border-radius: calc(0.5em + 4px);
     }
-    &:nth-of-type(2) {
-      width: 18ch;
+  }
+
+  h3 {
+    position: relative;
+  }
+
+  > div {
+    margin-left: 10px;
+  }
+
+  .crown {
+    display: inline-block;
+    background-color: gold;
+    border-radius: 50%;
+    padding: 5px;
+    position: absolute;
+    left: -30px;
+    width: 15px;
+    height: 15px;
+    box-sizing: content-box;
+
+    svg {
+      display: block;
+      width: 100%;
+      height: 100%;
     }
-    &:nth-of-type(3) {
-      width: 15ch;
-    }
-    &:nth-of-type(4) {
-      width: 10ch;
+  }
+
+  :has(:not(path):not(input):not(img):empty) {
+    display: none;
+  }
+
+  .members {
+    display: flex;
+    flex-flow: row wrap;
+    gap: 2ch;
+    margin-top: 1ch;
+
+    .pictureContainer {
+      display: flex;
+      flex-flow: row nowrap;
+      gap: 1ch;
+      align-items: center;
+
+      img {
+        width: 5ch;
+        height: 5ch;
+        border-radius: 50%;
+        object-fit: cover;
+        display: flex;
+        text-align: center;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        flex-shrink: 0;
+        background-color: rgba($color: $ung-light-grey, $alpha: 0.2);
+      }
+
+      .temporal {
+        font-size: 0.8em;
+        color: $ung-dark-grey;
+      }
     }
   }
 }
