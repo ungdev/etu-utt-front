@@ -25,16 +25,21 @@
     }
   }
 
-  .legalStuff {
-    display: flex;
-    justify-content: space-around;
+  .randomLinks {
+    text-align: center;
     margin-top: 10px;
 
-    > * {
-      transition: opacity 0.1s ease-in-out;
+    .legalStuff {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 5px;
 
-      &:hover {
-        opacity: 0.8;
+      > * {
+        transition: opacity 0.1s ease-in-out;
+
+        &:hover {
+          opacity: 0.8;
+        }
       }
     }
   }

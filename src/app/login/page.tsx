@@ -13,17 +13,24 @@ import { CasRegisterRequestDto } from '@/api/auth/casRegister';
 import { useAPI } from '@/api/api';
 import { useAppTranslation } from '@/lib/i18n';
 import { Trans } from 'react-i18next';
+import { etuuttWebApplicationId } from '@/utils/environment';
 import Page from '@/components/utilities/Page';
 
 export default function LoginPage() {
   const { internallyLoaded, markPageLoaded } = usePageLoaded();
   const ticket = useSearchParam('ticket');
+  const application = useSearchParam('application');
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { t } = useAppTranslation();
   const [registerToken, setRegisterToken] = useState<string | null>(null);
   const [validatedToken, setValidatedToken] = useState(false);
   const api = useAPI();
+  useEffect(() => {
+    if (application == etuuttWebApplicationId) {
+      router.replace('/login');
+    }
+  }, []);
   useEffect(() => {
     if (!ticket || validatedToken) return;
     setValidatedToken(true);
@@ -33,12 +40,12 @@ export default function LoginPage() {
         service: process.env.NEXT_PUBLIC_CAS_SERVICE!,
       })
       .on('success', (body) => {
-        if (!body.signedIn) {
-          setRegisterToken(body.access_token);
+        if (body.status === 'no_api_key') {
+          setRegisterToken(body.token);
           router.replace('/login');
           return;
         }
-        dispatch(setToken(body.access_token, api));
+        dispatch(setToken(body.token, api));
         router.push('/');
       });
   }, [ticket]);
@@ -70,7 +77,7 @@ export default function LoginPage() {
                   registerToken,
                 })
                 .on('success', (body) => {
-                  dispatch(setToken(body.access_token, api));
+                  dispatch(setToken(body.token, api));
                   router.push('/');
                 })
             }>
@@ -86,9 +93,10 @@ export default function LoginPage() {
       </Page>
     );
   }
+
   return (
     <Page hasNavbar={true} permissions={'public'} needsLoading={true} id="login-page" className={styles.loginPage}>
-      <LoginForm />
+      <LoginForm application={application} />
     </Page>
   );
 }

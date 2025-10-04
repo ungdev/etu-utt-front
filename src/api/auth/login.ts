@@ -1,8 +1,11 @@
 export interface LoginRequestDto {
   login: string;
   password: string;
+  tokenExpiresIn: number;
 }
 
 export interface LoginResponseDto {
-  access_token: string;
+  signedIn: boolean;
+  token: string;
+  redirectUrl: string;
 }
