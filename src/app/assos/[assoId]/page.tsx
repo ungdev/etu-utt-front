@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { PropsWithoutRef, useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import styles from './style.module.scss';
 import { useAsso } from '@/api/assos/fetchAsso.hook';
@@ -15,6 +15,97 @@ import { deleteRole } from '@/api/assos/deleteRole';
 import { useAPI } from '@/api/api';
 import { VerticalSortDnd } from '@/components/UI/VerticalSortDnd';
 import { updateRole } from '@/api/assos/updateRole';
+import Input from '@/components/UI/Input';
+import { Role } from '@/api/assos/member.interface';
+
+function RoleComponent({
+  role,
+  editing = false,
+  canEdit,
+  hasPermission,
+  displayOldMembers,
+  deleteAssoRole,
+  updateAssoRole,
+  setCurrentEditingRole,
+}: PropsWithoutRef<{
+  role: Role;
+  editing?: boolean;
+  canEdit: boolean;
+  hasPermission: boolean;
+  displayOldMembers: boolean;
+  deleteAssoRole: (id: string) => void;
+  updateAssoRole: (id: string, data: Partial<{ name: string; position: number }>) => void;
+  setCurrentEditingRole: (id: string | null) => void;
+}>) {
+  const [currentEditingRoleValue, setCurrentEditingRoleValue] = useState<string>(role.name);
+  const { t } = useAppTranslation();
+
+  return (
+    <>
+      <h3>
+        {role.isPresident ? (
+          <div className={styles.crown}>
+            <Icons.Crown />
+          </div>
+        ) : (
+          ''
+        )}
+        {editing && canEdit ? (
+          <Input value={currentEditingRoleValue} onChange={setCurrentEditingRoleValue} />
+        ) : (
+          role.name
+        )}
+        {canEdit && (
+          <>
+            <Button onClick={() => deleteAssoRole(role.id)} disabled={!hasPermission || role.isPresident}>
+              {t('assos:member.role.delete')}
+            </Button>
+            <Button
+              onClick={() => {
+                if (editing) {
+                  updateAssoRole(role.id, { name: currentEditingRoleValue });
+                  setCurrentEditingRole(null);
+                } else {
+                  setCurrentEditingRole(role.id);
+                  setCurrentEditingRoleValue(role.name);
+                }
+              }}
+              disabled={!hasPermission}>
+              {editing ? t('assos:member.role.edit.ok') : t('assos:member.role.edit')}
+            </Button>
+          </>
+        )}
+      </h3>
+      <div className={styles.members}>
+        {role.members.map((member) => {
+          const isOld = member.endAt < new Date();
+          return (
+            (!isOld || displayOldMembers) && (
+              <Link key={member.id} noStyle href={`/users/${member.userId}`}>
+                <div className={styles.pictureContainer}>
+                  <img />
+                  <div>
+                    <div>
+                      {member.firstName} {member.lastName}
+                    </div>
+                    <div className={styles.temporal}>
+                      {t(isOld ? 'assos:member.old.from' : 'assos:member.since')}
+                      {member.startAt.toLocaleString(undefined, {
+                        year: 'numeric',
+                        month: 'long',
+                      })}
+                      {isOld && t('assos:member.old.to')}
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            )
+          );
+        })}
+      </div>
+    </>
+  );
+}
 
 export default function AssoDetailPage() {
   const params = useParams<{ assoId: string }>();
@@ -24,6 +115,7 @@ export default function AssoDetailPage() {
   const [permissions, setPermissions] = useState(new Set<string>());
   const [displayOldMembers, setDisplayOldMembers] = useState(false);
   const [editMembersMode, setEditMembersMode] = useState(false);
+  const [currentEditingRole, setCurrentEditingRole] = useState<string | null>(null);
   const { t } = useAppTranslation();
 
   const api = useAPI();
@@ -120,57 +212,16 @@ export default function AssoDetailPage() {
             setItems={setMembers}
             onItemMoved={(id, newIndex) => updateAssoRole(id, { position: newIndex })}
             inflater={({ item: role }) => (
-              <>
-                <h3>
-                  {role.isPresident ? (
-                    <div className={styles.crown}>
-                      <Icons.Crown />
-                    </div>
-                  ) : (
-                    ''
-                  )}
-                  {role.name}
-                  {editMembersMode && (
-                    <>
-                      <Button
-                        onClick={() => deleteAssoRole(role.id)}
-                        disabled={!permissions.has('manage_roles') || role.isPresident}>
-                        {t('assos:member.role.delete')}
-                      </Button>
-                      <Button onClick={() => {}} disabled={!permissions.has('manage_roles')}>
-                        {t('assos:member.role.edit')}
-                      </Button>
-                    </>
-                  )}
-                </h3>
-                <div className={styles.members}>
-                  {role.members.map((member) => {
-                    const isOld = member.endAt < new Date();
-                    return (
-                      (!isOld || displayOldMembers) && (
-                        <Link key={member.id} noStyle href={`/users/${member.userId}`}>
-                          <div className={styles.pictureContainer}>
-                            <img />
-                            <div>
-                              <div>
-                                {member.firstName} {member.lastName}
-                              </div>
-                              <div className={styles.temporal}>
-                                {t(isOld ? 'assos:member.old.from' : 'assos:member.since')}
-                                {member.startAt.toLocaleString(undefined, {
-                                  year: 'numeric',
-                                  month: 'long',
-                                })}
-                                {isOld && t('assos:member.old.to')}
-                              </div>
-                            </div>
-                          </div>
-                        </Link>
-                      )
-                    );
-                  })}
-                </div>
-              </>
+              <RoleComponent
+                role={role}
+                editing={currentEditingRole === role.id}
+                hasPermission={permissions.has('manage_roles')}
+                canEdit={editMembersMode}
+                displayOldMembers={displayOldMembers}
+                deleteAssoRole={deleteAssoRole}
+                updateAssoRole={updateAssoRole}
+                setCurrentEditingRole={setCurrentEditingRole}
+              />
             )}
             disabled={!editMembersMode || !permissions.has('manage_roles')}></VerticalSortDnd>
         </div>

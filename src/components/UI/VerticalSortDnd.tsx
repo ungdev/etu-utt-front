@@ -1,6 +1,8 @@
+/* eslint-disable import/named */
 import {
   ComponentType,
   Dispatch,
+  PointerEvent,
   PropsWithChildren,
   PropsWithoutRef,
   PropsWithRef,
@@ -13,20 +15,31 @@ import {
   DragEndEvent,
   DragOverlay,
   DragStartEvent,
-  KeyboardSensor,
   PointerSensor,
   useSensor,
   useSensors,
 } from '@dnd-kit/core';
-import {
-  arrayMove,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  useSortable,
-  verticalListSortingStrategy,
-} from '@dnd-kit/sortable';
+import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { restrictToParentElement, restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import { CSS } from '@dnd-kit/utilities';
+
+class ClickPreservingPointerSensor extends PointerSensor {
+  static activators = [
+    {
+      eventName: 'onPointerDown' as const,
+      handler: ({ nativeEvent: event }: PointerEvent) => {
+        const target = event.target as HTMLElement;
+        return !(
+          target.closest('button') ||
+          target.closest('a') ||
+          target.closest('input') ||
+          target.closest('textarea') ||
+          target.closest('select')
+        );
+      },
+    },
+  ];
+}
 
 function SortableItem(props: PropsWithChildren<{ id: string }>) {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: props.id });
@@ -64,12 +77,7 @@ export const VerticalSortDnd = <T extends { id: string }>({
   setItems: Dispatch<SetStateAction<T[]>>;
   onItemMoved?: (id: string, newIndex: number, oldIndex: number) => void;
 }>) => {
-  const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    }),
-  );
+  const sensors = useSensors(useSensor(ClickPreservingPointerSensor));
   const [activeId, setActiveId] = useState<string | null>(null);
 
   const handleDragStart = (veent: DragStartEvent) => {
