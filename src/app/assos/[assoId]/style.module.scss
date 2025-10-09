@@ -72,16 +72,40 @@
 .membersCard {
   background: white;
   margin-top: 3ch;
-  padding: 3ch;
+  padding: calc(3ch - 2px);
   display: flex;
   flex-flow: column nowrap;
-  gap: 2ch;
+  gap: 1ch;
   border-radius: 1ch;
+  border: 2px solid transparent;
+
+  &.editMode {
+    border: 2px dashed $ung-light-blue;
+    background: rgba($color: $ung-light-blue, $alpha: 0.1);
+
+    & > div {
+      cursor: grab;
+      background-color: color-mix(in srgb, $ung-light-blue 20%, $very-light-gray 80%);
+      border-radius: 10px;
+    }
+
+    & > [aria-pressed] {
+      opacity: 0.3;
+      pointer-events: none;
+    }
+  }
 
   h2 {
     display: flex;
     flex-flow: row nowrap;
     justify-content: space-between;
+
+    .actionRow {
+      display: flex;
+      flex-flow: row wrap;
+      gap: 1ch;
+      align-items: center;
+    }
 
     .toggleOldMembers {
       font-size: 0.8em;
@@ -95,7 +119,7 @@
   }
 
   > div {
-    margin-left: 10px;
+    padding: 1ch 10px;
   }
 
   .crown {
@@ -104,7 +128,8 @@
     border-radius: 50%;
     padding: 5px;
     position: absolute;
-    left: -30px;
+    left: -31px;
+    top: -0.05em;
     width: 15px;
     height: 15px;
     box-sizing: content-box;
@@ -116,8 +141,12 @@
     }
   }
 
-  :has(:not(path):not(input):not(img):empty) {
+  :has(> :not(path):nth-child(2):empty) {
     display: none;
+  }
+
+  &.editMode :has(> :not(path):nth-child(2):empty) {
+    display: block;
   }
 
   .members {
