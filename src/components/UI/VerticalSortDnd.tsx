@@ -31,7 +31,6 @@ class ClickPreservingPointerSensor extends PointerSensor {
         const target = event.target as HTMLElement;
         return !(
           target.closest('button') ||
-          target.closest('a') ||
           target.closest('input') ||
           target.closest('textarea') ||
           target.closest('select')
