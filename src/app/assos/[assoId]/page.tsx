@@ -17,6 +17,7 @@ import { VerticalSortDnd } from '@/components/UI/VerticalSortDnd';
 import { updateRole } from '@/api/assos/updateRole';
 import Input from '@/components/UI/Input';
 import { Role } from '@/api/assos/member.interface';
+import { createRole } from '@/api/assos/createRole';
 
 function RoleComponent({
   role,
@@ -158,6 +159,11 @@ export default function AssoDetailPage() {
     setMembers(members.filter((role) => role.id !== deletedRole?.id));
   };
 
+  const createAssoRole = async (name: string) => {
+    const createdRole = await createRole(api, asso!.id, name).toPromise();
+    if (createdRole) setMembers([...members, { ...createdRole, members: [] }].sort((a, b) => a.position - b.position));
+  };
+
   return (
     <Page className={styles.page}>
       <div className={[styles.headerCard, !asso ? styles.glimmer : ''].filter((i) => i).join(' ')}>
@@ -197,6 +203,13 @@ export default function AssoDetailPage() {
           <h2>
             Membres
             <div className={styles.actionRow}>
+              {permissions.has('manage_roles') && editMembersMode && (
+                <Button
+                  onClick={() => createAssoRole(t('assos:member.role.default.name'))}
+                  className={styles.toggleOldMembers}>
+                  {t('assos:member.role.add')}
+                </Button>
+              )}
               {!!permissions.size && (
                 <Button onClick={() => setEditMembersMode(!editMembersMode)} className={styles.toggleOldMembers}>
                   {editMembersMode ? t('assos:member.edit.stop') : t('assos:member.edit')}
