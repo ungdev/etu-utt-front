@@ -26,15 +26,27 @@ import Mail from './Mail';
 import Phone from './Phone';
 import LinkExternal from './LinkExternal';
 import Crown from './Crown';
+import Add from './Add';
+import Close from './Close';
+import Edit from './Edit';
+import EyeOff from './EyeOff';
+import EyeOn from './EyeOn';
+import Confirm from './Confirm';
 
 const Icons = {
+  Add,
   Book,
   Caret,
   CircleCheck,
   CircleWarning,
   Clock,
+  Close,
   Collapse,
+  Confirm,
   Crown,
+  Edit,
+  EyeOff,
+  EyeOn,
   Home,
   Language,
   LeftArrow,
