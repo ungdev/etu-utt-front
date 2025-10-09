@@ -51,38 +51,44 @@ function RoleComponent({
         ) : (
           ''
         )}
-        {editing && canEdit ? (
-          <Input value={currentEditingRoleValue} onChange={setCurrentEditingRoleValue} />
-        ) : (
-          role.name
-        )}
-        {canEdit && (
-          <>
-            <Button onClick={() => deleteAssoRole(role.id)} disabled={!hasPermission || role.isPresident}>
-              {t('assos:member.role.delete')}
-            </Button>
-            <Button
-              onClick={() => {
-                if (editing) {
-                  updateAssoRole(role.id, { name: currentEditingRoleValue });
-                  setCurrentEditingRole(null);
-                } else {
-                  setCurrentEditingRole(role.id);
-                  setCurrentEditingRoleValue(role.name);
-                }
-              }}
-              disabled={!hasPermission}>
-              {editing ? t('assos:member.role.edit.ok') : t('assos:member.role.edit')}
-            </Button>
-          </>
-        )}
+        <div className={styles.actionRow}>
+          {editing && canEdit ? (
+            <Input value={currentEditingRoleValue} onChange={setCurrentEditingRoleValue} />
+          ) : (
+            <div>{role.name}</div>
+          )}
+          {canEdit && (
+            <>
+              <Button onClick={() => deleteAssoRole(role.id)} disabled={!hasPermission || role.isPresident}>
+                <Icons.Trash />
+              </Button>
+              <Button
+                onClick={() => {
+                  if (editing) {
+                    updateAssoRole(role.id, { name: currentEditingRoleValue });
+                    setCurrentEditingRole(null);
+                  } else {
+                    setCurrentEditingRole(role.id);
+                    setCurrentEditingRoleValue(role.name);
+                  }
+                }}
+                disabled={!hasPermission}>
+                {editing ? <Icons.Confirm /> : <Icons.Edit />}
+              </Button>
+            </>
+          )}
+        </div>
       </h3>
       <div className={styles.members}>
         {role.members.map((member) => {
           const isOld = member.endAt < new Date();
           return (
-            (!isOld || displayOldMembers) && (
-              <Link key={member.id} noStyle href={`/users/${member.userId}`}>
+            (!isOld || displayOldMembers || canEdit) && (
+              <Link
+                key={member.id}
+                noStyle
+                href={`/users/${member.userId}`}
+                className={isOld ? styles.oldMember : styles.member}>
                 <div className={styles.pictureContainer}>
                   <img />
                   <div>
@@ -95,7 +101,15 @@ function RoleComponent({
                         year: 'numeric',
                         month: 'long',
                       })}
-                      {isOld && t('assos:member.old.to')}
+                      {isOld && (
+                        <>
+                          {t('assos:member.old.to')}
+                          {member.endAt.toLocaleString(undefined, {
+                            year: 'numeric',
+                            month: 'long',
+                          })}
+                        </>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -207,17 +221,22 @@ export default function AssoDetailPage() {
                 <Button
                   onClick={() => createAssoRole(t('assos:member.role.default.name'))}
                   className={styles.toggleOldMembers}>
+                  <Icons.Add />
                   {t('assos:member.role.add')}
                 </Button>
               )}
               {!!permissions.size && (
                 <Button onClick={() => setEditMembersMode(!editMembersMode)} className={styles.toggleOldMembers}>
+                  {editMembersMode ? <Icons.Close /> : <Icons.Edit />}
                   {editMembersMode ? t('assos:member.edit.stop') : t('assos:member.edit')}
                 </Button>
               )}
-              <Button onClick={() => setDisplayOldMembers(!displayOldMembers)} className={styles.toggleOldMembers}>
-                {displayOldMembers ? t('assos:member.old.hide') : t('assos:member.old.display')}
-              </Button>
+              {!editMembersMode && (
+                <Button onClick={() => setDisplayOldMembers(!displayOldMembers)} className={styles.toggleOldMembers}>
+                  {displayOldMembers ? <Icons.EyeOff /> : <Icons.EyeOn />}
+                  {displayOldMembers ? t('assos:member.old.hide') : t('assos:member.old.display')}
+                </Button>
+              )}
             </div>
           </h2>
           <VerticalSortDnd
