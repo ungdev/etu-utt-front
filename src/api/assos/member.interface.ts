@@ -1,10 +1,11 @@
 export interface Member {
   id: string;
-  userid: string;
+  userId: string;
   firstName: string;
   lastName: string;
   startAt: Date;
   endAt: Date;
+  permissions: string[];
 }
 
 export interface Role {
@@ -17,4 +18,12 @@ export interface Role {
 
 export interface RoleResponse {
   roles: Role[];
+}
+
+export interface RoleCreateRequest {
+  name: string;
+}
+
+export interface RoleUpdateRequest extends RoleCreateRequest {
+  position: number;
 }

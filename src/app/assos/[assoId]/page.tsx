@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import styles from './style.module.scss';
 import { useAsso } from '@/api/assos/fetchAsso.hook';
@@ -10,13 +10,61 @@ import Icons from '@/icons';
 import Link from '@/components/UI/Link';
 import { useAppTranslation } from '@/lib/i18n';
 import Button from '@/components/UI/Button';
+import { useAppSelector } from '@/lib/hooks';
+import { deleteRole } from '@/api/assos/deleteRole';
+import { useAPI } from '@/api/api';
+import { VerticalSortDnd } from '@/components/UI/VerticalSortDnd';
+import { updateRole } from '@/api/assos/updateRole';
 
 export default function AssoDetailPage() {
   const params = useParams<{ assoId: string }>();
+  const user = useAppSelector((state) => state.user);
   const [asso] = useAsso(params.assoId);
-  const [members] = useMembers(params.assoId);
+  const [members, setMembers] = useMembers(params.assoId);
+  const [permissions, setPermissions] = useState(new Set<string>());
   const [displayOldMembers, setDisplayOldMembers] = useState(false);
+  const [editMembersMode, setEditMembersMode] = useState(false);
   const { t } = useAppTranslation();
+
+  const api = useAPI();
+
+  useEffect(() => {
+    const permissions = new Set(
+      members
+        .map((role) =>
+          role.members.filter((member) => member.userId === user?.id).flatMap((member) => member.permissions),
+        )
+        .flat(),
+    );
+    setPermissions(permissions);
+    console.log('Current user permissions:');
+    console.log(permissions);
+  }, [members, user]);
+
+  const updateAssoRole = async (roleId: string, data: Partial<{ name: string; position: number }>) => {
+    const role = members.find((r) => r.id === roleId);
+    if (!role) return;
+    const updatedRoles = await updateRole(
+      api,
+      asso!.id,
+      roleId,
+      data?.position ?? role.position,
+      data?.name ?? role.name,
+    );
+    if (updatedRoles)
+      setMembers(
+        updatedRoles.map((role) => {
+          const legacyRole = members.find((r) => r.id === role.id);
+          return { ...role, members: legacyRole?.members ?? [] };
+        }),
+      );
+  };
+
+  const deleteAssoRole = async (roleId: string) => {
+    // TODO: add popup for confirmation
+    const deletedRole = await deleteRole(api, asso!.id, roleId).toPromise();
+    setMembers(members.filter((role) => role.id !== deletedRole?.id));
+  };
 
   return (
     <Page className={styles.page}>
@@ -53,56 +101,78 @@ export default function AssoDetailPage() {
         </div>
       </div>
       {!!members.length && (
-        <div className={styles.membersCard}>
+        <div className={[styles.membersCard, editMembersMode ? styles.editMode : ''].filter((i) => i).join(' ')}>
           <h2>
             Membres
-            <div>
+            <div className={styles.actionRow}>
+              {!!permissions.size && (
+                <Button onClick={() => setEditMembersMode(!editMembersMode)} className={styles.toggleOldMembers}>
+                  {editMembersMode ? t('assos:member.edit.stop') : t('assos:member.edit')}
+                </Button>
+              )}
               <Button onClick={() => setDisplayOldMembers(!displayOldMembers)} className={styles.toggleOldMembers}>
                 {displayOldMembers ? t('assos:member.old.hide') : t('assos:member.old.display')}
               </Button>
             </div>
           </h2>
-          {members.map((role) => (
-            <div key={role.id} style={{ order: role.position }}>
-              <h3>
-                {role.isPresident ? (
-                  <div className={styles.crown}>
-                    <Icons.Crown />
-                  </div>
-                ) : (
-                  ''
-                )}
-                {role.name}
-              </h3>
-              <div className={styles.members}>
-                {role.members.map((member) => {
-                  const isOld = member.endAt < new Date();
-                  return (
-                    (!isOld || displayOldMembers) && (
-                      <Link key={member.id} noStyle href={`/users/${member.userid}`}>
-                        <div className={styles.pictureContainer}>
-                          <img />
-                          <div>
+          <VerticalSortDnd
+            items={members}
+            setItems={setMembers}
+            onItemMoved={(id, newIndex) => updateAssoRole(id, { position: newIndex })}
+            inflater={({ item: role }) => (
+              <>
+                <h3>
+                  {role.isPresident ? (
+                    <div className={styles.crown}>
+                      <Icons.Crown />
+                    </div>
+                  ) : (
+                    ''
+                  )}
+                  {role.name}
+                  {editMembersMode && (
+                    <>
+                      <Button
+                        onClick={() => deleteAssoRole(role.id)}
+                        disabled={!permissions.has('manage_roles') || role.isPresident}>
+                        {t('assos:member.role.delete')}
+                      </Button>
+                      <Button onClick={() => {}} disabled={!permissions.has('manage_roles')}>
+                        {t('assos:member.role.edit')}
+                      </Button>
+                    </>
+                  )}
+                </h3>
+                <div className={styles.members}>
+                  {role.members.map((member) => {
+                    const isOld = member.endAt < new Date();
+                    return (
+                      (!isOld || displayOldMembers) && (
+                        <Link key={member.id} noStyle href={`/users/${member.userId}`}>
+                          <div className={styles.pictureContainer}>
+                            <img />
                             <div>
-                              {member.firstName} {member.lastName}
-                            </div>
-                            <div className={styles.temporal}>
-                              {t(isOld ? 'assos:member.old.from' : 'assos:member.since')}
-                              {member.startAt.toLocaleString(undefined, {
-                                year: 'numeric',
-                                month: 'long',
-                              })}
-                              {isOld && t('assos:member.old.to')}
+                              <div>
+                                {member.firstName} {member.lastName}
+                              </div>
+                              <div className={styles.temporal}>
+                                {t(isOld ? 'assos:member.old.from' : 'assos:member.since')}
+                                {member.startAt.toLocaleString(undefined, {
+                                  year: 'numeric',
+                                  month: 'long',
+                                })}
+                                {isOld && t('assos:member.old.to')}
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      </Link>
-                    )
-                  );
-                })}
-              </div>
-            </div>
-          ))}
+                        </Link>
+                      )
+                    );
+                  })}
+                </div>
+              </>
+            )}
+            disabled={!editMembersMode || !permissions.has('manage_roles')}></VerticalSortDnd>
         </div>
       )}
     </Page>

@@ -10,4 +10,6 @@ export default {
   'member.old.to': ' et ',
   'member.old.display': 'Afficher les anciens',
   'member.old.hide': 'Masquer les anciens',
+  'member.edit': 'Modifier les membres',
+  'member.edit.stop': 'Fermer',
 } as const;

@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useAPI } from '@/api/api';
 import { Role, RoleResponse } from './member.interface';
 
-export function useMembers(assoId: string): [Role[], (roles: Role[]) => void] {
+export function useMembers(assoId: string): [Role[], Dispatch<SetStateAction<Role[]>>] {
   const [roles, setRoles] = useState<Role[]>([]);
   const api = useAPI();
   useEffect(() => {
