@@ -37,7 +37,7 @@ type DataModalEntry<T extends keyof DataModalType> = T extends OptionsFieldsRequ
 
 type DataModalKeys = { [key: string]: keyof DataModalType };
 
-type DataModalSchema<T extends DataModalKeys> = {
+export type DataModalSchema<T extends DataModalKeys> = {
   [S in keyof T]: DataModalEntry<T[S]>;
 };
 
@@ -45,15 +45,17 @@ type ModalStates<Schema extends DataModalKeys> = {
   [K in keyof Schema]: DataModalType[Schema[K]];
 };
 
-type WindowOptions = {
+export type WindowOptions = {
   title: string;
   submitText: ReactNode;
 };
 
+export type ModalCallbackType<Schema extends DataModalKeys> = { [K in keyof Schema]: DataModalType[Schema[K]] };
+
 type ModalFormProps<Schema extends DataModalKeys> = PropsWithoutRef<{
   fields: DataModalSchema<Schema>;
   window: WindowOptions;
-  onSubmit: (data: { [K in keyof Schema]: DataModalType[Schema[K]] }) => void;
+  onSubmit: (data: ModalCallbackType<Schema>) => void;
   onClose: () => void;
 }>;
 
