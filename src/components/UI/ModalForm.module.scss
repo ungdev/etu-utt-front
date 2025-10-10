@@ -1,0 +1,119 @@
+@import '@/variables';
+
+.darkModal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  transition: opacity 200ms ease-in-out;
+
+  &.hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
+.modal {
+  position: fixed;
+  right: 0;
+  top: 0;
+  width: 600px;
+  height: 100vh;
+  background-color: $light-gray;
+  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.3);
+  transition: right 200ms ease-in-out;
+
+  &.hidden {
+    right: -600px;
+    pointer-events: none;
+  }
+
+  .title {
+    width: 100%;
+    padding: 1em;
+    background-color: $ung-dark-grey;
+    color: $very-light-gray;
+    font-weight: bold;
+    font-size: 1.2em;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1em;
+
+    .close {
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+
+  .container {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: space-between;
+    height: calc(100% - 4em);
+
+    .confirm {
+      flex: 0 0 auto;
+      margin: 1em;
+    }
+
+    .content {
+      flex: 1 1 auto;
+      display: flex;
+      flex-flow: column nowrap;
+      padding: 1em;
+      gap: 1em;
+      overflow: auto;
+
+      .element {
+        .label {
+          margin-bottom: 0.5em;
+          font-size: 1.1em;
+
+          .required {
+            color: crimson;
+            font-weight: bold;
+          }
+        }
+
+        .resetUser {
+          margin-top: 0.5em;
+        }
+
+        .options {
+          display: flex;
+          flex-flow: row wrap;
+          gap: 0.5em;
+
+          .option {
+            padding: 2px 6px 2px 2px;
+            font-size: 0.9em;
+            border-radius: calc(10px + 0.9em);
+            background: transparent;
+            border: 1px solid $ung-dark-grey;
+            margin: 1px;
+            color: $ung-dark-grey;
+            text-transform: uppercase;
+
+            & > svg {
+              width: 20px;
+              height: 20px;
+            }
+
+            &.selected {
+              border-color: $ung-light-blue;
+              border-width: 2px;
+              margin: 0;
+              color: $ung-light-blue;
+            }
+          }
+        }
+      }
+    }
+  }
+}
