@@ -23,7 +23,8 @@ type OptionsFieldsPossible = 'string';
 interface DataModalEntryBase<T extends keyof DataModalType> {
   type: T;
   defaultValue?: DataModalType[T];
-  options: DataModalType[T];
+  /** When using options, you can choose to add label. The label must be provided as first element of the tuple */
+  options: DataModalType[T] | [DataModalType[T], DataModalType[T]];
   label: ReactNode;
   required?: boolean;
 }
@@ -112,22 +113,26 @@ export function ModalForm<T extends DataModalKeys>({ fields, window, onSubmit, o
                   variant =
                     'options' in fields[key] ? (
                       <div className={styles.options}>
-                        {fields[key].options!.map((option) => (
-                          <Button
-                            className={[styles.option, (state as string) === option && styles.selected]
-                              .filter((c) => c)
-                              .join(' ')}
-                            key={option}
-                            onClick={() =>
-                              setStates({
-                                ...states,
-                                [key]: (states[key] as string) === option ? '' : option,
-                              })
-                            }>
-                            {(state as string) === option ? <Icons.Close /> : <Icons.Add />}
-                            {option}
-                          </Button>
-                        ))}
+                        {fields[key].options!.map((option) => {
+                          const optionLabel = Array.isArray(option) ? option[0] : option;
+                          const optionValue = Array.isArray(option) ? option[1] : option;
+                          return (
+                            <Button
+                              className={[styles.option, (state as string) === optionValue && styles.selected]
+                                .filter((c) => c)
+                                .join(' ')}
+                              key={optionValue}
+                              onClick={() =>
+                                setStates({
+                                  ...states,
+                                  [key]: (states[key] as string) === optionValue ? '' : optionValue,
+                                })
+                              }>
+                              {(state as string) === optionValue ? <Icons.Close /> : <Icons.Add />}
+                              {optionLabel}
+                            </Button>
+                          );
+                        })}
                       </div>
                     ) : (
                       <Input value={state as string} onChange={(value) => setStates({ ...states, [key]: value })} />
@@ -158,24 +163,31 @@ export function ModalForm<T extends DataModalKeys>({ fields, window, onSubmit, o
                 case 'stringList':
                   variant = (
                     <div className={styles.options}>
-                      {fields[key].options.map((option) => (
-                        <Button
-                          className={[styles.option, (states[key] as string[]).includes(option) && styles.selected]
-                            .filter((c) => c)
-                            .join(' ')}
-                          key={option}
-                          onClick={() =>
-                            setStates({
-                              ...states,
-                              [key]: (states[key] as string[]).includes(option)
-                                ? (states[key] as string[]).filter((f) => f !== option)
-                                : [...(states[key] as string[]), option],
-                            })
-                          }>
-                          {(state as string[]).includes(option) ? <Icons.Close /> : <Icons.Add />}
-                          {option}
-                        </Button>
-                      ))}
+                      {fields[key].options.map((option) => {
+                        const optionLabel = Array.isArray(option) ? option[0] : option;
+                        const optionValue = Array.isArray(option) ? option[1] : option;
+                        return (
+                          <Button
+                            className={[
+                              styles.option,
+                              (states[key] as string[]).includes(optionValue) && styles.selected,
+                            ]
+                              .filter((c) => c)
+                              .join(' ')}
+                            key={optionValue}
+                            onClick={() =>
+                              setStates({
+                                ...states,
+                                [key]: (states[key] as string[]).includes(optionValue)
+                                  ? (states[key] as string[]).filter((f) => f !== optionValue)
+                                  : [...(states[key] as string[]), optionValue],
+                              })
+                            }>
+                            {(state as string[]).includes(optionValue) ? <Icons.Close /> : <Icons.Add />}
+                            {optionLabel}
+                          </Button>
+                        );
+                      })}
                     </div>
                   );
                   break;
