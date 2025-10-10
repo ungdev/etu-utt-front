@@ -1,6 +1,6 @@
 'use client';
 
-import { PropsWithoutRef, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import styles from './style.module.scss';
 import { useAsso } from '@/api/assos/fetchAsso.hook';
@@ -15,137 +15,12 @@ import { deleteRole } from '@/api/assos/deleteRole';
 import { useAPI } from '@/api/api';
 import { VerticalSortDnd } from '@/components/UI/VerticalSortDnd';
 import { updateRole } from '@/api/assos/updateRole';
-import Input from '@/components/UI/Input';
-import { Member, Role } from '@/api/assos/member.interface';
+import { Member } from '@/api/assos/member.interface';
 import { createRole } from '@/api/assos/createRole';
 import { addMember, deleteMember, updateMember } from '@/api/assos/manageMembers';
 import { User } from '@/api/users/user.interface';
 import { DataModalSchema, ModalCallbackType, ModalForm, WindowOptions } from '@/components/UI/ModalForm';
-
-function RoleComponent({
-  role,
-  editing = false,
-  canEdit,
-  hasPermission,
-  hasMembersPermission,
-  displayOldMembers,
-  deleteAssoRole,
-  updateAssoRole,
-  createAssoMember,
-  deleteAssoMember,
-  updateAssoMember,
-  setCurrentEditingRole,
-}: PropsWithoutRef<{
-  role: Role;
-  editing?: boolean;
-  canEdit: boolean;
-  hasPermission: boolean;
-  hasMembersPermission: boolean;
-  displayOldMembers: boolean;
-  deleteAssoRole: (id: string) => void;
-  updateAssoRole: (id: string, data: Partial<{ name: string; position: number }>) => void;
-  createAssoMember: (roleId: string) => void;
-  deleteAssoMember: (id: string) => void;
-  updateAssoMember: (member: Member, fromRoleId: string) => void;
-  setCurrentEditingRole: (id: string | null) => void;
-}>) {
-  const [currentEditingRoleValue, setCurrentEditingRoleValue] = useState<string>(role.name);
-  const { t } = useAppTranslation();
-
-  return (
-    <>
-      <h3>
-        {role.isPresident ? (
-          <div className={styles.crown}>
-            <Icons.Crown />
-          </div>
-        ) : (
-          ''
-        )}
-        <div className={styles.actionRow}>
-          {editing && canEdit ? (
-            <Input value={currentEditingRoleValue} onChange={setCurrentEditingRoleValue} />
-          ) : (
-            <div>{role.name}</div>
-          )}
-          {canEdit && (
-            <>
-              <Button onClick={() => createAssoMember(role.id)} disabled={!hasMembersPermission}>
-                <Icons.UserAdd />
-              </Button>
-              <Button onClick={() => deleteAssoRole(role.id)} disabled={!hasPermission || role.isPresident}>
-                <Icons.Trash />
-              </Button>
-              <Button
-                onClick={() => {
-                  if (editing) {
-                    updateAssoRole(role.id, { name: currentEditingRoleValue });
-                    setCurrentEditingRole(null);
-                  } else {
-                    setCurrentEditingRole(role.id);
-                    setCurrentEditingRoleValue(role.name);
-                  }
-                }}
-                disabled={!hasPermission}>
-                {editing ? <Icons.Confirm /> : <Icons.Edit />}
-              </Button>
-            </>
-          )}
-        </div>
-      </h3>
-      <div className={styles.members}>
-        {role.members.map((member) => {
-          const isOld = member.endAt < new Date();
-          return (
-            (!isOld || displayOldMembers || canEdit) && (
-              <Link
-                key={member.id}
-                noStyle
-                href={`/users/${member.userId}`}
-                disabled={canEdit}
-                className={isOld ? styles.oldMember : styles.member}>
-                <div className={styles.pictureContainer}>
-                  <img alt={member?.firstName.charAt(0) || '?'} />
-                  <div>
-                    <div>
-                      {member.firstName} {member.lastName}
-                    </div>
-                    <div className={styles.temporal}>
-                      {t(isOld ? 'assos:member.old.from' : 'assos:member.since')}
-                      {member.startAt.toLocaleString(undefined, {
-                        year: 'numeric',
-                        month: 'long',
-                      })}
-                      {isOld && (
-                        <>
-                          {t('assos:member.old.to')}
-                          {member.endAt.toLocaleString(undefined, {
-                            year: 'numeric',
-                            month: 'long',
-                          })}
-                        </>
-                      )}
-                    </div>
-                  </div>
-                  {!isOld && canEdit && (
-                    <>
-                      <Button onClick={() => updateAssoMember(member, role.id)} disabled={!hasMembersPermission}>
-                        <Icons.Edit />
-                      </Button>
-                      <Button onClick={() => deleteAssoMember(member.id)} disabled={!hasMembersPermission}>
-                        <Icons.UserRemove />
-                      </Button>
-                    </>
-                  )}
-                </div>
-              </Link>
-            )
-          );
-        })}
-      </div>
-    </>
-  );
-}
+import { AssoRole } from '@/components/assos/AssoRole';
 
 type AssoDetailModalType =
   | { user: 'user'; roleId: 'string'; permissions: 'stringList'; endAt: 'date' }
@@ -218,18 +93,21 @@ export default function AssoDetailPage() {
 
   const createAssoMember = async (roleId: string, endAt: Date, permissions: string[], user: User) => {
     const newMembership = await addMember(api, asso!.id, roleId, user.id, endAt, permissions).toPromise();
-    if (newMembership)
-      setMembers((members) => {
-        const role = members.find((r) => r.id === roleId);
-        if (!role) return members;
-        role.members.push({
-          ...newMembership,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          permissions: permissions,
-        });
-        return [...members]; // force rerender
-      });
+    if (newMembership) {
+      setMembers(
+        members.map((role) =>
+          role.id === roleId
+            ? {
+                ...role,
+                members: [
+                  ...role.members,
+                  { ...newMembership, firstName: user.firstName, lastName: user.lastName, permissions: permissions },
+                ],
+              }
+            : role,
+        ),
+      );
+    }
   };
 
   const updateAssoMember = async (
@@ -237,6 +115,7 @@ export default function AssoDetailPage() {
     data: Partial<{ endAt: Date; permissions: string[]; roleId: string }>,
     roleId: string,
   ) => {
+    if (data.roleId === roleId) delete data.roleId; // the api will refuse to update if roleId is the same
     const updatedMembership = await updateMember(api, asso.id, id, data).toPromise();
     setMembers((members) => {
       const affectedMembership = members
@@ -244,7 +123,7 @@ export default function AssoDetailPage() {
         ?.members.find((member) => member.id === updatedMembership?.id);
       if (affectedMembership && updatedMembership) {
         Object.assign(affectedMembership, updatedMembership);
-        if (roleId !== data.roleId) {
+        if (data.roleId && roleId !== data.roleId) {
           // Move member to another role
           const oldRole = members.find((role) => role.id === roleId);
           oldRole?.members.splice(oldRole.members.indexOf(affectedMembership!), 1);
@@ -420,7 +299,7 @@ export default function AssoDetailPage() {
             setItems={setMembers}
             onItemMoved={(id, newIndex) => updateAssoRole(id, { position: newIndex })}
             inflater={({ item: role }) => (
-              <RoleComponent
+              <AssoRole
                 role={role}
                 editing={currentEditingRole === role.id}
                 hasPermission={permissions.has('manage_roles')}
