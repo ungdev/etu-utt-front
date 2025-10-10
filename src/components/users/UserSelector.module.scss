@@ -20,42 +20,5 @@
       top: 50%;
       transform: translateY(-50%);
     }
-
-    .user {
-      background: white;
-      border-radius: 5px;
-      padding: 1ch;
-      display: flex;
-      flex-flow: row nowrap;
-      align-items: center;
-      gap: 1ch;
-      user-select: none;
-
-      .avatar {
-        width: 2em;
-        height: 2em;
-        border-radius: 50%;
-        object-fit: cover;
-        flex-shrink: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.2em;
-        background: $ung-light-blue;
-        color: $very-light-gray;
-      }
-
-      .info {
-        display: flex;
-        flex-flow: column nowrap;
-        gap: 0.2ch;
-        color: $ung-dark-grey;
-
-        :nth-child(2) {
-          font-style: italic;
-          opacity: 0.8;
-        }
-      }
-    }
   }
 }

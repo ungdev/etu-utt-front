@@ -32,6 +32,8 @@ import Edit from './Edit';
 import EyeOff from './EyeOff';
 import EyeOn from './EyeOn';
 import Confirm from './Confirm';
+import UserAdd from './UserAdd';
+import UserRemove from './UserRemove';
 
 const Icons = {
   Add,
@@ -66,6 +68,8 @@ const Icons = {
   RightChevron,
   Rotate,
   User,
+  UserAdd,
+  UserRemove,
   Users,
   Copy,
 };

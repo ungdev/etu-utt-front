@@ -181,8 +181,8 @@
       align-items: center;
 
       img {
-        width: 5ch;
-        height: 5ch;
+        width: 3.125ch;
+        height: 3.125ch;
         border-radius: 50%;
         object-fit: cover;
         display: flex;
@@ -191,6 +191,7 @@
         justify-content: center;
         overflow: hidden;
         flex-shrink: 0;
+        font-size: 1.6em;
         background-color: rgba($color: $ung-light-grey, $alpha: 0.2);
       }
 

@@ -39,4 +39,5 @@ export default {
   'selector.ui.placeholder': 'Rechercher un utilisateur',
   'selector.ui.noName': 'Nom inconnu',
   'selector.ui.noCursus': 'Parcours inconnu',
+  'modal.form.change': "Changer l'utilisateur",
 } as const;
