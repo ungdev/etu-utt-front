@@ -18,24 +18,38 @@ import { updateRole } from '@/api/assos/updateRole';
 import Input from '@/components/UI/Input';
 import { Role } from '@/api/assos/member.interface';
 import { createRole } from '@/api/assos/createRole';
+import { addMember, deleteMember, updateMember } from '@/api/assos/manageMembers';
+import { User } from '@/api/users/user.interface';
 
 function RoleComponent({
   role,
   editing = false,
   canEdit,
   hasPermission,
+  hasMembersPermission,
   displayOldMembers,
   deleteAssoRole,
   updateAssoRole,
+  createAssoMember,
+  deleteAssoMember,
+  updateAssoMember,
   setCurrentEditingRole,
 }: PropsWithoutRef<{
   role: Role;
   editing?: boolean;
   canEdit: boolean;
   hasPermission: boolean;
+  hasMembersPermission: boolean;
   displayOldMembers: boolean;
   deleteAssoRole: (id: string) => void;
   updateAssoRole: (id: string, data: Partial<{ name: string; position: number }>) => void;
+  createAssoMember: (roleId: string, endAt: Date, permissions: string[], user: User) => void;
+  deleteAssoMember: (id: string) => void;
+  updateAssoMember: (
+    id: string,
+    data: Partial<{ endAt: Date; permissions: string[]; roleId: string }>,
+    fromRoleId: string,
+  ) => void;
   setCurrentEditingRole: (id: string | null) => void;
 }>) {
   const [currentEditingRoleValue, setCurrentEditingRoleValue] = useState<string>(role.name);
@@ -59,6 +73,11 @@ function RoleComponent({
           )}
           {canEdit && (
             <>
+              <Button
+                onClick={() => createAssoMember(role.id, new Date(), [], {} as any as User)} // TODO: add UI for data retrieval
+                disabled={!hasMembersPermission}>
+                <Icons.UserAdd />
+              </Button>
               <Button onClick={() => deleteAssoRole(role.id)} disabled={!hasPermission || role.isPresident}>
                 <Icons.Trash />
               </Button>
@@ -88,9 +107,10 @@ function RoleComponent({
                 key={member.id}
                 noStyle
                 href={`/users/${member.userId}`}
+                disabled={canEdit}
                 className={isOld ? styles.oldMember : styles.member}>
                 <div className={styles.pictureContainer}>
-                  <img />
+                  <img alt={member?.firstName.charAt(0) || '?'} />
                   <div>
                     <div>
                       {member.firstName} {member.lastName}
@@ -112,6 +132,17 @@ function RoleComponent({
                       )}
                     </div>
                   </div>
+                  {!isOld && canEdit && (
+                    <>
+                      <Button onClick={() => updateAssoMember(member.id, {}, role.id)} disabled={!hasMembersPermission}>
+                        {/* TODO: add UI for data retrieval */}
+                        <Icons.Edit />
+                      </Button>
+                      <Button onClick={() => deleteAssoMember(member.id)} disabled={!hasMembersPermission}>
+                        <Icons.UserRemove />
+                      </Button>
+                    </>
+                  )}
                 </div>
               </Link>
             )
@@ -176,6 +207,55 @@ export default function AssoDetailPage() {
   const createAssoRole = async (name: string) => {
     const createdRole = await createRole(api, asso!.id, name).toPromise();
     if (createdRole) setMembers([...members, { ...createdRole, members: [] }].sort((a, b) => a.position - b.position));
+  };
+
+  const createAssoMember = async (roleId: string, endAt: Date, permissions: string[], user: User) => {
+    const newMembership = await addMember(api, asso!.id, roleId, user.id, endAt, permissions).toPromise();
+    if (newMembership)
+      setMembers((members) => {
+        const role = members.find((r) => r.id === roleId);
+        if (!role) return members;
+        role.members.push({
+          ...newMembership,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          permissions: permissions,
+        });
+        return [...members]; // force rerender
+      });
+  };
+
+  const updateAssoMember = async (
+    id: string,
+    data: Partial<{ endAt: Date; permissions: string[]; roleId: string }>,
+    roleId: string,
+  ) => {
+    const updatedMembership = await updateMember(api, asso.id, id, data).toPromise();
+    setMembers((members) => {
+      const affectedMembership = members
+        .find((role) => role.id === roleId)
+        ?.members.find((member) => member.id === updatedMembership?.id);
+      if (affectedMembership && updatedMembership) {
+        Object.assign(affectedMembership, updatedMembership);
+        if (roleId !== data.roleId) {
+          // Move member to another role
+          const oldRole = members.find((role) => role.id === roleId);
+          oldRole?.members.splice(oldRole.members.indexOf(affectedMembership!), 1);
+          members.find((role) => role.id === data.roleId)?.members.push(affectedMembership!);
+        }
+      }
+      return [...members]; // force rerender
+    });
+  };
+
+  const deleteAssoMember = async (id: string) => {
+    const deletedMembership = await deleteMember(api, asso.id, id).toPromise();
+    setMembers((members) => {
+      const affectedRole = members.find((role) => role.id === deletedMembership?.roleId);
+      const affectedMembership = affectedRole?.members.find((member) => member.id === deletedMembership?.id);
+      if (affectedMembership) Object.assign(affectedMembership, deletedMembership);
+      return [...members]; // force rerender
+    });
   };
 
   return (
@@ -248,10 +328,14 @@ export default function AssoDetailPage() {
                 role={role}
                 editing={currentEditingRole === role.id}
                 hasPermission={permissions.has('manage_roles')}
+                hasMembersPermission={permissions.has('manage_members')}
                 canEdit={editMembersMode}
                 displayOldMembers={displayOldMembers}
                 deleteAssoRole={deleteAssoRole}
                 updateAssoRole={updateAssoRole}
+                createAssoMember={createAssoMember}
+                deleteAssoMember={deleteAssoMember}
+                updateAssoMember={updateAssoMember}
                 setCurrentEditingRole={setCurrentEditingRole}
               />
             )}
