@@ -4,7 +4,6 @@
   display: flex;
   flex-flow: column nowrap;
   gap: 1ch;
-  padding: 10px;
 
   .resultPool {
     display: grid;
@@ -19,6 +18,10 @@
       width: 100%;
       top: 50%;
       transform: translateY(-50%);
+    }
+
+    & > :not(.noResult) {
+      cursor: pointer;
     }
   }
 }
