@@ -16,10 +16,11 @@ import { useAPI } from '@/api/api';
 import { VerticalSortDnd } from '@/components/UI/VerticalSortDnd';
 import { updateRole } from '@/api/assos/updateRole';
 import Input from '@/components/UI/Input';
-import { Role } from '@/api/assos/member.interface';
+import { Member, Role } from '@/api/assos/member.interface';
 import { createRole } from '@/api/assos/createRole';
 import { addMember, deleteMember, updateMember } from '@/api/assos/manageMembers';
 import { User } from '@/api/users/user.interface';
+import { DataModalSchema, ModalCallbackType, ModalForm, WindowOptions } from '@/components/UI/ModalForm';
 
 function RoleComponent({
   role,
@@ -43,13 +44,9 @@ function RoleComponent({
   displayOldMembers: boolean;
   deleteAssoRole: (id: string) => void;
   updateAssoRole: (id: string, data: Partial<{ name: string; position: number }>) => void;
-  createAssoMember: (roleId: string, endAt: Date, permissions: string[], user: User) => void;
+  createAssoMember: (roleId: string) => void;
   deleteAssoMember: (id: string) => void;
-  updateAssoMember: (
-    id: string,
-    data: Partial<{ endAt: Date; permissions: string[]; roleId: string }>,
-    fromRoleId: string,
-  ) => void;
+  updateAssoMember: (member: Member, fromRoleId: string) => void;
   setCurrentEditingRole: (id: string | null) => void;
 }>) {
   const [currentEditingRoleValue, setCurrentEditingRoleValue] = useState<string>(role.name);
@@ -73,9 +70,7 @@ function RoleComponent({
           )}
           {canEdit && (
             <>
-              <Button
-                onClick={() => createAssoMember(role.id, new Date(), [], {} as any as User)} // TODO: add UI for data retrieval
-                disabled={!hasMembersPermission}>
+              <Button onClick={() => createAssoMember(role.id)} disabled={!hasMembersPermission}>
                 <Icons.UserAdd />
               </Button>
               <Button onClick={() => deleteAssoRole(role.id)} disabled={!hasPermission || role.isPresident}>
@@ -134,8 +129,7 @@ function RoleComponent({
                   </div>
                   {!isOld && canEdit && (
                     <>
-                      <Button onClick={() => updateAssoMember(member.id, {}, role.id)} disabled={!hasMembersPermission}>
-                        {/* TODO: add UI for data retrieval */}
+                      <Button onClick={() => updateAssoMember(member, role.id)} disabled={!hasMembersPermission}>
                         <Icons.Edit />
                       </Button>
                       <Button onClick={() => deleteAssoMember(member.id)} disabled={!hasMembersPermission}>
@@ -153,6 +147,16 @@ function RoleComponent({
   );
 }
 
+type AssoDetailModalType =
+  | { user: 'user'; roleId: 'string'; permissions: 'stringList'; endAt: 'date' }
+  | {
+      roleId: 'string';
+      permissions: 'stringList';
+      endAt: 'date';
+    }
+  | { confirmation: 'string' }
+  | { roleId: 'string' };
+
 export default function AssoDetailPage() {
   const params = useParams<{ assoId: string }>();
   const user = useAppSelector((state) => state.user);
@@ -163,6 +167,10 @@ export default function AssoDetailPage() {
   const [editMembersMode, setEditMembersMode] = useState(false);
   const [currentEditingRole, setCurrentEditingRole] = useState<string | null>(null);
   const { t } = useAppTranslation();
+
+  const [modalForm, setModalForm] = useState<DataModalSchema<AssoDetailModalType> | null>(null);
+  const [modalFormWindow, setModalFormWindow] = useState<WindowOptions | null>(null);
+  const [extraModalData, setExtraModalData] = useState<Partial<{ roleId: string; memberId: string }>>({});
 
   const api = useAPI();
 
@@ -199,7 +207,6 @@ export default function AssoDetailPage() {
   };
 
   const deleteAssoRole = async (roleId: string) => {
-    // TODO: add popup for confirmation
     const deletedRole = await deleteRole(api, asso!.id, roleId).toPromise();
     setMembers(members.filter((role) => role.id !== deletedRole?.id));
   };
@@ -258,6 +265,97 @@ export default function AssoDetailPage() {
     });
   };
 
+  /* Modal entrypoints */
+
+  const openModalForMemberCreation = (roleId: string) => {
+    setModalFormWindow({ title: t('assos:member.add.title'), submitText: t('assos:member.add.submit') });
+    setModalForm({
+      user: { type: 'user', label: t('assos:member.add.label.user'), required: true },
+      roleId: {
+        type: 'string',
+        label: t('assos:member.add.label.role'),
+        options: members.map((role) => [role.name, role.id]),
+        required: true,
+        defaultValue: roleId,
+      },
+      permissions: {
+        type: 'stringList',
+        label: t('assos:member.add.label.permissions'),
+        options: Array.from(permissions),
+      },
+      endAt: { type: 'date', label: t('assos:member.add.label.endAt'), required: true },
+    });
+  };
+
+  const openModalForMemberUpdate = (member: Member, roleId: string) => {
+    setExtraModalData({ roleId, memberId: member.id });
+    setModalFormWindow({ title: t('assos:member.edit.title'), submitText: t('assos:member.edit.submit') });
+    setModalForm({
+      roleId: {
+        type: 'string',
+        label: t('assos:member.edit.label.role'),
+        options: members.map((role) => [role.name, role.id]),
+        required: true,
+        defaultValue: roleId,
+      },
+      permissions: {
+        type: 'stringList',
+        label: t('assos:member.edit.label.permissions'),
+        options: Array.from(permissions),
+        defaultValue: member.permissions,
+      },
+      endAt: { type: 'date', label: t('assos:member.edit.label.endAt'), required: true, defaultValue: member.endAt },
+    });
+  };
+
+  const openModalForRoleDeletion = (roleId: string) => {
+    setExtraModalData({ roleId });
+    setModalFormWindow({
+      title: t('assos:member.role.delete.title'),
+      submitText: t('assos:member.role.delete.submit'),
+    });
+    setModalForm({
+      confirmation: {
+        type: 'string',
+        label: t('assos:member.role.delete.label'),
+        options: [t('assos:member.role.delete.confirm')],
+        required: true,
+      },
+    });
+  };
+
+  const openModalForRoleCreation = () => {
+    setModalFormWindow({
+      title: t('assos:member.role.create.title'),
+      submitText: t('assos:member.role.create.submit'),
+    });
+    setModalForm({
+      roleId: {
+        type: 'string',
+        label: t('assos:member.role.create.label'),
+        required: true,
+      },
+    });
+  };
+
+  const handlePopupSubmit = (data: ModalCallbackType<AssoDetailModalType>) => {
+    if ('user' in data && data.roleId && data.endAt && data.permissions) {
+      createAssoMember(data.roleId, data.endAt, data.permissions, data.user);
+    } else if ('permissions' in data && extraModalData.memberId && extraModalData.roleId && data.roleId && data.endAt) {
+      updateAssoMember(
+        extraModalData.memberId,
+        { endAt: data.endAt, permissions: data.permissions, roleId: data.roleId },
+        extraModalData.roleId,
+      );
+    } else if ('confirmation' in data && extraModalData.roleId) {
+      deleteAssoRole(extraModalData.roleId);
+    } else if ('roleId' in data) {
+      createAssoRole(data.roleId);
+    }
+  };
+
+  /* End of modal operations */
+
   return (
     <Page className={styles.page}>
       <div className={[styles.headerCard, !asso ? styles.glimmer : ''].filter((i) => i).join(' ')}>
@@ -295,12 +393,10 @@ export default function AssoDetailPage() {
       {!!members.length && (
         <div className={[styles.membersCard, editMembersMode ? styles.editMode : ''].filter((i) => i).join(' ')}>
           <h2>
-            Membres
+            {t('assos:member.list.title')}
             <div className={styles.actionRow}>
               {permissions.has('manage_roles') && editMembersMode && (
-                <Button
-                  onClick={() => createAssoRole(t('assos:member.role.default.name'))}
-                  className={styles.toggleOldMembers}>
+                <Button onClick={openModalForRoleCreation} className={styles.toggleOldMembers}>
                   <Icons.Add />
                   {t('assos:member.role.add')}
                 </Button>
@@ -331,16 +427,27 @@ export default function AssoDetailPage() {
                 hasMembersPermission={permissions.has('manage_members')}
                 canEdit={editMembersMode}
                 displayOldMembers={displayOldMembers}
-                deleteAssoRole={deleteAssoRole}
+                deleteAssoRole={openModalForRoleDeletion}
                 updateAssoRole={updateAssoRole}
-                createAssoMember={createAssoMember}
+                createAssoMember={openModalForMemberCreation}
                 deleteAssoMember={deleteAssoMember}
-                updateAssoMember={updateAssoMember}
+                updateAssoMember={openModalForMemberUpdate}
                 setCurrentEditingRole={setCurrentEditingRole}
               />
             )}
             disabled={!editMembersMode || !permissions.has('manage_roles')}></VerticalSortDnd>
         </div>
+      )}
+      {modalForm && modalFormWindow && (
+        <ModalForm<AssoDetailModalType>
+          onSubmit={handlePopupSubmit}
+          onClose={() => {
+            setModalForm(null);
+            setModalFormWindow(null);
+          }}
+          window={modalFormWindow}
+          fields={modalForm}
+        />
       )}
     </Page>
   );
