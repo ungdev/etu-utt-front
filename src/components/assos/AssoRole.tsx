@@ -37,6 +37,14 @@ export function AssoRole({
   const [currentEditingRoleValue, setCurrentEditingRoleValue] = useState<string>(role.name);
   const { t } = useAppTranslation();
 
+  const userSorter = (a: Member, b: Member) => {
+    const aSign = Math.sign(a.endAt.getTime() - Date.now());
+    const oldComparison = Math.sign(b.endAt.getTime() - Date.now()) - aSign;
+    return (
+      oldComparison || (aSign > 0 ? a.startAt.getTime() - b.startAt.getTime() : b.endAt.getTime() - a.endAt.getTime())
+    );
+  };
+
   return (
     <>
       <h3 className={styles.roleRoot}>
@@ -79,7 +87,7 @@ export function AssoRole({
         </div>
       </h3>
       <div className={styles.members}>
-        {role.members.map((member) => {
+        {role.members.sort(userSorter).map((member) => {
           const isOld = member.endAt < new Date();
           return (
             (!isOld || displayOldMembers || canEdit) && (
