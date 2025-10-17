@@ -22,11 +22,11 @@ import { useEffect } from 'react';
 import { $createImageNode, $isImageNode, ImageNode } from './ImageNode';
 
 export const INSERT_IMAGE_COMMAND = createCommand<{
-  key: string;
   src: string;
-  altText: string;
-  width: number;
-  height: number;
+  key?: string;
+  altText?: string;
+  width?: number;
+  height?: number;
 }>('INSERT_IMAGE_COMMAND');
 
 function textNodeTransform(node: TextNode): void {

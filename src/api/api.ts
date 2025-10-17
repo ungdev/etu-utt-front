@@ -1,6 +1,11 @@
 import { apiTimeout, apiUrl, apiVersion, etuuttWebApplicationId } from '@/utils/environment';
 import { StatusCodes } from 'http-status-codes';
 
+export const computeApiURL = (path: string, version = apiVersion) =>
+  `${apiUrl.slice(-1) === '/' ? apiUrl.slice(0, -1) : apiUrl}/v${version}/${
+    path.slice(0, 1) === '/' ? path.slice(1) : path
+  }`;
+
 /**
  * The type of error that can be produced while making a request to the API.
  * Note that these errors are not errors that the API can return, but rather errors that can happen while making a request / interpreting the result.
@@ -60,8 +65,8 @@ type RawResponseType<T> = T extends Date
  */
 export class ResponseHandler<
   T,
-  R extends { [status in StatusCodes]?: any } & { fallback: any } & {
-    [status in ResponseError | 'success' | 'error' | 'failure']?: any;
+  R extends { [status in StatusCodes]?: unknown } & { fallback: unknown } & {
+    [status in ResponseError | 'success' | 'error' | 'failure']?: unknown;
   } = { fallback: undefined },
 > {
   private readonly handlers = { fallback: () => undefined } as {
@@ -137,7 +142,7 @@ async function internalRequestAPI<RequestType>(
   route: string,
   body: RequestType | null,
   timeoutMillis: number,
-  version: string,
+  version: number,
   isFile: true,
   applicationId: string,
 ): Promise<APIResponse<Blob>>;
@@ -146,7 +151,7 @@ async function internalRequestAPI<RequestType, ResponseType>(
   route: string,
   body: RequestType | null,
   timeoutMillis: number,
-  version: string,
+  version: number,
   isFile: boolean,
   applicationId: string,
 ): Promise<APIResponse<ResponseType>>;
@@ -155,7 +160,7 @@ async function internalRequestAPI<RequestType, ResponseType>(
   route: string,
   body: RequestType | null,
   timeoutMillis: number,
-  version: string,
+  version: number,
   isFile: boolean,
   applicationId: string,
 ): Promise<APIResponse<ResponseType | Blob>> {
@@ -173,21 +178,16 @@ async function internalRequestAPI<RequestType, ResponseType>(
 
   try {
     // Make the request
-    const response = await fetch(
-      `${apiUrl.slice(-1) === '/' ? apiUrl.slice(0, -1) : apiUrl}/${version}/${
-        route.slice(0, 1) === '/' ? route.slice(1) : route
-      }`,
-      {
-        method,
-        headers,
-        body: (method === 'GET' || method === 'DELETE' ? undefined : isFile ? body : JSON.stringify(body)) as
-          | BodyInit
-          | null
-          | undefined,
-        cache: 'no-cache',
-        signal: abortController.signal,
-      },
-    );
+    const response = await fetch(computeApiURL(route, version), {
+      method,
+      headers,
+      body: (method === 'GET' || method === 'DELETE' ? undefined : isFile ? body : JSON.stringify(body)) as
+        | BodyInit
+        | null
+        | undefined,
+      cache: 'no-cache',
+      signal: abortController.signal,
+    });
 
     if (response.status === StatusCodes.NO_CONTENT) {
       return { code: response.status, body: null as ResponseType };
@@ -236,13 +236,13 @@ function requestAPI<RequestType>(
   method: 'GET',
   route: string,
   body: RequestType | null,
-  params: { timeoutMillis?: number; version?: string; isFile: true; applicationId?: string },
+  params: { timeoutMillis?: number; version?: number; isFile: true; applicationId?: string },
 ): ResponseHandler<Blob>;
 function requestAPI<RequestType, ResponseType>(
   method: string,
   route: string,
   body: RequestType | null,
-  params: { timeoutMillis?: number; version?: string; isFile?: boolean; applicationId?: string },
+  params: { timeoutMillis?: number; version?: number; isFile?: boolean; applicationId?: string },
 ): ResponseHandler<ResponseType>;
 function requestAPI<RequestType, ResponseType>(
   method: string,
@@ -253,7 +253,7 @@ function requestAPI<RequestType, ResponseType>(
     version = apiVersion,
     isFile = false,
     applicationId = etuuttWebApplicationId,
-  }: { timeoutMillis?: number; version?: string; isFile?: boolean; applicationId?: string } = {},
+  }: { timeoutMillis?: number; version?: number; isFile?: boolean; applicationId?: string } = {},
 ): ResponseHandler<ResponseType> {
   return new ResponseHandler(internalRequestAPI(method, route, body, timeoutMillis, version, isFile, applicationId));
 }
@@ -273,24 +273,24 @@ export function useAPI(): API {
   return {
     get: <ResponseType = never>(
       route: string,
-      options: { timeoutMillis?: number; version?: string; isFile?: boolean } = {},
+      options: { timeoutMillis?: number; version?: number; isFile?: boolean } = {},
     ) => applyDefaultHandler(requestAPI<never, ResponseType>('GET', route, null, options)),
     post: <RequestType, ResponseType = never>(
       route: string,
       body = {} as RequestType,
-      options: { version?: string; isFile?: boolean; applicationId?: string } = {},
+      options: { version?: number; isFile?: boolean; applicationId?: string } = {},
     ) => applyDefaultHandler(requestAPI<RequestType, ResponseType>('POST', route, body, options)),
     put: <RequestType, ResponseType = never>(
       route: string,
       body = {} as RequestType,
-      options: { version?: string; isFile?: boolean; applicationId?: string } = {},
+      options: { version?: number; isFile?: boolean; applicationId?: string } = {},
     ) => applyDefaultHandler(requestAPI<RequestType, ResponseType>('PUT', route, body, options)),
     patch: <RequestType, ResponseType = never>(
       route: string,
       body = {} as RequestType,
-      options: { version?: string; isFile?: boolean } = {},
+      options: { version?: number; isFile?: boolean } = {},
     ) => applyDefaultHandler(requestAPI<RequestType, ResponseType>('PATCH', route, body, options)),
-    delete: <ResponseType = never>(route: string, options: { version?: string } = {}) =>
+    delete: <ResponseType = never>(route: string, options: { version?: number } = {}) =>
       applyDefaultHandler(requestAPI<never, ResponseType>('DELETE', route, null, options)),
   };
 }
@@ -298,28 +298,28 @@ export function useAPI(): API {
 export interface API {
   get(
     route: string,
-    options: { timeoutMillis?: number; version?: string; isFile: true },
+    options: { timeoutMillis?: number; version?: number; isFile: true },
   ): DefaultResponseHandlerType<Blob>;
   get<ResponseType = never>(
     route: string,
-    options?: { timeoutMillis?: number; version?: string; isFile?: boolean },
+    options?: { timeoutMillis?: number; version?: number; isFile?: boolean },
   ): DefaultResponseHandlerType<ResponseType>;
   post<RequestType, ResponseType = never>(
     route: string,
     body?: RequestType,
-    options?: { version?: string; isFile?: boolean; applicationId?: string },
+    options?: { version?: number; isFile?: boolean; applicationId?: string },
   ): DefaultResponseHandlerType<ResponseType>;
   put<RequestType, ResponseType = never>(
     route: string,
     body?: RequestType,
-    options?: { version?: string; isFile?: boolean },
+    options?: { version?: number; isFile?: boolean },
   ): DefaultResponseHandlerType<ResponseType>;
   patch: <RequestType, ResponseType = never>(
     route: string,
     body?: RequestType,
-    options?: { version?: string; isFile?: boolean },
+    options?: { version?: number; isFile?: boolean },
   ) => DefaultResponseHandlerType<ResponseType>;
-  delete<ResponseType = never>(route: string, options?: { version?: string }): DefaultResponseHandlerType<ResponseType>;
+  delete<ResponseType = never>(route: string, options?: { version?: number }): DefaultResponseHandlerType<ResponseType>;
 }
 
 /**

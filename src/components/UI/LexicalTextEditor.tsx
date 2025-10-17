@@ -24,6 +24,7 @@ import { MATCHERS } from './LexicalPlugins/AutoLinkMatcherPlugin';
 import { ImagePlugin } from './LexicalPlugins/ImagePlugin';
 import { ImageNode } from './LexicalPlugins/ImageNode';
 import type { EditorThemeClasses } from 'lexical';
+import { ImageDropPlugin } from './LexicalPlugins/ImageDropPlugin';
 
 const theme = {
   root: 'editor-root',
@@ -65,6 +66,7 @@ function LexicalTextEditor({ disabled = false }) {
       <OnChangePlugin onChange={(state) => console.log(state.toJSON())} />
       <EnableDisablePlugin disabled={disabled} />
       <ImagePlugin />
+      <ImageDropPlugin />
       <LinkPlugin />
       <ListPlugin />
       <CheckListPlugin />
