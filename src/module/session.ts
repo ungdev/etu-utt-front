@@ -59,13 +59,22 @@ export const sessionSlice = createSlice({
 const { login: loginReducer, logout: logoutReducer } = sessionSlice.actions;
 
 export const login =
-  (api: API, login: string, password: string): AppThunk =>
+  (api: API, login: string, password: string, application?: string): AppThunk<Promise<LoginResponseDto | null>> =>
   (dispatch) =>
     api
-      .post<LoginRequestDto, LoginResponseDto>('/auth/signin', { login, password })
-      .on('success', async (body) => dispatch(setToken(body.access_token, api)))
+      .post<LoginRequestDto, LoginResponseDto>(
+        '/auth/signin',
+        { login, password, tokenExpiresIn: 24 * 360 },
+        { applicationId: application || undefined },
+      )
+      .on('success', async (body) => {
+        if (!body.signedIn) return body;
+        if (body.token) dispatch(setToken(body.token, api));
+        return body;
+      })
       .on(StatusCodes.UNAUTHORIZED, (body) => console.error('Wrong credentials', body))
-      .on(StatusCodes.BAD_REQUEST, (body) => console.error('Bad request', body));
+      .on(StatusCodes.BAD_REQUEST, (body) => console.error('Bad request', body))
+      .toPromise();
 
 export const register =
   (api: API, lastName: string, firstName: string, login: string, password: string): AppThunk =>
@@ -80,7 +89,7 @@ export const register =
         type: 'STUDENT',
         birthday: new Date(2003, 1, 28),
       })
-      .on('success', (body) => dispatch(setToken(body.access_token, api)));
+      .on('success', (body) => dispatch(setToken(body.token, api)));
 
 export const logout = (): AppThunk => (dispatch) => dispatch(setToken(null));
 

@@ -239,10 +239,13 @@ export default function Navbar() {
       </div>
 
       {!collapsed && (
-        <div className={styles.legalStuff}>
-          <Link className={styles.legal} href={'/legal'}>
-            Mentions légales
-          </Link>
+        <div className={styles.randomLinks}>
+          <Link href={'/developers'}>Espace développeur</Link>
+          <div className={styles.legalStuff}>
+            <Link className={styles.legal} href={'/legal'}>
+              Mentions légales
+            </Link>
+          </div>
         </div>
       )}
     </div>
