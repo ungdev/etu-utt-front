@@ -1,9 +1,9 @@
 import { MenuItem } from '@/components/Navbar';
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import { AppThunk, RootState } from 'src/lib/store';
-import Icons from '@/icons';
 import { LocalStorageNames } from '@/global';
 import { useAppSelector } from '@/lib/hooks';
+import { IconBook, IconChevronRight, IconHome, IconUser, IconUsers } from 'obra-icons-react';
 
 interface NavbarSlice {
   items: MenuItem[];
@@ -77,35 +77,35 @@ export const navbarSlice = createSlice({
   initialState: {
     items: [
       {
-        icon: Icons.Home,
+        icon: IconHome,
         name: 'common:navbar.home',
         path: '/',
         translate: true,
         needLogin: false,
       },
       {
-        icon: Icons.User,
+        icon: IconUser,
         name: 'common:navbar.userBrowser',
         path: '/users',
         translate: true,
         needLogin: true,
       },
       {
-        icon: Icons.Book,
+        icon: IconBook,
         name: 'common:navbar.uesBrowser',
         path: '/ues',
         translate: true,
         needLogin: false,
       },
       {
-        icon: Icons.Users,
+        icon: IconUsers,
         name: 'common:navbar.associations',
         path: '/assos',
         translate: true,
         needLogin: false,
       },
       {
-        icon: Icons.Caret,
+        icon: IconChevronRight,
         name: 'common:navbar.myUEs',
         translate: true,
         needLogin: true,
@@ -129,7 +129,7 @@ export const navbarSlice = createSlice({
         ],
       },
       {
-        icon: Icons.Caret,
+        icon: IconChevronRight,
         name: 'common:navbar.myAssociations',
         translate: true,
         needLogin: true,

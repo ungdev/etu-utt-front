@@ -2,11 +2,12 @@
 
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import styles from './Navbar.module.scss';
-import { FC, useState } from 'react';
+import { ForwardRefExoticComponent, useState } from 'react';
 import { getMenu, setCollapsed, useCollapsed } from '@/module/navbar';
 import Link from 'next/link';
 import { type NotParameteredTranslationKey, useAppTranslation } from '@/lib/i18n';
 import Icons from '@/icons';
+import { IconArrowLeft, IconLanguage, IconLogIn, IconLogOut, IconMenu } from 'obra-icons-react';
 import { isLoggedIn, logout } from '@/module/session';
 import Button from './UI/Button';
 import { usePageSettings } from '@/module/pageSettings';
@@ -18,7 +19,7 @@ import { LocalStorageNames } from '@/global';
  * This is an internal type that should not be used when developping features.
  * */
 type MenuItemProperties<Translate extends boolean> = {
-  icon: FC;
+  icon: ForwardRefExoticComponent<unknown>;
   name: Translate extends true
     ? NotParameteredTranslationKey
     : Translate extends false
@@ -121,7 +122,7 @@ export default function Navbar() {
         <Link
           href={item.path as string}
           className={`${styles.navigationLink} ${(item.path !== '/' || pathname === item.path) && pathname.startsWith(item.path as string) ? styles.active : ''}`}>
-          {'icon' in item ? (item as MenuItem<true>).icon({}) : ''}
+          {'icon' in item && item.icon ? <item.icon /> : ''}
           <span>{item.translate ? t(item.name as NotParameteredTranslationKey) : item.name}</span>
         </Link>
       </li>
@@ -135,7 +136,7 @@ export default function Navbar() {
         <div
           className={`${styles.buttonContent} ${styles['indent-' + (after.split(',').length - 1)]}`}
           onClick={() => toggleSelected([after, item.name].join(','))}>
-          {'icon' in item ? (item as MenuItem<true>).icon({}) : ''}
+          {'icon' in item && item.icon ? <item.icon /> : ''}
           <div className={styles.name}>{item.translate ? t(item.name as NotParameteredTranslationKey) : item.name}</div>
         </div>
         <div className={styles.buttonChildrenContainer}>
@@ -155,11 +156,11 @@ export default function Navbar() {
           <span>EtuUTT</span>
         </Link>
         <div className={styles.rightIcon} onClick={toggleCollapsed}>
-          <Icons.LeftArrow />
+          <IconArrowLeft />
         </div>
 
         <div className={styles.uncollapseButton} onClick={toggleCollapsed}>
-          <Icons.Menu />
+          <IconMenu />
         </div>
       </div>
       {/* NAVIGATION */}
@@ -189,7 +190,7 @@ export default function Navbar() {
             </div>
             <div className={styles.actions}>
               <div className={styles.language} onClick={() => setLanguageSelectorOpen(!languageSelectorOpen)}>
-                <Icons.Language />
+                <IconLanguage />
 
                 <div className={`${styles.languageSelector} ${languageSelectorOpen ? styles.open : ''}`}>
                   <div>
@@ -217,7 +218,7 @@ export default function Navbar() {
                 </div>
               </div>
               <div onClick={logoutUser}>
-                <Icons.Logout />
+                <IconLogOut />
               </div>
             </div>
           </a>
@@ -227,7 +228,7 @@ export default function Navbar() {
         {!loggedIn && (
           <div className={styles.guest}>
             <Link className={styles.navigationLink} href={'/login'}>
-              <Icons.Login />
+              <IconLogIn />
               <span>Connexion</span>
             </Link>
             <div className={`${styles.buttons}`}>

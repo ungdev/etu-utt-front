@@ -1,7 +1,7 @@
 import { PropsWithoutRef, ReactNode, useEffect, useState } from 'react';
 import { User } from '@/api/users/user.interface';
 import { useAppTranslation } from '@/lib/i18n';
-import Icons from '@/icons';
+import { IconAdd, IconClose } from 'obra-icons-react';
 import { UserCard } from '../users/UserCard';
 import UserSelector from '../users/UserSelector';
 import Input from './Input';
@@ -103,7 +103,7 @@ export function ModalForm<T extends DataModalKeys>({ fields, window, onSubmit, o
         <div className={styles.title}>
           {window.title}
           <div className={styles.close} onClick={handleClose}>
-            <Icons.Close />
+            <IconClose />
           </div>
         </div>
         <div className={styles.container}>
@@ -130,7 +130,7 @@ export function ModalForm<T extends DataModalKeys>({ fields, window, onSubmit, o
                                   [key]: (states[key] as string) === optionValue ? '' : optionValue,
                                 })
                               }>
-                              {(state as string) === optionValue ? <Icons.Close /> : <Icons.Add />}
+                              {(state as string) === optionValue ? <IconClose /> : <IconAdd />}
                               {optionLabel}
                             </Button>
                           );
@@ -154,7 +154,7 @@ export function ModalForm<T extends DataModalKeys>({ fields, window, onSubmit, o
                     <>
                       <UserCard user={state as User} />
                       <Button className={styles.resetUser} onClick={() => setStates({ ...states, [key]: undefined })}>
-                        <Icons.Close />
+                        <IconClose />
                         {t('users:modal.form.change')}
                       </Button>
                     </>
@@ -185,7 +185,7 @@ export function ModalForm<T extends DataModalKeys>({ fields, window, onSubmit, o
                                   : [...(states[key] as string[]), optionValue],
                               })
                             }>
-                            {(state as string[]).includes(optionValue) ? <Icons.Close /> : <Icons.Add />}
+                            {(state as string[]).includes(optionValue) ? <IconClose /> : <IconAdd />}
                             {optionLabel}
                           </Button>
                         );

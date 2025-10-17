@@ -6,7 +6,6 @@ import styles from './style.module.scss';
 import { useAsso } from '@/api/assos/fetchAsso.hook';
 import Page from '@/components/utilities/Page';
 import { useMembers } from '@/api/assos/fetchAssoMembers.hook';
-import Icons from '@/icons';
 import Link from '@/components/UI/Link';
 import { useAppTranslation } from '@/lib/i18n';
 import Button from '@/components/UI/Button';
@@ -21,6 +20,17 @@ import { addMember, deleteMember, updateMember } from '@/api/assos/manageMembers
 import { User } from '@/api/users/user.interface';
 import { DataModalSchema, ModalCallbackType, ModalForm, WindowOptions } from '@/components/UI/ModalForm';
 import { AssoRole } from '@/components/assos/AssoRole';
+import LexicalTextEditor from '@/components/UI/LexicalTextEditor';
+import {
+  IconAdd,
+  IconCall,
+  IconClose,
+  IconEdit,
+  IconEmail,
+  IconExternalLink,
+  IconEye,
+  IconEyeOff,
+} from 'obra-icons-react';
 
 type AssoDetailModalType =
   | { user: 'user'; roleId: 'string'; permissions: 'stringList'; endAt: 'date' }
@@ -39,6 +49,7 @@ export default function AssoDetailPage() {
   const [members, setMembers] = useMembers(params.assoId);
   const [permissions, setPermissions] = useState(new Set<string>());
   const [displayOldMembers, setDisplayOldMembers] = useState(false);
+  const [editInfosMode, setEditInfosMode] = useState(false);
   const [editMembersMode, setEditMembersMode] = useState(false);
   const [currentEditingRole, setCurrentEditingRole] = useState<string | null>(null);
   const { t } = useAppTranslation();
@@ -238,19 +249,26 @@ export default function AssoDetailPage() {
   return (
     <Page className={styles.page}>
       <div className={[styles.headerCard, !asso ? styles.glimmer : ''].filter((i) => i).join(' ')}>
+        {permissions.has('manage_infos') && (
+          <Button onClick={() => setEditInfosMode(!editInfosMode)} className={styles.edit}>
+            {editInfosMode ? <IconClose /> : <IconEdit />}
+            {editInfosMode ? t('assos:infos.edit.stop') : t('assos:infos.edit')}
+          </Button>
+        )}
         <img src={asso?.logo} alt={`Logo ${asso?.name}`} />
         <div className={styles.details}>
           <div>
             <h1>{asso?.name}</h1>
             <div>{asso?.description}</div>
+            <LexicalTextEditor disabled={!editInfosMode} />
           </div>
           <div className={styles.actionRow}>
             <Link href={asso?.website ? asso?.website.replace(/^(?:https?:\/\/)?/, 'https://') : '#'} noStyle newTab>
-              <Icons.LinkExternal />
+              <IconExternalLink />
               <div>{asso?.website?.replace(/^https?:\/\/(?:www\.)?/, '')}</div>
             </Link>
             <Link href={asso?.mail ? asso?.mail.replace(/^(?:mailto:)?/, 'mailto:') : '#'} noStyle>
-              <Icons.Mail />
+              <IconEmail />
               <div>{asso?.mail}</div>
             </Link>
             <Link
@@ -263,7 +281,7 @@ export default function AssoDetailPage() {
                   : '#'
               }
               noStyle>
-              <Icons.Phone />
+              <IconCall />
               <div>{asso?.phoneNumber}</div>
             </Link>
           </div>
@@ -276,19 +294,19 @@ export default function AssoDetailPage() {
             <div className={styles.actionRow}>
               {permissions.has('manage_roles') && editMembersMode && (
                 <Button onClick={openModalForRoleCreation} className={styles.toggleOldMembers}>
-                  <Icons.Add />
+                  <IconAdd />
                   {t('assos:member.role.add')}
                 </Button>
               )}
               {!!permissions.size && (
                 <Button onClick={() => setEditMembersMode(!editMembersMode)} className={styles.toggleOldMembers}>
-                  {editMembersMode ? <Icons.Close /> : <Icons.Edit />}
+                  {editMembersMode ? <IconClose /> : <IconEdit />}
                   {editMembersMode ? t('assos:member.edit.stop') : t('assos:member.edit')}
                 </Button>
               )}
               {!editMembersMode && (
                 <Button onClick={() => setDisplayOldMembers(!displayOldMembers)} className={styles.toggleOldMembers}>
-                  {displayOldMembers ? <Icons.EyeOff /> : <Icons.EyeOn />}
+                  {displayOldMembers ? <IconEyeOff /> : <IconEye />}
                   {displayOldMembers ? t('assos:member.old.hide') : t('assos:member.old.display')}
                 </Button>
               )}

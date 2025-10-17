@@ -1,6 +1,7 @@
 'use client';
 
 import styles from './style.module.scss';
+import { IconCopy } from 'obra-icons-react';
 import useApplications from '@/api/auth/applications/fetchApplications';
 import Trash from '@/icons/Trash';
 import Input from '@/components/UI/Input';
@@ -10,7 +11,6 @@ import createApplication from '@/api/auth/applications/createApplication';
 import { useAPI } from '@/api/api';
 import { useConnectedUser } from '@/module/user';
 import updateApplicationToken from '@/api/auth/applications/updateToken';
-import Icons from '@/icons';
 import Page from '@/components/utilities/Page';
 
 export default function ApplicationsPage() {
@@ -71,7 +71,7 @@ export default function ApplicationsPage() {
             {token}
             <div className={styles.buttons}>
               <Button onClick={() => navigator.clipboard.writeText(token)}>
-                <Icons.Copy />
+                <IconCopy />
               </Button>
               <Button onClick={() => setToken(null)}>Ok</Button>
             </div>

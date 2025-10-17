@@ -2,10 +2,10 @@ import { PropsWithoutRef, useState } from 'react';
 import { Role, Member } from '@/api/assos/member.interface';
 import { useAppTranslation } from '@/lib/i18n';
 import styles from './AssoRole.module.scss';
-import Icons from '@/icons';
 import Button from '../UI/Button';
 import Input from '../UI/Input';
 import Link from '../UI/Link';
+import { IconCheck, IconCrown, IconDelete, IconEdit, IconUserAdd, IconUserCross } from 'obra-icons-react';
 
 export function AssoRole({
   role,
@@ -50,7 +50,7 @@ export function AssoRole({
       <h3 className={styles.roleRoot}>
         {role.isPresident ? (
           <div className={styles.crown}>
-            <Icons.Crown />
+            <IconCrown />
           </div>
         ) : (
           ''
@@ -64,10 +64,10 @@ export function AssoRole({
           {canEdit && (
             <>
               <Button onClick={() => createAssoMember(role.id)} disabled={!hasMembersPermission}>
-                <Icons.UserAdd />
+                <IconUserAdd />
               </Button>
               <Button onClick={() => deleteAssoRole(role.id)} disabled={!hasPermission || role.isPresident}>
-                <Icons.Trash />
+                <IconDelete />
               </Button>
               <Button
                 onClick={() => {
@@ -80,7 +80,7 @@ export function AssoRole({
                   }
                 }}
                 disabled={!hasPermission}>
-                {editing ? <Icons.Confirm /> : <Icons.Edit />}
+                {editing ? <IconCheck /> : <IconEdit />}
               </Button>
             </>
           )}
@@ -123,10 +123,10 @@ export function AssoRole({
                   {!isOld && canEdit && (
                     <>
                       <Button onClick={() => updateAssoMember(member, role.id)} disabled={!hasMembersPermission}>
-                        <Icons.Edit />
+                        <IconEdit />
                       </Button>
                       <Button onClick={() => deleteAssoMember(member.id)} disabled={!hasMembersPermission}>
-                        <Icons.UserRemove />
+                        <IconUserCross />
                       </Button>
                     </>
                   )}

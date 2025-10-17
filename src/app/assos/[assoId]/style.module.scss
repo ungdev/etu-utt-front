@@ -6,8 +6,17 @@
   padding: 3ch;
   display: flex;
   flex-flow: row nowrap;
+  position: relative;
   gap: 2ch;
   border-radius: 1ch;
+
+  & > .edit {
+    position: absolute;
+    right: 3ch;
+    top: 3ch;
+    padding: 4px 8px !important;
+    border-radius: calc(1em + 4px) !important;
+  }
 
   & > img {
     width: 12ch;

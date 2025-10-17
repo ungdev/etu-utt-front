@@ -1,8 +1,8 @@
 'use client';
 import styles from './style.module.scss';
+import { IconBook } from 'obra-icons-react';
 import { createInputFilter } from '@/components/filteredSearch/InputFilter';
 import FilteredSearch, { FiltersDataType, GenericFiltersType } from '@/components/filteredSearch/FilteredSearch';
-import Icons from '@/icons';
 import { ResultsList } from '@/components/ResultsList';
 import { useAppTranslation } from '@/lib/i18n';
 import { useAssos } from '@/api/assos/searchAssos.hook';
@@ -22,7 +22,7 @@ type FilterNames = 'name';
  */
 const assoFilters = Object.freeze({
   name: {
-    component: createInputFilter('assos:filter.search', 'assos:filter.search.title', Icons.Book),
+    component: createInputFilter('assos:filter.search', 'assos:filter.search.title', IconBook),
     parameterName: 'q',
     updateDelayed: true,
   }, // This one does not need a name as it will never be displayed

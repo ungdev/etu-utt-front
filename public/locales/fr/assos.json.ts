@@ -5,6 +5,8 @@ export default {
   browser: 'UTT Travail',
   'filter.search': 'Recherche dans le guide des assos',
   'filter.search.title': 'Recherche dans le guide des assos',
+  'infos.edit': 'Modifier',
+  'infos.edit.stop': 'Fermer',
   'member.list.title': 'Membres',
   'member.since': 'Depuis ',
   'member.old.from': 'Entre ',

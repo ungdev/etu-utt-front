@@ -2,7 +2,7 @@ import styles from './Comments.module.scss';
 
 import useComments from '@/api/comment/fetchComments';
 import { TFunction, useAppTranslation } from '@/lib/i18n';
-import Icons from '@/icons';
+import { IconChevronRight } from 'obra-icons-react';
 import EditableText from '@/components/EditableText';
 import Button from '@/components/UI/Button';
 import { useConnectedUser } from '@/module/user';
@@ -79,7 +79,7 @@ function CommentFooter(
           {comment.answers.length === 0
             ? t('ues:detailed.comments.conversation.see.empty')
             : t('ues:detailed.comments.conversation.see', { responseCount: comment.answers.length.toString() })}
-          <Icons.Caret />
+          <IconChevronRight />
         </a>
       </div>
     );
