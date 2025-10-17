@@ -1,5 +1,6 @@
 import { useLexicalNodeSelection } from '@lexical/react/useLexicalNodeSelection';
 import { DecoratorNode, EditorConfig, NodeKey, SerializedLexicalNode, Spread } from 'lexical';
+import { ImageMedia } from '../ImageMedia';
 
 type SerializedImageNode = Spread<
   {
@@ -46,12 +47,12 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
     function ImageComponent() {
       const [isSelected, setSelected, clearSelection] = useLexicalNodeSelection(image.getKey());
       return (
-        <img
+        <ImageMedia
           className={isSelected ? 'selected' : ''}
           src={image.__src}
-          width={Number.isInteger(image.__width) ? image.__width : undefined}
-          height={Number.isInteger(image.__height) ? image.__height : undefined}
-          alt={image.__altText}
+          width={image.__width}
+          height={image.__height}
+          altText={image.__altText}
           onClick={(event) => {
             if (event.shiftKey) {
               setSelected(!isSelected);
@@ -63,7 +64,6 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
             event.stopPropagation();
             return true;
           }}
-          referrerPolicy="no-referrer"
         />
       );
     }
