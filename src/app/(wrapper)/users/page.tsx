@@ -4,7 +4,7 @@ import FilteredSearch, { FiltersDataType, GenericFiltersType } from '@/component
 import { createInputFilter } from '@/components/filteredSearch/InputFilter';
 import { useUsers } from '@/api/users/searchUsers.hook';
 import { ResultsList } from '@/components/ResultsList';
-import defaultAvatar from '@/../public/images/default-avatar.jpg';
+import defaultAvatar from '../../../../public/images/default-avatar.jpg';
 import Page from '@/components/utilities/Page';
 import { PagePermission } from '@/module/pageSettings';
 import { useAppTranslation } from '@/lib/i18n';

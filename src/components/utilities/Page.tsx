@@ -1,6 +1,6 @@
 'use client';
 
-import { FC, useEffect, useRef, ReactNode } from 'react';
+import { FC, useEffect, ReactNode } from 'react';
 import { useAppDispatch } from '@/lib/hooks';
 import { defaultPageSettings, initPageSettings, updatePageSettings, PagePermission } from '@/module/pageSettings';
 
@@ -24,7 +24,6 @@ export default function Page({
 }: PageProps & {
   children: ReactNode;
 }) {
-  const firstLoad = useRef(true);
   const dispatch = useAppDispatch();
   useEffect(
     () => () => {
@@ -33,13 +32,12 @@ export default function Page({
     [],
   );
   useEffect(() => {
-    firstLoad.current = false;
     dispatch(
       updatePageSettings({
         navbarAdditionalComponent,
         hasNavbar,
         permissions,
-        needsLoading: needsLoading,
+        needsLoading,
       }),
     );
   }, [hasNavbar, needsLoading]);

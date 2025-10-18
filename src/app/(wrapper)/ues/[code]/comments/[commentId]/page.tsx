@@ -1,9 +1,9 @@
 'use client';
 
-import styles from '@/app/ues/[code]/comments/[commentId]/style.module.scss';
+import styles from '@/app/(wrapper)/ues/[code]/comments/[commentId]/style.module.scss';
 import { useParams } from 'next/navigation';
 import { useUEComment } from '@/api/comment/getComment';
-import useUE from '@/api/ue/fetchUEs';
+import useUe from '@/api/ue/fetchUe';
 import { TFunction, useAppTranslation } from '@/lib/i18n';
 import TextArea from '@/components/UI/TextArea';
 import Button from '@/components/UI/Button';
@@ -35,7 +35,7 @@ export default function CommentDetailsPage() {
   const { t } = useAppTranslation();
   const params = useParams<{ code: string; commentId: string }>();
   const [comment, setComment] = useUEComment(params.commentId);
-  const [ue] = useUE(params.code);
+  const [ue] = useUe(params.code);
   const [answer, setAnswer] = useState('');
   const user = useConnectedUser();
   const api = useAPI();

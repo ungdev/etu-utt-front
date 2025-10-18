@@ -1,5 +1,6 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import { FC } from 'react';
+import { FC, useState } from 'react';
+import { notFound } from 'next/navigation';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import { useConnectedUser } from '@/module/session';
 
@@ -37,8 +38,9 @@ export const defaultPageSettings = {
 export const getInitialState = () =>
   ({
     ...defaultPageSettings,
-    pageComponentReady: false,
     searchParams: {},
+    notFound: false,
+    pageComponentReady: false,
     internalLoading: {
       searchParamsLoaded: false,
       permissionsVerified: true, // TODO: verify them properly
@@ -112,6 +114,27 @@ export function usePagePermissions(): { [K in PagePermission]: boolean } {
   return {
     [PagePermission.CONNECTED]: user !== null,
   };
+}
+
+/**
+ * Use this instead of the builtin notFound() if you need to call it outside the body of a component (e.g. in a useEffect block).
+ * @example
+ * function MyComponent() {
+ *   const notFound = useSetNotFound();
+ *   useEffect(() => {
+ *     fetch("https://example.com")
+ *       .then(() => console.log("Request succeeded!")
+ *       .catch(() => notFound());
+ *   }, []);
+ *   return <p>Making a request to https://example.com...</p>;
+ * }
+ */
+export function useNotFound(): () => void {
+  const [wasNotFound, setWasNotFound] = useState(false);
+  if (wasNotFound) {
+    notFound();
+  }
+  return () => setWasNotFound(true);
 }
 
 export default pageSettingsSlice.reducer;

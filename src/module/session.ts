@@ -6,14 +6,15 @@ import { RegisterRequestDto, RegisterResponseDto } from '@/api/auth/register';
 import { IsLoggedInResponseDto } from '@/api/auth/isLoggedIn';
 import { API, setAuthorizationToken, useAPI } from '@/api/api';
 import { fetchProfile } from '@/api/profile/fetchProfile';
+import { useAppSelector } from '@/lib/hooks';
 import { LocalStorageNames } from '@/global';
+import { authorizationTokenExpiresIn } from '@/utils/environment';
 import { fetchMyPermissions } from '@/api/permissions/fetchMyPermissions';
 import { Permissions } from '@/api/permissions/permissions.interface';
 import { Profile } from '@/api/profile/profile.types';
 import { addMenuItem, getMenuItem, removeMenuItem } from '@/module/navbar';
 import { fetchMyUes } from '@/api/ue/fetchMyUes';
 import { MenuItem } from '@/components/Navbar';
-import { useAppSelector } from '@/lib/hooks';
 
 export const enum UserType {
   STUDENT = 'STUDENT',
@@ -59,12 +60,16 @@ export const sessionSlice = createSlice({
 const { login: loginReducer, logout: logoutReducer } = sessionSlice.actions;
 
 export const login =
-  (api: API, login: string, password: string, application?: string): AppThunk<Promise<LoginResponseDto | null>> =>
+  (api: API, login: string, password: string, application?: string): AppThunk<Promise<LoginResponseDto | undefined>> =>
   (dispatch) =>
     api
       .post<LoginRequestDto, LoginResponseDto>(
         '/auth/signin',
-        { login, password, tokenExpiresIn: 24 * 360 },
+        {
+          login,
+          password,
+          tokenExpiresIn: authorizationTokenExpiresIn(),
+        },
         { applicationId: application || undefined },
       )
       .on('success', async (body) => {
@@ -72,8 +77,8 @@ export const login =
         if (body.token) dispatch(setToken(body.token, api));
         return body;
       })
-      .on(StatusCodes.UNAUTHORIZED, (body) => console.error('Wrong credentials', body))
-      .on(StatusCodes.BAD_REQUEST, (body) => console.error('Bad request', body))
+      .on(StatusCodes.UNAUTHORIZED, (error) => console.error(`Wrong credentials (${error})`))
+      .on(StatusCodes.BAD_REQUEST, (error) => console.error(`Bad request (${error})`))
       .toPromise();
 
 export const register =
@@ -154,5 +159,9 @@ export function setToken(token: string | null, api?: API): AppThunk {
 export const useConnectedUser = () => useAppSelector((state) => state.session.user);
 
 export const usePermissions = () => useAppSelector((state) => state.session.permissions);
+
+export function useLoggedIn() {
+  return useAppSelector((state) => state.session.logged);
+}
 
 export default sessionSlice.reducer;

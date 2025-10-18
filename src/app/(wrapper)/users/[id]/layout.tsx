@@ -3,7 +3,7 @@ import { useParams, usePathname } from 'next/navigation';
 import { useUser } from '@/api/users/getUser';
 import Link from '@/components/UI/Link';
 import styles from './layout.module.scss';
-import defaultAvatar from '@/../public/images/default-avatar.jpg';
+import defaultAvatar from '../../../../../public/images/default-avatar.jpg';
 import { apiUrl } from '@/utils/environment';
 import { NotParameteredTranslationKey, useAppTranslation } from '@/lib/i18n';
 
