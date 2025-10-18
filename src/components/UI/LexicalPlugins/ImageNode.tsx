@@ -2,6 +2,7 @@ import { useLexicalNodeSelection } from '@lexical/react/useLexicalNodeSelection'
 import { DecoratorNode, EditorConfig, NodeKey, SerializedLexicalNode, Spread } from 'lexical';
 import { ImageMedia } from '../ImageMedia';
 import styles from '../LexicalTextEditor.module.scss';
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 
 type SerializedImageNode = Spread<
   {
@@ -46,6 +47,7 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const image = this;
     function ImageComponent() {
+      const [editor] = useLexicalComposerContext();
       const [isSelected, setSelected, clearSelection] = useLexicalNodeSelection(image.getKey());
       return (
         <ImageMedia
@@ -55,7 +57,10 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
           height={image.__height}
           altText={image.__altText}
           onClick={(event) => {
-            if (event.shiftKey) {
+            if (!editor._editable) {
+              setSelected(false);
+              clearSelection();
+            } else if (event.shiftKey) {
               setSelected(!isSelected);
             } else {
               clearSelection();

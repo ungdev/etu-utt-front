@@ -260,7 +260,11 @@ export default function AssoDetailPage() {
           <div>
             <h1>{asso?.name}</h1>
             <div>{asso?.description}</div>
-            <LexicalTextEditor disabled={!editInfosMode} />
+            <LexicalTextEditor
+              placeholder={t('assos:infos.edit.description.placeholder')}
+              emptyText={t('assos:infos.description.empty')}
+              disabled={!editInfosMode}
+            />
           </div>
           <div className={styles.actionRow}>
             <Link href={asso?.website ? asso?.website.replace(/^(?:https?:\/\/)?/, 'https://') : '#'} noStyle newTab>

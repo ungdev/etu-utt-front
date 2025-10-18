@@ -33,7 +33,13 @@ const theme = {
   link: styles['editor-link'],
 } satisfies EditorThemeClasses;
 
-function LexicalTextEditor({ disabled = false }) {
+interface LexicalTextEditorProps {
+  placeholder: string;
+  emptyText?: string;
+  disabled?: boolean;
+}
+
+function LexicalTextEditor({ placeholder, emptyText, disabled = false }: LexicalTextEditorProps) {
   const initialConfig = {
     namespace: 'EtuUTT Front Editor',
     theme,
@@ -62,8 +68,8 @@ function LexicalTextEditor({ disabled = false }) {
         <RichTextPlugin
           contentEditable={
             <ContentEditable
-              aria-placeholder={'Enter some text...'}
-              placeholder={<div className={styles.placeholder}>Enter some text...</div>}
+              aria-placeholder={(disabled && emptyText) || placeholder}
+              placeholder={<div className={styles.placeholder}>{(disabled && emptyText) || placeholder}</div>}
             />
           }
           ErrorBoundary={LexicalErrorBoundary}
