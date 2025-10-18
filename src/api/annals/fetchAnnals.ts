@@ -26,9 +26,5 @@ export default function useAnnals(
 }
 
 export function openAnnalInNewTab(api: API, id: string) {
-  api
-    .get(`/ue/annals/${id}`, {
-      isFile: true,
-    })
-    .on('success', (blob) => window.open(URL.createObjectURL(blob), '_blank'));
+  api.getFile(`/ue/annals/${id}`).on('success', (blob) => window.open(URL.createObjectURL(blob), '_blank'));
 }

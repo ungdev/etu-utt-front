@@ -23,7 +23,7 @@ type APIResponse<ResponseType> =
       code: StatusCodes;
       body: ResponseType | ApiError;
     }
-  | Record<'failure', ResponseFailureReason>;
+  | Record<'failureReason', ResponseFailureReason>;
 
 /**
  * Dates do not exist in JSON, so the API does not return type Date, but instead string.
@@ -44,11 +44,11 @@ function isStatusSuccess(code: StatusCodes): code is StatusCodesSuccess {
   return code < 400;
 }
 
-type HandlerNoParam<R> = () => R;
-type HandlerBody<T, R> = (body: T) => R;
-type HandlerError<R> = (error: string) => R;
-type HandlerCodeAndError<R> = (errorCode: number, error: string) => R;
-type HandlerFailureReason<R> = (failureReason: ResponseFailureReason) => R;
+type HandlerNoParam<R> = VoidToUndefinedReturn<() => R>;
+type HandlerBody<T, R> = VoidToUndefinedReturn<(body: T) => R>;
+type HandlerError<R> = VoidToUndefinedReturn<(error?: string) => R>;
+type HandlerCodeAndError<R> = VoidToUndefinedReturn<(errorCode?: number, error?: string) => R>;
+type HandlerFailureReason<R> = VoidToUndefinedReturn<(failureReason?: ResponseFailureReason) => R>;
 
 type ResponseHandlerExtendsType<T> = Partial<Record<'success' | StatusCodesSuccess, HandlerBody<T, any>>> &
   Partial<Record<'error', HandlerCodeAndError<any>>> &
@@ -56,6 +56,9 @@ type ResponseHandlerExtendsType<T> = Partial<Record<'success' | StatusCodesSucce
   Partial<Record<'failure', HandlerFailureReason<any>>> &
   Partial<Record<ResponseFailureReason, HandlerNoParam<any>>> &
   Record<'fallback', HandlerNoParam<any>>;
+
+type VoidToUndefinedReturn<T extends (...args: any) => any> =
+  ReturnType<T> extends void ? (...args: Parameters<T>) => undefined : T;
 
 /**
  * The response handler is a class that allows you to handle the response of a request to the API.
@@ -83,15 +86,15 @@ type ResponseHandlerExtendsType<T> = Partial<Record<'success' | StatusCodesSucce
  */
 export class ResponseHandler<T, R extends ResponseHandlerExtendsType<T> = { fallback: HandlerNoParam<undefined> }> {
   private readonly handlers = { fallback: () => undefined } as R;
-  private readonly promise: Promise<R[keyof R]>;
+  private readonly promise: Promise<ReturnType<R[keyof R] extends (...args: any) => any ? R[keyof R] : never>>;
 
   constructor(rawResponse: Promise<APIResponse<T>>) {
     this.promise = rawResponse.then((response) => {
-      if ('failure' in response) {
-        if (this.handlers[response.failure]) {
-          return this.handlers[response.failure]!();
+      if ('failureReason' in response) {
+        if (this.handlers[response.failureReason]) {
+          return this.handlers[response.failureReason]!();
         } else if (this.handlers.failure) {
-          return this.handlers.failure(response.failure);
+          return this.handlers.failure(response.failureReason);
         } else {
           return this.handlers.fallback();
         }
@@ -122,23 +125,38 @@ export class ResponseHandler<T, R extends ResponseHandlerExtendsType<T> = { fall
    *                   failure: An error occurred when making the request
    * @param handler Callback
    */
-  on<
-    S extends keyof ResponseHandlerExtendsType<T>,
-    O extends ResponseHandlerExtendsType<T>[S],
-  >(
+  on<S extends keyof ResponseHandlerExtendsType<T>, H extends Exclude<ResponseHandlerExtendsType<T>[S], undefined>>(
     statusCode: S,
-    handler: O,
-  ): ResponseHandler<T, { [K in S | keyof R]: K extends S ? O : R[K] }> {
+    handler: H,
+  ): ResponseHandler<
+    T,
+    {
+      [K in S | keyof R]: K extends S
+        ? VoidToUndefinedReturn<H> extends ResponseHandlerExtendsType<T>[K] // Typescript does not understand that VoidToUndefinedReturn<H> must match ResponseHandlerExtendsType<T>[K]
+          ? VoidToUndefinedReturn<H>
+          : never
+        : R[K];
+    }
+  > {
+    // @ts-expect-error TS2322 `handler` does not match generic `R` of `this`
     this.handlers[statusCode] = handler;
-    return this as unknown as ResponseHandler<T, { [K in S | keyof R]: K extends S ? O : R[K] }>;
+    return this as ResponseHandler<
+      T,
+      {
+        [K in S | keyof R]: K extends S
+          ? VoidToUndefinedReturn<H> extends ResponseHandlerExtendsType<T>[K]
+            ? VoidToUndefinedReturn<H>
+            : never
+          : R[K];
+      }
+    >;
   }
 
   async toPromise(): Promise<
-    Awaited<Exclude<R[keyof R], void | undefined> | (undefined extends R[keyof R] ? null : never)> // For some reason, undefined extends void. See https://github.com/ungdev/etu-utt-front/pull/28/files#r2357325209, Alban got the explanation
+    //Awaited<Exclude<R[keyof R], void | undefined> | (undefined extends R[keyof R] ? null : never)> // For some reason, undefined extends void. See https://github.com/ungdev/etu-utt-front/pull/28/files#r2357325209, Alban got the explanation
+    Awaited<ReturnType<R[keyof R] extends (...args: any) => any ? R[keyof R] : never>>
   > {
-    return ((await this.promise) ?? null) as Awaited<
-      Exclude<R[keyof R], void | undefined> | (undefined extends R[keyof R] ? null : never)
-    >;
+    return await this.promise;
   }
 }
 
@@ -232,7 +250,8 @@ async function internalRequestAPI<RequestType, ResponseType>(
       return { code: response.status, body: null as ResponseType };
     }
     if (isFile && method === 'GET') return { code: response.status, body: await response.blob() };
-    if (!response.headers.get('content-type')?.includes('application/json')) return { error: ResponseError.not_json };
+    if (!response.headers.get('content-type')?.includes('application/json'))
+      return { failureReason: ResponseFailureReason.not_json };
 
     try {
       const res: RawResponseType<ResponseType> = await response.json();
@@ -240,13 +259,13 @@ async function internalRequestAPI<RequestType, ResponseType>(
     } catch (error) {
       // BROOO, who makes APIs that return headers with Content-Type: application/json without a json body :(
       // (Ok, in theory none, but it's better to be safe than sorry)
-      return { error: ResponseError.not_json };
+      return { failureReason: ResponseFailureReason.not_json };
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     if (error instanceof Error && error.name === 'AbortError') {
       console.error('Request timed out');
-      return { error: ResponseError.timeout };
+      return { failureReason: ResponseFailureReason.timeout };
     }
     if (error.message?.startsWith('Network Error') || error.code === 'ECONNABORTED') {
       console.error('Cannot connect to server');
@@ -254,7 +273,7 @@ async function internalRequestAPI<RequestType, ResponseType>(
       console.error('An error occurred when making a request to the API');
     }
 
-    return { error: ResponseError.unknown };
+    return { failureReason: ResponseFailureReason.unknown };
   } finally {
     // If the request hasn't timed out, cancel timeout
     if (!abortController.signal.aborted) clearTimeout(timeout);
@@ -311,10 +330,16 @@ export const setAuthorizationToken = (token: string) => {
 export function useAPI(): API {
   const setNotFound = useNotFound();
   return {
+    getFile: (route: string, options: { timeoutMillis?: number; version?: string; applicationId?: string } = {}) =>
+      applyDefaultHandler(requestAPI<never, Blob>('GET', route, null, { ...options, isFile: true }), setNotFound),
     get: <ResponseType = never>(
       route: string,
-      options: { timeoutMillis?: number; version?: string; isFile?: boolean } = {},
-    ) => applyDefaultHandler(requestAPI<never, ResponseType>('GET', route, null, options), setNotFound),
+      options: { timeoutMillis?: number; version?: string; applicationId?: string } = {},
+    ) =>
+      applyDefaultHandler(
+        requestAPI<never, ResponseType>('GET', route, null, { ...options, isFile: false }),
+        setNotFound,
+      ),
     post: <RequestType, ResponseType = never>(
       route: string,
       body = {} as RequestType,
@@ -336,13 +361,13 @@ export function useAPI(): API {
 }
 
 export interface API {
-  get(
+  getFile(
     route: string,
-    options: { timeoutMillis?: number; version?: string; isFile: true },
+    options?: { timeoutMillis?: number; version?: string; applicationId?: string },
   ): DefaultResponseHandlerType<Blob>;
   get<ResponseType = never>(
     route: string,
-    options?: { timeoutMillis?: number; version?: string; isFile?: boolean },
+    options?: { timeoutMillis?: number; version?: string; applicationId?: string },
   ): DefaultResponseHandlerType<ResponseType>;
   post<RequestType, ResponseType = never>(
     route: string,
@@ -367,7 +392,7 @@ export interface API {
  * @param handler The response handler we need to apply the default handler to.
  * @param setNotFound A function that can be called to set the current route as "not found".
  */
-function applyDefaultHandler<T>(handler: ResponseHandler<T>, setNotFound: () => void) {
+function applyDefaultHandler<T>(handler: ResponseHandler<T>, setNotFound: () => void): DefaultResponseHandlerType<T> {
   return handler
     .on('success', (body) => body)
     .on('failure', () => {
@@ -381,5 +406,11 @@ function applyDefaultHandler<T>(handler: ResponseHandler<T>, setNotFound: () => 
 
 type DefaultResponseHandlerType<T> = ResponseHandler<
   T,
-  { fallback: undefined; success: T; failure: void; error: void }
+  {
+    fallback: HandlerNoParam<undefined>;
+    success: HandlerBody<T, T>;
+    failure: HandlerFailureReason<undefined>;
+    error: HandlerCodeAndError<undefined>;
+    404: HandlerError<undefined>;
+  }
 >;
