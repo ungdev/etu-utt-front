@@ -46,7 +46,7 @@ export class ColorTextNode extends TextNode {
    * @see TextNode.splitText
    */
   splitText(...splitOffsets: Array<number>): Array<ColorTextNode> {
-    super.splitText(...splitOffsets); // Keep this to fail on read-only
+    if (!$getEditor()._editable) throw new Error('splitText: Cannot split text on a read-only editor');
     const self = this.getLatest();
     const textContent = self.getTextContent();
     if (textContent === '') {
@@ -214,6 +214,10 @@ export class ColorTextNode extends TextNode {
 
 export function $createColorTextNode(text?: string, color?: ColorType, nodeKey?: NodeKey): ColorTextNode {
   return new ColorTextNode(text, color, nodeKey);
+}
+
+export function $createColorTextNodeFromTextNode(textNode: TextNode, color?: ColorType): ColorTextNode {
+  return $createColorTextNode(textNode.getTextContent(), color).updateFromJSON(textNode.exportJSON());
 }
 
 export function $isColorTextNode(node: unknown): node is ColorTextNode {
