@@ -152,10 +152,7 @@ export class ResponseHandler<T, R extends ResponseHandlerExtendsType<T> = { fall
     >;
   }
 
-  async toPromise(): Promise<
-    //Awaited<Exclude<R[keyof R], void | undefined> | (undefined extends R[keyof R] ? null : never)> // For some reason, undefined extends void. See https://github.com/ungdev/etu-utt-front/pull/28/files#r2357325209, Alban got the explanation
-    Awaited<ReturnType<R[keyof R] extends (...args: any) => any ? R[keyof R] : never>>
-  > {
+  async toPromise(): Promise<Awaited<ReturnType<R[keyof R] extends (...args: any) => any ? R[keyof R] : never>>> {
     return await this.promise;
   }
 }
@@ -220,7 +217,6 @@ async function internalRequestAPI<RequestType, ResponseType>(
   headers.append('Authorization', authorizationToken ? `Bearer ${authorizationToken}` : '');
   headers.append('X-Application', applicationId);
   if (!isFile) headers.append('Content-Type', 'application/json');
-  headers.append('X-Application', '52ce644d-183f-49e9-bd21-d2d4f37e2196');
 
   // Add timeout to the request
   const abortController = new AbortController();
