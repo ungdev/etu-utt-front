@@ -210,6 +210,16 @@ export class ColorTextNode extends TextNode {
       color: this.__color,
     };
   }
+
+  mayMerge(node: LexicalNode): boolean {
+    return (
+      $isColorTextNode(node) &&
+      node.__color === this.__color &&
+      node.__format === this.__format &&
+      !this.isUnmergeable() &&
+      !node.isUnmergeable()
+    );
+  }
 }
 
 export function $createColorTextNode(text?: string, color?: ColorType, nodeKey?: NodeKey): ColorTextNode {
