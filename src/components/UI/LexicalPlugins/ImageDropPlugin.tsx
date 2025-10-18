@@ -3,7 +3,7 @@ import { mergeRegister } from '@lexical/utils';
 import {
   COMMAND_PRIORITY_HIGH,
   COMMAND_PRIORITY_LOW,
-  DRAGEND_COMMAND,
+  createCommand,
   DRAGOVER_COMMAND,
   DROP_COMMAND,
   LexicalEditor,
@@ -12,6 +12,10 @@ import { useEffect, useState } from 'react';
 import { ImageNode } from './ImageNode';
 import { INSERT_IMAGE_COMMAND } from './ImagePlugin';
 import { computeApiURL, useAPI } from '@/api/api';
+import styles from '../LexicalTextEditor.module.scss';
+import { useAppTranslation } from '@/lib/i18n';
+
+export const DRAGLEAVE_COMMAND = createCommand<DragEvent>('DRAGLEAVE_COMMAND');
 
 interface PartialUploadResponse {
   id: string;
@@ -23,17 +27,18 @@ export function ImageDropPlugin() {
   const [editor] = useLexicalComposerContext();
   const [isHovered, setIsHovered] = useState(false);
   const api = useAPI();
+  const { t } = useAppTranslation();
 
-  function onDragover(event: DragEvent) {
-    const file = getImageFromDataTransfer(event.dataTransfer!);
-    if (file) {
+  function onDragOver(event: DragEvent) {
+    if (event.dataTransfer!.types.includes('Files')) {
       setIsHovered(true);
       event.preventDefault();
+      return true;
     }
-    return !!file;
+    return false;
   }
 
-  function onDragEnd() {
+  function onDragLeave() {
     setIsHovered(false);
     return true;
   }
@@ -63,14 +68,17 @@ export function ImageDropPlugin() {
   useEffect(() => {
     if (!editor.hasNodes([ImageNode])) throw new Error('ImagePlugin: ImageNode not registered on editor');
 
+    const listener = (event: DragEvent) => editor.dispatchCommand(DRAGLEAVE_COMMAND, event);
+    editor.getRootElement()?.addEventListener('dragleave', listener);
     return mergeRegister(
-      editor.registerCommand(DRAGOVER_COMMAND, (event) => onDragover(event), COMMAND_PRIORITY_LOW),
-      editor.registerCommand(DRAGEND_COMMAND, () => onDragEnd(), COMMAND_PRIORITY_HIGH),
+      editor.registerCommand(DRAGOVER_COMMAND, (event) => onDragOver(event), COMMAND_PRIORITY_LOW),
+      editor.registerCommand(DRAGLEAVE_COMMAND, () => onDragLeave(), COMMAND_PRIORITY_HIGH),
       editor.registerCommand(DROP_COMMAND, (event) => onDrop(event, editor), COMMAND_PRIORITY_HIGH),
+      () => editor.getRootElement()?.removeEventListener('dragleave', listener),
     );
   }, [editor]);
 
-  return <div className={isHovered ? 'dropZone' : undefined}></div>;
+  return <div className={isHovered ? styles.dropZone : undefined}>{isHovered && t('common:rte.dnd.drop')}</div>;
 }
 
 function getImageFromDataTransfer(dataTransfer: DataTransfer) {

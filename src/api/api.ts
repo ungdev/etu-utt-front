@@ -145,6 +145,7 @@ async function internalRequestAPI<RequestType>(
   version: number,
   isFile: true,
   applicationId: string,
+  forceCache: boolean,
 ): Promise<APIResponse<Blob>>;
 async function internalRequestAPI<RequestType, ResponseType>(
   method: string,
@@ -154,6 +155,7 @@ async function internalRequestAPI<RequestType, ResponseType>(
   version: number,
   isFile: boolean,
   applicationId: string,
+  forceCache: boolean,
 ): Promise<APIResponse<ResponseType>>;
 async function internalRequestAPI<RequestType, ResponseType>(
   method: string,
@@ -163,6 +165,7 @@ async function internalRequestAPI<RequestType, ResponseType>(
   version: number,
   isFile: boolean,
   applicationId: string,
+  forceCache: boolean,
 ): Promise<APIResponse<ResponseType | Blob>> {
   // Generate headers
   const headers = new Headers();
@@ -185,7 +188,7 @@ async function internalRequestAPI<RequestType, ResponseType>(
         | BodyInit
         | null
         | undefined,
-      cache: 'no-cache',
+      cache: forceCache ? 'force-cache' : 'no-cache',
       signal: abortController.signal,
     });
 
@@ -236,13 +239,13 @@ function requestAPI<RequestType>(
   method: 'GET',
   route: string,
   body: RequestType | null,
-  params: { timeoutMillis?: number; version?: number; isFile: true; applicationId?: string },
+  params: { timeoutMillis?: number; version?: number; isFile: true; applicationId?: string; forceCache?: boolean },
 ): ResponseHandler<Blob>;
 function requestAPI<RequestType, ResponseType>(
   method: string,
   route: string,
   body: RequestType | null,
-  params: { timeoutMillis?: number; version?: number; isFile?: boolean; applicationId?: string },
+  params: { timeoutMillis?: number; version?: number; isFile?: boolean; applicationId?: string; forceCache?: boolean },
 ): ResponseHandler<ResponseType>;
 function requestAPI<RequestType, ResponseType>(
   method: string,
@@ -253,9 +256,12 @@ function requestAPI<RequestType, ResponseType>(
     version = apiVersion,
     isFile = false,
     applicationId = etuuttWebApplicationId,
-  }: { timeoutMillis?: number; version?: number; isFile?: boolean; applicationId?: string } = {},
+    forceCache = false,
+  }: { timeoutMillis?: number; version?: number; isFile?: boolean; applicationId?: string; forceCache?: boolean } = {},
 ): ResponseHandler<ResponseType> {
-  return new ResponseHandler(internalRequestAPI(method, route, body, timeoutMillis, version, isFile, applicationId));
+  return new ResponseHandler(
+    internalRequestAPI(method, route, body, timeoutMillis, version, isFile, applicationId, forceCache),
+  );
 }
 
 // Set the authorization header with the given token for next requests
@@ -273,7 +279,7 @@ export function useAPI(): API {
   return {
     get: <ResponseType = never>(
       route: string,
-      options: { timeoutMillis?: number; version?: number; isFile?: boolean } = {},
+      options: { timeoutMillis?: number; version?: number; isFile?: boolean; forceCache?: boolean } = {},
     ) => applyDefaultHandler(requestAPI<never, ResponseType>('GET', route, null, options)),
     post: <RequestType, ResponseType = never>(
       route: string,
@@ -298,11 +304,11 @@ export function useAPI(): API {
 export interface API {
   get(
     route: string,
-    options: { timeoutMillis?: number; version?: number; isFile: true },
+    options: { timeoutMillis?: number; version?: number; isFile: true; forceCache?: boolean },
   ): DefaultResponseHandlerType<Blob>;
   get<ResponseType = never>(
     route: string,
-    options?: { timeoutMillis?: number; version?: number; isFile?: boolean },
+    options?: { timeoutMillis?: number; version?: number; isFile?: boolean; forceCache?: boolean },
   ): DefaultResponseHandlerType<ResponseType>;
   post<RequestType, ResponseType = never>(
     route: string,

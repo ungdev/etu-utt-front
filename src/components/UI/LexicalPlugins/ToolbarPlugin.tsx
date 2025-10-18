@@ -25,9 +25,10 @@ import {
   IconUnderline,
 } from 'obra-icons-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import styles from '../LexicalTextEditor.module.scss';
 
 function Divider() {
-  return <div className="divider" />;
+  return <div className={styles.divider} />;
 }
 
 export function ToolbarPlugin() {
@@ -53,48 +54,22 @@ export function ToolbarPlugin() {
   useEffect(() => {
     return mergeRegister(
       editor.registerUpdateListener(({ editorState }) => {
-        editorState.read(
-          () => {
-            $updateToolbar();
-          },
-          { editor },
-        );
+        editorState.read(() => $updateToolbar(), { editor });
       }),
-      editor.registerCommand(
-        SELECTION_CHANGE_COMMAND,
-        () => {
-          $updateToolbar();
-          return false;
-        },
-        COMMAND_PRIORITY_LOW,
-      ),
-      editor.registerCommand(
-        CAN_UNDO_COMMAND,
-        (payload) => {
-          setCanUndo(payload);
-          return false;
-        },
-        COMMAND_PRIORITY_LOW,
-      ),
-      editor.registerCommand(
-        CAN_REDO_COMMAND,
-        (payload) => {
-          setCanRedo(payload);
-          return false;
-        },
-        COMMAND_PRIORITY_LOW,
-      ),
+      editor.registerCommand(SELECTION_CHANGE_COMMAND, () => ($updateToolbar(), false), COMMAND_PRIORITY_LOW),
+      editor.registerCommand(CAN_UNDO_COMMAND, (payload) => (setCanUndo(payload), false), COMMAND_PRIORITY_LOW),
+      editor.registerCommand(CAN_REDO_COMMAND, (payload) => (setCanRedo(payload), false), COMMAND_PRIORITY_LOW),
     );
   }, [editor, $updateToolbar]);
 
   return (
-    <div className="toolbar" ref={toolbarRef}>
+    <div className={styles.toolbar} ref={toolbarRef}>
       <button
         disabled={!canUndo}
         onClick={() => {
           editor.dispatchCommand(UNDO_COMMAND, undefined);
         }}
-        className="toolbar-item spaced"
+        className={styles.item}
         aria-label="Undo">
         <IconPrevious />
         <i className="format undo" />
@@ -104,7 +79,7 @@ export function ToolbarPlugin() {
         onClick={() => {
           editor.dispatchCommand(REDO_COMMAND, undefined);
         }}
-        className="toolbar-item"
+        className={styles.item}
         aria-label="Redo">
         <IconNext />
       </button>
@@ -113,7 +88,7 @@ export function ToolbarPlugin() {
         onClick={() => {
           editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'bold');
         }}
-        className={'toolbar-item spaced ' + (isBold ? 'active' : '')}
+        className={`${styles.item} ${isBold ? styles.active : ''}`}
         aria-label="Format Bold">
         <IconBold />
       </button>
@@ -121,7 +96,7 @@ export function ToolbarPlugin() {
         onClick={() => {
           editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'italic');
         }}
-        className={'toolbar-item spaced ' + (isItalic ? 'active' : '')}
+        className={`${styles.item} ${isItalic ? styles.active : ''}`}
         aria-label="Format Italics">
         <IconItalic />
       </button>
@@ -129,7 +104,7 @@ export function ToolbarPlugin() {
         onClick={() => {
           editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'underline');
         }}
-        className={'toolbar-item spaced ' + (isUnderline ? 'active' : '')}
+        className={`${styles.item} ${isUnderline ? styles.active : ''}`}
         aria-label="Format Underline">
         <IconUnderline />
       </button>
@@ -137,7 +112,7 @@ export function ToolbarPlugin() {
         onClick={() => {
           editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'strikethrough');
         }}
-        className={'toolbar-item spaced ' + (isStrikethrough ? 'active' : '')}
+        className={`${styles.item} ${isStrikethrough ? styles.active : ''}`}
         aria-label="Format Strikethrough">
         <IconStrikethrough />
       </button>
@@ -146,7 +121,7 @@ export function ToolbarPlugin() {
         onClick={() => {
           editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'left');
         }}
-        className="toolbar-item spaced"
+        className={styles.item}
         aria-label="Left Align">
         <IconAlignText4Left />
       </button>
@@ -154,7 +129,7 @@ export function ToolbarPlugin() {
         onClick={() => {
           editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'center');
         }}
-        className="toolbar-item spaced"
+        className={styles.item}
         aria-label="Center Align">
         <IconAlignText4Center />
       </button>
@@ -162,7 +137,7 @@ export function ToolbarPlugin() {
         onClick={() => {
           editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'right');
         }}
-        className="toolbar-item spaced"
+        className={styles.item}
         aria-label="Right Align">
         <IconAlignText4Right />
       </button>
@@ -170,7 +145,7 @@ export function ToolbarPlugin() {
         onClick={() => {
           editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'justify');
         }}
-        className="toolbar-item"
+        className={styles.item}
         aria-label="Justify Align">
         <IconAlignText4Justify />
       </button>

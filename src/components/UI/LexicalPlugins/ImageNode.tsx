@@ -1,6 +1,7 @@
 import { useLexicalNodeSelection } from '@lexical/react/useLexicalNodeSelection';
 import { DecoratorNode, EditorConfig, NodeKey, SerializedLexicalNode, Spread } from 'lexical';
 import { ImageMedia } from '../ImageMedia';
+import styles from '../LexicalTextEditor.module.scss';
 
 type SerializedImageNode = Spread<
   {
@@ -48,7 +49,7 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
       const [isSelected, setSelected, clearSelection] = useLexicalNodeSelection(image.getKey());
       return (
         <ImageMedia
-          className={isSelected ? 'selected' : ''}
+          className={isSelected ? styles.selected : ''}
           src={image.__src}
           width={image.__width}
           height={image.__height}
@@ -76,7 +77,6 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
       serializedNode.altText,
       serializedNode.width,
       serializedNode.height,
-      serializedNode.key,
     ).updateFromJSON(serializedNode);
   }
 

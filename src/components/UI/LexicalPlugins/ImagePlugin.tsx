@@ -64,7 +64,7 @@ export function ImagePlugin() {
         COMMAND_PRIORITY_EDITOR,
       ),
       editor.registerCommand(DRAGSTART_COMMAND, (event) => onDragStart(event), COMMAND_PRIORITY_HIGH),
-      editor.registerCommand(DRAGOVER_COMMAND, (event) => onDragover(event), COMMAND_PRIORITY_LOW),
+      editor.registerCommand(DRAGOVER_COMMAND, (event) => onDragover(event, editor), COMMAND_PRIORITY_LOW),
       editor.registerCommand(DROP_COMMAND, (event) => onDrop(event, editor), COMMAND_PRIORITY_HIGH),
       editor.registerNodeTransform(TextNode, textNodeTransform),
     );
@@ -100,10 +100,10 @@ function onDragStart(event: DragEvent) {
   return true;
 }
 
-function onDragover(event: DragEvent) {
+function onDragover(event: DragEvent, editor: LexicalEditor) {
   const node = getImageNodeInSelection();
   if (!node) return false;
-  if (!canDropImage(event)) event.preventDefault();
+  if (!canDropImage(event, editor)) event.preventDefault();
   return true;
 }
 
@@ -113,7 +113,7 @@ function onDrop(event: DragEvent, editor: LexicalEditor) {
   const data = getDragImageData(event);
   if (!data) return false;
   event.preventDefault();
-  if (canDropImage(event)) {
+  if (canDropImage(event, editor)) {
     const range = getDragSelection(event);
     node.remove();
     const rangeSelection = $createRangeSelection();
@@ -140,14 +140,14 @@ function getDragImageData(event: DragEvent) {
   return data;
 }
 
-function canDropImage(event: DragEvent) {
+function canDropImage(event: DragEvent, editor: LexicalEditor) {
   const target = event.target;
   return !!(
     target &&
     target instanceof HTMLElement &&
-    !target.closest('code, span.editor-image') &&
+    !target.closest(`code, span.${editor._config.theme.image}`) &&
     target.parentElement &&
-    target.parentElement.closest('div.editor-root')
+    target.parentElement.closest(`div.${editor._config.theme.root}`)
   );
 }
 

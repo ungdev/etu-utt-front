@@ -34,4 +34,5 @@ export default {
   results: 'résultats',
   confirm: 'Confirmer',
   '404': '404 - Page not found',
+  'rte.dnd.drop': "Déposez le fichier pour l'importer",
 } as const;

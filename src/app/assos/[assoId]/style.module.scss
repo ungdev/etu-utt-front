@@ -38,7 +38,8 @@
     justify-content: space-between;
 
     h1:empty,
-    div:empty {
+    & > div:empty,
+    .actionRow div:empty {
       @extend .glimmer-animated;
       width: 16ch;
       height: 0.8em;

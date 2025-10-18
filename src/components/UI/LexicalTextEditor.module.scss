@@ -1,0 +1,96 @@
+@import '@/variables';
+
+.editor-root {
+  position: relative;
+  margin: 5px -5px -5px;
+  padding: 5px;
+  outline: none;
+
+  &[contenteditable='true'] {
+    border: 1px solid rgba($color: $ung-light-grey, $alpha: 0.6);
+    border-radius: 5px;
+  }
+}
+
+.editor-image {
+  img {
+    max-width: 100%;
+    max-height: 100%;
+    border-radius: 3px;
+    background-color: rgba($color: $ung-light-grey, $alpha: 0.5);
+    &.selected {
+      outline: 3px solid $ung-light-blue;
+      border-radius: 0;
+    }
+  }
+}
+
+.toolbar {
+  display: flex;
+  flex-flow: row wrap;
+  gap: 5px;
+  margin: 5px 0;
+  align-items: center;
+
+  .divider {
+    width: 1px;
+    height: 2em;
+    margin: 0 5px;
+    background-color: rgba($color: $ung-light-grey, $alpha: 0.5);
+  }
+
+  .item {
+    border: none;
+    border-radius: 3px;
+    padding: 0;
+    height: calc(24px + 0.4em);
+    padding: 0.2em;
+    background-color: $ung-light-blue;
+    color: $very-light-gray;
+
+    &.active {
+      background-color: darken($ung-light-blue, 20%);
+    }
+
+    &:disabled {
+      background-color: desaturate($color: $ung-light-grey, $amount: 100%);
+      cursor: not-allowed;
+    }
+  }
+}
+
+.editor-link {
+  color: $ung-light-blue;
+  border-bottom: 1px solid $ung-light-blue;
+}
+
+.placeholderContainer {
+  position: relative;
+
+  .placeholder {
+    color: rgba($color: $ung-dark-grey, $alpha: 0.6);
+    font-style: italic;
+    position: absolute;
+    top: 5px;
+    left: 2px;
+    pointer-events: none;
+  }
+}
+
+.dropZone {
+  position: absolute;
+  top: 0;
+  left: -5px;
+  right: -5px;
+  bottom: 0;
+  background-color: rgba($color: $ung-light-blue, $alpha: 0.3);
+  border: 4px dashed $ung-light-blue;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-transform: uppercase;
+  color: $ung-dark-grey;
+  font-size: 2em;
+  border-radius: 5px;
+  pointer-events: none;
+}

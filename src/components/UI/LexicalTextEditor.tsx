@@ -25,10 +25,12 @@ import { ImagePlugin } from './LexicalPlugins/ImagePlugin';
 import { ImageNode } from './LexicalPlugins/ImageNode';
 import type { EditorThemeClasses } from 'lexical';
 import { ImageDropPlugin } from './LexicalPlugins/ImageDropPlugin';
+import styles from './LexicalTextEditor.module.scss';
 
 const theme = {
-  root: 'editor-root',
-  image: 'editor-image',
+  root: styles['editor-root'],
+  image: styles['editor-image'],
+  link: styles['editor-link'],
 } satisfies EditorThemeClasses;
 
 function LexicalTextEditor({ disabled = false }) {
@@ -56,17 +58,22 @@ function LexicalTextEditor({ disabled = false }) {
   return (
     <LexicalComposer initialConfig={initialConfig}>
       {!disabled && <ToolbarPlugin />}
-      <RichTextPlugin
-        contentEditable={
-          <ContentEditable aria-placeholder={'Enter some text...'} placeholder={<div>Enter some text...</div>} />
-        }
-        ErrorBoundary={LexicalErrorBoundary}
-      />
+      <div className={styles.placeholderContainer}>
+        <RichTextPlugin
+          contentEditable={
+            <ContentEditable
+              aria-placeholder={'Enter some text...'}
+              placeholder={<div className={styles.placeholder}>Enter some text...</div>}
+            />
+          }
+          ErrorBoundary={LexicalErrorBoundary}
+        />
+        <ImageDropPlugin />
+      </div>
       <HistoryPlugin />
       <OnChangePlugin onChange={(state) => console.log(state.toJSON())} />
       <EnableDisablePlugin disabled={disabled} />
       <ImagePlugin />
-      <ImageDropPlugin />
       <LinkPlugin />
       <ListPlugin />
       <CheckListPlugin />
