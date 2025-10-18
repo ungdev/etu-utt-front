@@ -1,81 +1,75 @@
-import { createState, EditorConfig, LexicalNode, NodeKey, SerializedTextNode, Spread, TextNode } from 'lexical';
+import {
+  $getState,
+  $setState,
+  createState,
+  EditorConfig,
+  NodeKey,
+  SerializedTextNode,
+  Spread,
+  TextNode,
+} from 'lexical';
 import styles from '../LexicalTextEditor.module.scss';
 
-export type ColorType = 'blue' | 'darkblue' | 'grey' | 'darkgrey';
+const ColorOptions = ['blue', 'darkblue', 'grey', 'darkgrey'] as const;
+export type ColorType = (typeof ColorOptions)[number];
 
 type SerializedColorTextNode = Spread<{ color?: ColorType }, SerializedTextNode>;
 
-export class ColorTextNode extends TextNode {
-  __color?: ColorType;
+const colorState = createState('color', {
+  parse: (v) => (ColorOptions.includes(v as ColorType) ? (v as ColorType) : undefined),
+});
 
+export class ColorTextNode extends TextNode {
   static getType() {
     return 'color-text';
   }
 
   static clone(node: ColorTextNode) {
-    return new ColorTextNode(node.__text, node.__color, node.__key);
-  }
-
-  constructor(text?: string, color?: ColorType, key?: NodeKey) {
-    super(text, key);
-    this.__color = color;
+    return new ColorTextNode(node.__text, node.__key);
   }
 
   setColor(color?: ColorType) {
-    const self = this.getWritable();
-    self.__color = color;
+    $setState(this, colorState, color);
     return this;
-  }
-
-  splitText(...splitOffsets: Array<number>): Array<ColorTextNode> {
-    return super.splitText(...splitOffsets).map((node) => (node as ColorTextNode).setColor(this.__color));
   }
 
   createDOM(config: EditorConfig) {
     const dom = super.createDOM(config);
-    if (this.__color) dom.classList.toggle(styles[`color-text-${this.__color}`], true);
+    if ($getState(this, colorState)) dom.classList.toggle(styles[`color-text-${$getState(this, colorState)}`], true);
     return dom;
   }
 
   updateDOM(prevNode: this, dom: HTMLElement, config: EditorConfig) {
     const updated = super.updateDOM(prevNode, dom, config);
-    if (prevNode.__color !== this.__color) dom.classList.toggle(styles[`color-text-${prevNode.__color}`], false);
-    if (this.__color) dom.classList.toggle(styles[`color-text-${this.__color}`], true);
+    if ($getState(prevNode, colorState) !== $getState(this, colorState))
+      dom.classList.toggle(styles[`color-text-${$getState(prevNode, colorState)}`], false);
+    if ($getState(this, colorState)) dom.classList.toggle(styles[`color-text-${$getState(this, colorState)}`], true);
     return updated;
   }
 
   static importJSON(serializedNode: SerializedColorTextNode): ColorTextNode {
-    return $createColorTextNode(serializedNode.text, serializedNode.color).updateFromJSON(serializedNode);
+    return $createColorTextNode(serializedNode.text).updateFromJSON(serializedNode).setColor(serializedNode.color);
   }
 
   exportJSON(): SerializedColorTextNode {
     return {
       ...super.exportJSON(),
-      color: this.__color,
+      color: $getState(this, colorState),
+      $: undefined,
     };
   }
 
   isSimpleText(): boolean {
-    return this.__type === 'color-text' && !this.__color && this.__mode === 0;
-  }
-
-  mayMerge(node: LexicalNode): boolean {
-    return (
-      $isColorTextNode(node) &&
-      node.__color === this.__color &&
-      node.__format === this.__format &&
-      !this.isUnmergeable() &&
-      !node.isUnmergeable()
-    );
+    return this.__type === 'color-text' && this.__mode === 0;
   }
 }
 
-export function $createColorTextNode(text?: string, color?: ColorType, nodeKey?: NodeKey): ColorTextNode {
-  return new ColorTextNode(text, color, nodeKey);
+export function $createColorTextNode(text?: string, nodeKey?: NodeKey): ColorTextNode {
+  return new ColorTextNode(text, nodeKey);
 }
 
 export function $createColorTextNodeFromTextNode(textNode: TextNode, color?: ColorType): ColorTextNode {
-  return $createColorTextNode(textNode.getTextContent(), color).updateFromJSON(textNode.exportJSON());
+  return $createColorTextNode(textNode.getTextContent()).updateFromJSON(textNode.exportJSON()).setColor(color);
 }
 
 export function $isColorTextNode(node: unknown): node is ColorTextNode {

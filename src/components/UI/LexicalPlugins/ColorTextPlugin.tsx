@@ -43,13 +43,7 @@ export function ColorTextPlugin() {
                 selection.isBackward() ? selection.focus.offset : selection.anchor.offset,
                 '',
               );
-            const insertion = colorNodes.filter((node) => node.getTextContent().length > 0);
-            selection.insertNodes(insertion);
-            for (let i = 0; i < insertion.length; i++) {
-              const node = insertion[i];
-              if ($isColorTextNode(node) && node.mayMerge(insertion[i + 1]))
-                insertion[i + 1] = node.mergeWithSibling(insertion[i + 1] as ColorTextNode);
-            }
+            selection.insertNodes(colorNodes);
           }
         });
         return true;
