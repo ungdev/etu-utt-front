@@ -7,13 +7,14 @@ import {
   DRAGOVER_COMMAND,
   DROP_COMMAND,
   LexicalEditor,
+  PASTE_COMMAND,
 } from 'lexical';
 import { useEffect, useState } from 'react';
 import { ImageNode } from './ImageNode';
 import { INSERT_IMAGE_COMMAND } from './ImagePlugin';
 import { computeApiURL, useAPI } from '@/api/api';
-import styles from '../LexicalTextEditor.module.scss';
 import { useAppTranslation } from '@/lib/i18n';
+import styles from '../LexicalTextEditor.module.scss';
 
 export const DRAGLEAVE_COMMAND = createCommand<DragEvent>('DRAGLEAVE_COMMAND');
 
@@ -44,12 +45,13 @@ export function ImageDropPlugin() {
   }
 
   function onDrop(event: DragEvent, editor: LexicalEditor) {
-    const file = getImageFromDataTransfer(event.dataTransfer!);
-    if (!file) return false;
-    setIsHovered(false);
-    event.preventDefault();
-    uploadFile(file, editor);
-    return true;
+    const file = getImagesFromFileList(event.dataTransfer!.files);
+    if (file.length) {
+      setIsHovered(false);
+      event.preventDefault();
+    }
+    file.forEach((f) => uploadFile(f, editor));
+    return !!file.length;
   }
 
   async function uploadFile(file: File, editor: LexicalEditor) {
@@ -74,6 +76,19 @@ export function ImageDropPlugin() {
       editor.registerCommand(DRAGOVER_COMMAND, (event) => onDragOver(event), COMMAND_PRIORITY_LOW),
       editor.registerCommand(DRAGLEAVE_COMMAND, () => onDragLeave(), COMMAND_PRIORITY_HIGH),
       editor.registerCommand(DROP_COMMAND, (event) => onDrop(event, editor), COMMAND_PRIORITY_HIGH),
+      editor.registerCommand(
+        PASTE_COMMAND,
+        (event) => {
+          if (event instanceof ClipboardEvent) {
+            const files = getImagesFromFileList(event.clipboardData!.files);
+            if (files.length) event.preventDefault();
+            files.forEach((file) => uploadFile(file, editor));
+            return !!files.length;
+          }
+          return false;
+        },
+        COMMAND_PRIORITY_HIGH,
+      ),
       () => editor.getRootElement()?.removeEventListener('dragleave', listener),
     );
   }, [editor]);
@@ -81,11 +96,11 @@ export function ImageDropPlugin() {
   return <div className={isHovered ? styles.dropZone : undefined}>{isHovered && t('common:rte.dnd.drop')}</div>;
 }
 
-function getImageFromDataTransfer(dataTransfer: DataTransfer) {
-  const files = dataTransfer.files;
-  for (let i = 0; i < files.length; i++) {
-    const file = files[i];
-    if (file.type.startsWith('image/')) return file;
+function getImagesFromFileList(fileList: FileList) {
+  const list = [] as File[];
+  for (let i = 0; i < fileList.length; i++) {
+    const file = fileList[i];
+    if (file.type.startsWith('image/')) list.push(file);
   }
-  return null;
+  return list;
 }
