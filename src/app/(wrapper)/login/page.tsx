@@ -59,7 +59,7 @@ export default function LoginPage() {
   }
   if (registerToken) {
     return (
-      <Page hasNavbar={true} permissions={'public'} needsLoading={true} className={styles.confirmRegister}>
+      <Page hasNavbar={true} needsLoading={true} className={styles.confirmRegister}>
         <div>
           <Trans
             i18nKey={'login:legal.text'}
@@ -95,7 +95,7 @@ export default function LoginPage() {
   }
 
   return (
-    <Page hasNavbar={true} permissions={'public'} needsLoading={true} id="login-page" className={styles.loginPage}>
+    <Page hasNavbar={true} needsLoading={true} id="login-page" className={styles.loginPage}>
       <LoginForm application={application} />
     </Page>
   );

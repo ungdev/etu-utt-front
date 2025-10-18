@@ -4,32 +4,60 @@ import { LoginRequestDto, LoginResponseDto } from '@/api/auth/login';
 import { StatusCodes } from 'http-status-codes';
 import { RegisterRequestDto, RegisterResponseDto } from '@/api/auth/register';
 import { IsLoggedInResponseDto } from '@/api/auth/isLoggedIn';
-import { setUser } from '@/module/user';
-import { API, setAuthorizationToken } from '@/api/api';
+import { API, setAuthorizationToken, useAPI } from '@/api/api';
 import { fetchProfile } from '@/api/profile/fetchProfile';
 import { useAppSelector } from '@/lib/hooks';
 import { LocalStorageNames } from '@/global';
 import { authorizationTokenExpiresIn } from '@/utils/environment';
+import { fetchMyPermissions } from '@/api/permissions/fetchMyPermissions';
+import { Permissions } from '@/api/permissions/permissions.interface';
+import { Profile } from '@/api/profile/profile.types';
+import { addMenuItem, getMenuItem, removeMenuItem } from '@/module/navbar';
+import { fetchMyUes } from '@/api/ue/fetchMyUes';
+import { MenuItem } from '@/components/Navbar';
+
+export const enum UserType {
+  STUDENT = 'STUDENT',
+  FORMER_STUDENT = 'FORMER_STUDENT',
+  TEACHER = 'TEACHER',
+  EMPLOYEE = 'EMPLOYEE',
+  OTHER = 'OTHER',
+}
+
+type LoggedInUser = Profile;
 
 interface SessionSlice {
   logged: boolean;
   token: string | null;
+  user: LoggedInUser | null;
+  permissions: Permissions;
 }
+
+const initialState = {
+  logged: false,
+  token: null,
+  permissions: { apiPermissions: [], userPermissions: [] },
+  user: null,
+} as SessionSlice;
 
 export const sessionSlice = createSlice({
   name: 'session',
   reducers: {
-    setToken: (state, action: PayloadAction<string | null>) => {
-      setAuthorizationToken(action.payload ?? '');
-      localStorage.setItem(LocalStorageNames.TOKEN, action.payload ?? '');
-      state.token = action.payload;
-      state.logged = !!action.payload;
+    login: {
+      prepare: (user: LoggedInUser, permissions: Permissions, token: string) => ({
+        payload: { user, permissions, token },
+      }),
+      reducer: (_state, action: PayloadAction<{ user: LoggedInUser; permissions: Permissions; token: string }>) => ({
+        ...action.payload,
+        logged: true,
+      }),
     },
+    logout: () => initialState,
   },
-  initialState: { logged: false, token: null } as SessionSlice,
+  initialState,
 });
 
-const { setToken: _setToken } = sessionSlice.actions;
+const { login: loginReducer, logout: logoutReducer } = sessionSlice.actions;
 
 export const login =
   (api: API, login: string, password: string, application?: string): AppThunk<Promise<LoginResponseDto | undefined>> =>
@@ -91,20 +119,46 @@ export function setToken(token: null): AppThunk;
 export function setToken(token: string, api: API): AppThunk;
 export function setToken(token: string | null, api?: API): AppThunk {
   return async (dispatch) => {
-    dispatch(_setToken(token));
+    localStorage.setItem(LocalStorageNames.TOKEN, token ?? '');
+    setAuthorizationToken(token ?? '');
+    let loggedIn: boolean;
     if (token === null) {
-      dispatch(setUser(null));
+      dispatch(logoutReducer());
+      loggedIn = false;
+    } else {
+      const user = (await fetchProfile(api!).toPromise())!;
+      const permissions = (await fetchMyPermissions(api!).toPromise())!;
+      loggedIn = user !== null;
+      dispatch(loginReducer(user, permissions, token));
+    }
+
+    // Update navbar
+    const menuItem = dispatch(getMenuItem('common:navbar.myUEs'));
+    if (!menuItem || !menuItem.submenus) {
+      console.error('Cannot find the menu item "common:navbar.myUEs"');
       return;
     }
-    const user = await fetchProfile(api!).toPromise();
-    if (!user) {
-      console.error('Could not fetch profile of user');
-      dispatch(setUser(null));
-      return;
+    for (const submenu of menuItem.submenus) {
+      dispatch(removeMenuItem('common:navbar.myUEs', submenu.name));
     }
-    dispatch(setUser(user, api!));
+    if (!loggedIn) return;
+    const ues = await fetchMyUes(useAPI());
+    if (!ues) return;
+    ues.forEach((ue) => {
+      dispatch(
+        addMenuItem({ name: ue.code, path: `/ues/${ue.code}` } as MenuItem<false>, {
+          parents: 'common:navbar.myUEs',
+          before: undefined,
+          after: undefined,
+        }),
+      );
+    });
   };
 }
+
+export const useConnectedUser = () => useAppSelector((state) => state.session.user);
+
+export const usePermissions = () => useAppSelector((state) => state.session.permissions);
 
 export function useLoggedIn() {
   return useAppSelector((state) => state.session.logged);

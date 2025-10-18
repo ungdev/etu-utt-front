@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useAPI } from '@/api/api';
 import { ApplicationOverview } from '@/api/auth/applications/application.interface';
-import { useConnectedUser } from '@/module/user';
+import { useConnectedUser } from '@/module/session';
 
 export default function useApplications(): [
   ApplicationOverview[] | undefined,

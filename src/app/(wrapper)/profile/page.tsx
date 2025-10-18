@@ -1,6 +1,6 @@
 'use client';
 
-// import { useConnectedUser } from '@/module/user';
+// import { useConnectedUser } from '@/module/session';
 import { setProfilePicture } from '@/api/profile/setProfilePicture';
 import { useAPI } from '@/api/api';
 import { useAppTranslation } from '@/lib/i18n';

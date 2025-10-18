@@ -5,7 +5,7 @@ import { TFunction, useAppTranslation } from '@/lib/i18n';
 import Icons from '@/icons';
 import EditableText from '@/components/EditableText';
 import Button from '@/components/UI/Button';
-import { useConnectedUser } from '@/module/user';
+import { useConnectedUser } from '@/module/session';
 import { Comment } from '@/api/comment/comment.interface';
 import { useState } from 'react';
 import { editComment } from '@/api/comment/editComment';

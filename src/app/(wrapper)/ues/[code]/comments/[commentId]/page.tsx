@@ -8,7 +8,7 @@ import { TFunction, useAppTranslation } from '@/lib/i18n';
 import TextArea from '@/components/UI/TextArea';
 import Button from '@/components/UI/Button';
 import { useState } from 'react';
-import { useConnectedUser } from '@/module/user';
+import { useConnectedUser } from '@/module/session';
 import EditableText from '@/components/EditableText';
 import { editCommentReply } from '@/api/commentReply/editCommentReply';
 import { useAPI } from '@/api/api';

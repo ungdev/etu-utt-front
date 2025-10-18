@@ -1,10 +1,11 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import { FC, useState } from 'react';
-import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import { notFound } from 'next/navigation';
+import { useAppDispatch, useAppSelector } from '@/lib/hooks';
+import { useConnectedUser } from '@/module/session';
 
 interface PageSettingsSlice {
-  permissions: string;
+  permissions: PagePermission[];
   hasNavbar: boolean;
   navbarAdditionalComponent: FC<Record<string, never>> | null;
   searchParams: Record<string, string>;
@@ -16,12 +17,20 @@ interface PageSettingsSlice {
   };
 }
 
+export const enum PagePermission {
+  CONNECTED,
+}
+
+export const missingPermissionRedirections = {
+  [PagePermission.CONNECTED]: '/login',
+} satisfies { [P in PagePermission]: string };
+
 type InternalPageSettingsKeys = 'searchParams' | 'pageComponentReady' | 'internalLoading';
 
 type PageSettings = Omit<PageSettingsSlice, InternalPageSettingsKeys>;
 
 export const defaultPageSettings = {
-  permissions: 'user',
+  permissions: [],
   hasNavbar: true,
   navbarAdditionalComponent: null,
 } as PageSettings;
@@ -98,6 +107,13 @@ export function usePageLoaded() {
 
 export function useSearchParam(param: string): string | undefined {
   return useAppSelector((state) => state.pageSettings.searchParams[param]);
+}
+
+export function usePagePermissions(): { [K in PagePermission]: boolean } {
+  const user = useConnectedUser();
+  return {
+    [PagePermission.CONNECTED]: user !== null,
+  };
 }
 
 /**

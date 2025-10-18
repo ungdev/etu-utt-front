@@ -2,12 +2,12 @@
 
 import { FC, useEffect, ReactNode } from 'react';
 import { useAppDispatch } from '@/lib/hooks';
-import { defaultPageSettings, initPageSettings, updatePageSettings } from '@/module/pageSettings';
+import { defaultPageSettings, initPageSettings, updatePageSettings, PagePermission } from '@/module/pageSettings';
 
 export type PageProps = {
   hasNavbar?: boolean;
   navbarAdditionalComponent?: FC<Record<string, never>> | null;
-  permissions?: string;
+  permissions?: PagePermission[];
   needsLoading?: boolean;
   className?: string;
   id?: string;
