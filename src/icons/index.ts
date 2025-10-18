@@ -21,6 +21,7 @@ import CircleCheck from './CircleCheck';
 import CircleWarning from './CircleWarning';
 import Clock from './Clock';
 import Rotate from './Rotate';
+import Copy from './Copy';
 
 const Icons = {
   Book,
@@ -46,6 +47,7 @@ const Icons = {
   Rotate,
   User,
   Users,
+  Copy,
 };
 
 export default Icons;

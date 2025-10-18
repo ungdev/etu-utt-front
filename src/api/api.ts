@@ -1,4 +1,4 @@
-import { apiTimeout, apiUrl, apiVersion } from '@/utils/environment';
+import { apiTimeout, apiUrl, apiVersion, etuuttWebApplicationId } from '@/utils/environment';
 import { StatusCodes } from 'http-status-codes';
 import { useNotFound } from '@/module/pageSettings';
 import { toast } from 'react-toastify';
@@ -8,7 +8,7 @@ import { ApiError } from '@/api/api.interface';
  * The type of error that can be produced while making a request to the API.
  * Note that these errors are not errors that the API can return, but rather errors that can happen while making a request / interpreting the result.
  */
-export enum ResponseError {
+export enum ResponseFailureReason {
   'not_json',
   'timeout',
   'unknown',
@@ -20,10 +20,10 @@ export enum ResponseError {
  */
 type APIResponse<ResponseType> =
   | {
-      code: number;
+      code: StatusCodes;
       body: ResponseType | ApiError;
     }
-  | Record<'error', ResponseError>;
+  | Record<'failure', ResponseFailureReason>;
 
 /**
  * Dates do not exist in JSON, so the API does not return type Date, but instead string.
@@ -40,9 +40,23 @@ type RawResponseType<T> = T extends Date
 type StatusCodesSuccess = (typeof StatusCodes)['OK' | 'CREATED' | 'ACCEPTED' | 'NO_CONTENT' | 'NOT_MODIFIED'];
 type StatusCodesError = Exclude<StatusCodes, StatusCodesSuccess>;
 
-type FailureHandler<R> = () => R | void;
-type ErrorHandler<R> = (errorCode: number, error: string) => R | void;
-type SuccessHandler<T, R> = (body: T) => R | void;
+function isStatusSuccess(code: StatusCodes): code is StatusCodesSuccess {
+  return code < 400;
+}
+
+type HandlerNoParam<R> = () => R;
+type HandlerBody<T, R> = (body: T) => R;
+type HandlerError<R> = (error: string) => R;
+type HandlerCodeAndError<R> = (errorCode: number, error: string) => R;
+type HandlerFailureReason<R> = (failureReason: ResponseFailureReason) => R;
+
+type ResponseHandlerExtendsType<T> = Partial<Record<'success' | StatusCodesSuccess, HandlerBody<T, any>>> &
+  Partial<Record<'error', HandlerCodeAndError<any>>> &
+  Partial<Record<StatusCodesError, HandlerError<any>>> &
+  Partial<Record<'failure', HandlerFailureReason<any>>> &
+  Partial<Record<ResponseFailureReason, HandlerNoParam<any>>> &
+  Record<'fallback', HandlerNoParam<any>>;
+
 /**
  * The response handler is a class that allows you to handle the response of a request to the API.
  * It allows you to define what to do when the request is successful, when it returns an error (an API error), when it fails (a request error), or when it returns a specific status code or specific failure.
@@ -67,40 +81,35 @@ type SuccessHandler<T, R> = (body: T) => R | void;
  *     .toPromise();
  * }
  */
-export class ResponseHandler<T, R = undefined> {
-  private readonly handlers: Partial<Record<'success' | StatusCodesSuccess, SuccessHandler<T, R>>> &
-    Partial<Record<'error' | StatusCodesError, ErrorHandler<R>>> &
-    Partial<Record<'failure' | ResponseError, FailureHandler<R>>> = {};
-  private readonly promise: Promise<R | void>;
+export class ResponseHandler<T, R extends ResponseHandlerExtendsType<T> = { fallback: HandlerNoParam<undefined> }> {
+  private readonly handlers = { fallback: () => undefined } as R;
+  private readonly promise: Promise<R[keyof R]>;
 
   constructor(rawResponse: Promise<APIResponse<T>>) {
     this.promise = rawResponse.then((response) => {
-      if ('error' in response) {
-        if (this.handlers[response.error]) {
-          return this.handlers[response.error]!();
+      if ('failure' in response) {
+        if (this.handlers[response.failure]) {
+          return this.handlers[response.failure]!();
         } else if (this.handlers.failure) {
-          return this.handlers.failure();
+          return this.handlers.failure(response.failure);
         } else {
-          return undefined;
+          return this.handlers.fallback();
         }
-      } else if (response.code < 400) {
-        const codeAsSuccess = response.code as StatusCodesSuccess;
-        if (this.handlers[codeAsSuccess]) {
-          return this.handlers[codeAsSuccess]!(response.body as T);
+      } else if (isStatusSuccess(response.code)) {
+        if (response.code in this.handlers) {
+          return this.handlers[response.code]!(response.body as T);
         } else if (this.handlers.success) {
           return this.handlers.success(response.body as T);
         } else {
-          return undefined;
+          return this.handlers.fallback();
         }
       } else {
-        const codeAsError = response.code as StatusCodesError;
-        const bodyAsError = response.body as ApiError;
-        if (this.handlers[codeAsError]) {
-          return this.handlers[codeAsError]!(bodyAsError.errorCode, bodyAsError.error);
+        if (response.code in this.handlers) {
+          return this.handlers[response.code]!((response.body as ApiError).error);
         } else if (this.handlers.error) {
-          return this.handlers.error(bodyAsError.errorCode, bodyAsError.error);
+          return this.handlers.error(response.code as StatusCodesError, (response.body as ApiError).error);
         } else {
-          return undefined;
+          return this.handlers.fallback();
         }
       }
     });
@@ -113,21 +122,23 @@ export class ResponseHandler<T, R = undefined> {
    *                   failure: An error occurred when making the request
    * @param handler Callback
    */
-  on<E, P extends number | ResponseError | 'success' | 'error' | 'failure'>(
-    statusCode: P,
-    handler: P extends 'success' | StatusCodesSuccess
-      ? SuccessHandler<T, E>
-      : P extends 'error' | StatusCodesError
-        ? ErrorHandler<E>
-        : FailureHandler<E>,
-  ): ResponseHandler<T, R | E> {
-    // @ts-expect-error TS2322
+  on<
+    S extends keyof ResponseHandlerExtendsType<T>,
+    O extends ResponseHandlerExtendsType<T>[S],
+  >(
+    statusCode: S,
+    handler: O,
+  ): ResponseHandler<T, { [K in S | keyof R]: K extends S ? O : R[K] }> {
     this.handlers[statusCode] = handler;
-    return this;
+    return this as unknown as ResponseHandler<T, { [K in S | keyof R]: K extends S ? O : R[K] }>;
   }
 
-  async toPromise(): Promise<null | R> {
-    return (await this.promise) ?? null;
+  async toPromise(): Promise<
+    Awaited<Exclude<R[keyof R], void | undefined> | (undefined extends R[keyof R] ? null : never)> // For some reason, undefined extends void. See https://github.com/ungdev/etu-utt-front/pull/28/files#r2357325209, Alban got the explanation
+  > {
+    return ((await this.promise) ?? null) as Awaited<
+      Exclude<R[keyof R], void | undefined> | (undefined extends R[keyof R] ? null : never)
+    >;
   }
 }
 
@@ -166,6 +177,7 @@ async function internalRequestAPI<RequestType>(
   timeoutMillis: number,
   version: string,
   isFile: true,
+  applicationId: string,
 ): Promise<APIResponse<Blob>>;
 async function internalRequestAPI<RequestType, ResponseType>(
   method: string,
@@ -174,6 +186,7 @@ async function internalRequestAPI<RequestType, ResponseType>(
   timeoutMillis: number,
   version: string,
   isFile: boolean,
+  applicationId: string,
 ): Promise<APIResponse<ResponseType>>;
 async function internalRequestAPI<RequestType, ResponseType>(
   method: string,
@@ -182,10 +195,12 @@ async function internalRequestAPI<RequestType, ResponseType>(
   timeoutMillis: number,
   version: string,
   isFile: boolean,
+  applicationId: string,
 ): Promise<APIResponse<ResponseType | Blob>> {
   // Generate headers
   const headers = new Headers();
   headers.append('Authorization', authorizationToken ? `Bearer ${authorizationToken}` : '');
+  headers.append('X-Application', applicationId);
   if (!isFile) headers.append('Content-Type', 'application/json');
   headers.append('X-Application', '52ce644d-183f-49e9-bd21-d2d4f37e2196');
 
@@ -251,20 +266,22 @@ async function internalRequestAPI<RequestType, ResponseType>(
  * @param method The HTTP method to use.
  * @param route The route to call.
  * @param body The body of the request. Defaults to `null`.
- * @param timeoutMillis The timeout of the request, in milliseconds. Defaults to 10000 milliseconds (10 seconds).
- * @param version The version of the API to use : v1, v2, ... Defaults to the environment variable `NEXT_PUBLIC_API_VERSION`.
+ * @param params * timeoutMillis: The timeout of the request, in milliseconds. Defaults to 10000 milliseconds (10 seconds).
+ *               * version: The version of the API to use : v1, v2, ... Defaults to the environment variable `NEXT_PUBLIC_API_VERSION`.
+ *               * isFile Set it to true if you are sending a file.
+ *               * applicationId Set its value if you are not using the default application to make the request.
  */
 function requestAPI<RequestType>(
   method: 'GET',
   route: string,
   body: RequestType | null,
-  params: { timeoutMillis?: number; version?: string; isFile: true },
+  params: { timeoutMillis?: number; version?: string; isFile: true; applicationId?: string },
 ): ResponseHandler<Blob>;
 function requestAPI<RequestType, ResponseType>(
   method: string,
   route: string,
   body: RequestType | null,
-  params: { timeoutMillis?: number; version?: string; isFile?: boolean },
+  params: { timeoutMillis?: number; version?: string; isFile?: boolean; applicationId?: string },
 ): ResponseHandler<ResponseType>;
 function requestAPI<RequestType, ResponseType>(
   method: string,
@@ -274,9 +291,10 @@ function requestAPI<RequestType, ResponseType>(
     timeoutMillis = apiTimeout,
     version = apiVersion,
     isFile = false,
-  }: { timeoutMillis?: number; version?: string; isFile?: boolean } = {},
+    applicationId = etuuttWebApplicationId,
+  }: { timeoutMillis?: number; version?: string; isFile?: boolean; applicationId?: string } = {},
 ): ResponseHandler<ResponseType> {
-  return new ResponseHandler(internalRequestAPI(method, route, body, timeoutMillis, version, isFile));
+  return new ResponseHandler(internalRequestAPI(method, route, body, timeoutMillis, version, isFile, applicationId));
 }
 
 // Set the authorization header with the given token for next requests
@@ -300,12 +318,12 @@ export function useAPI(): API {
     post: <RequestType, ResponseType = never>(
       route: string,
       body = {} as RequestType,
-      options: { version?: string; isFile?: boolean } = {},
+      options: { version?: string; isFile?: boolean; applicationId?: string } = {},
     ) => applyDefaultHandler(requestAPI<RequestType, ResponseType>('POST', route, body, options), setNotFound),
     put: <RequestType, ResponseType = never>(
       route: string,
       body = {} as RequestType,
-      options: { version?: string; isFile?: boolean } = {},
+      options: { version?: string; isFile?: boolean; applicationId?: string } = {},
     ) => applyDefaultHandler(requestAPI<RequestType, ResponseType>('PUT', route, body, options), setNotFound),
     patch: <RequestType, ResponseType = never>(
       route: string,
@@ -318,30 +336,30 @@ export function useAPI(): API {
 }
 
 export interface API {
-  get(route: string, options: { timeoutMillis?: number; version?: string; isFile: true }): ResponseHandler<Blob>;
+  get(
+    route: string,
+    options: { timeoutMillis?: number; version?: string; isFile: true },
+  ): DefaultResponseHandlerType<Blob>;
   get<ResponseType = never>(
     route: string,
     options?: { timeoutMillis?: number; version?: string; isFile?: boolean },
-  ): ResponseHandler<ResponseType, ResponseType | void | undefined>;
+  ): DefaultResponseHandlerType<ResponseType>;
   post<RequestType, ResponseType = never>(
     route: string,
     body?: RequestType,
-    options?: { version?: string; isFile?: boolean },
-  ): ResponseHandler<ResponseType, ResponseType | void | undefined>;
+    options?: { version?: string; isFile?: boolean; applicationId?: string },
+  ): DefaultResponseHandlerType<ResponseType>;
   put<RequestType, ResponseType = never>(
     route: string,
     body?: RequestType,
     options?: { version?: string; isFile?: boolean },
-  ): ResponseHandler<ResponseType, ResponseType | void | undefined>;
+  ): DefaultResponseHandlerType<ResponseType>;
   patch: <RequestType, ResponseType = never>(
     route: string,
     body?: RequestType,
     options?: { version?: string; isFile?: boolean },
-  ) => ResponseHandler<ResponseType, ResponseType | void | undefined>;
-  delete<ResponseType = never>(
-    route: string,
-    options?: { version?: string },
-  ): ResponseHandler<ResponseType, ResponseType | void | undefined>;
+  ) => DefaultResponseHandlerType<ResponseType>;
+  delete<ResponseType = never>(route: string, options?: { version?: string }): DefaultResponseHandlerType<ResponseType>;
 }
 
 /**
@@ -360,3 +378,8 @@ function applyDefaultHandler<T>(handler: ResponseHandler<T>, setNotFound: () => 
     })
     .on(404, setNotFound);
 }
+
+type DefaultResponseHandlerType<T> = ResponseHandler<
+  T,
+  { fallback: undefined; success: T; failure: void; error: void }
+>;
