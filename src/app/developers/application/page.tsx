@@ -8,10 +8,10 @@ import { useState } from 'react';
 import Button from '@/components/UI/Button';
 import createApplication from '@/api/auth/applications/createApplication';
 import { useAPI } from '@/api/api';
-import { useConnectedUser } from '@/module/user';
 import updateApplicationToken from '@/api/auth/applications/updateToken';
 import Icons from '@/icons';
 import Page from '@/components/utilities/Page';
+import { useConnectedUser } from '@/module/session';
 
 export default function ApplicationsPage() {
   const loggedIn = !!useConnectedUser();

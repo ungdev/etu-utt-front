@@ -7,7 +7,7 @@ import { getMenu, setCollapsed, useCollapsed } from '@/module/navbar';
 import Link from 'next/link';
 import { type NotParameteredTranslationKey, useAppTranslation } from '@/lib/i18n';
 import Icons from '@/icons';
-import { isLoggedIn, logout } from '@/module/session';
+import { isLoggedIn, logout, useConnectedUser } from '@/module/session';
 import Button from './UI/Button';
 import { usePageSettings } from '@/module/pageSettings';
 import { usePathname, useRouter } from 'next/navigation';
@@ -73,7 +73,7 @@ export default function Navbar() {
   const menuItems = useAppSelector(getMenu);
   const collapsed = useCollapsed();
   const loggedIn = useAppSelector(isLoggedIn);
-  const user = useAppSelector((state) => state.user);
+  const user = useConnectedUser();
   const dispatch = useAppDispatch();
   const { navbarAdditionalComponent: Additional } = usePageSettings();
 
