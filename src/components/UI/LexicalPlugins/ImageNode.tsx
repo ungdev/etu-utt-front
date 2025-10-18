@@ -51,7 +51,7 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
       const [isSelected, setSelected, clearSelection] = useLexicalNodeSelection(image.getKey());
       return (
         <ImageMedia
-          className={isSelected ? styles.selected : ''}
+          className={isSelected && editor._editable ? styles.selected : ''}
           src={image.__src}
           width={image.__width}
           height={image.__height}

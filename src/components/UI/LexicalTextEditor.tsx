@@ -23,14 +23,22 @@ import { EnableDisablePlugin } from './LexicalPlugins/EnableDisablePlugin';
 import { MATCHERS } from './LexicalPlugins/AutoLinkMatcherPlugin';
 import { ImagePlugin } from './LexicalPlugins/ImagePlugin';
 import { ImageNode } from './LexicalPlugins/ImageNode';
-import type { EditorThemeClasses } from 'lexical';
+import { ColorTextNode } from './LexicalPlugins/ColorTextNode';
 import { ImageDropPlugin } from './LexicalPlugins/ImageDropPlugin';
+import { ColorTextPlugin } from './LexicalPlugins/ColorTextPlugin';
 import styles from './LexicalTextEditor.module.scss';
+import type { EditorThemeClasses } from 'lexical';
 
 const theme = {
   root: styles['editor-root'],
   image: styles['editor-image'],
   link: styles['editor-link'],
+  text: {
+    bold: styles['bold'],
+    italic: styles['italic'],
+    underline: styles['underline'],
+    strikethrough: styles['strikethrough'],
+  },
 } satisfies EditorThemeClasses;
 
 interface LexicalTextEditorProps {
@@ -48,6 +56,7 @@ function LexicalTextEditor({ placeholder, emptyText, disabled = false }: Lexical
       AutoLinkNode,
       CodeHighlightNode,
       CodeNode,
+      ColorTextNode,
       HeadingNode,
       HorizontalRuleNode,
       ImageNode,
@@ -80,6 +89,7 @@ function LexicalTextEditor({ placeholder, emptyText, disabled = false }: Lexical
       <OnChangePlugin onChange={(state) => console.log(state.toJSON())} />
       <EnableDisablePlugin disabled={disabled} />
       <ImagePlugin />
+      <ColorTextPlugin />
       <LinkPlugin />
       <ListPlugin />
       <CheckListPlugin />

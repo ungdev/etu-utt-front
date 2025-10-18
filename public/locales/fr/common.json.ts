@@ -35,4 +35,5 @@ export default {
   confirm: 'Confirmer',
   '404': '404 - Page not found',
   'rte.dnd.drop': "Déposez le fichier pour l'importer",
+  'rte.toolbar.uploadImage': "Cliquez pour sélectionner l'image",
 } as const;

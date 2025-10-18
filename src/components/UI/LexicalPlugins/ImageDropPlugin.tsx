@@ -1,6 +1,7 @@
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { mergeRegister } from '@lexical/utils';
 import {
+  $addUpdateTag,
   COMMAND_PRIORITY_HIGH,
   COMMAND_PRIORITY_LOW,
   createCommand,
@@ -8,20 +9,37 @@ import {
   DROP_COMMAND,
   LexicalEditor,
   PASTE_COMMAND,
+  SKIP_SELECTION_FOCUS_TAG,
 } from 'lexical';
 import { useEffect, useState } from 'react';
 import { ImageNode } from './ImageNode';
 import { INSERT_IMAGE_COMMAND } from './ImagePlugin';
-import { computeApiURL, useAPI } from '@/api/api';
+import { API, computeApiURL, useAPI } from '@/api/api';
 import { useAppTranslation } from '@/lib/i18n';
 import styles from '../LexicalTextEditor.module.scss';
 
 export const DRAGLEAVE_COMMAND = createCommand<DragEvent>('DRAGLEAVE_COMMAND');
 
-interface PartialUploadResponse {
+export interface PartialUploadResponse {
   id: string;
   width: number;
   height: number;
+}
+
+export async function uploadFile(file: File, api: API, editor: LexicalEditor) {
+  const formData = new FormData();
+  formData.append('file', file);
+  const uploadResponse = await api
+    .post<FormData, PartialUploadResponse>(`/media/image?public=true`, formData, { isFile: true })
+    .toPromise();
+  editor.update(() => {
+    $addUpdateTag(SKIP_SELECTION_FOCUS_TAG);
+    editor.dispatchCommand(INSERT_IMAGE_COMMAND, {
+      src: computeApiURL(`/media/image/${uploadResponse!.id}.webp`),
+      width: uploadResponse!.width,
+      height: uploadResponse!.height,
+    });
+  });
 }
 
 export function ImageDropPlugin() {
@@ -50,21 +68,8 @@ export function ImageDropPlugin() {
       setIsHovered(false);
       event.preventDefault();
     }
-    file.forEach((f) => uploadFile(f, editor));
+    file.forEach((f) => uploadFile(f, api, editor));
     return !!file.length;
-  }
-
-  async function uploadFile(file: File, editor: LexicalEditor) {
-    const formData = new FormData();
-    formData.append('file', file);
-    const uploadResponse = await api
-      .post<FormData, PartialUploadResponse>(`/media/image?public=true`, formData, { isFile: true })
-      .toPromise();
-    editor.dispatchCommand(INSERT_IMAGE_COMMAND, {
-      src: computeApiURL(`/media/image/${uploadResponse!.id}.webp`),
-      width: uploadResponse!.width,
-      height: uploadResponse!.height,
-    });
   }
 
   useEffect(() => {
@@ -82,7 +87,7 @@ export function ImageDropPlugin() {
           if (event instanceof ClipboardEvent) {
             const files = getImagesFromFileList(event.clipboardData!.files);
             if (files.length) event.preventDefault();
-            files.forEach((file) => uploadFile(file, editor));
+            files.forEach((file) => uploadFile(file, api, editor));
             return !!files.length;
           }
           return false;

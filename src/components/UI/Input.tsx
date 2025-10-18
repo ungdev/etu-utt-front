@@ -1,5 +1,5 @@
 import styles from './Input.module.scss';
-import { FC, HTMLInputTypeAttribute, Ref, forwardRef } from 'react';
+import { FC, HTMLInputTypeAttribute, KeyboardEvent, Ref, forwardRef } from 'react';
 import Button from '@/components/UI/Button';
 
 function Input<T extends string | number = string | number>(
@@ -16,7 +16,7 @@ function Input<T extends string | number = string | number>(
   }: {
     className?: string;
     onChange?: (v: T) => void;
-    onEnter?: () => void;
+    onEnter?: (event?: KeyboardEvent<HTMLInputElement>) => void;
     value?: T;
     placeholder?: string;
     type?: HTMLInputTypeAttribute;
@@ -32,7 +32,7 @@ function Input<T extends string | number = string | number>(
         ref={ref}
         onChange={(v) => onChange(v.target.value as T)}
         onKeyDown={(e) => {
-          if (e.key === 'Enter') onEnter();
+          if (e.key === 'Enter') onEnter(e);
           else if (e.key === 'ArrowUp') onArrowPressed('up');
           else if (e.key === 'ArrowDown') onArrowPressed('down');
         }}

@@ -35,6 +35,9 @@ importers:
       '@lexical/rich-text':
         specifier: ^0.37.0
         version: 0.37.0
+      '@lexical/selection':
+        specifier: ^0.37.0
+        version: 0.37.0
       '@lexical/table':
         specifier: ^0.37.0
         version: 0.37.0

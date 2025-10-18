@@ -40,21 +40,58 @@
   }
 
   .item {
+    position: relative;
     border: none;
     border-radius: 3px;
     padding: 0;
-    height: calc(24px + 0.4em);
-    padding: 0.2em;
-    background-color: $ung-light-blue;
-    color: $very-light-gray;
+    height: calc(28px + 0.2em);
+    padding: 0.1em;
+    background-color: $very-light-gray;
+    color: $ung-light-blue;
+    border: 2px solid $ung-light-blue;
+    cursor: pointer;
 
     &.active {
-      background-color: darken($ung-light-blue, 20%);
+      background-color: $ung-light-blue;
+      color: $very-light-gray;
     }
 
     &:disabled {
       background-color: desaturate($color: $ung-light-grey, $amount: 100%);
+      border-color: desaturate($color: $ung-light-grey, $amount: 100%);
+      color: $very-light-gray;
       cursor: not-allowed;
+    }
+
+    .floatingMenu {
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translate(-50%, 6px);
+      background-color: $very-light-gray;
+      border: 2px solid $ung-light-blue;
+      color: $ung-light-blue;
+      border-radius: 5px;
+      padding: 5px;
+      display: flex;
+      flex-flow: row wrap;
+      gap: 2px;
+      z-index: 10;
+      max-width: 188px;
+      width: max-content;
+
+      &::before {
+        content: '';
+        position: absolute;
+        top: -6px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 0;
+        height: 0;
+        border-left: 6px solid transparent;
+        border-right: 6px solid transparent;
+        border-bottom: 6px solid $ung-light-blue;
+      }
     }
   }
 }
@@ -92,4 +129,78 @@
   font-size: 2em;
   border-radius: 5px;
   pointer-events: none;
+}
+
+.color-palette,
+.table-palette {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba($color: $ung-light-grey, $alpha: 0.5);
+  border-radius: 1px;
+
+  &.color-palette-blue {
+    background-color: $ung-light-blue;
+  }
+  &.color-palette-darkblue {
+    background-color: darken($color: $ung-light-blue, $amount: 20%);
+  }
+  &.color-palette-grey {
+    background-color: $ung-light-grey;
+  }
+  &.color-palette-darkgrey {
+    background-color: $ung-dark-grey;
+  }
+  &.active {
+    background-color: rgba($color: $ung-light-blue, $alpha: 0.2);
+  }
+}
+
+.link-palette {
+  border: none;
+  background-color: transparent;
+  &:focus-within {
+    background-color: transparent;
+  }
+  input {
+    background-color: transparent;
+    padding: 2px;
+  }
+}
+
+.file-palette {
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+
+  & > input {
+    display: none;
+  }
+}
+
+.color-text-blue {
+  color: $ung-light-blue;
+}
+.color-text-darkblue {
+  color: darken($color: $ung-light-blue, $amount: 20%);
+}
+.color-text-grey {
+  color: $ung-light-grey;
+}
+.color-text-darkgrey {
+  color: $ung-dark-grey;
+}
+
+.bold {
+  font-weight: bold;
+}
+.italic {
+  font-style: italic;
+}
+.underline {
+  text-decoration: underline;
+}
+.strikethrough {
+  text-decoration: line-through;
 }
