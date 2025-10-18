@@ -1,4 +1,4 @@
-import { LexicalComposer } from '@lexical/react/LexicalComposer';
+import { InitialConfigType, LexicalComposer } from '@lexical/react/LexicalComposer';
 import { ContentEditable } from '@lexical/react/LexicalContentEditable';
 import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary';
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
@@ -23,11 +23,11 @@ import { EnableDisablePlugin } from './LexicalPlugins/EnableDisablePlugin';
 import { MATCHERS } from './LexicalPlugins/AutoLinkMatcherPlugin';
 import { ImagePlugin } from './LexicalPlugins/ImagePlugin';
 import { ImageNode } from './LexicalPlugins/ImageNode';
-import { ColorTextNode } from './LexicalPlugins/ColorTextNode';
+import { $createColorTextNodeFromTextNode, ColorTextNode } from './LexicalPlugins/ColorTextNode';
 import { ImageDropPlugin } from './LexicalPlugins/ImageDropPlugin';
 import { ColorTextPlugin } from './LexicalPlugins/ColorTextPlugin';
 import styles from './LexicalTextEditor.module.scss';
-import type { EditorThemeClasses } from 'lexical';
+import { TextNode, type EditorThemeClasses } from 'lexical';
 
 const theme = {
   root: styles['editor-root'],
@@ -67,8 +67,15 @@ function LexicalTextEditor({ placeholder, emptyText, disabled = false }: Lexical
       TableNode,
       TableRowNode,
       QuoteNode,
+      {
+        replace: TextNode,
+        with: (node: TextNode) => {
+          return $createColorTextNodeFromTextNode(node);
+        },
+        withKlass: ColorTextNode,
+      },
     ],
-  };
+  } satisfies InitialConfigType;
 
   return (
     <LexicalComposer initialConfig={initialConfig}>
