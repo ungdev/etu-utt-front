@@ -36,7 +36,7 @@ export default function Avatar({ localSrc, name, editable, className, onChange, 
       {editable && (
         <>
           <label className={styles.avatarEdit}>
-            {t('common:ui.profilepicture.uplaod')}
+            {t('common:ui.profilepicture.upload')}
             <input
               type="file"
               accept="image/webp,image/png,image/jpeg,image/avif,image/tiff"
