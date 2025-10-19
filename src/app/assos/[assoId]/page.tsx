@@ -19,8 +19,9 @@ import { Member } from '@/api/assos/member.interface';
 import { createRole } from '@/api/assos/createRole';
 import { addMember, deleteMember, updateMember } from '@/api/assos/manageMembers';
 import { User } from '@/api/users/user.interface';
-import { DataModalSchema, ModalCallbackType, ModalForm, WindowOptions } from '@/components/UI/ModalForm';
+import { DataModalSchema, ModalStates, ModalForm, WindowOptions } from '@/components/UI/ModalForm';
 import { AssoRole } from '@/components/assos/AssoRole';
+import { c } from '@/utils';
 
 type AssoDetailModalType =
   | { user: 'user'; roleId: 'string'; permissions: 'stringList'; endAt: 'date' }
@@ -58,8 +59,6 @@ export default function AssoDetailPage() {
         .flat(),
     );
     setPermissions(permissions);
-    console.log('Current user permissions:');
-    console.log(permissions);
   }, [members, user]);
 
   const updateAssoRole = async (roleId: string, data: Partial<{ name: string; position: number }>) => {
@@ -116,7 +115,7 @@ export default function AssoDetailPage() {
     roleId: string,
   ) => {
     if (data.roleId === roleId) delete data.roleId; // the api will refuse to update if roleId is the same
-    const updatedMembership = await updateMember(api, asso.id, id, data).toPromise();
+    const updatedMembership = await updateMember(api, asso!.id, id, data).toPromise();
     setMembers((members) => {
       const affectedMembership = members
         .find((role) => role.id === roleId)
@@ -135,7 +134,7 @@ export default function AssoDetailPage() {
   };
 
   const deleteAssoMember = async (id: string) => {
-    const deletedMembership = await deleteMember(api, asso.id, id).toPromise();
+    const deletedMembership = await deleteMember(api, asso!.id, id).toPromise();
     setMembers((members) => {
       const affectedRole = members.find((role) => role.id === deletedMembership?.roleId);
       const affectedMembership = affectedRole?.members.find((member) => member.id === deletedMembership?.id);
@@ -217,7 +216,7 @@ export default function AssoDetailPage() {
     });
   };
 
-  const handlePopupSubmit = (data: ModalCallbackType<AssoDetailModalType>) => {
+  const handlePopupSubmit = (data: ModalStates<AssoDetailModalType>) => {
     if ('user' in data && data.roleId && data.endAt && data.permissions) {
       createAssoMember(data.roleId, data.endAt, data.permissions, data.user);
     } else if ('permissions' in data && extraModalData.memberId && extraModalData.roleId && data.roleId && data.endAt) {
@@ -237,7 +236,7 @@ export default function AssoDetailPage() {
 
   return (
     <Page className={styles.page}>
-      <div className={[styles.headerCard, !asso ? styles.glimmer : ''].filter((i) => i).join(' ')}>
+      <div className={c(styles.headerCard, !asso && styles.glimmer)}>
         <img src={asso?.logo} alt={`Logo ${asso?.name}`} />
         <div className={styles.details}>
           <div>
@@ -270,7 +269,7 @@ export default function AssoDetailPage() {
         </div>
       </div>
       {!!members.length && (
-        <div className={[styles.membersCard, editMembersMode ? styles.editMode : ''].filter((i) => i).join(' ')}>
+        <div className={c(styles.membersCard, editMembersMode && styles.editMode)}>
           <h2>
             {t('assos:member.list.title')}
             <div className={styles.actionRow}>

@@ -44,16 +44,10 @@ export default function UserSelector({
 
   return (
     <div className={styles.userSelector}>
-      <Input
-        value={searchString}
-        onChange={(value) => setSearchString(value)}
-        placeholder={t('users:selector.ui.placeholder')}
-      />
+      <Input value={searchString} onChange={setSearchString} placeholder={t('users:selector.ui.placeholder')} />
       <div className={styles.resultPool}>
         {!items.length && <div className={styles.noResult}>{t('users:selector.ui.noResult')}</div>}
-        {items.map(
-          (user: User | null) => user && <UserCard key={user.id} user={user} onSelect={(user) => select(user)} />,
-        )}
+        {items.map((user: User | null) => user && <UserCard key={user.id} user={user} onSelect={select} />)}
       </div>
     </div>
   );

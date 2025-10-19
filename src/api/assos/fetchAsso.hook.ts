@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useAPI } from '@/api/api';
 import { Asso } from '@/api/assos/asso.interface';
 
-export function useAsso(assoId: string): [Asso, (asso: Asso) => void] {
+export function useAsso(assoId: string): [Asso | null, (asso: Asso) => void] {
   const [asso, setAsso] = useState<Asso | null>(null);
   const api = useAPI();
   useEffect(() => {
@@ -10,5 +10,5 @@ export function useAsso(assoId: string): [Asso, (asso: Asso) => void] {
       setAsso(body);
     });
   }, []);
-  return [asso!, setAsso];
+  return [asso, setAsso];
 }

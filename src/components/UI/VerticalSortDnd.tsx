@@ -79,8 +79,8 @@ export const VerticalSortDnd = <T extends { id: string }>({
   const sensors = useSensors(useSensor(ClickPreservingPointerSensor));
   const [activeId, setActiveId] = useState<string | null>(null);
 
-  const handleDragStart = (veent: DragStartEvent) => {
-    setActiveId(veent.active.id as string);
+  const handleDragStart = (event: DragStartEvent) => {
+    setActiveId(event.active.id as string);
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
@@ -106,7 +106,7 @@ export const VerticalSortDnd = <T extends { id: string }>({
       onDragEnd={handleDragEnd}
       autoScroll={true}>
       <DragOverlay modifiers={[restrictToParentElement]}>
-        <Inflater item={items.find((i) => i.id === activeId)!} />
+        {activeId && <Inflater item={items.find((i) => i.id === activeId)!} />}
       </DragOverlay>
       <SortableContext items={items} strategy={verticalListSortingStrategy} disabled={disabled}>
         {items.map((item) => (
