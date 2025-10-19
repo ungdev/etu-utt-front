@@ -9,6 +9,7 @@
   &[contenteditable='true'] {
     border: 1px solid rgba($color: $ung-light-grey, $alpha: 0.6);
     border-radius: 5px;
+    min-height: 100px;
   }
 }
 
@@ -37,6 +38,10 @@
     height: 2em;
     margin: 0 5px;
     background-color: rgba($color: $ung-light-grey, $alpha: 0.5);
+
+    & + .divider {
+      display: none;
+    }
   }
 
   .item {

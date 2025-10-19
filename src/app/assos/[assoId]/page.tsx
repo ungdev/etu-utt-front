@@ -261,8 +261,11 @@ export default function AssoDetailPage() {
             <h1>{asso?.name}</h1>
             <div>{asso?.description}</div>
             <LexicalTextEditor
+              bundle="@etuutt/full"
               placeholder={t('assos:infos.edit.description.placeholder')}
               emptyText={t('assos:infos.description.empty')}
+              initialState={asso?.description}
+              onChange={console.log}
               disabled={!editInfosMode}
             />
           </div>

@@ -21,14 +21,80 @@ import { HorizontalRuleNode } from '@lexical/react/LexicalHorizontalRuleNode';
 import { ToolbarPlugin } from './LexicalPlugins/ToolbarPlugin';
 import { EnableDisablePlugin } from './LexicalPlugins/EnableDisablePlugin';
 import { MATCHERS } from './LexicalPlugins/AutoLinkMatcherPlugin';
-import { ImagePlugin } from './LexicalPlugins/ImagePlugin';
 import { ImageNode } from './LexicalPlugins/ImageNode';
 import { $createColorTextNodeFromTextNode, ColorTextNode } from './LexicalPlugins/ColorTextNode';
 import { ImageDropPlugin } from './LexicalPlugins/ImageDropPlugin';
 import { ColorTextPlugin } from './LexicalPlugins/ColorTextPlugin';
+import { ImagePlugin } from './LexicalPlugins/ImagePlugin';
 import styles from './LexicalTextEditor.module.scss';
 import { TextNode, type EditorThemeClasses } from 'lexical';
+import type { FC } from 'react';
 
+/**
+ * Bundle of features (nodes and plugins) to use in Lexical Editor.
+ *
+ * Contains:
+ * - `nodes`: List of custom nodes to register in Lexical Editor {@link InitialConfigType}
+ * - `plugins`: List of Lexical plugins to use in the Editor. Each plugin can be a React
+ *              Functional Component (the type you'll get when importing plugins) or an object containing
+ *              the plugin as `plugin` property and an `options` property containing props to pass to the
+ *              plugin. When adding a plugin, make sure its required nodes are also added in the `nodes` list.
+ *
+ * **Important Note:** When using {@link ColorTextNode}, make sure to add a node replacement rule to turn
+ * any{@link TextNode} into a {@link ColorTextNode} such as described {@link https://lexical.dev/docs/concepts/node-replacement in the docs}.
+ */
+export type RTEFeatureBundle = {
+  nodes: InitialConfigType['nodes'];
+  plugins: (FC | { plugin: FC; options: Record<string, unknown> })[];
+};
+
+/** Preconfigurations for Editor, see {@link $registerBundle} to create other bundles and {@link RTEFeatureBundle} for types. */
+const EDITOR_BUNDLES = {
+  '@etuutt/simple': {
+    nodes: [],
+    plugins: [],
+  },
+  '@etuutt/full': {
+    nodes: [
+      AutoLinkNode,
+      CodeHighlightNode,
+      CodeNode,
+      ColorTextNode,
+      HeadingNode,
+      HorizontalRuleNode,
+      ImageNode,
+      LinkNode,
+      ListItemNode,
+      ListNode,
+      TableCellNode,
+      TableNode,
+      TableRowNode,
+      QuoteNode,
+      {
+        replace: TextNode,
+        with: (node: TextNode) => {
+          return $createColorTextNodeFromTextNode(node);
+        },
+        withKlass: ColorTextNode,
+      },
+    ],
+    plugins: [
+      ImageDropPlugin,
+      ImagePlugin,
+      ColorTextPlugin,
+      LinkPlugin,
+      ListPlugin,
+      CheckListPlugin,
+      TablePlugin,
+      TabIndentationPlugin,
+      HorizontalRulePlugin,
+      MarkdownShortcutPlugin,
+      { plugin: AutoLinkPlugin, options: { matchers: MATCHERS } },
+    ],
+  },
+} as Record<string, RTEFeatureBundle>;
+
+/** Theme used to display contents of Editor */
 const theme = {
   root: styles['editor-root'],
   image: styles['editor-image'],
@@ -57,44 +123,72 @@ const theme = {
 } satisfies EditorThemeClasses;
 
 interface LexicalTextEditorProps {
-  placeholder: string;
-  emptyText?: string;
+  /**
+   * The feature bundle to use: custom nodes from used in {@link InitialConfigType} and lexical plugins.
+   * This property should not be edited after the component is mounted as Lexical does not support dynamic
+   * node list changes. You can use custom bundles if registered with {@link $registerBundle}.
+   *
+   * Predefined bundles:
+   * - `@etuutt/simple`: No extra nodes or plugins, only basic rich text features: bold, italic, underline,
+   *                     strikethrough and alignment
+   * - `@etuutt/full`: All available nodes and plugins provided by EtuUTT: including images, tables, code blocks,
+   *                   colored text, links, lists, horizontal rules, markdown support, quotes, headings, indentation.
+   * @default '@etuutt/simple'
+   */
+  bundle?: string | '@etuutt/simple' | '@etuutt/full';
+  /** Whether the Editor should handle inputs and events. This property can be updated at anytime. */
   disabled?: boolean;
+  /** The text (or ReactNode) to display when Editor is empty and disabled (property disabled set to true) */
+  emptyText?: string;
+  /** The text (or ReactNode) to display when Editor is empty and enabled (no property disabled=true) */
+  placeholder: string;
+  /** The initial state of the Editor, in Lexical's JSON format */
+  initialState?: string;
+  /** Callback called when the content of the Editor changes, providing the new state in Lexical's JSON format */
+  onChange?: (state: string) => void;
 }
 
-function LexicalTextEditor({ placeholder, emptyText, disabled = false }: LexicalTextEditorProps) {
+/**
+ * A Rich Text Editor component based on {@link https://lexical.dev Lexical}, with an onboarded toolbar
+ * and support for plugins and custom nodes.
+ *
+ * Lexical does not support dynamic node list changes, so the `bundle` property should not be changed
+ * after the component is mounted. Use {@link $registerBundle} to create and register custom bundles
+ * of nodes and plugins to use in the Editor.
+ *
+ * As Lexical does not use React nodes, the content of the editor is not managed through React state
+ * (it is managed through lexical state). The state you provide is an **initial state only**. To get
+ * the content of the editor, you can use the `onChange` callback from the props.
+ *
+ * @example
+ * <LexicalTextEditor
+ *   placeholder={t('assos:infos.edit.description.placeholder')}
+ *   emptyText={t('assos:infos.description.empty')}
+ *   initialState={asso?.description}
+ *   onChange={console.log}
+ *   disabled={!editInfosMode}
+ * />
+ */
+function LexicalTextEditor({
+  bundle = '@etuutt/simple',
+  placeholder,
+  emptyText,
+  disabled = false,
+  initialState,
+  onChange,
+}: LexicalTextEditorProps) {
+  const { nodes, plugins } = EDITOR_BUNDLES[bundle];
   const initialConfig = {
     namespace: 'EtuUTT Front Editor',
     theme,
     onError: console.error,
-    nodes: [
-      AutoLinkNode,
-      CodeHighlightNode,
-      CodeNode,
-      ColorTextNode,
-      HeadingNode,
-      HorizontalRuleNode,
-      ImageNode,
-      LinkNode,
-      ListItemNode,
-      ListNode,
-      TableCellNode,
-      TableNode,
-      TableRowNode,
-      QuoteNode,
-      {
-        replace: TextNode,
-        with: (node: TextNode) => {
-          return $createColorTextNodeFromTextNode(node);
-        },
-        withKlass: ColorTextNode,
-      },
-    ],
+    nodes,
+    editorState: initialState,
   } satisfies InitialConfigType;
 
   return (
     <LexicalComposer initialConfig={initialConfig}>
-      {!disabled && <ToolbarPlugin />}
+      {!disabled && <ToolbarPlugin enabledNodes={nodes} />}
       <div className={styles.placeholderContainer}>
         <RichTextPlugin
           contentEditable={
@@ -105,23 +199,25 @@ function LexicalTextEditor({ placeholder, emptyText, disabled = false }: Lexical
           }
           ErrorBoundary={LexicalErrorBoundary}
         />
-        <ImageDropPlugin />
+        <HistoryPlugin />
+        <OnChangePlugin onChange={(state) => onChange?.(JSON.stringify(state))} />
+        <EnableDisablePlugin disabled={disabled} />
+        {plugins.map((Plugin, index) =>
+          typeof Plugin === 'function' ? <Plugin key={index} /> : <Plugin.plugin key={index} {...Plugin.options} />,
+        )}
       </div>
-      <HistoryPlugin />
-      <OnChangePlugin onChange={(state) => console.log(state.toJSON())} />
-      <EnableDisablePlugin disabled={disabled} />
-      <ImagePlugin />
-      <ColorTextPlugin />
-      <LinkPlugin />
-      <ListPlugin />
-      <CheckListPlugin />
-      <TablePlugin />
-      <TabIndentationPlugin />
-      <HorizontalRulePlugin />
-      <MarkdownShortcutPlugin />
-      <AutoLinkPlugin matchers={MATCHERS} />
     </LexicalComposer>
   );
 }
 
 export default LexicalTextEditor;
+
+/**
+ * Registers a new feature bundle for the Lexical Text Editor. A bundle is a set of nodes and plugins
+ * that can be used in the Editor.
+ * @param name the name used to access to your bundle when intializing the {@link LexicalTextEditor}
+ * @param bundle the feature bundle containing nodes and plugins
+ */
+export function $registerBundle(name: string, bundle: RTEFeatureBundle) {
+  if (!(name in EDITOR_BUNDLES)) EDITOR_BUNDLES[name] = bundle;
+}

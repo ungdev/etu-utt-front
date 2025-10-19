@@ -47,7 +47,14 @@ import {
 } from 'obra-icons-react';
 import { PropsWithChildren, useCallback, useEffect, useRef, useState } from 'react';
 import styles from '../LexicalTextEditor.module.scss';
-import { $createHeadingNode, $createQuoteNode, $isHeadingNode, HeadingTagType } from '@lexical/rich-text';
+import {
+  $createHeadingNode,
+  $createQuoteNode,
+  $isHeadingNode,
+  HeadingNode,
+  HeadingTagType,
+  QuoteNode,
+} from '@lexical/rich-text';
 import {
   $isListNode,
   INSERT_CHECK_LIST_COMMAND,
@@ -56,13 +63,17 @@ import {
   ListNode,
 } from '@lexical/list';
 import { $isAtNodeEnd, $setBlocksType } from '@lexical/selection';
-import { $isLinkNode, TOGGLE_LINK_COMMAND } from '@lexical/link';
-import { $isTableNode, $isTableSelection, INSERT_TABLE_COMMAND } from '@lexical/table';
+import { $isLinkNode, LinkNode, TOGGLE_LINK_COMMAND } from '@lexical/link';
+import { $isTableNode, $isTableSelection, INSERT_TABLE_COMMAND, TableNode } from '@lexical/table';
 import Input from '../Input';
 import { useAppTranslation } from '@/lib/i18n';
 import { useAPI } from '@/api/api';
 import { uploadFile } from './ImageDropPlugin';
 import { FORMAT_COLOR_COMMAND } from './ColorTextPlugin';
+import type { InitialConfigType } from '@lexical/react/LexicalComposer';
+import { ColorTextNode } from './ColorTextNode';
+import { CodeNode } from '@lexical/code';
+import { ImageNode } from './ImageNode';
 
 function Divider() {
   return <div className={styles.divider} />;
@@ -81,7 +92,7 @@ export function ToolbarFloatingMenu({ children, display }: ToolbarFloatingMenuPr
   );
 }
 
-export function ToolbarPlugin() {
+export function ToolbarPlugin({ enabledNodes }: { enabledNodes: InitialConfigType['nodes'] }) {
   const [editor] = useLexicalComposerContext();
   const toolbarRef = useRef(null);
   const [canUndo, setCanUndo] = useState(false);
@@ -238,142 +249,169 @@ export function ToolbarPlugin() {
         aria-label="Format Strikethrough">
         <IconStrikethrough />
       </button>
-      <button onClick={() => toggleToolbarFloatingMenu('color')} className={styles.item} aria-label="Format Text Color">
-        <IconPalette />
-        <ToolbarFloatingMenu display={isColorPaletteOpen}>
-          <div
-            className={[styles['color-palette'], styles['color-palette-blue']].join(' ')}
-            onClick={() => (setIsColorPaletteOpen(false), editor.dispatchCommand(FORMAT_COLOR_COMMAND, 'blue'))}
-          />
-          <div
-            className={[styles['color-palette'], styles['color-palette-darkblue']].join(' ')}
-            onClick={() => (setIsColorPaletteOpen(false), editor.dispatchCommand(FORMAT_COLOR_COMMAND, 'darkblue'))}
-          />
-          <div
-            className={[styles['color-palette'], styles['color-palette-grey']].join(' ')}
-            onClick={() => (setIsColorPaletteOpen(false), editor.dispatchCommand(FORMAT_COLOR_COMMAND, 'grey'))}
-          />
-          <div
-            className={[styles['color-palette'], styles['color-palette-darkgrey']].join(' ')}
-            onClick={() => (setIsColorPaletteOpen(false), editor.dispatchCommand(FORMAT_COLOR_COMMAND, 'darkgrey'))}
-          />
-        </ToolbarFloatingMenu>
-      </button>
-      <Divider />
-      <button
-        onClick={() => formatParagraph(editor)}
-        className={`${styles.item} ${blockType === 'paragraph' ? styles.active : ''}`}
-        aria-label="Format Paragraph">
-        <IconText />
-      </button>
-      <button
-        onClick={() => formatHeading(editor, blockType, 'h1')}
-        className={`${styles.item} ${blockType === 'h1' ? styles.active : ''}`}
-        aria-label="Format H1">
-        H1
-      </button>
-      <button
-        onClick={() => formatHeading(editor, blockType, 'h2')}
-        className={`${styles.item} ${blockType === 'h2' ? styles.active : ''}`}
-        aria-label="Format H2">
-        H2
-      </button>
-      <button
-        onClick={() => formatHeading(editor, blockType, 'h3')}
-        className={`${styles.item} ${blockType === 'h3' ? styles.active : ''}`}
-        aria-label="Format H3">
-        H3
-      </button>
-      <button
-        onClick={() => formatQuote(editor, blockType)}
-        className={`${styles.item} ${blockType === 'quote' ? styles.active : ''}`}
-        aria-label="Format Quote">
-        <IconQuoteFill />
-      </button>
-      <button
-        onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'code')}
-        className={`${styles.item} ${isCode ? styles.active : ''}`}
-        aria-label="Format Code">
-        <IconCode />
-      </button>
-      <button
-        onClick={() => formatBulletList(editor, blockType)}
-        className={`${styles.item} ${blockType === 'bullet' ? styles.active : ''}`}
-        aria-label="Format Bullet List">
-        <IconUnorderedList />
-      </button>
-      <button
-        onClick={() => formatNumberedList(editor, blockType)}
-        className={`${styles.item} ${blockType === 'number' ? styles.active : ''}`}
-        aria-label="Format Numbered List">
-        <IconOrderedList />
-      </button>
-      <button
-        onClick={() => formatCheckList(editor, blockType)}
-        className={`${styles.item} ${blockType === 'check' ? styles.active : ''}`}
-        aria-label="Format Check List">
-        <IconChecklist />
-      </button>
-      <button
-        onClick={() => toggleToolbarFloatingMenu('table')}
-        className={`${styles.item} ${blockType === 'table' ? styles.active : ''}`}
-        aria-label="Format Table">
-        <IconTable />
-        <ToolbarFloatingMenu display={isTablePaletteOpen && blockType !== 'table'}>
-          {Array.from({ length: 8 * 8 }).map((_, index) => (
+      {enabledNodes?.includes(ColorTextNode) && (
+        <button
+          onClick={() => toggleToolbarFloatingMenu('color')}
+          className={styles.item}
+          aria-label="Format Text Color">
+          <IconPalette />
+          <ToolbarFloatingMenu display={isColorPaletteOpen}>
             <div
-              key={index}
-              className={[
-                styles['table-palette'],
-                tablePaletteHoverIndex >= index && (tablePaletteHoverIndex % 8) - (index % 8) >= 0 && styles['active'],
-              ]
-                .filter((c) => c)
-                .join(' ')}
-              onClick={() => (setIsTablePaletteOpen(false), setTablePaletteHoverIndex(-1), formatTable(editor, index))}
-              onMouseEnter={() => setTablePaletteHoverIndex(index)}
-              onMouseLeave={() => setTablePaletteHoverIndex(-1)}
+              className={[styles['color-palette'], styles['color-palette-blue']].join(' ')}
+              onClick={() => (setIsColorPaletteOpen(false), editor.dispatchCommand(FORMAT_COLOR_COMMAND, 'blue'))}
             />
-          ))}
-        </ToolbarFloatingMenu>
-      </button>
+            <div
+              className={[styles['color-palette'], styles['color-palette-darkblue']].join(' ')}
+              onClick={() => (setIsColorPaletteOpen(false), editor.dispatchCommand(FORMAT_COLOR_COMMAND, 'darkblue'))}
+            />
+            <div
+              className={[styles['color-palette'], styles['color-palette-grey']].join(' ')}
+              onClick={() => (setIsColorPaletteOpen(false), editor.dispatchCommand(FORMAT_COLOR_COMMAND, 'grey'))}
+            />
+            <div
+              className={[styles['color-palette'], styles['color-palette-darkgrey']].join(' ')}
+              onClick={() => (setIsColorPaletteOpen(false), editor.dispatchCommand(FORMAT_COLOR_COMMAND, 'darkgrey'))}
+            />
+          </ToolbarFloatingMenu>
+        </button>
+      )}
       <Divider />
-      <button
-        onClick={() => toggleToolbarFloatingMenu('link')}
-        className={`${styles.item} ${typeof link === 'string' ? styles.active : ''}`}
-        aria-label="Format Link">
-        <IconLink />
-        <ToolbarFloatingMenu display={isLinkPaletteOpen}>
-          <Input
-            className={styles['link-palette']}
-            type="url"
-            placeholder="https://..."
-            value={editingLink}
-            onChange={setEditingLink}
-            onEnter={(event) => {
-              event!.stopPropagation();
-              event!.preventDefault();
-              setEditingLink('');
-              setIsLinkPaletteOpen(false);
-              formatLink(editor, editingLink);
-            }}
-          />
-        </ToolbarFloatingMenu>
-      </button>
-      <button onClick={() => toggleToolbarFloatingMenu('file')} className={styles.item} aria-label="Upload Image">
-        <IconImage />
-        <ToolbarFloatingMenu display={isFilePaletteOpen}>
-          <label className={styles['file-palette']}>
-            {t('common:rte.toolbar.uploadImage')}
-            <input
-              type="file"
-              accept="image/webp,image/png,image/jpeg,image/avif,image/tiff"
-              onChange={(event) => (
-                setIsFilePaletteOpen(false), event.target.files?.[0] && uploadFile(event.target.files[0], api, editor)
-              )}
+      {enabledNodes?.includes(HeadingNode) && (
+        <>
+          <button
+            onClick={() => formatParagraph(editor)}
+            className={`${styles.item} ${blockType === 'paragraph' ? styles.active : ''}`}
+            aria-label="Format Paragraph">
+            <IconText />
+          </button>
+          <button
+            onClick={() => formatHeading(editor, blockType, 'h1')}
+            className={`${styles.item} ${blockType === 'h1' ? styles.active : ''}`}
+            aria-label="Format H1">
+            H1
+          </button>
+          <button
+            onClick={() => formatHeading(editor, blockType, 'h2')}
+            className={`${styles.item} ${blockType === 'h2' ? styles.active : ''}`}
+            aria-label="Format H2">
+            H2
+          </button>
+          <button
+            onClick={() => formatHeading(editor, blockType, 'h3')}
+            className={`${styles.item} ${blockType === 'h3' ? styles.active : ''}`}
+            aria-label="Format H3">
+            H3
+          </button>
+        </>
+      )}
+      {enabledNodes?.includes(QuoteNode) && (
+        <button
+          onClick={() => formatQuote(editor, blockType)}
+          className={`${styles.item} ${blockType === 'quote' ? styles.active : ''}`}
+          aria-label="Format Quote">
+          <IconQuoteFill />
+        </button>
+      )}
+      {enabledNodes?.includes(CodeNode) && (
+        <button
+          onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'code')}
+          className={`${styles.item} ${isCode ? styles.active : ''}`}
+          aria-label="Format Code">
+          <IconCode />
+        </button>
+      )}
+      {enabledNodes?.includes(ListNode) && (
+        <>
+          <button
+            onClick={() => formatBulletList(editor, blockType)}
+            className={`${styles.item} ${blockType === 'bullet' ? styles.active : ''}`}
+            aria-label="Format Bullet List">
+            <IconUnorderedList />
+          </button>
+          <button
+            onClick={() => formatNumberedList(editor, blockType)}
+            className={`${styles.item} ${blockType === 'number' ? styles.active : ''}`}
+            aria-label="Format Numbered List">
+            <IconOrderedList />
+          </button>
+          <button
+            onClick={() => formatCheckList(editor, blockType)}
+            className={`${styles.item} ${blockType === 'check' ? styles.active : ''}`}
+            aria-label="Format Check List">
+            <IconChecklist />
+          </button>
+        </>
+      )}
+      {enabledNodes?.includes(TableNode) && (
+        <button
+          onClick={() => toggleToolbarFloatingMenu('table')}
+          className={`${styles.item} ${blockType === 'table' ? styles.active : ''}`}
+          aria-label="Format Table">
+          <IconTable />
+          <ToolbarFloatingMenu display={isTablePaletteOpen && blockType !== 'table'}>
+            {Array.from({ length: 8 * 8 }).map((_, index) => (
+              <div
+                key={index}
+                className={[
+                  styles['table-palette'],
+                  tablePaletteHoverIndex >= index &&
+                    (tablePaletteHoverIndex % 8) - (index % 8) >= 0 &&
+                    styles['active'],
+                ]
+                  .filter((c) => c)
+                  .join(' ')}
+                onClick={() => (
+                  setIsTablePaletteOpen(false), setTablePaletteHoverIndex(-1), formatTable(editor, index)
+                )}
+                onMouseEnter={() => setTablePaletteHoverIndex(index)}
+                onMouseLeave={() => setTablePaletteHoverIndex(-1)}
+              />
+            ))}
+          </ToolbarFloatingMenu>
+        </button>
+      )}
+      <Divider />
+      {enabledNodes?.includes(LinkNode) && (
+        <button
+          onClick={() => toggleToolbarFloatingMenu('link')}
+          className={`${styles.item} ${typeof link === 'string' ? styles.active : ''}`}
+          aria-label="Format Link">
+          <IconLink />
+          <ToolbarFloatingMenu display={isLinkPaletteOpen}>
+            <Input
+              className={styles['link-palette']}
+              type="url"
+              placeholder="https://..."
+              value={editingLink}
+              onChange={setEditingLink}
+              onEnter={(event) => {
+                event!.stopPropagation();
+                event!.preventDefault();
+                setEditingLink('');
+                setIsLinkPaletteOpen(false);
+                formatLink(editor, editingLink);
+              }}
             />
-          </label>
-        </ToolbarFloatingMenu>
-      </button>
+          </ToolbarFloatingMenu>
+        </button>
+      )}
+      {enabledNodes?.includes(ImageNode) && (
+        <button onClick={() => toggleToolbarFloatingMenu('file')} className={styles.item} aria-label="Upload Image">
+          <IconImage />
+          <ToolbarFloatingMenu display={isFilePaletteOpen}>
+            <label className={styles['file-palette']}>
+              {t('common:rte.toolbar.uploadImage')}
+              <input
+                type="file"
+                accept="image/webp,image/png,image/jpeg,image/avif,image/tiff"
+                onChange={(event) => (
+                  setIsFilePaletteOpen(false), event.target.files?.[0] && uploadFile(event.target.files[0], api, editor)
+                )}
+              />
+            </label>
+          </ToolbarFloatingMenu>
+        </button>
+      )}
       <Divider />
       <button
         onClick={() => {
