@@ -45,6 +45,8 @@
     border-radius: 3px;
     padding: 0;
     height: calc(28px + 0.2em);
+    width: calc(28px + 0.2em);
+    text-align: center;
     padding: 0.1em;
     background-color: $very-light-gray;
     color: $ung-light-blue;
@@ -203,4 +205,107 @@
 }
 .strikethrough {
   text-decoration: line-through;
+}
+
+.editor-quote {
+  background-color: rgba($color: $ung-dark-grey, $alpha: 0.1);
+  margin: 0.5em;
+  padding: 0.5em;
+  border-left: 5px solid $ung-dark-grey;
+  border-radius: 0 5px 5px 0;
+}
+
+.editor-horizontal-rule {
+  border: none;
+  border-top: 2px solid $ung-dark-grey;
+  margin: 1em 0;
+}
+
+.editor-list-item {
+  position: relative;
+}
+
+.editor-list-item:has(.editor-ordered-list),
+.editor-list-item:has(.editor-unordered-list),
+.editor-list-item-checked,
+.editor-list-item-unchecked {
+  list-style-type: none;
+}
+
+.editor-checklist {
+  margin-left: -1.5em;
+}
+
+.editor-list-item-unchecked,
+.editor-list-item-checked {
+  position: relative;
+  margin-left: 0.5em;
+  margin-right: 0.5em;
+  padding-left: 1.5em;
+  padding-right: 1.5em;
+  outline: none;
+  display: block;
+
+  &::before {
+    content: '';
+    width: 0.9em;
+    height: 0.9em;
+    top: 50%;
+    left: 0;
+    cursor: pointer;
+    display: block;
+    background-size: cover;
+    position: absolute;
+    transform: translateY(-50%);
+  }
+}
+.editor-list-item-checked {
+  &::before {
+    border: 1px solid $ung-light-blue;
+    border-radius: 2px;
+    background-color: $ung-light-blue;
+    background-repeat: no-repeat;
+  }
+  &::after {
+    content: '';
+    cursor: pointer;
+    border-color: $very-light-gray;
+    border-style: solid;
+    position: absolute;
+    display: block;
+    top: 45%;
+    width: 0.2em;
+    left: 0.32em;
+    height: 0.4em;
+    transform: translateY(-50%) rotate(45deg);
+    border-width: 0 0.1em 0.1em 0;
+  }
+}
+
+.editor-list-item-unchecked::before {
+  border: 1px solid rgba($color: $ung-light-grey, $alpha: 0.5);
+  border-radius: 2px;
+}
+
+.editor-table {
+  border-collapse: collapse;
+
+  .editor-table-row:nth-child(2n) {
+    background-color: rgba($color: $ung-light-grey, $alpha: 0.1);
+  }
+  .editor-table-cell {
+    padding: 3px 4px;
+    min-width: 200px;
+    border: 1px solid rgba($color: $ung-light-grey, $alpha: 0.3);
+  }
+  .editor-table-cell-header {
+    background-color: $ung-dark-grey;
+    color: $very-light-gray;
+    border: 1px solid $ung-dark-grey;
+  }
+}
+
+.editor-code {
+  background-color: rgba($color: $ung-dark-grey, $alpha: 0.1);
+  border-radius: 3px;
 }

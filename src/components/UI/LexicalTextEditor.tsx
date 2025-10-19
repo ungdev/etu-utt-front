@@ -38,7 +38,22 @@ const theme = {
     italic: styles['italic'],
     underline: styles['underline'],
     strikethrough: styles['strikethrough'],
+    code: styles['editor-code'],
   },
+  quote: styles['editor-quote'],
+  hr: styles['editor-horizontal-rule'],
+  list: {
+    checklist: styles['editor-checklist'],
+    listitem: styles['editor-list-item'],
+    listitemChecked: styles['editor-list-item-checked'],
+    listitemUnchecked: styles['editor-list-item-unchecked'],
+    ol: styles['editor-ordered-list'],
+    ul: styles['editor-unordered-list'],
+  },
+  table: styles['editor-table'],
+  tableCell: styles['editor-table-cell'],
+  tableCellHeader: styles['editor-table-cell-header'],
+  tableRow: styles['editor-table-row'],
 } satisfies EditorThemeClasses;
 
 interface LexicalTextEditorProps {

@@ -270,19 +270,19 @@ export function ToolbarPlugin() {
         onClick={() => formatHeading(editor, blockType, 'h1')}
         className={`${styles.item} ${blockType === 'h1' ? styles.active : ''}`}
         aria-label="Format H1">
-        <IconText />
+        H1
       </button>
       <button
         onClick={() => formatHeading(editor, blockType, 'h2')}
         className={`${styles.item} ${blockType === 'h2' ? styles.active : ''}`}
         aria-label="Format H2">
-        <IconText />
+        H2
       </button>
       <button
         onClick={() => formatHeading(editor, blockType, 'h3')}
         className={`${styles.item} ${blockType === 'h3' ? styles.active : ''}`}
         aria-label="Format H3">
-        <IconText />
+        H3
       </button>
       <button
         onClick={() => formatQuote(editor, blockType)}
