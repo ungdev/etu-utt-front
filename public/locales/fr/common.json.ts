@@ -36,4 +36,5 @@ export default {
   '404': '404 - Page not found',
   'rte.dnd.drop': "Déposez le fichier pour l'importer",
   'rte.toolbar.uploadImage': "Cliquez pour sélectionner l'image",
+  'ui.profilepicture.uplaod': 'Télécharger une image',
 } as const;

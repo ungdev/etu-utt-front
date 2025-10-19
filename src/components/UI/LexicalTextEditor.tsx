@@ -28,7 +28,7 @@ import { ColorTextPlugin } from './LexicalPlugins/ColorTextPlugin';
 import { ImagePlugin } from './LexicalPlugins/ImagePlugin';
 import styles from './LexicalTextEditor.module.scss';
 import { TextNode, type EditorThemeClasses } from 'lexical';
-import type { FC } from 'react';
+import type { FC, MutableRefObject } from 'react';
 
 /**
  * Bundle of features (nodes and plugins) to use in Lexical Editor.
@@ -146,6 +146,12 @@ interface LexicalTextEditorProps {
   initialState?: string;
   /** Callback called when the content of the Editor changes, providing the new state in Lexical's JSON format */
   onChange?: (state: string) => void;
+  /**
+   * A ref to a hook to update Editor state (contents). This hook must be only used when setting different content,
+   * not for regular updated sent by `onChange` as state is already retained by Lexical (and it would be a bummer to
+   * recompute the whole state for every change).
+   */
+  setStateRef?: MutableRefObject<(s: string) => void>;
 }
 
 /**
@@ -164,7 +170,7 @@ interface LexicalTextEditorProps {
  * <LexicalTextEditor
  *   placeholder={t('assos:infos.edit.description.placeholder')}
  *   emptyText={t('assos:infos.description.empty')}
- *   initialState={asso?.description}
+ *   initialState={asso!.description}
  *   onChange={console.log}
  *   disabled={!editInfosMode}
  * />
@@ -176,6 +182,7 @@ function LexicalTextEditor({
   disabled = false,
   initialState,
   onChange,
+  setStateRef,
 }: LexicalTextEditorProps) {
   const { nodes, plugins } = EDITOR_BUNDLES[bundle];
   const initialConfig = {
@@ -200,8 +207,8 @@ function LexicalTextEditor({
           ErrorBoundary={LexicalErrorBoundary}
         />
         <HistoryPlugin />
-        <OnChangePlugin onChange={(state) => onChange?.(JSON.stringify(state))} />
-        <EnableDisablePlugin disabled={disabled} />
+        <OnChangePlugin onChange={(state) => !disabled && onChange?.(JSON.stringify(state))} />
+        <EnableDisablePlugin disabled={disabled} ref={setStateRef} />
         {plugins.map((Plugin, index) =>
           typeof Plugin === 'function' ? <Plugin key={index} /> : <Plugin.plugin key={index} {...Plugin.options} />,
         )}
@@ -220,4 +227,21 @@ export default LexicalTextEditor;
  */
 export function $registerBundle(name: string, bundle: RTEFeatureBundle) {
   if (!(name in EDITOR_BUNDLES)) EDITOR_BUNDLES[name] = bundle;
+}
+
+/**
+ * Use this function to ensure `str` can be used in a {@link LexicalTextEditor}
+ * (either in the `initialState` prop or through the `setStateRef` hook)
+ */
+export function $makeJson(str: string) {
+  try {
+    JSON.parse(str);
+    return str;
+  } catch {
+    return (
+      `{"root":{"children":[{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"${str.replaceAll(/"/g, '\\"')}",` +
+      `"type":"color-text","version":1}],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textFormat":0,"textStyle":""}],` +
+      `"direction":"ltr","format":"","indent":0,"type":"root","version":1}}`
+    );
+  }
 }

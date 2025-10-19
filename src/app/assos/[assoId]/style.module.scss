@@ -16,19 +16,19 @@
     top: 3ch;
     padding: 4px 8px !important;
     border-radius: calc(1em + 4px) !important;
+
+    svg {
+      margin-right: 0.5ch;
+    }
   }
 
-  & > img {
-    width: 12ch;
-    height: 12ch;
-    border-radius: 50%;
-    object-fit: cover;
-    display: flex;
-    text-align: center;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    flex-shrink: 0;
+  & > .logo {
+    width: 125px;
+    height: 125px;
+    background: rgba($color: $ung-light-grey, $alpha: 0.2);
+    border: 2px solid rgba($color: $ung-light-grey, $alpha: 0.2);
+    color: $ung-dark-grey;
+    font-size: 6ch;
   }
 
   .details {
@@ -38,7 +38,7 @@
     justify-content: space-between;
 
     h1:empty,
-    & > div:empty,
+    & > div > :empty,
     .actionRow div:empty {
       @extend .glimmer-animated;
       width: 16ch;
@@ -48,6 +48,14 @@
 
       &:nth-child(2) {
         width: 48ch;
+      }
+
+      &:nth-child(3) {
+        width: 36ch;
+      }
+
+      &:nth-child(4) {
+        width: 62ch;
       }
     }
 
@@ -72,10 +80,6 @@
         width: 10ch;
       }
     }
-  }
-
-  img {
-    background: rgba($color: $ung-light-grey, $alpha: 0.2);
   }
 }
 
@@ -121,6 +125,10 @@
       font-size: 0.8em;
       padding: 4px 8px;
       border-radius: calc(0.5em + 4px);
+
+      svg {
+        margin-right: 0.5ch;
+      }
     }
   }
 

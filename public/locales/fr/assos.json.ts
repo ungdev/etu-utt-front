@@ -6,7 +6,7 @@ export default {
   'filter.search': 'Recherche dans le guide des assos',
   'filter.search.title': 'Recherche dans le guide des assos',
   'infos.edit': 'Modifier',
-  'infos.edit.stop': 'Fermer',
+  'infos.edit.save': 'Enregistrer',
   'infos.edit.description.placeholder': 'Notre association est géniale parce que...',
   'infos.description.empty': "Cette association n'a pas encore de description.",
   'member.list.title': 'Membres',

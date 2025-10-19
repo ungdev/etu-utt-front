@@ -1,0 +1,68 @@
+@import '@/variables';
+
+.avatar {
+  display: block;
+  position: relative;
+  width: 2em;
+  height: 2em;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  font-size: 1.2em;
+  background: $ung-light-blue;
+  color: $very-light-gray;
+  user-select: none;
+  border: 2px solid $ung-light-blue;
+
+  img {
+    position: absolute;
+    object-fit: cover;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.avatar:hover > .avatarEdit {
+  opacity: 1;
+}
+
+.avatar > svg {
+  position: absolute;
+  width: 60%;
+  height: 60%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  fill: $very-light-gray;
+  color: color-mix(in srgb, $ung-dark-grey 40%, $very-light-gray 60%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.avatarEdit {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  z-index: 2;
+  font-size: 0.3em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: $very-light-gray;
+  background-color: rgba($color: $ung-dark-grey, $alpha: 0.6);
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+
+  & > input {
+    display: none;
+  }
+}

@@ -8,9 +8,18 @@ export type ImageMediaProps = PropsWithoutRef<{
   width?: number | 'inherit';
   height?: number | 'inherit';
   onClick?: MouseEventHandler<HTMLImageElement>;
+  displayWhileLoading?: boolean;
 }>;
 
-export function ImageMedia({ src: worldSrc, altText, className, width, height, onClick }: ImageMediaProps) {
+export function ImageMedia({
+  src: worldSrc,
+  altText,
+  className,
+  width,
+  height,
+  onClick,
+  displayWhileLoading = true,
+}: ImageMediaProps) {
   const [src, setSrc] = useState('');
   const api = useAPI();
 
@@ -29,14 +38,16 @@ export function ImageMedia({ src: worldSrc, altText, className, width, height, o
   }, [worldSrc]);
 
   return (
-    <img
-      className={className}
-      src={src}
-      width={Number.isInteger(width) ? width : undefined}
-      height={Number.isInteger(height) ? height : undefined}
-      alt={altText}
-      onClick={onClick}
-      referrerPolicy="no-referrer"
-    />
+    (src || displayWhileLoading) && (
+      <img
+        className={className}
+        src={src}
+        width={Number.isInteger(width) ? width : undefined}
+        height={Number.isInteger(height) ? height : undefined}
+        alt={altText}
+        onClick={onClick}
+        referrerPolicy="no-referrer"
+      />
+    )
   );
 }
