@@ -239,7 +239,7 @@ export function $makeJson(str: string) {
     return str;
   } catch {
     return (
-      `{"root":{"children":[{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"${str.replaceAll(/"/g, '\\"')}",` +
+      `{"root":{"children":[{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"${str.replaceAll(/\\/g, '\\\\').replaceAll(/"/g, '\\"')}",` +
       `"type":"color-text","version":1}],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textFormat":0,"textStyle":""}],` +
       `"direction":"ltr","format":"","indent":0,"type":"root","version":1}}`
     );
