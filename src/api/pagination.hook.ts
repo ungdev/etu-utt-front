@@ -15,7 +15,7 @@ type PaginationHook<T> = {
 export function usePaginationLoader<T>(path: string): PaginationHook<T> {
   const [items, setItems] = useState<T[]>([]);
   const [total, setTotal] = useState(0);
-  const searching = useRef(false);
+  const onUpdate = useRef<Promise<void>>();
   const lastSearch = useRef<Record<string, string>>({});
   const itemsPerPage = useRef(0);
   const pageIndex = useRef(1);
@@ -23,8 +23,11 @@ export function usePaginationLoader<T>(path: string): PaginationHook<T> {
   const api = useAPI();
 
   const updateItems = (query: Record<string, string>) => {
-    if (searching.current) return;
-    else searching.current = true;
+    let resolvePromise: () => void;
+    if (onUpdate.current) {
+      onUpdate.current.then(() => updateItems(query));
+      return;
+    } else onUpdate.current = new Promise((res) => (resolvePromise = res));
 
     setItems([...Array(itemsPerPage.current || 20).fill(null)]);
     const { page, ...queryData } = query;
@@ -35,16 +38,18 @@ export function usePaginationLoader<T>(path: string): PaginationHook<T> {
         setItems(body.items);
         itemsPerPage.current = body.itemsPerPage;
         lastSearch.current = queryData;
-        searching.current = false;
         pageIndex.current = (page && Number(page)) || 1;
+        delete onUpdate.current;
+        resolvePromise();
       })
-      .on('error', () => (searching.current = false))
-      .on('failure', () => (searching.current = false));
+      .on('error', () => (delete onUpdate.current, resolvePromise()))
+      .on('failure', () => (delete onUpdate.current, resolvePromise()));
   };
 
   const fetchNextPage = () => {
-    if (searching.current || items.length >= total) return;
-    else searching.current = true;
+    let resolvePromise: () => void;
+    if (onUpdate.current) return;
+    else onUpdate.current = new Promise((res) => (resolvePromise = res));
 
     const pendingItemCount = Math.min(itemsPerPage.current, total - items.length);
     setItems((prev) => [...prev, ...Array(pendingItemCount).fill(null)]);
@@ -56,10 +61,11 @@ export function usePaginationLoader<T>(path: string): PaginationHook<T> {
         pageIndex.current++;
         setTotal(body.itemCount);
         setItems((prev) => [...prev.slice(0, prev.length - pendingItemCount), ...body.items]);
-        searching.current = false;
+        delete onUpdate.current;
+        resolvePromise();
       })
-      .on('error', () => (searching.current = false))
-      .on('failure', () => (searching.current = false));
+      .on('error', () => (delete onUpdate.current, resolvePromise()))
+      .on('failure', () => (delete onUpdate.current, resolvePromise()));
   };
   return { items, total, updateFilters: updateItems, fetchNextItems: fetchNextPage };
 }

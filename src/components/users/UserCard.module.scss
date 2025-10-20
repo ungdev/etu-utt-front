@@ -3,11 +3,11 @@
 .user {
   background: white;
   border-radius: 5px;
-  padding: 1ch;
+  padding: 0.5em;
   display: flex;
   flex-flow: row nowrap;
   align-items: center;
-  gap: 1ch;
+  gap: 0.5em;
   user-select: none;
 
   .avatar {
@@ -27,7 +27,7 @@
   .info {
     display: flex;
     flex-flow: column nowrap;
-    gap: 0.2ch;
+    gap: 0.1em;
     color: $ung-dark-grey;
 
     .cursus {

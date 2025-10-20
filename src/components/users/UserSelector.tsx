@@ -16,7 +16,7 @@ export default function UserSelector({
   const [searchString, setSearchString] = useState<string>('');
 
   useEffect(() => {
-    const tId = setTimeout(() => updateFilters({ search: searchString }), updateInterval);
+    const tId = setTimeout(() => updateFilters({ q: searchString }), updateInterval);
     return () => clearTimeout(tId);
   }, [searchString]);
 
