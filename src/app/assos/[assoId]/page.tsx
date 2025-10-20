@@ -23,15 +23,25 @@ import { DataModalSchema, ModalStates, ModalForm, WindowOptions } from '@/compon
 import { AssoRole } from '@/components/assos/AssoRole';
 import { c } from '@/utils';
 
-type AssoDetailModalType =
-  | { user: 'user'; roleId: 'string'; permissions: 'stringList'; endAt: 'date' }
-  | {
-      roleId: 'string';
-      permissions: 'stringList';
-      endAt: 'date';
-    }
-  | { confirmation: 'string' }
-  | { roleId: 'string' };
+type CreateAssoRoleModalFields = { name: 'string' };
+type DeleteAssoRoleModalFields = { confirmation: 'string' };
+type CreateAssoMemberModalFields = { user: 'user'; roleId: 'string'; permissions: 'stringList'; endAt: 'date' };
+type UpdateAssoMemberModalFields = { roleId: 'string'; permissions: 'stringList'; endAt: 'date' };
+type AssoDetailModalFields =
+  | CreateAssoRoleModalFields
+  | DeleteAssoRoleModalFields
+  | CreateAssoMemberModalFields
+  | UpdateAssoMemberModalFields;
+
+type CreateAssoRoleModalData = { id: 'create-role' };
+type DeleteAssoRoleModalData = { id: 'delete-role'; roleId: string };
+type CreateAssoMemberModalData = { id: 'create-member' };
+type UpdateAssoMemberModalData = { id: 'update-member'; roleId: string; memberId: string };
+type ExtraModalData =
+  | CreateAssoRoleModalData
+  | DeleteAssoRoleModalData
+  | CreateAssoMemberModalData
+  | UpdateAssoMemberModalData;
 
 export default function AssoDetailPage() {
   const params = useParams<{ assoId: string }>();
@@ -44,9 +54,9 @@ export default function AssoDetailPage() {
   const [currentEditingRole, setCurrentEditingRole] = useState<string | null>(null);
   const { t } = useAppTranslation();
 
-  const [modalForm, setModalForm] = useState<DataModalSchema<AssoDetailModalType> | null>(null);
+  const [modalForm, setModalForm] = useState<DataModalSchema<AssoDetailModalFields> | null>(null);
   const [modalFormWindow, setModalFormWindow] = useState<WindowOptions | null>(null);
-  const [extraModalData, setExtraModalData] = useState<Partial<{ roleId: string; memberId: string }>>({});
+  const [extraModalData, setExtraModalData] = useState<ExtraModalData | null>(null);
 
   const api = useAPI();
 
@@ -146,6 +156,7 @@ export default function AssoDetailPage() {
   /* Modal entrypoints */
 
   const openModalForMemberCreation = (roleId: string) => {
+    setExtraModalData({ id: 'create-member' });
     setModalFormWindow({ title: t('assos:member.add.title'), submitText: t('assos:member.add.submit') });
     setModalForm({
       user: { type: 'user', label: t('assos:member.add.label.user'), required: true },
@@ -166,7 +177,7 @@ export default function AssoDetailPage() {
   };
 
   const openModalForMemberUpdate = (member: Member, roleId: string) => {
-    setExtraModalData({ roleId, memberId: member.id });
+    setExtraModalData({ id: 'update-member', roleId, memberId: member.id });
     setModalFormWindow({ title: t('assos:member.edit.title'), submitText: t('assos:member.edit.submit') });
     setModalForm({
       roleId: {
@@ -187,7 +198,7 @@ export default function AssoDetailPage() {
   };
 
   const openModalForRoleDeletion = (roleId: string) => {
-    setExtraModalData({ roleId });
+    setExtraModalData({ id: 'delete-role', roleId });
     setModalFormWindow({
       title: t('assos:member.role.delete.title'),
       submitText: t('assos:member.role.delete.submit'),
@@ -203,12 +214,13 @@ export default function AssoDetailPage() {
   };
 
   const openModalForRoleCreation = () => {
+    setExtraModalData({ id: 'create-role' });
     setModalFormWindow({
       title: t('assos:member.role.create.title'),
       submitText: t('assos:member.role.create.submit'),
     });
     setModalForm({
-      roleId: {
+      name: {
         type: 'string',
         label: t('assos:member.role.create.label'),
         required: true,
@@ -216,19 +228,18 @@ export default function AssoDetailPage() {
     });
   };
 
-  const handlePopupSubmit = (data: ModalStates<AssoDetailModalType>) => {
-    if ('user' in data && data.roleId && data.endAt && data.permissions) {
+  const handlePopupSubmit = (genericData: ModalStates<AssoDetailModalFields>) => {
+    if (extraModalData?.id === 'create-member') {
+      const data = genericData as ModalStates<CreateAssoMemberModalFields>;
       createAssoMember(data.roleId, data.endAt, data.permissions, data.user);
-    } else if ('permissions' in data && extraModalData.memberId && extraModalData.roleId && data.roleId && data.endAt) {
-      updateAssoMember(
-        extraModalData.memberId,
-        { endAt: data.endAt, permissions: data.permissions, roleId: data.roleId },
-        extraModalData.roleId,
-      );
-    } else if ('confirmation' in data && extraModalData.roleId) {
+    } else if (extraModalData?.id === 'update-member') {
+      const data = genericData as ModalStates<UpdateAssoMemberModalFields>;
+      updateAssoMember(extraModalData.memberId, data, extraModalData.roleId);
+    } else if (extraModalData?.id === 'delete-role') {
       deleteAssoRole(extraModalData.roleId);
-    } else if ('roleId' in data) {
-      createAssoRole(data.roleId);
+    } else if (extraModalData?.id === 'create-role') {
+      const data = genericData as ModalStates<CreateAssoRoleModalFields>;
+      createAssoRole(data.name);
     }
   };
 
@@ -301,8 +312,8 @@ export default function AssoDetailPage() {
               <AssoRole
                 role={role}
                 editing={currentEditingRole === role.id}
-                hasPermission={permissions.has('manage_roles')}
-                hasMembersPermission={permissions.has('manage_members')}
+                hasEditRolesPermission={permissions.has('manage_roles')}
+                hasEditMembersPermission={permissions.has('manage_members')}
                 canEdit={editMembersMode}
                 displayOldMembers={displayOldMembers}
                 deleteAssoRole={openModalForRoleDeletion}
@@ -316,12 +327,13 @@ export default function AssoDetailPage() {
             disabled={!editMembersMode || !permissions.has('manage_roles')}></VerticalSortDnd>
         </div>
       )}
-      {modalForm && modalFormWindow && (
-        <ModalForm<AssoDetailModalType>
+      {modalForm && modalFormWindow && extraModalData && (
+        <ModalForm<AssoDetailModalFields>
           onSubmit={handlePopupSubmit}
           onClose={() => {
             setModalForm(null);
             setModalFormWindow(null);
+            setExtraModalData(null);
           }}
           window={modalFormWindow}
           fields={modalForm}

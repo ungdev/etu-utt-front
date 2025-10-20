@@ -71,7 +71,11 @@ type DataModalEntry<T extends keyof DataModalType> = T extends OptionsFieldsRequ
     ? Omit<DataModalEntryBase<T>, 'options'> & { options?: DataModalEntryBase<T>['options'][] }
     : Omit<DataModalEntryBase<T>, 'options'>;
 
-/** A list of all entries you have in the {@link ModalForm} along with the type associated to each entry */
+/**
+ * A list of all entries you have in the {@link ModalForm} along with the type associated to each entry
+ * This type is not intended to be used as is but rather to be extended with a litteral type that contains
+ * the actual keys and types you want to use in your modal form.
+ */
 type DataModalKeys = Record<string, keyof DataModalType>;
 
 /**
@@ -165,22 +169,10 @@ export function ModalForm<T extends DataModalKeys>({ fields, window, onSubmit, o
                   />
                 )}
                 {fields[key].type === 'date' && (
-                  <DateFormPart
-                    field={fields[key]}
-                    fieldKey={key}
-                    state={state as Date}
-                    states={states}
-                    setStates={setStates}
-                  />
+                  <DateFormPart fieldKey={key} state={state as Date} states={states} setStates={setStates} />
                 )}
                 {fields[key].type === 'user' && (
-                  <UserFormPart
-                    field={fields[key]}
-                    fieldKey={key}
-                    state={state as User}
-                    states={states}
-                    setStates={setStates}
-                  />
+                  <UserFormPart fieldKey={key} state={state as User} states={states} setStates={setStates} />
                 )}
                 {fields[key].type === 'stringList' && (
                   <StringListFormPart
@@ -245,13 +237,11 @@ function StringFormPart<T extends DataModalKeys>({
 function DateFormPart<T extends DataModalKeys>({
   fieldKey,
   state,
-  field,
   states,
   setStates,
 }: {
   fieldKey: keyof T;
   state: Date;
-  field: DataModalEntry<'date'>;
   states: ModalStates<T>;
   setStates: (states: ModalStates<T>) => void;
 }) {
@@ -267,13 +257,11 @@ function DateFormPart<T extends DataModalKeys>({
 function UserFormPart<T extends DataModalKeys>({
   fieldKey,
   state,
-  field,
   states,
   setStates,
 }: {
   fieldKey: keyof T;
   state: User;
-  field: DataModalEntry<'user'>;
   states: ModalStates<T>;
   setStates: (states: ModalStates<T>) => void;
 }) {

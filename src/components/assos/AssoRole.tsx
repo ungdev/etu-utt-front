@@ -27,8 +27,8 @@ export function AssoRole({
   role,
   editing = false,
   canEdit,
-  hasPermission,
-  hasMembersPermission,
+  hasEditRolesPermission,
+  hasEditMembersPermission,
   displayOldMembers,
   deleteAssoRole,
   updateAssoRole,
@@ -40,8 +40,8 @@ export function AssoRole({
   role: Role;
   editing?: boolean;
   canEdit: boolean;
-  hasPermission: boolean;
-  hasMembersPermission: boolean;
+  hasEditRolesPermission: boolean;
+  hasEditMembersPermission: boolean;
   displayOldMembers: boolean;
   deleteAssoRole: (id: string) => void;
   updateAssoRole: (id: string, data: Partial<{ name: string; position: number }>) => void;
@@ -69,10 +69,10 @@ export function AssoRole({
           )}
           {canEdit && (
             <>
-              <Button onClick={() => createAssoMember(role.id)} disabled={!hasMembersPermission}>
+              <Button onClick={() => createAssoMember(role.id)} disabled={!hasEditMembersPermission}>
                 <Icons.UserAdd />
               </Button>
-              <Button onClick={() => deleteAssoRole(role.id)} disabled={!hasPermission || role.isPresident}>
+              <Button onClick={() => deleteAssoRole(role.id)} disabled={!hasEditRolesPermission || role.isPresident}>
                 <Icons.Trash />
               </Button>
               <Button
@@ -85,7 +85,7 @@ export function AssoRole({
                     setCurrentEditingRoleName(role.name);
                   }
                 }}
-                disabled={!hasPermission}>
+                disabled={!hasEditRolesPermission}>
                 {editing ? <Icons.Confirm /> : <Icons.Edit />}
               </Button>
             </>
@@ -128,10 +128,10 @@ export function AssoRole({
                   </div>
                   {!isOld && canEdit && (
                     <>
-                      <Button onClick={() => updateAssoMember(member, role.id)} disabled={!hasMembersPermission}>
+                      <Button onClick={() => updateAssoMember(member, role.id)} disabled={!hasEditMembersPermission}>
                         <Icons.Edit />
                       </Button>
-                      <Button onClick={() => deleteAssoMember(member.id)} disabled={!hasMembersPermission}>
+                      <Button onClick={() => deleteAssoMember(member.id)} disabled={!hasEditMembersPermission}>
                         <Icons.UserRemove />
                       </Button>
                     </>

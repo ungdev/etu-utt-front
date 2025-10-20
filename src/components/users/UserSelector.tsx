@@ -7,34 +7,17 @@ import styles from './UserSelector.module.scss';
 import { UserCard } from './UserCard';
 
 export default function UserSelector({
-  updateInterval = 1000,
+  updateInterval = 500,
   onSelect,
 }: PropsWithoutRef<{ updateInterval?: number; onSelect?: (user: User) => void }>) {
   const { t } = useAppTranslation();
 
   const { items, updateFilters } = useUsers();
-
   const [searchString, setSearchString] = useState<string>('');
-  const [timeoutId, setTimeoutId] = useState<number>(-1);
-  const [lastUpdate, setLastUpdate] = useState<number>(0);
 
   useEffect(() => {
-    if (Date.now() - lastUpdate >= updateInterval) {
-      updateFilters({ q: searchString });
-      setLastUpdate(Date.now());
-    } else {
-      if (timeoutId >= 0) clearTimeout(timeoutId);
-      setTimeoutId(
-        window.setTimeout(
-          () => {
-            updateFilters({ q: searchString });
-            setLastUpdate(Date.now());
-            setTimeoutId(-1);
-          },
-          updateInterval - (Date.now() - lastUpdate),
-        ),
-      );
-    }
+    const tId = setTimeout(() => updateFilters({ search: searchString }), updateInterval);
+    return () => clearTimeout(tId);
   }, [searchString]);
 
   const select = (user: User) => {
