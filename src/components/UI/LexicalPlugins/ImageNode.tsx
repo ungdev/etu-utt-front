@@ -13,6 +13,7 @@ import {
 import { ImageMedia } from '../ImageMedia';
 import styles from '../LexicalTextEditor.module.scss';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
+import type { JSX } from 'react';
 
 type SerializedImageNode = Spread<
   {

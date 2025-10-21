@@ -349,7 +349,9 @@ export function ToolbarPlugin({ enabledNodes }: { enabledNodes: InitialConfigTyp
                   .filter((c) => c)
                   .join(' ')}
                 onClick={() => (
-                  setIsTablePaletteOpen(false), setTablePaletteHoverIndex(-1), formatTable(editor, index)
+                  setIsTablePaletteOpen(false),
+                  setTablePaletteHoverIndex(-1),
+                  formatTable(editor, index)
                 )}
                 onMouseEnter={() => setTablePaletteHoverIndex(index)}
                 onMouseLeave={() => setTablePaletteHoverIndex(-1)}
@@ -393,7 +395,8 @@ export function ToolbarPlugin({ enabledNodes }: { enabledNodes: InitialConfigTyp
                 type="file"
                 accept="image/webp,image/png,image/jpeg,image/avif,image/tiff"
                 onChange={(event) => (
-                  setIsFilePaletteOpen(false), event.target.files?.[0] && uploadFile(event.target.files[0], api, editor)
+                  setIsFilePaletteOpen(false),
+                  event.target.files?.[0] && uploadFile(event.target.files[0], api, editor)
                 )}
               />
             </label>

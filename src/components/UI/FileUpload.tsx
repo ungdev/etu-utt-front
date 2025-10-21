@@ -43,7 +43,7 @@ export default function FileUpload({
           style={{ transform: `rotate(${90 * rotation}deg)` }}
         />
       ) : (
-        filename ?? placeholder
+        (filename ?? placeholder)
       )}
       <input
         type="file"

@@ -1,4 +1,3 @@
-/* eslint-disable */
 // Yeah, I know, a TS file, what ? The day you will be able to do
 // import json from 'path/to/json.json' as const;
 // or something similar, you will be able to remove the .ts extension
