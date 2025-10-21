@@ -201,7 +201,7 @@ async function internalRequestAPI<RequestType, ResponseType>(
     try {
       const res: RawResponseType<ResponseType> = await response.json();
       return { code: response.status, body: formatResponse(res) as ResponseType };
-    } catch (error) {
+    } catch {
       // BROOO, who makes APIs that return headers with Content-Type: application/json without a json body :(
       // (Ok, in theory none, but it's better to be safe than sorry)
       return { error: ResponseError.not_json };

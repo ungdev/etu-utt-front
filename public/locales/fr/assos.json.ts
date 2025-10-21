@@ -1,4 +1,3 @@
-/* eslint-disable */
 // For more information, check the common.json.ts file
 
 export default {

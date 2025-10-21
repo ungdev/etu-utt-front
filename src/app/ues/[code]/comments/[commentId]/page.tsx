@@ -46,12 +46,12 @@ export default function CommentDetailsPage() {
     <Page className={styles.page}>
       <h1>
         {comment.isAnonymous
-          ? t('ues:detailed.comments.resume.anonymous', {
+          ? t('ues:detailed.comments.summary.anonymous', {
               ue: ue.code,
               semester: comment.semester.code,
               date: comment.createdAt.toLocaleDateString(),
             })
-          : t('ues:detailed.comments.resume', {
+          : t('ues:detailed.comments.summary', {
               authorFirstName: comment.author.firstName,
               authorLastName: comment.author.lastName,
               ue: ue.code,
@@ -97,12 +97,12 @@ export default function CommentDetailsPage() {
           </div>
         ))}
       </div>
-      <h2 className={styles.answerTitle}>{t('ues:detailed.comments.answers.answerTitle')}</h2>
+      <h2 className={styles.answerTitle}>{t('ues:detailed.comments.answers.title')}</h2>
       <TextArea
         className={styles.input}
         onChange={setAnswer}
         value={answer}
-        placeholder={t('ues:detailed.comments.answers.answerEntry')}
+        placeholder={t('ues:detailed.comments.answers.placeholder')}
       />
       <div className={styles.buttonWrapper}>
         <Button
@@ -113,7 +113,7 @@ export default function CommentDetailsPage() {
               setAnswer('');
             })
           }>
-          {t('ues:detailed.comments.answers.answerButton')}
+          {t('ues:detailed.comments.answers.send')}
         </Button>
       </div>
     </Page>

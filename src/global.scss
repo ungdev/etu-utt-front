@@ -1,4 +1,4 @@
-@import 'node_modules/modern-normalize/modern-normalize.css';
+@import 'modern-normalize/modern-normalize.css';
 
 @import url('https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;600&display=swap');
 @import '@/variables.scss';
@@ -12,7 +12,13 @@ body {
   flex-flow: row nowrap;
 }
 
-p, h1, h2, h3, h4, h5, h6 {
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   margin: 0;
 }
 
@@ -30,4 +36,3 @@ h1 {
   color: $ung-dark-grey;
   font-weight: 900;
 }
-
