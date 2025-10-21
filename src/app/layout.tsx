@@ -1,3 +1,4 @@
+// @ts-expect-error global.scss does not match the *.module.scss pattern
 import '@/global.scss';
 import Providers from '@/lib/Providers';
 import React, { ReactNode, Suspense } from 'react';
