@@ -41,7 +41,7 @@ export function ImageMedia({
     (src || displayWhileLoading) && (
       <img
         className={className}
-        src={src}
+        src={src || undefined}
         width={Number.isInteger(width) ? width : undefined}
         height={Number.isInteger(height) ? height : undefined}
         alt={altText}
