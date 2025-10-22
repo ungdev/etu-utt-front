@@ -230,8 +230,7 @@
   position: relative;
 }
 
-.editor-list-item:has(.editor-ordered-list),
-.editor-list-item:has(.editor-unordered-list),
+.editor-list-item-nested,
 .editor-list-item-checked,
 .editor-list-item-unchecked {
   list-style-type: none;

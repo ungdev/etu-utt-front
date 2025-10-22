@@ -115,6 +115,9 @@ const theme = {
     listitemUnchecked: styles['editor-list-item-unchecked'],
     ol: styles['editor-ordered-list'],
     ul: styles['editor-unordered-list'],
+    nested: {
+      listitem: styles['editor-list-item-nested'],
+    },
   },
   table: styles['editor-table'],
   tableCell: styles['editor-table-cell'],
