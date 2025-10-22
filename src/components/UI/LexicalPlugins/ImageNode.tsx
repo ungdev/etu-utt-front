@@ -6,7 +6,6 @@ import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext
 
 type SerializedImageNode = Spread<
   {
-    key: NodeKey;
     src: string;
     altText: string;
     width: number | 'inherit';
@@ -88,7 +87,6 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
   exportJSON(): SerializedImageNode {
     return {
       ...super.exportJSON(),
-      key: this.__key,
       src: this.__src,
       altText: this.__altText,
       width: this.__width,
