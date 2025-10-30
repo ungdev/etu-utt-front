@@ -200,8 +200,9 @@ export default function LegalPage() {
         <h3 className={styles.subArticleTitle}>4.1. Le responsable du traitement des données</h3>
         <div>
           <p>
-            Les données à caractère personnelles sont collectées par {env.NEXT_PUBLIC_ASSOCIATION_NAME}, association loi 1901, dont
-            le numéro RNA est {env.NEXT_PUBLIC_ASSOCIATION_RNA} et le numéro d'immatriculation RCS est {env.NEXT_PUBLIC_ASSOCIATION_RCS}.
+            Les données à caractère personnelles sont collectées par {env.NEXT_PUBLIC_ASSOCIATION_NAME}, association loi
+            1901, dont le numéro RNA est {env.NEXT_PUBLIC_ASSOCIATION_RNA} et le numéro d'immatriculation RCS est{' '}
+            {env.NEXT_PUBLIC_ASSOCIATION_RCS}.
           </p>
           <br />
           Le responsable du traitement des données à caractère personnel peut être contacté de la manière suivante :
@@ -209,7 +210,8 @@ export default function LegalPage() {
             <li>Par courrier à l’adresse suivante : {env.NEXT_PUBLIC_ASSOCIATION_ADDRESS}</li>
             <li>Par téléphone au {env.NEXT_PUBLIC_ASSOCIATION_PHONE}</li>
             <li>
-              Par mail à l’adresse suivante : <a href={`mailto:${env.NEXT_PUBLIC_ASSOCIATION_EMAIL}`}>{env.NEXT_PUBLIC_ASSOCIATION_EMAIL}</a>
+              Par mail à l’adresse suivante :{' '}
+              <a href={`mailto:${env.NEXT_PUBLIC_ASSOCIATION_EMAIL}`}>{env.NEXT_PUBLIC_ASSOCIATION_EMAIL}</a>
             </li>
           </ul>
         </div>
@@ -279,7 +281,8 @@ export default function LegalPage() {
           L’utilisateur est invité à prendre connaissance de cette Politique à chaque fois qu’il utilise nos services,
           sans qu’il soit nécessaire de l’en prévenir formellement.
           <br />
-          La présente politique, éditée le 02/04/2024, a été mise à jour le {env.NEXT_PUBLIC_LAST_PRIVACY_POLICY_UPDATE}.
+          La présente politique, éditée le 02/04/2024, a été mise à jour le {env.NEXT_PUBLIC_LAST_PRIVACY_POLICY_UPDATE}
+          .
         </p>
       </div>
     </Page>
