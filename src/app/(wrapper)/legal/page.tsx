@@ -1,45 +1,28 @@
+import Page from '@/components/utilities/Page';
 import styles from './style.module.scss';
 
 export default function LegalPage() {
-  // Associtation Informations
-  const ASSOCIATION_NAME = 'ASS UTT NET GROUP';
-  const ASSOCIATION_RNA = 'W103000699';
-  const ASSOCIATION_RCS = '500164249';
-  const ASSOCIATION_ADDRESS = '12 rue Marie Curie, 10000 Troyes';
-  const ASSOCIATION_PHONE = '03 25 71 85 50';
-  const ASSOCIATION_EMAIL = 'ung@utt.fr';
-
-  // Data Protection Officer
-  const DPO_NAME = 'Guillaume Etheve';
-  const DPO_EMAIL = 'ung@utt.fr';
-
-  // Publication Director
-  const PUBLICATION_DIRECTOR = 'Alban Souchard de Lavoreille';
-
-  // Updates
-  const LAST_TERMS_UPDATE = '02/04/2024';
-  const LAST_PRIVACY_POLICY_UPDATE = '02/04/2024';
-
+  const env = process.env;
   return (
-    <div id="legal" className={styles.legal}>
+    <Page id="legal" className={styles.legal}>
       <div className={styles.container}>
-        Cette page a été mise à jour le {LAST_TERMS_UPDATE}.<h1>Mentions légales</h1>
+        Cette page a été mise à jour le {env.NEXT_PUBLIC_LAST_TERMS_UPDATE}.<h1>Mentions légales</h1>
         <p>
           Le site web EtuUTT est développé, maintenu et hébergé par :<br />
           <br />
-          {ASSOCIATION_NAME}, association loi 1901
+          {env.NEXT_PUBLIC_ASSOCIATION_NAME}, association loi 1901
           <br />
-          N° RNA : {ASSOCIATION_RNA}
+          N° RNA : {env.NEXT_PUBLIC_ASSOCIATION_RNA}
           <br />
-          N° d'immatriculation RCS : {ASSOCIATION_RCS}
+          N° d'immatriculation RCS : {env.NEXT_PUBLIC_ASSOCIATION_RCS}
           <br />
-          {ASSOCIATION_ADDRESS}
+          {env.NEXT_PUBLIC_ASSOCIATION_ADDRESS}
           <br />
-          {ASSOCIATION_PHONE}
+          {env.NEXT_PUBLIC_ASSOCIATION_PHONE}
           <br />
-          <a href={`mailto:${ASSOCIATION_EMAIL}`}>{ASSOCIATION_EMAIL}</a>
+          <a href={`mailto:${env.NEXT_PUBLIC_ASSOCIATION_EMAIL}`}>{env.NEXT_PUBLIC_ASSOCIATION_EMAIL}</a>
           <br />
-          Directeur de la publication : {PUBLICATION_DIRECTOR}
+          Directeur de la publication : {env.NEXT_PUBLIC_PUBLICATION_DIRECTOR}
         </p>
         <h1>Conditions Générales d'Utilisation (CGU)</h1>
         {/* <h2 className={styles.articleTitle}>Collecte des données</h2>
@@ -77,8 +60,8 @@ export default function LegalPage() {
         </p>
         <h1>Politique de confidentialité</h1>
         <h2 className={styles.articleTitle}>1. Préambule</h2>
-        <p>
-          La présente politique de confidentialité a pour but d’informer les utilisateurs du site :
+        <div>
+          <p>La présente politique de confidentialité a pour but d’informer les utilisateurs du site :</p>
           <ul>
             <li>
               Sur la manière dont sont collectées leurs données personnelles. Sont considérées comme des données
@@ -98,13 +81,13 @@ export default function LegalPage() {
             <li>Sur la politique du site en matière de cookies.</li>
           </ul>
           <br />
-          Cette politique complète les mentions légales et les Conditions Générales d’Utilisation.
-        </p>
+          <p>Cette politique complète les mentions légales et les Conditions Générales d’Utilisation.</p>
+        </div>
         <h2 className={styles.articleTitle}>
           2. Principes relatifs à la collecte et au traitement des données personnelles
         </h2>
-        <p>
-          Conformément à l’article 5 du Règlement européen 2016/679, les données à caractère personnel sont :
+        <div>
+          <p>Conformément à l’article 5 du Règlement européen 2016/679, les données à caractère personnel sont :</p>
           <ul>
             <li>Traitées de manière licite, loyale et transparente au regard de la personne concernée ;</li>
             <li>
@@ -130,7 +113,9 @@ export default function LegalPage() {
               accidentelle, à l'aide de mesures techniques ou organisationnelles appropriées.
             </li>
           </ul>
-          Le traitement n'est licite que si, et dans la mesure où, au moins une des conditions suivantes est remplie :
+          <p>
+            Le traitement n'est licite que si, et dans la mesure où, au moins une des conditions suivantes est remplie :
+          </p>
           <ul>
             <li>
               La personne concernée a consenti au traitement de ses données à caractère personnel pour une ou plusieurs
@@ -159,7 +144,7 @@ export default function LegalPage() {
               personne concernée est un enfant.
             </li>
           </ul>
-        </p>
+        </div>
         <h2 className={styles.articleTitle}>
           3. Données à caractère personnel collectées et traitées dans le cadre de la navigation sur le site
         </h2>
@@ -213,38 +198,44 @@ export default function LegalPage() {
           4. Responsable du traitement des données et délégué à la protection des données
         </h2>
         <h3 className={styles.subArticleTitle}>4.1. Le responsable du traitement des données</h3>
-        <p>
-          Les données à caractère personnelles sont collectées par {ASSOCIATION_NAME}, association loi 1901, dont le
-          numéro RNA est {ASSOCIATION_RNA} et le numéro d'immatriculation RCS est {ASSOCIATION_RCS}.
+        <div>
+          <p>
+            Les données à caractère personnelles sont collectées par {env.NEXT_PUBLIC_ASSOCIATION_NAME}, association loi 1901, dont
+            le numéro RNA est {env.NEXT_PUBLIC_ASSOCIATION_RNA} et le numéro d'immatriculation RCS est {env.NEXT_PUBLIC_ASSOCIATION_RCS}.
+          </p>
           <br />
           Le responsable du traitement des données à caractère personnel peut être contacté de la manière suivante :
           <ul>
-            <li>Par courrier à l’adresse suivante : {ASSOCIATION_ADDRESS}</li>
-            <li>Par téléphone au {ASSOCIATION_PHONE}</li>
+            <li>Par courrier à l’adresse suivante : {env.NEXT_PUBLIC_ASSOCIATION_ADDRESS}</li>
+            <li>Par téléphone au {env.NEXT_PUBLIC_ASSOCIATION_PHONE}</li>
             <li>
-              Par mail à l’adresse suivante : <a href={`mailto:${ASSOCIATION_EMAIL}`}>{ASSOCIATION_EMAIL}</a>
+              Par mail à l’adresse suivante : <a href={`mailto:${env.NEXT_PUBLIC_ASSOCIATION_EMAIL}`}>{env.NEXT_PUBLIC_ASSOCIATION_EMAIL}</a>
             </li>
           </ul>
-        </p>
+        </div>
         <h3 className={styles.subArticleTitle}>4.2. Délégué à la protection des données</h3>
-        <p>
-          Le délégué à la protection des données de l'association est :
+        <div>
+          <p>Le délégué à la protection des données de l'association est :</p>
           <ul>
-            <li>Nom : {DPO_NAME}</li>
+            <li>Nom : {env.NEXT_PUBLIC_DPO_NAME}</li>
             <li>
-              Adresse mail : <a href={`mailto:${DPO_EMAIL}`}>{DPO_EMAIL}</a>
+              Adresse mail : <a href={`mailto:${env.NEXT_PUBLIC_DPO_EMAIL}`}>{env.NEXT_PUBLIC_DPO_EMAIL}</a>
             </li>
           </ul>
-          Si vous estimez, après nous avoir contactés, que vos droits “Informatique et Libertés”, ne sont pas respectés,
-          vous pouvez adresser une information à la CNIL.
-        </p>
+          <p>
+            Si vous estimez, après nous avoir contactés, que vos droits “Informatique et Libertés”, ne sont pas
+            respectés, vous pouvez adresser une information à la CNIL.
+          </p>
+        </div>
         <h2 className={styles.articleTitle}>
           5. Les droits de l'utilisateur en matière de collecte et de traitement des données
         </h2>
-        <p>
-          Tout utilisateur concerné par le traitement de ses données personnelles peut se prévaloir des droits suivants,
-          en application du règlement européen 2016/679 et de la Loi Informatique et Liberté (Loi 78-17 du 6 janvier
-          1978) :
+        <div>
+          <p>
+            Tout utilisateur concerné par le traitement de ses données personnelles peut se prévaloir des droits
+            suivants, en application du règlement européen 2016/679 et de la Loi Informatique et Liberté (Loi 78-17 du 6
+            janvier 1978) :
+          </p>
           <ul>
             <li>
               Droit d’accès, de rectification et droit à l’effacement des données (posés respectivement aux articles 15,
@@ -264,15 +255,18 @@ export default function LegalPage() {
 
             <li>Droit de saisir l’autorité de contrôle compétente (article 77 du RGPD).</li>
           </ul>
-          Pour exercer vos droits, veuillez adresser votre courrier à "{ASSOCIATION_NAME} - {ASSOCIATION_ADDRESS}" ou
-          par mail à <a href={`mailto:${ASSOCIATION_EMAIL}`}>{ASSOCIATION_EMAIL}</a>.
-          <br />
-          Afin que le responsable du traitement des données puisse faire droit à sa demande, l’utilisateur peut être
-          tenu de lui communiquer certaines informations telles que : ses noms et prénoms, son adresse e-mail ainsi que
-          son numéro étudiant s'il en dispose d'un.
-          <br />
-          Consultez le site <a href="https://cnil.fr">cnil.fr</a> pour plus d’informations sur vos droits.
-        </p>
+          <p>
+            Pour exercer vos droits, veuillez adresser votre courrier à "{env.NEXT_PUBLIC_ASSOCIATION_NAME} -{' '}
+            {env.NEXT_PUBLIC_ASSOCIATION_ADDRESS}" ou par mail à{' '}
+            <a href={`mailto:${env.ASSOCIATION_EMAIL}`}>{env.NEXT_PUBLIC_ASSOCIATION_EMAIL}</a>.
+            <br />
+            Afin que le responsable du traitement des données puisse faire droit à sa demande, l’utilisateur peut être
+            tenu de lui communiquer certaines informations telles que : ses noms et prénoms, son adresse e-mail ainsi
+            que son numéro étudiant s'il en dispose d'un.
+            <br />
+            Consultez le site <a href="https://cnil.fr">cnil.fr</a> pour plus d’informations sur vos droits.
+          </p>
+        </div>
         <h2 className={styles.articleTitle}>6. Conditions de modification de la politique de confidentialité</h2>
         <p>
           L’éditeur du site EtuUTT se réserve le droit de pouvoir modifier la présente Politique à tout moment afin
@@ -285,9 +279,9 @@ export default function LegalPage() {
           L’utilisateur est invité à prendre connaissance de cette Politique à chaque fois qu’il utilise nos services,
           sans qu’il soit nécessaire de l’en prévenir formellement.
           <br />
-          La présente politique, éditée le 02/04/2024, a été mise à jour le {LAST_PRIVACY_POLICY_UPDATE}.
+          La présente politique, éditée le 02/04/2024, a été mise à jour le {env.NEXT_PUBLIC_LAST_PRIVACY_POLICY_UPDATE}.
         </p>
       </div>
-    </div>
+    </Page>
   );
 }
