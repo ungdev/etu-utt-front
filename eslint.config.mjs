@@ -1,85 +1,68 @@
-import { defineConfig } from 'eslint/config';
-import { fixupConfigRules, fixupPluginRules } from '@eslint/compat';
-import react from 'eslint-plugin-react';
+import { defineConfig, globalIgnores } from 'eslint/config';
+import nextVitals from 'eslint-config-next/core-web-vitals'
 import prettier from 'eslint-plugin-prettier';
-import typescriptEslint from '@typescript-eslint/eslint-plugin';
 import tsParser from '@typescript-eslint/parser';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import js from '@eslint/js';
-import { FlatCompat } from '@eslint/eslintrc';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-  recommendedConfig: js.configs.recommended,
-  allConfig: js.configs.all,
-});
 
 export default defineConfig([
+  js.configs.recommended,
+  ...nextVitals,
   {
-    extends: fixupConfigRules(
-      compat.extends(
-        'plugin:react/recommended',
-        'plugin:import/errors',
-        'plugin:import/warnings',
-        'plugin:import/react',
-        'eslint:recommended',
-        'next/core-web-vitals',
-        'prettier',
-        'plugin:@typescript-eslint/recommended',
-      ),
-    ),
-
-    plugins: {
-      react: fixupPluginRules(react),
-      prettier,
-      '@typescript-eslint': fixupPluginRules(typescriptEslint),
+    name: 'prettier',
+    plugins: { prettier },
+    rules: {
+      'prettier/prettier': 'error',
     },
-
+  },
+  {
+    name: 'typescript',
     languageOptions: {
-      globals: {},
       parser: tsParser,
-      ecmaVersion: 2018,
-      sourceType: 'module',
-
       parserOptions: {
         project: './tsconfig.json',
-
         ecmaFeatures: {
           jsx: true,
         },
       },
     },
-
+    rules: {
+      'no-unused-vars': 'off',
+      '@typescript-eslint/no-unused-vars': [
+        'warn',
+        { args: 'after-used', vars: 'all', ignoreRestSiblings: true },
+      ],
+      '@typescript-eslint/no-explicit-any': 'warn',
+    }
+  },
+  {
+    name: 'react',
     settings: {
       react: {
         version: 'detect',
       },
-
       'import/resolver': {
         node: {
           extensions: ['.js', '.jsx'],
         },
       },
     },
-
     rules: {
-      'prettier/prettier': ['error'],
-      'no-console': 'off',
-      'no-alert': 'error',
-      'linebreak-style': ['warn', 'unix'],
       'react/require-default-props': 'off',
       'react-hooks/rules-of-hooks': 'error',
       'react-hooks/exhaustive-deps': 'off',
       'react/no-unescaped-entities': 'off',
+    },
+  },
+  {
+    rules: {
+      'no-console': 'warn',
+      'no-alert': 'error',
+      'no-redeclare': 'off',
+      'linebreak-style': ['warn', 'unix'],
       'import/default': 'off',
-      '@typescript-eslint/no-explicit-any': 'warn',
       '@next/next/no-img-element': 'off',
       'import/no-named-as-default-member': 'off',
     },
-
-    ignores: ['.next/**/*', '**/*.mjs', '**/*.js'],
   },
+  globalIgnores(['.next/**/*', '**/*.mjs', '**/*.js'])
 ]);
