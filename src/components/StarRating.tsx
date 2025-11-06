@@ -1,6 +1,6 @@
+import { IconFavorite } from 'obra-icons-react';
 import styles from './StarRating.module.scss';
 import { CSSProperties } from 'react';
-import Star from '@/icons/Star';
 
 export default function StarRating({
   stars,
@@ -19,7 +19,7 @@ export default function StarRating({
           key={i}
           onClick={onClick && (() => onClick(i + 1))}
           className={`${styles.starWrapper} ${onClick ? styles.hoverEffect : ''}`}>
-          <Star />
+          <IconFavorite />
         </div>
       ))}
     </div>

@@ -7,10 +7,7 @@ import {
   AnnalType,
 } from '@/api/annals/annal.interface';
 import { openAnnalInNewTab } from '@/api/annals/fetchAnnals';
-import CircleCheck from '@/icons/CircleCheck';
-import CircleWarning from '@/icons/CircleWarning';
-import Clock from '@/icons/Clock';
-import Trash from '@/icons/Trash';
+import { IconCircleCheck, IconCircleWarning, IconClock4Alt, IconDelete } from 'obra-icons-react';
 import { UserType } from '@/module/user';
 import Button from '../UI/Button';
 import Tooltip from '../UI/Tooltip';
@@ -20,10 +17,10 @@ import { useAppTranslation } from '@/lib/i18n';
 import { useAPI } from '@/api/api';
 
 function getIcon(status: AnnalStatus) {
-  if (status === 'deleted') return <Trash />;
-  if (status === 'processing') return <Clock />;
-  if (status === 'unverified') return <CircleWarning />;
-  return <CircleCheck />;
+  if (status === 'deleted') return <IconDelete />;
+  if (status === 'processing') return <IconClock4Alt />;
+  if (status === 'unverified') return <IconCircleWarning />;
+  return <IconCircleCheck />;
 }
 
 export default function ExamList({

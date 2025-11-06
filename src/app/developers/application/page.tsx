@@ -1,9 +1,8 @@
 'use client';
 
 import styles from './style.module.scss';
-import { IconCopy } from 'obra-icons-react';
+import { IconCopy, IconDelete } from 'obra-icons-react';
 import useApplications from '@/api/auth/applications/fetchApplications';
-import Trash from '@/icons/Trash';
 import Input from '@/components/UI/Input';
 import { useState } from 'react';
 import Button from '@/components/UI/Button';
@@ -42,7 +41,7 @@ export default function ApplicationsPage() {
               Générer un nouveau token
             </Button>
             <Button className={styles.trash} disabled>
-              <Trash className={styles.icon} />
+              <IconDelete className={styles.icon} />
             </Button>
           </div>
         ))}
