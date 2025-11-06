@@ -1,6 +1,6 @@
-import Icons from '@/icons';
 import styles from './FileUpload.module.scss';
 import { MutableRefObject, useEffect, useState } from 'react';
+import { IconRotate } from 'obra-icons-react';
 
 export type FileType = 'image/png' | 'image/jpeg' | 'image/webp' | 'image/avif' | 'image/tiff' | 'application/pdf';
 function isPicture(fileType: string | undefined) {
@@ -71,7 +71,7 @@ export default function FileUpload({
         <div className={styles.toolbar}>
           {supportsPictureRotation && (
             <div className={styles.action} onClick={() => setRotation((rotation + 1) % 4)}>
-              <Icons.Rotate />
+              <IconRotate />
             </div>
           )}
         </div>
