@@ -5,4 +5,4 @@ import pageSettings from './pageSettings';
 import homepage from './homepage';
 import constantData from '@/module/constantData';
 
-export default combineReducers({ navbar, session, pageSettings, homepage, constantData, cookies });
+export default combineReducers({ navbar, session, pageSettings, homepage, constantData });
