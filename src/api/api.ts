@@ -60,6 +60,10 @@ type ResponseHandlerExtendsType<T> = Partial<Record<'success' | StatusCodesSucce
 type VoidToUndefinedReturn<T extends (...args: any) => any> =
   ReturnType<T> extends void ? (...args: Parameters<T>) => undefined : T;
 
+export interface Abortable {
+  abort(): void;
+}
+
 /**
  * The response handler is a class that allows you to handle the response of a request to the API.
  * It allows you to define what to do when the request is successful, when it returns an error (an API error), when it fails (a request error), or when it returns a specific status code or specific failure.
@@ -84,11 +88,16 @@ type VoidToUndefinedReturn<T extends (...args: any) => any> =
  *     .toPromise();
  * }
  */
-export class ResponseHandler<T, R extends ResponseHandlerExtendsType<T> = { fallback: HandlerNoParam<undefined> }> {
+export class ResponseHandler<T, R extends ResponseHandlerExtendsType<T> = { fallback: HandlerNoParam<undefined> }>
+  implements Abortable
+{
   private readonly handlers = { fallback: () => undefined } as R;
   private readonly promise: Promise<ReturnType<R[keyof R] extends (...args: any) => any ? R[keyof R] : never>>;
 
-  constructor(rawResponse: Promise<APIResponse<T>>) {
+  constructor(
+    rawResponse: Promise<APIResponse<T>>,
+    private readonly abortController: AbortController,
+  ) {
     this.promise = rawResponse.then((response) => {
       if ('failureReason' in response) {
         if (this.handlers[response.failureReason]) {
@@ -152,6 +161,14 @@ export class ResponseHandler<T, R extends ResponseHandlerExtendsType<T> = { fall
     >;
   }
 
+  /**
+   * Aborts the request that produces this reponse.
+   * Fires ResponseError.timeout handler or falls back to failure handler.
+   */
+  abort() {
+    this.abortController.abort();
+  }
+
   async toPromise(): Promise<Awaited<ReturnType<R[keyof R] extends (...args: any) => any ? R[keyof R] : never>>> {
     return await this.promise;
   }
@@ -193,6 +210,7 @@ async function internalRequestAPI<RequestType>(
   version: string,
   isFile: true,
   applicationId: string,
+  abortController: AbortController,
 ): Promise<APIResponse<Blob>>;
 async function internalRequestAPI<RequestType, ResponseType>(
   method: string,
@@ -202,6 +220,7 @@ async function internalRequestAPI<RequestType, ResponseType>(
   version: string,
   isFile: boolean,
   applicationId: string,
+  abortController: AbortController,
 ): Promise<APIResponse<ResponseType>>;
 async function internalRequestAPI<RequestType, ResponseType>(
   method: string,
@@ -211,6 +230,7 @@ async function internalRequestAPI<RequestType, ResponseType>(
   version: string,
   isFile: boolean,
   applicationId: string,
+  abortController: AbortController,
 ): Promise<APIResponse<ResponseType | Blob>> {
   // Generate headers
   const headers = new Headers();
@@ -219,7 +239,6 @@ async function internalRequestAPI<RequestType, ResponseType>(
   if (!isFile) headers.append('Content-Type', 'application/json');
 
   // Add timeout to the request
-  const abortController = new AbortController();
   const timeout = setTimeout(() => {
     abortController.abort();
   }, timeoutMillis);
@@ -309,7 +328,11 @@ function requestAPI<RequestType, ResponseType>(
     applicationId = etuuttWebApplicationId,
   }: { timeoutMillis?: number; version?: string; isFile?: boolean; applicationId?: string } = {},
 ): ResponseHandler<ResponseType> {
-  return new ResponseHandler(internalRequestAPI(method, route, body, timeoutMillis, version, isFile, applicationId));
+  const abortController = new AbortController();
+  return new ResponseHandler(
+    internalRequestAPI(method, route, body, timeoutMillis, version, isFile, applicationId, abortController),
+    abortController,
+  );
 }
 
 // Set the authorization header with the given token for next requests

@@ -26,7 +26,7 @@ interface DataModalType {
 
 /**
  * All keys of {@link DataModalType} whose type require an `options` field in {@link DataModalEntry}.
- * These are types are already arrays.
+ * These types are already arrays.
  */
 type OptionsFieldsRequired = 'stringList';
 /**
