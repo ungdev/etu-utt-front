@@ -6,6 +6,7 @@ import Icons from '@/icons';
 import Button from '../UI/Button';
 import Input from '../UI/Input';
 import Link from '../UI/Link';
+import DisableableButton from '../UI/DisableableButton';
 
 /**
  * Sorts {@link Member asso members}.
@@ -128,12 +129,18 @@ export function AssoRole({
                   </div>
                   {!isOld && canEdit && (
                     <>
-                      <Button onClick={() => updateAssoMember(member, role.id)} disabled={!hasEditMembersPermission}>
+                      <DisableableButton
+                        onClick={() => updateAssoMember(member, role.id)}
+                        disabled={!hasEditMembersPermission}
+                        disabledTooltip={t('assos:no.permission.edit.member')}>
                         <Icons.Edit />
-                      </Button>
-                      <Button onClick={() => deleteAssoMember(member.id)} disabled={!hasEditMembersPermission}>
+                      </DisableableButton>
+                      <DisableableButton
+                        onClick={() => deleteAssoMember(member.id)}
+                        disabled={!hasEditMembersPermission}
+                        disabledTooltip={t('assos:no.permission.edit.member')}>
                         <Icons.UserRemove />
-                      </Button>
+                      </DisableableButton>
                     </>
                   )}
                 </div>

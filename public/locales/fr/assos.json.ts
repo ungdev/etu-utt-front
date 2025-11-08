@@ -33,4 +33,5 @@ export default {
   'member.edit.label.permissions': 'Permissions',
   'member.edit.label.endAt': "Date de fin d'adhésion",
   'member.edit.submit': 'Modifier',
+  'no.permission.edit.member': 'Permission insuffisante pour modifier les membres',
 } as const;
