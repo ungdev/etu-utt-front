@@ -19,7 +19,7 @@ export default function ApplicationsPage() {
   const [newApplicationName, setNewApplicationName] = useState<string>('');
   const [redirectUrl, setRedirectUrl] = useState<string>('');
   const api = useAPI();
-  const [token, setToken] = useState<string | null>(null);
+  const [token, setToken] = useState<string | undefined | null>(undefined);
 
   if (!loggedIn || !applications) {
     return false;

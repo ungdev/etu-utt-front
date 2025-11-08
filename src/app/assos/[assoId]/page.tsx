@@ -10,7 +10,7 @@ import Icons from '@/icons';
 import Link from '@/components/UI/Link';
 import { useAppTranslation } from '@/lib/i18n';
 import Button from '@/components/UI/Button';
-import { useAppSelector } from '@/lib/hooks';
+import { useConnectedUser } from '@/module/session';
 import { deleteRole } from '@/api/assos/deleteRole';
 import { useAPI } from '@/api/api';
 import { VerticalSortDnd } from '@/components/UI/VerticalSortDnd';
@@ -45,7 +45,7 @@ type ExtraModalData =
 
 export default function AssoDetailPage() {
   const params = useParams<{ assoId: string }>();
-  const user = useAppSelector((state) => state.user);
+  const user = useConnectedUser();
   const [asso] = useAsso(params.assoId);
   const [members, setMembers] = useMembers(params.assoId);
   const [permissions, setPermissions] = useState(new Set<string>());

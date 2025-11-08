@@ -127,7 +127,7 @@ export function setToken(token: string | null, api?: API): AppThunk {
       loggedIn = false;
     } else {
       const user = (await fetchProfile(api!).toPromise())!;
-      const permissions = (await fetchMyPermissions(api!).toPromise())!;
+      const permissions = (await fetchMyPermissions(api!))!;
       loggedIn = user !== null;
       dispatch(loginReducer(user, permissions, token));
     }
