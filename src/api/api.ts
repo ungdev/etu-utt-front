@@ -12,6 +12,7 @@ export enum ResponseFailureReason {
   'not_json',
   'timeout',
   'unknown',
+  'abort',
 }
 
 /**
@@ -166,7 +167,7 @@ export class ResponseHandler<T, R extends ResponseHandlerExtendsType<T> = { fall
    * Fires ResponseError.timeout handler or falls back to failure handler.
    */
   abort() {
-    this.abortController.abort();
+    this.abortController.abort(ResponseFailureReason.abort);
   }
 
   async toPromise(): Promise<Awaited<ReturnType<R[keyof R] extends (...args: any) => any ? R[keyof R] : never>>> {
@@ -279,6 +280,8 @@ async function internalRequestAPI<RequestType, ResponseType>(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     if (error instanceof Error && error.name === 'AbortError') {
+      if (abortController.signal.reason === ResponseFailureReason.abort)
+        return { failureReason: ResponseFailureReason.abort };
       console.error('Request timed out');
       return { failureReason: ResponseFailureReason.timeout };
     }

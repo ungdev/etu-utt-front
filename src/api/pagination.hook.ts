@@ -38,7 +38,7 @@ export function usePaginationLoader<T>(path: string): PaginationHook<T> {
         delete handler.current;
       })
       .on('fallback', () => delete handler.current)
-      .on(ResponseFailureReason.timeout, () => {}); // Hide toast error here as we might have aborted the request
+      .on(ResponseFailureReason.abort, () => {}); // Hide toast error here as we might have aborted the request
   };
 
   const fetchNextPage = () => {
