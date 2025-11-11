@@ -8,11 +8,11 @@ import { ApiError } from '@/api/api.interface';
  * The type of error that can be produced while making a request to the API.
  * Note that these errors are not errors that the API can return, but rather errors that can happen while making a request / interpreting the result.
  */
-export enum ResponseFailureReason {
-  'not_json',
-  'timeout',
-  'unknown',
-  'abort',
+export const enum ResponseFailureReason {
+  not_json,
+  timeout,
+  unknown,
+  abort,
 }
 
 /**
@@ -280,8 +280,6 @@ async function internalRequestAPI<RequestType, ResponseType>(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     if (error instanceof Error && error.name === 'AbortError') {
-      if (abortController.signal.reason === ResponseFailureReason.abort)
-        return { failureReason: ResponseFailureReason.abort };
       console.error('Request timed out');
       return { failureReason: ResponseFailureReason.timeout };
     }
@@ -290,6 +288,9 @@ async function internalRequestAPI<RequestType, ResponseType>(
     } else {
       console.error('An error occurred when making a request to the API');
     }
+
+    if (abortController.signal.reason === ResponseFailureReason.abort)
+      return { failureReason: ResponseFailureReason.abort };
 
     return { failureReason: ResponseFailureReason.unknown };
   } finally {
