@@ -75,4 +75,13 @@ export default {
   'detailed.annals.send.placeholder': 'Dépose le sujet ici',
   'detailed.annals.send.back': 'Retour',
   'detailed.annals.send.sumbit': 'Valider',
+  'detailed.comments.summary':
+    "Commentaire de {{authorFirstName}} {{authorLastName}} sur l'UE {{ue}} au semestre {{semester}} ({{date}})",
+  'detailed.comments.summary.anonymous': "Commentaire anonyme sur l'UE {{ue}} au semestre {{semester}} ({{date}})",
+  'detailed.comments.answers.send': 'Envoyer',
+  'detailed.comments.answers.placeholder': 'Tapez votre réponse ici',
+  'detailed.comments.answers.title': 'Répondre dans ce fil de discussion',
+  'detailed.comments.write.anonymous': 'Commenter anonymement',
+  'detailed.workTime': 'Temps de travail',
+  'detailed.workTime.project': 'Projet',
 } as const;

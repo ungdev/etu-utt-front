@@ -3,15 +3,15 @@
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import styles from './Navbar.module.scss';
 import { FC, useState } from 'react';
-import { getMenu, setCollapsed } from '@/module/navbar';
+import { getMenu, setCollapsed, useCollapsed } from '@/module/navbar';
 import Link from 'next/link';
 import { type NotParameteredTranslationKey, useAppTranslation } from '@/lib/i18n';
 import Icons from '@/icons';
-import { isLoggedIn, logout } from '@/module/session';
+import { isLoggedIn, logout, useConnectedUser } from '@/module/session';
 import Button from './UI/Button';
 import { usePageSettings } from '@/module/pageSettings';
 import { usePathname, useRouter } from 'next/navigation';
-import { CookieNames, setCookie, useCookie } from '@/module/cookies';
+import { LocalStorageNames } from '@/global';
 
 /**
  * The type defining all possible properties for a menu item
@@ -71,11 +71,11 @@ export default function Navbar() {
   const pathname = usePathname();
   const [selectedMenuName, setSelectedMenuName] = useState<string>('');
   const menuItems = useAppSelector(getMenu);
-  const collapsed = useCookie(CookieNames.NAVBAR_COLLAPSED) === 'true';
+  const collapsed = useCollapsed();
   const loggedIn = useAppSelector(isLoggedIn);
-  const user = useAppSelector((state) => state.user);
+  const user = useConnectedUser();
   const dispatch = useAppDispatch();
-  const { navbarAdditionalComponent } = usePageSettings();
+  const { navbarAdditionalComponent: Additional } = usePageSettings();
 
   const { t, i18n } = useAppTranslation();
   const [language, setLanguage] = useState(i18n.language);
@@ -103,7 +103,7 @@ export default function Navbar() {
   /** Change the language */
   const changeLanguage = (lang: string) => {
     i18n.changeLanguage(lang);
-    dispatch(setCookie(CookieNames.LANG, lang));
+    localStorage.setItem(LocalStorageNames.LANG, lang);
     setLanguage(lang);
     setLanguageSelectorOpen(false);
   };
@@ -167,10 +167,10 @@ export default function Navbar() {
         <ul>
           {menuItems.items.slice(0, menuItems.seperator).map((item) => inflateButton(item))}
           {menuItems.items.slice(menuItems.seperator).map((item) => inflateButton(item))}
-          {navbarAdditionalComponent && (
+          {Additional && (
             <>
               <div className={styles.separator} />
-              {navbarAdditionalComponent()}
+              <Additional />
             </>
           )}
         </ul>
@@ -239,13 +239,13 @@ export default function Navbar() {
       </div>
 
       {!collapsed && (
-        <div className={styles.legalStuff}>
-          <Link className={styles.legal} href={'/legal'}>
-            Mentions légales
-          </Link>
-          <Link className={styles.cookies} href={'/cookies'}>
-            Traceurs
-          </Link>
+        <div className={styles.randomLinks}>
+          <Link href={'/developers'}>Espace développeur</Link>
+          <div className={styles.legalStuff}>
+            <Link className={styles.legal} href={'/legal'}>
+              Mentions légales
+            </Link>
+          </div>
         </div>
       )}
     </div>

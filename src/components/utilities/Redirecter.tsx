@@ -1,34 +1,26 @@
 'use client';
 
-import { useAppSelector } from '@/lib/hooks';
-import { usePathname, useRouter } from 'next/navigation';
-
-interface RouteConditionState {
-  loggedIn: boolean;
-}
-
-type RouteRedirectionRules = {
-  [key: string]: Array<{ condition: (state: RouteConditionState) => boolean; redirectTo: string }>;
-};
-
-const redirectionRules: RouteRedirectionRules = {
-  '/login': [{ condition: (state) => state.loggedIn, redirectTo: '/' }],
-  '/register': [{ condition: (state) => state.loggedIn, redirectTo: '/' }],
-};
+import { useRouter } from 'next/navigation';
+import {
+  missingPermissionRedirections,
+  usePageLoaded,
+  usePagePermissions,
+  usePageSettings,
+} from '@/module/pageSettings';
 
 export default function Redirecter() {
-  const pathname = usePathname();
+  const pageSettings = usePageSettings();
   const router = useRouter();
-  const state = {
-    loggedIn: useAppSelector((state) => state.session.logged),
-  };
-  const rules = redirectionRules[pathname];
-  if (!rules) {
-    return false;
+  const permissions = usePagePermissions();
+  const loaded = usePageLoaded();
+
+  if (!loaded) {
+    return null;
   }
-  for (const condition of rules) {
-    if (condition.condition(state)) {
-      router.push(condition.redirectTo);
+
+  for (const permission of pageSettings.permissions) {
+    if (!permissions[permission]) {
+      router.push(missingPermissionRedirections[permission]);
     }
   }
   return false;

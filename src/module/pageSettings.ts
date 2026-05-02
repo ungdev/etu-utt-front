@@ -1,123 +1,140 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import { DependencyList, ReactNode, useEffect, useState } from 'react';
+import { FC, useState } from 'react';
+import { notFound } from 'next/navigation';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
-import { usePathname } from 'next/navigation';
+import { useConnectedUser } from '@/module/session';
 
 interface PageSettingsSlice {
-  page: string; // Needed to verify the page has correctly called the hook
-  searchParams: Record<string, string>;
-  permissions: string;
+  permissions: PagePermission[];
   hasNavbar: boolean;
-  navbarAdditionalComponent: (() => ReactNode) | null;
-  loaded: boolean;
-  internallyLoaded: boolean;
+  navbarAdditionalComponent: FC<Record<string, never>> | null;
+  searchParams: Record<string, string>;
+  pageComponentReady: boolean;
+  internalLoading: {
+    searchParamsLoaded: boolean;
+    permissionsVerified: boolean;
+    settingsLoaded: boolean;
+  };
 }
 
-type InternalPageSettingsKeys = 'page' | 'searchParams' | 'loaded' | 'internallyLoaded';
+export const enum PagePermission {
+  CONNECTED,
+}
+
+export const missingPermissionRedirections = {
+  [PagePermission.CONNECTED]: '/login',
+} satisfies { [P in PagePermission]: string };
+
+type InternalPageSettingsKeys = 'searchParams' | 'pageComponentReady' | 'internalLoading';
 
 type PageSettings = Omit<PageSettingsSlice, InternalPageSettingsKeys>;
 
-const defaultPageSettings = {
-  permissions: 'user',
+export const defaultPageSettings = {
+  permissions: [],
   hasNavbar: true,
   navbarAdditionalComponent: null,
 } as PageSettings;
 
+export const getInitialState = () =>
+  ({
+    ...defaultPageSettings,
+    searchParams: {},
+    notFound: false,
+    pageComponentReady: false,
+    internalLoading: {
+      searchParamsLoaded: false,
+      permissionsVerified: true, // TODO: verify them properly
+      settingsLoaded: false,
+    },
+  }) as PageSettingsSlice;
+
 export const pageSettingsSlice = createSlice({
   name: 'pageSettings',
   reducers: {
-    setPageSettings(
-      state,
-      action: PayloadAction<Pick<PageSettingsSlice, InternalPageSettingsKeys> & Partial<PageSettings>>,
-    ) {
-      return { ...state, ...defaultPageSettings, ...action.payload };
+    initPageSettings() {
+      return getInitialState();
     },
-    setPageParams(state, action: PayloadAction<Record<string, string>>) {
+    updatePageSettings(state, action: PayloadAction<Partial<PageSettings & { needsLoading: boolean }>>) {
+      return {
+        ...state,
+        ...action.payload,
+        pageComponentReady: state.pageComponentReady || !action.payload.needsLoading,
+        internalLoading: {
+          ...state.internalLoading,
+          settingsLoaded: true,
+        },
+      };
+    },
+    setSearchParams(state, action: PayloadAction<Record<string, string>>) {
       state.searchParams = action.payload;
-      state.internallyLoaded = true;
+      state.internalLoading.searchParamsLoaded = true;
       return state;
     },
     setLoaded(state, action: PayloadAction<boolean>) {
-      state.loaded = action.payload;
+      state.pageComponentReady = action.payload;
       return state;
     },
   },
-  initialState: {
-    ...defaultPageSettings,
-    page: '',
-    searchParams: {},
-    loaded: false,
-    internallyLoaded: false,
-  } as PageSettingsSlice,
+  initialState: getInitialState(),
 });
 
-const { setPageSettings, setPageParams, setLoaded } = pageSettingsSlice.actions;
-export { setPageParams };
+const { initPageSettings, updatePageSettings, setSearchParams, setLoaded } = pageSettingsSlice.actions;
+export { setSearchParams, initPageSettings, updatePageSettings };
 
-export function usePageSettings(): PageSettingsSlice;
-export function usePageSettings(
-  settings: Partial<PageSettings & { needsLoading: boolean }>,
-  deps?: DependencyList,
-): void;
-export function usePageSettings(
-  settings?: Partial<PageSettings & { needsLoading: boolean }>,
-  deps: DependencyList = [],
-): PageSettingsSlice | void {
-  /* eslint-disable react-hooks/rules-of-hooks */
-  const pathname = usePathname();
-  if (settings) {
-    const dispatch = useAppDispatch();
-    useEffect(() => {
-      dispatch(
-        setPageSettings({
-          ...settings,
-          page: pathname,
-          searchParams: {},
-          loaded: !settings.needsLoading,
-          internallyLoaded: false,
-        }),
-      );
-    }, deps);
-  } else {
-    let pageSettings = useAppSelector((state) => state.pageSettings);
-    const page = pageSettings.page;
-    const [initialized, setInitialized] = useState(page === pathname);
-    useEffect(() => {
-      if (!initialized) {
-        setInitialized(true);
-        return;
-      }
-      if (page !== pathname) {
-        console.error(`Page at address ${pathname} did not call hook usePageSettings(...)`);
-      }
-    }, [initialized]);
-    if (pageSettings.page !== pathname) {
-      pageSettings = {
-        page: pathname,
-        searchParams: {},
-        loaded: false,
-        internallyLoaded: false,
-        ...defaultPageSettings,
-      };
-    }
-    return pageSettings;
-  }
-  /* eslint-enable react-hooks/rules-of-hooks */
+export function usePageSettings(): PageSettingsSlice {
+  return useAppSelector((state) => state.pageSettings);
 }
 
-export function usePageLoaded(instantlyLoaded: boolean = false) {
+/**
+ * Hook that can be used to manage the loading of the page.
+ * @returns {internallyLoaded} True when the page finished loading internally (search parameters, permission checks, ..., in general all the loading not managed by the main page component)
+ * @returns {pageComponentReady} Whether the page was marked as loaded by the main page component. This does not mean that the page is fully loaded, only that the component is ready to be displayed.
+ * @returns {loaded} Whether the page is currently displayed or not. It's true only when main component is ready and internal loading is done.
+ * @returns {markPageLoaded} A function you can call at any point to mark the main page component as loaded.
+ */
+export function usePageLoaded() {
   const dispatch = useAppDispatch();
-  const internallyLoaded = useAppSelector((state) => state.pageSettings.internallyLoaded);
-  useEffect(() => {
-    if (instantlyLoaded) {
-      dispatch(setLoaded(true));
-    }
-  }, []);
-  return { internallyLoaded: internallyLoaded, markPageLoaded: () => dispatch(setLoaded(true)) };
+  const pageSettings = useAppSelector((state) => state.pageSettings);
+  const internallyLoaded = Object.values(pageSettings.internalLoading).every((value) => value);
+  return {
+    ...pageSettings.internalLoading,
+    internallyLoaded,
+    pageComponentReady: pageSettings.pageComponentReady,
+    loaded: internallyLoaded && pageSettings.pageComponentReady,
+    markPageLoaded: () => dispatch(setLoaded(true)),
+  };
 }
 
 export function useSearchParam(param: string): string | undefined {
   return useAppSelector((state) => state.pageSettings.searchParams[param]);
+}
+
+export function usePagePermissions(): { [K in PagePermission]: boolean } {
+  const user = useConnectedUser();
+  return {
+    [PagePermission.CONNECTED]: user !== null,
+  };
+}
+
+/**
+ * Use this instead of the builtin notFound() if you need to call it outside the body of a component (e.g. in a useEffect block).
+ * @example
+ * function MyComponent() {
+ *   const notFound = useSetNotFound();
+ *   useEffect(() => {
+ *     fetch("https://example.com")
+ *       .then(() => console.log("Request succeeded!")
+ *       .catch(() => notFound());
+ *   }, []);
+ *   return <p>Making a request to https://example.com...</p>;
+ * }
+ */
+export function useNotFound(): () => void {
+  const [wasNotFound, setWasNotFound] = useState(false);
+  if (wasNotFound) {
+    notFound();
+  }
+  return () => setWasNotFound(true);
 }
 
 export default pageSettingsSlice.reducer;

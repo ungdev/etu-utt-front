@@ -1,11 +1,14 @@
-import { apiTimeout, apiUrl, apiVersion } from '@/utils/environment';
+import { ApiError } from '@/api/api.interface';
+import { useNotFound } from '@/module/pageSettings';
+import { apiTimeout, apiUrl, apiVersion, etuuttWebApplicationId } from '@/utils/environment';
 import { StatusCodes } from 'http-status-codes';
+import { toast } from 'react-toastify';
 
 /**
  * The type of error that can be produced while making a request to the API.
  * Note that these errors are not errors that the API can return, but rather errors that can happen while making a request / interpreting the result.
  */
-export enum ResponseError {
+export enum ResponseFailureReason {
   'not_json',
   'timeout',
   'aborted',
@@ -18,10 +21,10 @@ export enum ResponseError {
  */
 type APIResponse<ResponseType> =
   | {
-      code: number;
-      body: ResponseType;
+      code: StatusCodes;
+      body: ResponseType | ApiError;
     }
-  | Record<'error', ResponseError>;
+  | Record<'failureReason', ResponseFailureReason>;
 
 /**
  * Dates do not exist in JSON, so the API does not return type Date, but instead string.
@@ -34,6 +37,29 @@ type RawResponseType<T> = T extends Date
         [K in keyof T]: T[K] extends object ? RawResponseType<T[K]> : T[K] extends Date ? string : T[K];
       }
     : T;
+
+type StatusCodesSuccess = (typeof StatusCodes)['OK' | 'CREATED' | 'ACCEPTED' | 'NO_CONTENT' | 'NOT_MODIFIED'];
+type StatusCodesError = Exclude<StatusCodes, StatusCodesSuccess>;
+
+function isStatusSuccess(code: StatusCodes): code is StatusCodesSuccess {
+  return code < 400;
+}
+
+type HandlerNoParam<R> = VoidToUndefinedReturn<() => R>;
+type HandlerBody<T, R> = VoidToUndefinedReturn<(body: T) => R>;
+type HandlerError<R> = VoidToUndefinedReturn<(error?: string) => R>;
+type HandlerCodeAndError<R> = VoidToUndefinedReturn<(errorCode?: number, error?: string) => R>;
+type HandlerFailureReason<R> = VoidToUndefinedReturn<(failureReason?: ResponseFailureReason) => R>;
+
+type ResponseHandlerExtendsType<T> = Partial<Record<'success' | StatusCodesSuccess, HandlerBody<T, any>>> &
+  Partial<Record<'error', HandlerCodeAndError<any>>> &
+  Partial<Record<StatusCodesError, HandlerError<any>>> &
+  Partial<Record<'failure', HandlerFailureReason<any>>> &
+  Partial<Record<ResponseFailureReason, HandlerNoParam<any>>> &
+  Record<'fallback', HandlerNoParam<any>>;
+
+type VoidToUndefinedReturn<T extends (...args: any) => any> =
+  ReturnType<T> extends void ? (...args: Parameters<T>) => undefined : T;
 
 /**
  * The response handler is a class that allows you to handle the response of a request to the API.
@@ -59,45 +85,77 @@ type RawResponseType<T> = T extends Date
  *     .toPromise();
  * }
  */
-export class ResponseHandler<T, R = undefined> {
-  private readonly handlers: { [status: number]: (body: T) => R | void } & Partial<{
-    [status in ResponseError | 'success' | 'error' | 'failure']: status extends 'success'
-      ? (body: T) => R | void
-      : () => R | void;
-  }> = {};
-  private readonly promise: Promise<R | void>;
-  public readonly abortController: AbortController;
+export class ResponseHandler<T, R extends ResponseHandlerExtendsType<T> = { fallback: HandlerNoParam<undefined> }> {
+  private readonly handlers = { fallback: () => undefined } as R;
+  private readonly promise: Promise<ReturnType<R[keyof R] extends (...args: any) => any ? R[keyof R] : never>>;
 
   constructor(rawResponse: Promise<APIResponse<T>>, abortController: AbortController) {
     this.abortController = abortController;
     this.promise = rawResponse.then((response) => {
-      if ('error' in response) {
-        return this.handlers[response.error]
-          ? this.handlers[response.error]!()
-          : this.handlers.failure
-            ? this.handlers.failure()
-            : undefined;
+      if ('failureReason' in response) {
+        if (this.handlers[response.failureReason]) {
+          return this.handlers[response.failureReason]!();
+        } else if (this.handlers.failure) {
+          return this.handlers.failure(response.failureReason);
+        } else {
+          return this.handlers.fallback();
+        }
+      } else if (isStatusSuccess(response.code)) {
+        if (response.code in this.handlers) {
+          return this.handlers[response.code]!(response.body as T);
+        } else if (this.handlers.success) {
+          return this.handlers.success(response.body as T);
+        } else {
+          return this.handlers.fallback();
+        }
+      } else {
+        if (response.code in this.handlers) {
+          return this.handlers[response.code]!((response.body as ApiError).error);
+        } else if (this.handlers.error) {
+          return this.handlers.error(response.code as StatusCodesError, (response.body as ApiError).error);
+        } else {
+          return this.handlers.fallback();
+        }
       }
-      if (response.code in this.handlers) {
-        return this.handlers[response.code](response.body);
-      }
-      if (response.code < 400) {
-        return 'success' in this.handlers ? this.handlers.success!(response.body) : undefined;
-      }
-      return 'error' in this.handlers ? this.handlers.error!() : undefined;
     });
   }
 
-  on<E, P extends number | ResponseError | 'success' | 'error' | 'failure'>(
-    statusCode: P,
-    handler: P extends number | 'success' ? (body: T) => E | void : () => E | void,
-  ): ResponseHandler<T, R | E> {
-    this.handlers[statusCode] = handler as (body?: T) => R | void;
-    return this;
+  /**
+   * @param statusCode number: Status code returned by the API
+   *                   success: Request returned a 200, 201, ...
+   *                   error: The API returned an error
+   *                   failure: An error occurred when making the request
+   * @param handler Callback
+   */
+  on<S extends keyof ResponseHandlerExtendsType<T>, H extends Exclude<ResponseHandlerExtendsType<T>[S], undefined>>(
+    statusCode: S,
+    handler: H,
+  ): ResponseHandler<
+    T,
+    {
+      [K in S | keyof R]: K extends S
+        ? VoidToUndefinedReturn<H> extends ResponseHandlerExtendsType<T>[K] // Typescript does not understand that VoidToUndefinedReturn<H> must match ResponseHandlerExtendsType<T>[K]
+          ? VoidToUndefinedReturn<H>
+          : never
+        : R[K];
+    }
+  > {
+    // @ts-expect-error TS2322 `handler` does not match generic `R` of `this`
+    this.handlers[statusCode] = handler;
+    return this as ResponseHandler<
+      T,
+      {
+        [K in S | keyof R]: K extends S
+          ? VoidToUndefinedReturn<H> extends ResponseHandlerExtendsType<T>[K]
+            ? VoidToUndefinedReturn<H>
+            : never
+          : R[K];
+      }
+    >;
   }
 
-  async toPromise(): Promise<null | R> {
-    return (await this.promise) ?? null;
+  async toPromise(): Promise<Awaited<ReturnType<R[keyof R] extends (...args: any) => any ? R[keyof R] : never>>> {
+    return await this.promise;
   }
 }
 
@@ -126,6 +184,7 @@ function formatResponse<T>(rawResponse: RawResponseType<T>): T {
  * @param body The body of the request.
  * @param timeoutMillis The timeout of the request.
  * @param version The version of the API to use : v1, v2, ...
+ * @param isFile If what we are sending/fetching is a file.
  */
 
 async function internalRequestAPI<RequestType>(
@@ -135,7 +194,7 @@ async function internalRequestAPI<RequestType>(
   timeoutMillis: number,
   version: string,
   isFile: true,
-  abortController: AbortController,
+  applicationId: string,
 ): Promise<APIResponse<Blob>>;
 async function internalRequestAPI<RequestType, ResponseType>(
   method: string,
@@ -144,7 +203,7 @@ async function internalRequestAPI<RequestType, ResponseType>(
   timeoutMillis: number,
   version: string,
   isFile: boolean,
-  abortController: AbortController,
+  applicationId: string,
 ): Promise<APIResponse<ResponseType>>;
 async function internalRequestAPI<RequestType, ResponseType>(
   method: string,
@@ -153,11 +212,12 @@ async function internalRequestAPI<RequestType, ResponseType>(
   timeoutMillis: number,
   version: string,
   isFile: boolean,
-  abortController: AbortController,
+  applicationId: string,
 ): Promise<APIResponse<ResponseType | Blob>> {
   // Generate headers
   const headers = new Headers();
   headers.append('Authorization', authorizationToken ? `Bearer ${authorizationToken}` : '');
+  headers.append('X-Application', applicationId);
   if (!isFile) headers.append('Content-Type', 'application/json');
 
   // Add timeout to the request
@@ -187,7 +247,8 @@ async function internalRequestAPI<RequestType, ResponseType>(
       return { code: response.status, body: null as ResponseType };
     }
     if (isFile && method === 'GET') return { code: response.status, body: await response.blob() };
-    if (!response.headers.get('content-type')?.includes('application/json')) return { error: ResponseError.not_json };
+    if (!response.headers.get('content-type')?.includes('application/json'))
+      return { failureReason: ResponseFailureReason.not_json };
 
     try {
       const res: RawResponseType<ResponseType> = await response.json();
@@ -195,14 +256,14 @@ async function internalRequestAPI<RequestType, ResponseType>(
     } catch (error) {
       // BROOO, who makes APIs that return headers with Content-Type: application/json without a json body :(
       // (Ok, in theory none, but it's better to be safe than sorry)
-      return { error: ResponseError.not_json };
+      return { failureReason: ResponseFailureReason.not_json };
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     if (error === 'query-update') return { error: ResponseError.aborted };
     if (error instanceof Error && error.name === 'AbortError') {
       console.error('Request timed out');
-      return { error: ResponseError.timeout };
+      return { failureReason: ResponseFailureReason.timeout };
     }
     if (error.message?.startsWith('Network Error') || error.code === 'ECONNABORTED') {
       console.error('Cannot connect to server');
@@ -210,7 +271,7 @@ async function internalRequestAPI<RequestType, ResponseType>(
       console.error('An error occurred when making a request to the API');
     }
 
-    return { error: ResponseError.unknown };
+    return { failureReason: ResponseFailureReason.unknown };
   } finally {
     // If the request hasn't timed out, cancel timeout
     if (!abortController.signal.aborted) clearTimeout(timeout);
@@ -222,20 +283,22 @@ async function internalRequestAPI<RequestType, ResponseType>(
  * @param method The HTTP method to use.
  * @param route The route to call.
  * @param body The body of the request. Defaults to `null`.
- * @param timeoutMillis The timeout of the request, in milliseconds. Defaults to 10000 milliseconds (10 seconds).
- * @param version The version of the API to use : v1, v2, ... Defaults to the environment variable `NEXT_PUBLIC_API_VERSION`.
+ * @param params * timeoutMillis: The timeout of the request, in milliseconds. Defaults to 10000 milliseconds (10 seconds).
+ *               * version: The version of the API to use : v1, v2, ... Defaults to the environment variable `NEXT_PUBLIC_API_VERSION`.
+ *               * isFile Set it to true if you are sending a file.
+ *               * applicationId Set its value if you are not using the default application to make the request.
  */
 function requestAPI<RequestType>(
   method: 'GET',
   route: string,
   body: RequestType | null,
-  params: { timeoutMillis?: number; version?: string; isFile: true },
+  params: { timeoutMillis?: number; version?: string; isFile: true; applicationId?: string },
 ): ResponseHandler<Blob>;
 function requestAPI<RequestType, ResponseType>(
   method: string,
   route: string,
   body: RequestType | null,
-  params: { timeoutMillis?: number; version?: string; isFile?: boolean },
+  params: { timeoutMillis?: number; version?: string; isFile?: boolean; applicationId?: string },
 ): ResponseHandler<ResponseType>;
 function requestAPI<RequestType, ResponseType>(
   method: string,
@@ -245,13 +308,10 @@ function requestAPI<RequestType, ResponseType>(
     timeoutMillis = apiTimeout,
     version = apiVersion,
     isFile = false,
-  }: { timeoutMillis?: number; version?: string; isFile?: boolean } = {},
+    applicationId = etuuttWebApplicationId,
+  }: { timeoutMillis?: number; version?: string; isFile?: boolean; applicationId?: string } = {},
 ): ResponseHandler<ResponseType> {
-  const abortController = new AbortController();
-  return new ResponseHandler(
-    internalRequestAPI(method, route, body, timeoutMillis, version, isFile, abortController),
-    abortController,
-  );
+  return new ResponseHandler(internalRequestAPI(method, route, body, timeoutMillis, version, isFile, applicationId));
 }
 
 // Set the authorization header with the given token for next requests
@@ -266,65 +326,89 @@ export const setAuthorizationToken = (token: string) => {
  */
 // TODO : wellll, implement that page settings thingy once it's merged.
 export function useAPI(): API {
+  const setNotFound = useNotFound();
   return {
+    getFile: (route: string, options: { timeoutMillis?: number; version?: string; applicationId?: string } = {}) =>
+      applyDefaultHandler(requestAPI<never, Blob>('GET', route, null, { ...options, isFile: true }), setNotFound),
     get: <ResponseType = never>(
       route: string,
-      options: { timeoutMillis?: number; version?: string; isFile?: boolean } = {},
-    ) => applyDefaultHandler(requestAPI<never, ResponseType>('GET', route, null, options)),
+      options: { timeoutMillis?: number; version?: string; applicationId?: string } = {},
+    ) =>
+      applyDefaultHandler(
+        requestAPI<never, ResponseType>('GET', route, null, { ...options, isFile: false }),
+        setNotFound,
+      ),
     post: <RequestType, ResponseType = never>(
       route: string,
       body = {} as RequestType,
-      options: { version?: string; isFile?: boolean } = {},
-    ) => applyDefaultHandler(requestAPI<RequestType, ResponseType>('POST', route, body, options)),
+      options: { version?: string; isFile?: boolean; applicationId?: string } = {},
+    ) => applyDefaultHandler(requestAPI<RequestType, ResponseType>('POST', route, body, options), setNotFound),
     put: <RequestType, ResponseType = never>(
       route: string,
       body = {} as RequestType,
-      options: { version?: string; isFile?: boolean } = {},
-    ) => applyDefaultHandler(requestAPI<RequestType, ResponseType>('PUT', route, body, options)),
+      options: { version?: string; isFile?: boolean; applicationId?: string } = {},
+    ) => applyDefaultHandler(requestAPI<RequestType, ResponseType>('PUT', route, body, options), setNotFound),
     patch: <RequestType, ResponseType = never>(
       route: string,
       body = {} as RequestType,
       options: { version?: string; isFile?: boolean } = {},
-    ) => applyDefaultHandler(requestAPI<RequestType, ResponseType>('PATCH', route, body, options)),
+    ) => applyDefaultHandler(requestAPI<RequestType, ResponseType>('PATCH', route, body, options), setNotFound),
     delete: <ResponseType = never>(route: string, options: { version?: string } = {}) =>
-      applyDefaultHandler(requestAPI<never, ResponseType>('DELETE', route, null, options)),
+      applyDefaultHandler(requestAPI<never, ResponseType>('DELETE', route, null, options), setNotFound),
   };
 }
 
 export interface API {
-  get(route: string, options: { timeoutMillis?: number; version?: string; isFile: true }): ResponseHandler<Blob>;
+  getFile(
+    route: string,
+    options?: { timeoutMillis?: number; version?: string; applicationId?: string },
+  ): DefaultResponseHandlerType<Blob>;
   get<ResponseType = never>(
     route: string,
-    options?: { timeoutMillis?: number; version?: string; isFile?: boolean },
-  ): ResponseHandler<ResponseType, ResponseType | void | undefined>;
+    options?: { timeoutMillis?: number; version?: string; applicationId?: string },
+  ): DefaultResponseHandlerType<ResponseType>;
   post<RequestType, ResponseType = never>(
     route: string,
     body?: RequestType,
-    options?: { version?: string; isFile?: boolean },
-  ): ResponseHandler<ResponseType, ResponseType | void | undefined>;
+    options?: { version?: string; isFile?: boolean; applicationId?: string },
+  ): DefaultResponseHandlerType<ResponseType>;
   put<RequestType, ResponseType = never>(
     route: string,
     body?: RequestType,
     options?: { version?: string; isFile?: boolean },
-  ): ResponseHandler<ResponseType, ResponseType | void | undefined>;
+  ): DefaultResponseHandlerType<ResponseType>;
   patch: <RequestType, ResponseType = never>(
     route: string,
     body?: RequestType,
     options?: { version?: string; isFile?: boolean },
-  ) => ResponseHandler<ResponseType, ResponseType | void | undefined>;
-  delete<ResponseType = never>(
-    route: string,
-    options?: { version?: string },
-  ): ResponseHandler<ResponseType, ResponseType | void | undefined>;
+  ) => DefaultResponseHandlerType<ResponseType>;
+  delete<ResponseType = never>(route: string, options?: { version?: string }): DefaultResponseHandlerType<ResponseType>;
 }
 
 /**
  * Apply the default handler to a response handler.
  * @param handler The response handler we need to apply the default handler to.
+ * @param setNotFound A function that can be called to set the current route as "not found".
  */
-function applyDefaultHandler<T>(handler: ResponseHandler<T>) {
+function applyDefaultHandler<T>(handler: ResponseHandler<T>, setNotFound: () => void): DefaultResponseHandlerType<T> {
   return handler
     .on('success', (body) => body)
-    .on('failure', () => console.log('Failed to make request'))
-    .on('error', () => console.log('Error !'));
+    .on('failure', () => {
+      toast.error('Could not connect to the API');
+    })
+    .on('error', () => {
+      toast.error('Request resulted in an error');
+    })
+    .on(404, setNotFound);
 }
+
+type DefaultResponseHandlerType<T> = ResponseHandler<
+  T,
+  {
+    fallback: HandlerNoParam<undefined>;
+    success: HandlerBody<T, T>;
+    failure: HandlerFailureReason<undefined>;
+    error: HandlerCodeAndError<undefined>;
+    404: HandlerError<undefined>;
+  }
+>;

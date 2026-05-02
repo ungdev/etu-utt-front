@@ -19,7 +19,7 @@ export const constantDataSlice = createSlice({
   name: 'session',
   reducers: {
     setCriteria: (state, action: PayloadAction<UERateCriterion[] | null>) => {
-      return { ...state, items: action.payload };
+      return { ...state, ueRateCriteria: action.payload };
     },
     setBranches: (state, action: PayloadAction<Branch[] | null>) => {
       return { ...state, branches: action.payload };
@@ -39,7 +39,11 @@ export function useUERateCriteria(): UERateCriterion[] | null {
   const api = useAPI();
   useEffect(() => {
     if (ueRateCriteria === null) {
-      fetchUERateCriteria(api).then((criteria) => criteria && dispatch(setCriteria(criteria)));
+      fetchUERateCriteria(api).then((criteria) => {
+        if (criteria) {
+          dispatch(setCriteria(criteria));
+        }
+      });
     }
   }, []);
   return ueRateCriteria;

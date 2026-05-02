@@ -1,8 +1,8 @@
 'use client';
 import styles from './DailyTimetableWidget.module.scss';
 import { useEffect, useState } from 'react';
-import { GetDailyTimetableResponseDto, TimetableEvent } from '@/api/users/getDailyTimetable';
-import { useAPI } from '@/api/api';
+import { /*GetDailyTimetableResponseDto,*/ TimetableEvent } from '@/api/users/getDailyTimetable';
+// import { useAPI } from '@/api/api';
 import { format } from 'date-fns';
 import * as locale from 'date-fns/locale';
 import Icons from '@/icons';
@@ -20,7 +20,7 @@ export default function DailyTimetableWidget() {
   const [timetable, setTimetable] = useState([] as TimetableEvent[]);
   const [selectedDate, setSelectedDate] = useState(new Date(0));
   const [columnsCount, setColumnsCount] = useState(0);
-  const api = useAPI();
+  // const api = useAPI();
   const { t } = useAppTranslation();
 
   useEffect(() => {
@@ -37,7 +37,7 @@ export default function DailyTimetableWidget() {
    */
   useEffect(() => {
     if (selectedDate.getTime() === 0) return;
-    api
+    /*api
       .get<GetDailyTimetableResponseDto>(
         `/timetable/current/daily/${selectedDate.getDate()}/${selectedDate.getMonth() + 1}/${selectedDate.getFullYear()}`,
       )
@@ -45,7 +45,10 @@ export default function DailyTimetableWidget() {
         const columnsCount = formatTimetable(body);
         setTimetable(body);
         setColumnsCount(columnsCount);
-      });
+      });*/
+    const columnsCount = formatTimetable([]);
+    setTimetable([]);
+    setColumnsCount(columnsCount);
   }, [selectedDate]);
 
   /**
