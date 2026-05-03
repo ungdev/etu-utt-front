@@ -1,10 +1,10 @@
 export interface CasLoginRequestDto {
   ticket: string;
-  service: string;
+  tokenExpiresIn: number;
 }
 
 export interface CasLoginResponseDto {
   status: 'no_account' | 'no_api_key' | 'ok';
-  token: string;
+  token: string | null;
   redirectUrl: string | null;
 }

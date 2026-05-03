@@ -1,15 +1,16 @@
 'use client';
 
-import styles from './AuthForm.module.scss';
-import { useState } from 'react';
-import { useAppDispatch } from '@/lib/hooks';
+import { useAPI } from '@/api/api';
+import Button from '@/components/UI/Button';
 import Input from '@/components/UI/Input';
 import Link from '@/components/UI/Link';
-import Button from '@/components/UI/Button';
-import * as sessionModule from '@/module/session';
-import { useAPI } from '@/api/api';
-import { useAppTranslation } from '@/lib/i18n';
 import Icons from '@/icons';
+import { useAppDispatch } from '@/lib/hooks';
+import { useAppTranslation } from '@/lib/i18n';
+import * as sessionModule from '@/module/session';
+import { getCasServiceUrl } from '@/utils/environment';
+import { useState } from 'react';
+import styles from './AuthForm.module.scss';
 
 export default function RegisterForm() {
   const dispatch = useAppDispatch();
@@ -33,7 +34,7 @@ export default function RegisterForm() {
       </div>
       <a
         href={`https://cas.utt.fr/cas/login?${new URLSearchParams({
-          service: process.env.NEXT_PUBLIC_CAS_SERVICE!,
+          service: getCasServiceUrl(),
         }).toString()}`}
         className={styles.cas}>
         <Icons.LogoUTT />

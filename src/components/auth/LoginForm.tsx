@@ -1,16 +1,17 @@
 'use client';
 
-import styles from './AuthForm.module.scss';
-import { useState } from 'react';
-import * as sessionModule from '@/module/session';
-import { useAppDispatch } from '@/lib/hooks';
-import Input from '@/components/UI/Input';
-import Button from '@/components/UI/Button';
-import Link from '@/components/UI/Link';
 import { useAPI } from '@/api/api';
-import { useAppTranslation } from '@/lib/i18n';
+import Button from '@/components/UI/Button';
+import Input from '@/components/UI/Input';
+import Link from '@/components/UI/Link';
 import Icons from '@/icons';
+import { useAppDispatch } from '@/lib/hooks';
+import { useAppTranslation } from '@/lib/i18n';
+import * as sessionModule from '@/module/session';
+import { etuuttWebApplicationId, getCasServiceUrl } from '@/utils/environment';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import styles from './AuthForm.module.scss';
 
 export default function LoginForm({ application }: { application: string | undefined }) {
   const dispatch = useAppDispatch();
@@ -23,11 +24,18 @@ export default function LoginForm({ application }: { application: string | undef
   const submit = async () => {
     const res = await dispatch(sessionModule.login(api, username, password, application));
     if (!res) return;
-    if (!res.signedIn)
+    if (!res.signedIn) {
       router.push(
-        `/login/external/create?${new URLSearchParams({ token: res.token, application: application! }).toString()}`,
+        `/login/external/create?${new URLSearchParams({
+          token: res.token,
+          application: application ?? etuuttWebApplicationId,
+        }).toString()}`,
       );
-    if (res.redirectUrl) router.push(res.redirectUrl);
+      return;
+    }
+    if (res.redirectUrl) {
+      router.push(res.redirectUrl);
+    }
   };
   const connectionText = t('login:login.connection');
 
@@ -40,7 +48,7 @@ export default function LoginForm({ application }: { application: string | undef
       </div>
       <a
         href={`https://cas.utt.fr/cas/login?${new URLSearchParams({
-          service: process.env.NEXT_PUBLIC_CAS_SERVICE!,
+          service: getCasServiceUrl(application),
         }).toString()}`}
         className={styles.cas}>
         <Icons.LogoUTT />

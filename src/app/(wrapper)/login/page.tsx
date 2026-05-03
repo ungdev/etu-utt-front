@@ -1,20 +1,20 @@
 'use client';
-import styles from './style.module.scss';
-import LoginForm from '@/components/auth/LoginForm';
-import { useRouter } from 'next/navigation';
-import { CasLoginRequestDto, CasLoginResponseDto } from '@/api/auth/casLogin';
-import { setToken } from '@/module/session';
-import { useAppDispatch } from '@/lib/hooks';
-import { useEffect, useState } from 'react';
-import { usePageLoaded, useSearchParam } from '@/module/pageSettings';
-import Button from '@/components/UI/Button';
-import { RegisterResponseDto } from '@/api/auth/register';
-import { CasRegisterRequestDto } from '@/api/auth/casRegister';
 import { useAPI } from '@/api/api';
-import { useAppTranslation } from '@/lib/i18n';
-import { Trans } from 'react-i18next';
-import { etuuttWebApplicationId } from '@/utils/environment';
+import { CasLoginRequestDto, CasLoginResponseDto } from '@/api/auth/casLogin';
+import { CasRegisterRequestDto } from '@/api/auth/casRegister';
+import { RegisterResponseDto } from '@/api/auth/register';
+import LoginForm from '@/components/auth/LoginForm';
+import Button from '@/components/UI/Button';
 import Page from '@/components/utilities/Page';
+import { useAppDispatch } from '@/lib/hooks';
+import { useAppTranslation } from '@/lib/i18n';
+import { usePageLoaded, useSearchParam } from '@/module/pageSettings';
+import { setToken } from '@/module/session';
+import { etuuttWebApplicationId } from '@/utils/environment';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { Trans } from 'react-i18next';
+import styles from './style.module.scss';
 
 export default function LoginPage() {
   const { internallyLoaded, markPageLoaded } = usePageLoaded();
@@ -37,14 +37,29 @@ export default function LoginPage() {
     api
       .post<CasLoginRequestDto, CasLoginResponseDto>('auth/signin/cas', {
         ticket: ticket,
-        service: process.env.NEXT_PUBLIC_CAS_SERVICE!,
+        tokenExpiresIn: 3600,
       })
       .on('success', (body) => {
-        if (body.status === 'no_api_key') {
+        if (body.status === 'no_account') {
+          if (!body.token) return;
           setRegisterToken(body.token);
-          router.replace('/login');
           return;
         }
+        if (body.status === 'no_api_key') {
+          if (!body.token) return;
+          router.push(
+            `/login/external/create?${new URLSearchParams({
+              token: body.token,
+              application: application ?? etuuttWebApplicationId,
+            }).toString()}`,
+          );
+          return;
+        }
+        if (body.redirectUrl) {
+          window.location.assign(body.redirectUrl);
+          return;
+        }
+        if (!body.token) return;
         dispatch(setToken(body.token, api));
         router.push('/');
       });
