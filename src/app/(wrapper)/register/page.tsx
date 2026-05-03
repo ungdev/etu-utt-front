@@ -6,7 +6,7 @@ import { notFound } from 'next/navigation';
 import { isDevEnv } from '@/utils/environment';
 
 export default function RegisterPage() {
-  if (!isDevEnv() || true) {
+  if (!isDevEnv()) {
     return notFound();
   }
 
