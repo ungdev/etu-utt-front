@@ -1,19 +1,15 @@
 'use client';
 import { useAPI } from '@/api/api';
 import { CasLoginRequestDto, CasLoginResponseDto } from '@/api/auth/casLogin';
-import { CasRegisterRequestDto } from '@/api/auth/casRegister';
-import { RegisterResponseDto } from '@/api/auth/register';
 import LoginForm from '@/components/auth/LoginForm';
-import Button from '@/components/UI/Button';
+import LegalsForm from '@/components/auth/LegalsForm';
 import Page from '@/components/utilities/Page';
 import { useAppDispatch } from '@/lib/hooks';
-import { useAppTranslation } from '@/lib/i18n';
 import { usePageLoaded, useSearchParam } from '@/module/pageSettings';
 import { setToken } from '@/module/session';
 import { etuuttWebApplicationId } from '@/utils/environment';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { Trans } from 'react-i18next';
 import styles from './style.module.scss';
 
 export default function LoginPage() {
@@ -22,7 +18,6 @@ export default function LoginPage() {
   const application = useSearchParam('application');
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const { t } = useAppTranslation();
   const [registerToken, setRegisterToken] = useState<string | null>(null);
   const [validatedToken, setValidatedToken] = useState(false);
   const api = useAPI();
@@ -35,7 +30,7 @@ export default function LoginPage() {
     if (!ticket || validatedToken) return;
     setValidatedToken(true);
     api
-      .post<CasLoginRequestDto, CasLoginResponseDto>('auth/signin/cas', {
+      .post<CasLoginRequestDto, CasLoginResponseDto>('auth/signin', {
         ticket: ticket,
         tokenExpiresIn: 3600,
       })
@@ -69,48 +64,21 @@ export default function LoginPage() {
       markPageLoaded();
     }
   }, [internallyLoaded]);
-  if (ticket && !registerToken) {
-    return null;
-  }
   if (registerToken) {
     return (
-      <Page hasNavbar={true} needsLoading={true} className={styles.confirmRegister}>
-        <div>
-          <Trans
-            i18nKey={'login:legal.text'}
-            components={{
-              toLegal: <a href="/legal" />,
-            }}
-          />
-        </div>
-        <div className={styles.options}>
-          <Button
-            className={styles.acceptButton}
-            onClick={() =>
-              api
-                .post<CasRegisterRequestDto, RegisterResponseDto>('auth/signup/cas', {
-                  registerToken,
-                })
-                .on('success', (body) => {
-                  dispatch(setToken(body.token, api));
-                  router.push('/');
-                })
-            }>
-            {t('login:cgu.button')}
-          </Button>
-          <Button
-            onClick={() => {
-              router.push('/');
-            }}>
-            {t('login:legal.dontConnect')}
-          </Button>
-        </div>
+      <Page
+        hasNavbar={true}
+        needsLoading={true}
+        id="register-page"
+        className={styles.loginPage}
+        noWrapperPadding={true}>
+        <LegalsForm registerToken={registerToken} />
       </Page>
     );
   }
 
   return (
-    <Page hasNavbar={true} needsLoading={true} id="login-page" className={styles.loginPage}>
+    <Page hasNavbar={true} needsLoading={true} id="login-page" className={styles.loginPage} noWrapperPadding={true}>
       <LoginForm application={application} />
     </Page>
   );

@@ -5,7 +5,7 @@ import Page from '@/components/utilities/Page';
 
 export default function RegisterPage() {
   return (
-    <Page hasNavbar={false} id="register-page" className={styles.loginPage}>
+    <Page hasNavbar={true} id="register-page" className={styles.loginPage} noWrapperPadding={true}>
       <RegisterForm />
     </Page>
   );
