@@ -7,7 +7,7 @@ import Page from '@/components/utilities/Page';
 import { useAppDispatch } from '@/lib/hooks';
 import { usePageLoaded, useSearchParam } from '@/module/pageSettings';
 import { setToken } from '@/module/session';
-import { etuuttWebApplicationId } from '@/utils/environment';
+import { etuuttWebApplicationId, authorizationTokenExpiresIn } from '@/utils/environment';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import styles from './style.module.scss';
@@ -32,16 +32,14 @@ export default function LoginPage() {
     api
       .post<CasLoginRequestDto, CasLoginResponseDto>('auth/signin', {
         ticket: ticket,
-        tokenExpiresIn: 3600,
+        tokenExpiresIn: authorizationTokenExpiresIn(),
       })
       .on('success', (body) => {
         if (body.status === 'no_account') {
-          if (!body.token) return;
           setRegisterToken(body.token);
           return;
         }
         if (body.status === 'no_api_key') {
-          if (!body.token) return;
           router.push(
             `/login/external/create?${new URLSearchParams({
               token: body.token,
@@ -50,11 +48,10 @@ export default function LoginPage() {
           );
           return;
         }
-        if (body.redirectUrl) {
+        if (body.token === null) {
           window.location.assign(body.redirectUrl);
           return;
         }
-        if (!body.token) return;
         dispatch(setToken(body.token, api));
         router.push('/');
       });
