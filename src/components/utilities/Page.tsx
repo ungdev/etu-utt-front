@@ -11,6 +11,7 @@ export type PageProps = {
   needsLoading?: boolean;
   className?: string;
   id?: string;
+  noWrapperPadding?: boolean;
 };
 
 export default function Page({
@@ -21,6 +22,7 @@ export default function Page({
   className,
   id,
   children,
+  noWrapperPadding = false,
 }: PageProps & {
   children: ReactNode;
 }) {
@@ -38,9 +40,10 @@ export default function Page({
         hasNavbar,
         permissions,
         needsLoading,
+        noWrapperPadding,
       }),
     );
-  }, [hasNavbar, needsLoading]);
+  }, [hasNavbar, needsLoading, noWrapperPadding]);
   return (
     <div id={id} className={className}>
       {children}

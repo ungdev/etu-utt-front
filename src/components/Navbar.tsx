@@ -12,6 +12,7 @@ import Button from './UI/Button';
 import { usePageSettings } from '@/module/pageSettings';
 import { usePathname, useRouter } from 'next/navigation';
 import { LocalStorageNames } from '@/global';
+import { isDevEnv } from '@/utils/environment';
 
 /**
  * The type defining all possible properties for a menu item
@@ -232,7 +233,7 @@ export default function Navbar() {
             </Link>
             <div className={`${styles.buttons}`}>
               <Button onClick={() => router.push('/login')}>Connexion</Button>
-              <Button onClick={() => router.push('/register')}>Inscription</Button>
+              {isDevEnv() && <Button onClick={() => router.push('/register')}>Inscription</Button>}
             </div>
           </div>
         )}

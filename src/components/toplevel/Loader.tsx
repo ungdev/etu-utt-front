@@ -6,11 +6,11 @@ export default function Loader() {
   return (
     <div className={styles.loader}>
       <Icons.LogoEtu className={styles.icon} />
-      {isDevEnv() ? (
+      {isDevEnv() && (
         <p>
           <strong>DevNote:</strong> Make sure the page is surrounded with the Page component
         </p>
-      ) : null}
+      )}
     </div>
   );
 }

@@ -15,6 +15,7 @@ interface PageSettingsSlice {
     permissionsVerified: boolean;
     settingsLoaded: boolean;
   };
+  noWrapperPadding?: boolean;
 }
 
 export const enum PagePermission {
