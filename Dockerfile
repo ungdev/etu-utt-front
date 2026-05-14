@@ -20,16 +20,17 @@ RUN apk add --upgrade --no-cache vips-dev build-base
 
 COPY --chown=node:node package.json pnpm-lock.yaml ./
 
-RUN npm i -g pnpm && pnpm install --frozen-lockfile --prod=false --allow-scripts=sharp
+RUN npm i -g pnpm@10 && pnpm install --frozen-lockfile --prod=false --ignore-scripts=false
 
 COPY --chown=node:node . .
 
 RUN pnpm next build
 
-ENV NODE_ENV production
+ENV NODE_ENV=production
+ENV CI=true
 
 RUN pnpm install -P
 
 USER node
 
-CMD pnpm next start -p 8080
+CMD ["pnpm", "next", "start", "-p", "8080"]
