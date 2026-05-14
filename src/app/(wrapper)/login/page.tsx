@@ -52,21 +52,6 @@ export default function LoginPage() {
           window.location.assign(body.redirectUrl);
           return;
         }
-        if (body.status === 'no_api_key') {
-          if (!body.token) return;
-          router.push(
-            `/login/external/create?${new URLSearchParams({
-              token: body.token,
-              application: application ?? etuuttWebApplicationId,
-            }).toString()}`,
-          );
-          return;
-        }
-        if (body.redirectUrl) {
-          window.location.assign(body.redirectUrl);
-          return;
-        }
-        if (!body.token) return;
         dispatch(setToken(body.token, api));
         router.push('/');
       });
