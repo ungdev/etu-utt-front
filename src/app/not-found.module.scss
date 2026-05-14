@@ -16,44 +16,44 @@
   display: grid;
   gap: 16px;
   text-align: center;
-}
 
-.code {
-  font-size: 0.85rem;
-  letter-spacing: 0.28em;
-  text-transform: uppercase;
-  color: #2d8fce;
-  font-weight: 700;
-}
+  .code {
+    font-size: 0.85rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: #2d8fce;
+    font-weight: 700;
+  }
 
-.title {
-  font-size: clamp(2rem, 5vw, 3.4rem);
-  line-height: 1.05;
-  color: #2e3442;
-}
+  .title {
+    font-size: clamp(2rem, 5vw, 3.4rem);
+    line-height: 1.05;
+    color: #2e3442;
+  }
 
-.description {
-  font-size: 1rem;
-  line-height: 1.6;
-  color: #444c5f;
-}
+  .description {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #444c5f;
+  }
 
-.homeLink {
-  justify-self: center;
-  margin-top: 10px;
-  padding: 10px 16px;
-  border-radius: 8px;
-  background: #2d8fce;
-  color: white;
-  font-weight: 600;
-  transition:
-    transform 160ms ease,
-    box-shadow 160ms ease,
-    background-color 160ms ease;
-  box-shadow: 0 10px 18px rgba(45, 143, 206, 0.24);
-}
+  .homeLink {
+    justify-self: center;
+    margin-top: 10px;
+    padding: 10px 16px;
+    border-radius: 8px;
+    background: #2d8fce;
+    color: white;
+    font-weight: 600;
+    transition:
+      transform 160ms ease,
+      box-shadow 160ms ease,
+      background-color 160ms ease;
+    box-shadow: 0 10px 18px rgba(45, 143, 206, 0.24);
 
-.homeLink:hover {
-  transform: translateY(-1px);
-  background: #2478ad;
+    &:hover {
+      transform: translateY(-1px);
+      background: #2478ad;
+    }
+  }
 }
