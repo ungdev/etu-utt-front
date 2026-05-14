@@ -20,7 +20,7 @@ RUN apk add --upgrade --no-cache vips-dev build-base
 
 COPY --chown=node:node package.json pnpm-lock.yaml ./
 
-RUN npm i -g pnpm && pnpm install --frozen-lockfile --prod=false
+RUN npm i -g pnpm && pnpm install --frozen-lockfile --prod=false --allow-scripts=sharp
 
 COPY --chown=node:node . .
 
