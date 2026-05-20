@@ -1,4 +1,5 @@
 'use client';
+import styles from './style.module.scss';
 import { Branch } from '@/api/branch/branch.interface';
 import { CreditCategory } from '@/api/credit/credit.interface';
 import { useUEs } from '@/api/ue/search';
@@ -12,7 +13,6 @@ import Icons from '@/icons';
 import { useAppTranslation } from '@/lib/i18n';
 import { useBranches, useCreditCategories } from '@/module/constantData';
 import { useMemo } from 'react';
-import styles from './style.module.scss';
 
 /**
  * The different filters that exist.
@@ -115,7 +115,9 @@ export default function UesPage() {
                       <div className={styles.credits}>
                         <span className={styles.label}>{t('ues:overview.credits')}</span>
                         {item?.credits
-                          ?.sort((a, b) => a.category.name > b.category.name)
+                          ?.sort((a, b) =>
+                            a.category.name > b.category.name ? 1 : a.category.name < b.category.name ? -1 : 0,
+                          )
                           .map((credit, i) => (
                             <div key={`${credit.category.code}-${i}`}>
                               {credit.credits}
@@ -129,9 +131,7 @@ export default function UesPage() {
                       </div>
                       <div className={styles.languages}>
                         <span className={[styles.taughtIn, styles.label].join(' ')}>{t('ues:overview.taughtIn')}</span>
-                        {item?.info.languages.map((language) => (
-                          <span key={language}>{language}</span>
-                        ))}
+                        {item?.info.languages.map((language) => <span key={language}>{language}</span>)}
                       </div>
                     </div>
                     <div className={styles.sideData}>
@@ -140,9 +140,7 @@ export default function UesPage() {
                           <span className={[styles.label, styles.categoryLabel].join(' ')}>
                             {t('ues:overview.minors')}
                           </span>
-                          {item?.info.minors.map((minor) => (
-                            <span key={minor}>{minor}</span>
-                          ))}
+                          {item?.info.minors.map((minor) => <span key={minor}>{minor}</span>)}
                         </div>
                       ) : (
                         ''

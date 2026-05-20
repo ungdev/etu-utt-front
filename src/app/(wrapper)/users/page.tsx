@@ -42,13 +42,23 @@ const filtersData = Object.freeze({
 } satisfies FiltersDataType<FilterNames, FiltersType>);
 
 export default function SearchUserPage() {
-  const { items: users, total: totalUsers, updateFilters: updateUsers, fetchNextItems: fetchNextPage } = useUsers();
+  const {
+    items: users,
+    total: totalUsers,
+    updateFilters: updateUsers,
+    fetchNextItems: fetchNextPage,
+    invalidateItems,
+  } = useUsers();
   const { t } = useAppTranslation();
   return (
     <Page className={styles.searchUserPage} permissions={[PagePermission.CONNECTED]}>
       <h1>{t('users:search.title')}</h1>
       <div className={styles.content}>
-        <FilteredSearch<FilterNames, FiltersType> filtersData={filtersData} updateSearch={updateUsers} />
+        <FilteredSearch<FilterNames, FiltersType>
+          filtersData={filtersData}
+          updateSearch={updateUsers}
+          invalidateItems={invalidateItems}
+        />
         <div className={styles.results}>
           <ResultsList
             data={users}

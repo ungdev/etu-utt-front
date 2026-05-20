@@ -10,5 +10,6 @@ export default function updateApplicationToken(api: API, applicationId: string):
       expiresIn: 1000,
     })
     .on('success', (body) => body.token)
-    .toPromise();
+    .toPromise()
+    .then((result) => result ?? null);
 }

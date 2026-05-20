@@ -1,24 +1,24 @@
 'use client';
 
-import { useAPI } from '@/api/api';
-import { useUEComment } from '@/api/comment/getComment';
-import { editCommentReply } from '@/api/commentReply/editCommentReply';
-import { sendCommentReply } from '@/api/commentReply/sendCommentReply';
-import useUe from '@/api/ue/fetchUe';
 import styles from '@/app/(wrapper)/ues/[code]/comments/[commentId]/style.module.scss';
-import EditableText from '@/components/EditableText';
-import Button from '@/components/UI/Button';
-import Link from '@/components/UI/Link';
+import { useUEComment } from '@/api/comment/getComment';
+import useUe from '@/api/ue/fetchUe';
+import { TFunction, useAppTranslation } from '@/lib/i18n';
 import TextArea from '@/components/UI/TextArea';
+import Button from '@/components/UI/Button';
+import { useState } from 'react';
+import { useConnectedUser } from '@/module/session';
+import EditableText from '@/components/EditableText';
+import { editCommentReply } from '@/api/commentReply/editCommentReply';
+import { useAPI } from '@/api/api';
+import { sendCommentReply } from '@/api/commentReply/sendCommentReply';
+import Link from '@/components/UI/Link';
 import Page from '@/components/utilities/Page';
 import Clock from '@/icons/Clock';
 import Comment from '@/icons/Comment';
 import Enter from '@/icons/Enter';
 import User from '@/icons/User';
-import { TFunction, useAppTranslation } from '@/lib/i18n';
-import { useConnectedUser } from '@/module/session';
 import { useParams } from 'next/navigation';
-import { useState } from 'react';
 
 function CommentEditorFooter(originalComment: string, onUpdate: (text: string) => void, t: TFunction) {
   return function CommentEditorFooter({ text, disable }: { text: string; disable: () => void }) {
@@ -50,9 +50,19 @@ export default function CommentDetailsPage() {
   return (
     <Page className={styles.page}>
       <h1>
-        {t('ues:detailed.comments.resume', {
-          ue: ue.code,
-        })}
+        {comment.isAnonymous
+          ? t('ues:detailed.comments.summary.anonymous', {
+              ue: ue.code,
+              semester: comment.semester.code,
+              date: comment.createdAt.toLocaleDateString(),
+            })
+          : t('ues:detailed.comments.summary', {
+              authorFirstName: comment.author.firstName,
+              authorLastName: comment.author.lastName,
+              ue: ue.code,
+              semester: comment.semester.code,
+              date: comment.createdAt.toLocaleDateString(),
+            })}
       </h1>
       <div className={styles.meta}>
         {!comment.isAnonymous && (
@@ -119,12 +129,12 @@ export default function CommentDetailsPage() {
           </div>
         ))}
       </div>
-      <h2 className={styles.answerTitle}>{t('ues:detailed.comments.answers.answerTitle')}</h2>
+      <h2 className={styles.answerTitle}>{t('ues:detailed.comments.answers.title')}</h2>
       <TextArea
         className={styles.input}
         onChange={setAnswer}
         value={answer}
-        placeholder={t('ues:detailed.comments.answers.answerEntry')}
+        placeholder={t('ues:detailed.comments.answers.placeholder')}
       />
       <div className={styles.buttonWrapper}>
         <Button
@@ -135,7 +145,7 @@ export default function CommentDetailsPage() {
               setAnswer('');
             })
           }>
-          {t('ues:detailed.comments.answers.answerButton')}
+          {t('ues:detailed.comments.answers.send')}
         </Button>
       </div>
     </Page>

@@ -1,36 +1,36 @@
 'use client';
 
+import styles from './style.module.scss';
+import { useParams } from 'next/navigation';
 import useAnnals from '@/api/annals/fetchAnnals';
 import useAnnalMetadata from '@/api/annals/fetchMetadata';
 import { useAPI } from '@/api/api';
-import sendComment from '@/api/comment/sendComment';
+import { sendComment } from '@/api/comment/sendComment';
 import useUe from '@/api/ue/fetchUe';
+import Comments, { useCommentsCommuniquer } from '@/app/(wrapper)/ues/[code]/Comments';
+import { useAppTranslation } from '@/lib/i18n';
+import { useUERateCriteria } from '@/module/constantData';
+import { UERateCriterion } from '@/api/ueRate/ueRateCriterion.interface';
+import Button from '@/components/UI/Button';
+import useGetRate from '@/api/ueRate/getUERate';
 import deleteUERate from '@/api/ueRate/deleteUERate';
 import doUERate from '@/api/ueRate/doUERate';
-import useGetRate from '@/api/ueRate/getUERate';
-import { UERateCriterion } from '@/api/ueRate/ueRateCriterion.interface';
-import Comments from '@/app/(wrapper)/ues/[code]/Comments';
 import StarRating from '@/components/StarRating';
+import TextArea from '@/components/UI/TextArea';
 import ExamList from '@/components/ues/ExamList';
 import ExamSender from '@/components/ues/ExamSender';
-import Button from '@/components/UI/Button';
 import Link from '@/components/UI/Link';
-import TextArea from '@/components/UI/TextArea';
 import Tooltip from '@/components/UI/Tooltip';
 import Page from '@/components/utilities/Page';
 import { useAppSelector } from '@/lib/hooks';
-import { useAppTranslation } from '@/lib/i18n';
-import { useUERateCriteria } from '@/module/constantData';
 import { UserType, useLoggedIn } from '@/module/session';
-import { useParams } from 'next/navigation';
 import { ReactNode, useState } from 'react';
-import styles from './style.module.scss';
 
 export default function UEDetailsPage() {
   const params = useParams<{ code: string }>();
   const { t } = useAppTranslation();
   const logged = useLoggedIn();
-  const type = useAppSelector((state) => state.user?.type);
+  const type = useAppSelector((state) => state.session.user?.type);
   const [ue, refreshUE] = useUe(params.code);
   const [ueofIndex, setUeofIndex] = useState(0);
   const criteria = useUERateCriteria();
@@ -40,8 +40,9 @@ export default function UEDetailsPage() {
   const [annalTypes, annalSemesters] = useAnnalMetadata(params.code);
   const [isAnnalUploaderOpen, setAnnalUploaderOpen] = useState(false);
   const api = useAPI();
+  const commentsCommuniquer = useCommentsCommuniquer();
 
-  if (!ue || !criteria || myRates === undefined) {
+  if (!ue || (logged && !criteria) || myRates === undefined) {
     return false;
   }
 
@@ -288,11 +289,18 @@ export default function UEDetailsPage() {
                   <div className={styles.writeComment}>
                     {t('ues:detailed.comments.write')}
                     <TextArea value={writingComment} onChange={setWritingComment} />
-                    <Button onClick={() => sendComment(api, ue.code, writingComment, false)}>
+                    <Button
+                      onClick={() =>
+                        sendComment(api, ue.code, writingComment, false).on('success', (newComment) => {
+                          commentsCommuniquer.newComment = newComment;
+                          commentsCommuniquer.send();
+                          setWritingComment('');
+                        })
+                      }>
                       {t('ues:detailed.comments.write.send')}
                     </Button>
                   </div>
-                  <Comments code={params.code} />
+                  <Comments code={params.code} communiquer={commentsCommuniquer} />
                 </>
               ) : (
                 t('ues:detailed.comments.loginRequired')

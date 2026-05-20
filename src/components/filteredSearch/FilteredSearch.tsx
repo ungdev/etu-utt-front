@@ -220,7 +220,7 @@ export default function FilteredSearch<
 
   return (
     <div className={styles.filtersBar}>
-      <h2>{t('common:filters')}</h2>
+      <h2>{t('common:filter.filters')}</h2>
       {filters.map((filter, i) => {
         const Filter = filtersData[filter.filter].component;
         const otherProps = Object.fromEntries(

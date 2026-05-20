@@ -39,14 +39,14 @@
         .metaContainer {
           display: flex;
           flex-flow: column wrap;
-          align-items: end;
+          //align-items: end;
 
           .sideData {
             width: 100%;
             display: flex;
             gap: 1ch;
             flex-flow: row wrap;
-            justify-content: end;
+            //justify-content: end;
           }
 
           .label {

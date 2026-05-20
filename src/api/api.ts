@@ -1,8 +1,8 @@
-import { ApiError } from '@/api/api.interface';
-import { useNotFound } from '@/module/pageSettings';
 import { apiTimeout, apiUrl, apiVersion, etuuttWebApplicationId } from '@/utils/environment';
 import { StatusCodes } from 'http-status-codes';
+import { useNotFound } from '@/module/pageSettings';
 import { toast } from 'react-toastify';
+import { ApiError } from '@/api/api.interface';
 
 /**
  * The type of error that can be produced while making a request to the API.
@@ -88,6 +88,7 @@ type VoidToUndefinedReturn<T extends (...args: any) => any> =
 export class ResponseHandler<T, R extends ResponseHandlerExtendsType<T> = { fallback: HandlerNoParam<undefined> }> {
   private readonly handlers = { fallback: () => undefined } as R;
   private readonly promise: Promise<ReturnType<R[keyof R] extends (...args: any) => any ? R[keyof R] : never>>;
+  public readonly abortController: AbortController;
 
   constructor(rawResponse: Promise<APIResponse<T>>, abortController: AbortController) {
     this.abortController = abortController;
@@ -185,8 +186,9 @@ function formatResponse<T>(rawResponse: RawResponseType<T>): T {
  * @param timeoutMillis The timeout of the request.
  * @param version The version of the API to use : v1, v2, ...
  * @param isFile If what we are sending/fetching is a file.
+ * @param applicationId Id of the application making the request.
+ * @param abortController AbortController to add to the request.
  */
-
 async function internalRequestAPI<RequestType>(
   method: 'GET',
   route: string,
@@ -195,6 +197,7 @@ async function internalRequestAPI<RequestType>(
   version: string,
   isFile: true,
   applicationId: string,
+  abortController: AbortController,
 ): Promise<APIResponse<Blob>>;
 async function internalRequestAPI<RequestType, ResponseType>(
   method: string,
@@ -204,6 +207,7 @@ async function internalRequestAPI<RequestType, ResponseType>(
   version: string,
   isFile: boolean,
   applicationId: string,
+  abortController: AbortController,
 ): Promise<APIResponse<ResponseType>>;
 async function internalRequestAPI<RequestType, ResponseType>(
   method: string,
@@ -213,6 +217,7 @@ async function internalRequestAPI<RequestType, ResponseType>(
   version: string,
   isFile: boolean,
   applicationId: string,
+  abortController: AbortController,
 ): Promise<APIResponse<ResponseType | Blob>> {
   // Generate headers
   const headers = new Headers();
@@ -260,7 +265,7 @@ async function internalRequestAPI<RequestType, ResponseType>(
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
-    if (error === 'query-update') return { error: ResponseError.aborted };
+    if (error === 'query-update') return { failureReason: ResponseFailureReason.aborted };
     if (error instanceof Error && error.name === 'AbortError') {
       console.error('Request timed out');
       return { failureReason: ResponseFailureReason.timeout };
@@ -311,7 +316,11 @@ function requestAPI<RequestType, ResponseType>(
     applicationId = etuuttWebApplicationId,
   }: { timeoutMillis?: number; version?: string; isFile?: boolean; applicationId?: string } = {},
 ): ResponseHandler<ResponseType> {
-  return new ResponseHandler(internalRequestAPI(method, route, body, timeoutMillis, version, isFile, applicationId));
+  const abortController = new AbortController();
+  return new ResponseHandler(
+    internalRequestAPI(method, route, body, timeoutMillis, version, isFile, applicationId, abortController),
+    abortController,
+  );
 }
 
 // Set the authorization header with the given token for next requests
@@ -399,7 +408,7 @@ function applyDefaultHandler<T>(handler: ResponseHandler<T>, setNotFound: () => 
     .on('error', () => {
       toast.error('Request resulted in an error');
     })
-    .on(404, setNotFound);
+    .on(404, () => setNotFound());
 }
 
 type DefaultResponseHandlerType<T> = ResponseHandler<

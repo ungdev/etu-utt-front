@@ -2,7 +2,7 @@ import { useState, useRef } from 'react';
 import { useAPI } from './api';
 import { Pagination } from './api.interface';
 
-type PaginationHook<T> = {
+export type PaginationHook<T> = {
   items: (T | null)[];
   total: number;
   updateFilters: (query: Record<string, string>) => void;

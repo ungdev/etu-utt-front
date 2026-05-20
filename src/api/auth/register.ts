@@ -2,10 +2,8 @@ export interface RegisterRequestDto {
   firstName: string;
   lastName: string;
   login: string;
-  password: string;
-  type: 'STUDENT' | 'TEACHER' | 'EMPLOYEE';
-  sex: 'MALE' | 'FEMALE' | 'OTHER';
-  birthday: Date;
+  mail: string;
+  tokenExpiresIn: number;
 }
 
 export interface RegisterResponseDto {

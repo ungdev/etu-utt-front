@@ -72,6 +72,9 @@
       .author {
         color: $ung-light-blue;
         font-weight: bold;
+        font-size: 1.2rem;
+        color: $ung-dark-grey;
+        margin-bottom: 0.2rem;
       }
 
       .date {
@@ -83,6 +86,12 @@
         text-align: justify;
       }
     }
+  }
+
+  .answerTitle {
+    margin-top: 3rem;
+    margin-bottom: 1rem;
+    color: $ung-dark-grey;
   }
 
   .input {
