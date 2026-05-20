@@ -60,17 +60,16 @@ export const sessionSlice = createSlice({
 const { login: loginReducer, logout: logoutReducer } = sessionSlice.actions;
 
 export const login =
-  (api: API, login: string, password: string, application?: string): AppThunk<Promise<LoginResponseDto | undefined>> =>
+  (api: API, login: string, application?: string): AppThunk<Promise<LoginResponseDto | undefined>> =>
   (dispatch) =>
     api
       .post<LoginRequestDto, LoginResponseDto>(
         '/auth/signin',
         {
           login,
-          password,
           tokenExpiresIn: authorizationTokenExpiresIn(),
         },
-        { applicationId: application || undefined },
+        { applicationId: application || undefined, version: 'vdev' },
       )
       .on('success', async (body) => {
         if (!body.signedIn) return body;
@@ -82,18 +81,20 @@ export const login =
       .toPromise();
 
 export const register =
-  (api: API, lastName: string, firstName: string, login: string, password: string): AppThunk =>
+  (api: API, lastName: string, firstName: string, login: string, mail: string): AppThunk =>
   async (dispatch) =>
     api
-      .post<RegisterRequestDto, RegisterResponseDto>('/auth/signup', {
-        lastName,
-        firstName,
-        login,
-        password,
-        sex: 'OTHER',
-        type: 'STUDENT',
-        birthday: new Date(2003, 1, 28),
-      })
+      .post<RegisterRequestDto, RegisterResponseDto>(
+        '/auth/signup',
+        {
+          lastName,
+          firstName,
+          login,
+          mail,
+          tokenExpiresIn: authorizationTokenExpiresIn(),
+        },
+        { version: 'vdev' },
+      )
       .on('success', (body) => dispatch(setToken(body.token, api)));
 
 export const logout = (): AppThunk => (dispatch) => dispatch(setToken(null));

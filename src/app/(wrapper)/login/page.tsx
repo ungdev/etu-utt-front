@@ -1,20 +1,16 @@
 'use client';
-import styles from './style.module.scss';
-import LoginForm from '@/components/auth/LoginForm';
-import { useRouter } from 'next/navigation';
-import { CasLoginRequestDto, CasLoginResponseDto } from '@/api/auth/casLogin';
-import { setToken } from '@/module/session';
-import { useAppDispatch } from '@/lib/hooks';
-import { useEffect, useState } from 'react';
-import { usePageLoaded, useSearchParam } from '@/module/pageSettings';
-import Button from '@/components/UI/Button';
-import { RegisterResponseDto } from '@/api/auth/register';
-import { CasRegisterRequestDto } from '@/api/auth/casRegister';
 import { useAPI } from '@/api/api';
-import { useAppTranslation } from '@/lib/i18n';
-import { Trans } from 'react-i18next';
-import { etuuttWebApplicationId } from '@/utils/environment';
+import { CasLoginRequestDto, CasLoginResponseDto } from '@/api/auth/casLogin';
+import LoginForm from '@/components/auth/LoginForm';
+import LegalsForm from '@/components/auth/LegalsForm';
 import Page from '@/components/utilities/Page';
+import { useAppDispatch } from '@/lib/hooks';
+import { usePageLoaded, useSearchParam } from '@/module/pageSettings';
+import { setToken } from '@/module/session';
+import { etuuttWebApplicationId, authorizationTokenExpiresIn } from '@/utils/environment';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import styles from './style.module.scss';
 
 export default function LoginPage() {
   const { internallyLoaded, markPageLoaded } = usePageLoaded();
@@ -22,7 +18,6 @@ export default function LoginPage() {
   const application = useSearchParam('application');
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const { t } = useAppTranslation();
   const [registerToken, setRegisterToken] = useState<string | null>(null);
   const [validatedToken, setValidatedToken] = useState(false);
   const api = useAPI();
@@ -35,14 +30,26 @@ export default function LoginPage() {
     if (!ticket || validatedToken) return;
     setValidatedToken(true);
     api
-      .post<CasLoginRequestDto, CasLoginResponseDto>('auth/signin/cas', {
+      .post<CasLoginRequestDto, CasLoginResponseDto>('auth/signin', {
         ticket: ticket,
-        service: process.env.NEXT_PUBLIC_CAS_SERVICE!,
+        tokenExpiresIn: authorizationTokenExpiresIn(),
       })
       .on('success', (body) => {
-        if (body.status === 'no_api_key') {
+        if (body.status === 'no_account') {
           setRegisterToken(body.token);
-          router.replace('/login');
+          return;
+        }
+        if (body.status === 'no_api_key') {
+          router.push(
+            `/login/external/create?${new URLSearchParams({
+              token: body.token,
+              application: application ?? etuuttWebApplicationId,
+            }).toString()}`,
+          );
+          return;
+        }
+        if (body.token === null) {
+          window.location.assign(body.redirectUrl);
           return;
         }
         dispatch(setToken(body.token, api));
@@ -54,48 +61,21 @@ export default function LoginPage() {
       markPageLoaded();
     }
   }, [internallyLoaded]);
-  if (ticket && !registerToken) {
-    return null;
-  }
   if (registerToken) {
     return (
-      <Page hasNavbar={true} needsLoading={true} className={styles.confirmRegister}>
-        <div>
-          <Trans
-            i18nKey={'login:legal.text'}
-            components={{
-              toLegal: <a href="/legal" />,
-            }}
-          />
-        </div>
-        <div className={styles.options}>
-          <Button
-            className={styles.acceptButton}
-            onClick={() =>
-              api
-                .post<CasRegisterRequestDto, RegisterResponseDto>('auth/signup/cas', {
-                  registerToken,
-                })
-                .on('success', (body) => {
-                  dispatch(setToken(body.token, api));
-                  router.push('/');
-                })
-            }>
-            {t('login:cgu.button')}
-          </Button>
-          <Button
-            onClick={() => {
-              router.push('/');
-            }}>
-            {t('login:legal.dontConnect')}
-          </Button>
-        </div>
+      <Page
+        hasNavbar={true}
+        needsLoading={true}
+        id="register-page"
+        className={styles.loginPage}
+        noWrapperPadding={true}>
+        <LegalsForm registerToken={registerToken} />
       </Page>
     );
   }
 
   return (
-    <Page hasNavbar={true} needsLoading={true} id="login-page" className={styles.loginPage}>
+    <Page hasNavbar={true} needsLoading={true} id="login-page" className={styles.loginPage} noWrapperPadding={true}>
       <LoginForm application={application} />
     </Page>
   );

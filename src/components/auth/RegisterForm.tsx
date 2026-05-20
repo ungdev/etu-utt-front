@@ -1,28 +1,29 @@
 'use client';
 
-import styles from './AuthForm.module.scss';
-import { useState } from 'react';
-import { useAppDispatch } from '@/lib/hooks';
+import { useAPI } from '@/api/api';
+import { useRouter } from 'next/navigation';
+import Button from '@/components/UI/Button';
 import Input from '@/components/UI/Input';
 import Link from '@/components/UI/Link';
-import Button from '@/components/UI/Button';
-import * as sessionModule from '@/module/session';
-import { useAPI } from '@/api/api';
-import { useAppTranslation } from '@/lib/i18n';
 import Icons from '@/icons';
+import { useAppDispatch } from '@/lib/hooks';
+import { useAppTranslation } from '@/lib/i18n';
+import * as sessionModule from '@/module/session';
+import { useState } from 'react';
+import styles from './AuthForm.module.scss';
 
 export default function RegisterForm() {
   const dispatch = useAppDispatch();
   const api = useAPI();
+  const router = useRouter();
   const [lastname, setLastname] = useState('');
   const [firstname, setFirstname] = useState('');
   const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [passwordConfirmation, setPasswordConfirmation] = useState('');
+  const [mail, setMail] = useState('');
   const { t } = useAppTranslation();
   const submit = () => {
-    if (password === passwordConfirmation && password)
-      dispatch(sessionModule.register(api, lastname, firstname, username, password));
+    dispatch(sessionModule.register(api, lastname, firstname, username, mail));
+    router.push('/');
   };
 
   return (
@@ -31,33 +32,12 @@ export default function RegisterForm() {
       <div className={styles.title}>
         INSCRIPT<span className={styles.bluePart}>ION</span>
       </div>
-      <a
-        href={`https://cas.utt.fr/cas/login?${new URLSearchParams({
-          service: process.env.NEXT_PUBLIC_CAS_SERVICE!,
-        }).toString()}`}
-        className={styles.cas}>
-        <Icons.LogoUTT />
-        <span>{t('login:login.connectWithCas')}</span>
-      </a>
-      <span>{t('common:or').toUpperCase()}</span>
+      <p>Environnement de développement uniquement</p>
       <div className={styles.inputContainer}>
         <Input value={lastname} onChange={setLastname} onEnter={submit} placeholder={t('users:lastName')} />
         <Input value={firstname} onChange={setFirstname} onEnter={submit} placeholder={t('users:firstName')} />
         <Input value={username} onChange={setUsername} onEnter={submit} placeholder={t('users:username')} />
-        <Input
-          value={password}
-          onChange={setPassword}
-          onEnter={submit}
-          placeholder={t('users:password')}
-          type="password"
-        />
-        <Input
-          value={passwordConfirmation}
-          onChange={setPasswordConfirmation}
-          onEnter={submit}
-          placeholder={t('users:password.confirmation')}
-          type="password"
-        />
+        <Input value={mail} onChange={setMail} onEnter={submit} placeholder={t('users:mail')} />
       </div>
       <Link href={'/login'} className={styles.link}>
         {t('auth:alreadyHaveAccount')}
