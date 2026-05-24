@@ -5,7 +5,7 @@ import { Pagination } from './api.interface';
 type PaginationHook<T> = {
   items: (T | null)[];
   total: number;
-  updateFilters: (query: Record<string, string>) => void;
+  updateFilters: (query: Record<string, string>, page?: number) => void;
   fetchNextItems: () => void;
 };
 
@@ -22,23 +22,23 @@ export function usePaginationLoader<T>(path: string): PaginationHook<T> {
 
   const api = useAPI();
 
-  const updateItems = (query: Record<string, string>) => {
+  const updateItems = (query: Record<string, string>, page?: number) => {
     if (handler.current) handler.current.abort();
 
     setItems([...Array(itemsPerPage.current || 20).fill(null)]);
-    const { page, ...queryData } = query;
+    const fullQuery = page ? { ...query, page: `${page}` } : query;
     handler.current = api
-      .get<Pagination<T>>(`${path}?${new URLSearchParams(query)}`)
+      .get<Pagination<T>>(`${path}?${new URLSearchParams(fullQuery)}`)
       .on('success', (body) => {
         setTotal(body.itemCount);
         setItems(body.items);
         itemsPerPage.current = body.itemsPerPage;
-        lastSearch.current = queryData;
-        pageIndex.current = (page && Number(page)) || 1;
-        delete handler.current;
+        lastSearch.current = query;
+        pageIndex.current = page || 1;
+        handler.current = undefined;
       })
-      .on('fallback', () => delete handler.current)
-      .on(ResponseFailureReason.abort, () => {}); // Hide toast error here as we might have aborted the request
+      .on('fallback', () => (handler.current = undefined))
+      .on(ResponseFailureReason.abort, () => {}); // Hide toast error here as we have aborted the request
   };
 
   const fetchNextPage = () => {
@@ -54,9 +54,9 @@ export function usePaginationLoader<T>(path: string): PaginationHook<T> {
         pageIndex.current++;
         setTotal(body.itemCount);
         setItems((prev) => [...prev.slice(0, prev.length - pendingItemCount), ...body.items]);
-        delete handler.current;
+        handler.current = undefined;
       })
-      .on('fallback', () => delete handler.current)
+      .on('fallback', () => (handler.current = undefined))
       .on(ResponseFailureReason.timeout, () => {}); // Hide toast error here as we might have aborted the request
   };
   return { items, total, updateFilters: updateItems, fetchNextItems: fetchNextPage };

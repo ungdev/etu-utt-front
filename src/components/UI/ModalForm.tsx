@@ -161,7 +161,7 @@ export function ModalForm<T extends DataModalKeys>({ fields, window, onSubmit, o
                 </div>
                 {fields[key].type === 'string' && (
                   <StringFormPart
-                    field={fields[key]}
+                    field={fields[key] as DataModalEntry<'string'>}
                     fieldKey={key}
                     state={state as string}
                     states={states}
@@ -176,7 +176,7 @@ export function ModalForm<T extends DataModalKeys>({ fields, window, onSubmit, o
                 )}
                 {fields[key].type === 'stringList' && (
                   <StringListFormPart
-                    field={fields[key]}
+                    field={fields[key] as DataModalEntry<'stringList'>}
                     fieldKey={key}
                     state={state as string[]}
                     states={states}

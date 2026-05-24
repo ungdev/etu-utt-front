@@ -8,7 +8,7 @@ import { useState } from 'react';
 import Button from '@/components/UI/Button';
 import createApplication from '@/api/auth/applications/createApplication';
 import { useAPI } from '@/api/api';
-import updateApplicationToken from '@/api/auth/applications/updateToken';
+import { updateApplicationToken } from '@/api/auth/applications/updateToken';
 import Icons from '@/icons';
 import Page from '@/components/utilities/Page';
 import { useConnectedUser } from '@/module/session';

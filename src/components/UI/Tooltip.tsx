@@ -4,10 +4,10 @@ import { c } from '@/utils';
 
 export const TooltipStyle = {
   TOP: cssStyle.top,
-  SIZE_SMALL: cssStyle['size-small'],
-  SIZE_MEDIUM: cssStyle['size-medium'],
-  SIZE_LARGE: cssStyle['size-large'],
-  TEXT_CENTER: cssStyle['text-center'],
+  SIZE_SMALL: cssStyle.sizeSmall,
+  SIZE_MEDIUM: cssStyle.sizeMedium,
+  SIZE_LARGE: cssStyle.sizeLarge,
+  TEXT_CENTER: cssStyle.textCenter,
   DISABLED: cssStyle.disabled,
 };
 

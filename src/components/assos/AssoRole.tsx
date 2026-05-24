@@ -3,7 +3,6 @@ import { Role, Member } from '@/api/assos/member.interface';
 import { useAppTranslation } from '@/lib/i18n';
 import styles from './AssoRole.module.scss';
 import Icons from '@/icons';
-import Button from '../UI/Button';
 import Input from '../UI/Input';
 import Link from '../UI/Link';
 import DisableableButton from '../UI/DisableableButton';
@@ -70,13 +69,19 @@ export function AssoRole({
           )}
           {canEdit && (
             <>
-              <Button onClick={() => createAssoMember(role.id)} disabled={!hasEditMembersPermission}>
+              <DisableableButton
+                onClick={() => createAssoMember(role.id)}
+                disabled={!hasEditMembersPermission}
+                disabledTooltip={t('assos:no.permission.edit.member')}>
                 <Icons.UserAdd />
-              </Button>
-              <Button onClick={() => deleteAssoRole(role.id)} disabled={!hasEditRolesPermission || role.isPresident}>
+              </DisableableButton>
+              <DisableableButton
+                onClick={() => deleteAssoRole(role.id)}
+                disabled={!hasEditRolesPermission || role.isPresident}
+                disabledTooltip={t('assos:no.permission.edit.member')}>
                 <Icons.Trash />
-              </Button>
-              <Button
+              </DisableableButton>
+              <DisableableButton
                 onClick={() => {
                   if (editing) {
                     updateAssoRole(role.id, { name: currentEditingRoleName });
@@ -86,9 +91,10 @@ export function AssoRole({
                     setCurrentEditingRoleName(role.name);
                   }
                 }}
-                disabled={!hasEditRolesPermission}>
+                disabled={!hasEditRolesPermission}
+                disabledTooltip={t('assos:no.permission.edit.member')}>
                 {editing ? <Icons.Confirm /> : <Icons.Edit />}
-              </Button>
+              </DisableableButton>
             </>
           )}
         </div>
