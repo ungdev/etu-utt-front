@@ -128,7 +128,7 @@ export function setToken(token: string | null, api?: API): AppThunk {
       loggedIn = false;
     } else {
       const user = (await fetchProfile(api!).toPromise())!;
-      const permissions = (await fetchMyPermissions(api!).toPromise())!;
+      const permissions = (await fetchMyPermissions(api!))!;
       loggedIn = user !== null;
       dispatch(loginReducer(user, permissions, token));
     }
@@ -158,11 +158,7 @@ export function setToken(token: string | null, api?: API): AppThunk {
 }
 
 export const useConnectedUser = () => useAppSelector((state) => state.session.user);
-
 export const usePermissions = () => useAppSelector((state) => state.session.permissions);
-
-export function useLoggedIn() {
-  return useAppSelector((state) => state.session.logged);
-}
+export const useLoggedIn = () => useAppSelector((state) => state.session.logged);
 
 export default sessionSlice.reducer;

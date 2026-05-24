@@ -28,6 +28,11 @@ const searchEntries: SearchEntry[] = [
     url: '/ues',
     keywordTranslationKeys: ['goTo:ues.normal.keywords'],
   },
+  {
+    name: 'goTo:assos.normal',
+    url: '/assos',
+    keywordTranslationKeys: ['goTo:assos.normal.keywords'],
+  },
 ];
 
 export default function GoTo() {
@@ -103,7 +108,8 @@ export default function GoTo() {
           <Link
             key={entryIndex}
             href={translatedSearchEntries[entryIndex].url}
-            className={`${styles.result} ${i === selectedResultIndex ? styles.selected : ''}`}>
+            className={`${styles.result} ${i === selectedResultIndex ? styles.selected : ''}`}
+            noStyle>
             {t(translatedSearchEntries[entryIndex].name)}
           </Link>
         ))}

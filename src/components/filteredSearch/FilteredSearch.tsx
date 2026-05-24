@@ -105,7 +105,7 @@ export default function FilteredSearch<
   updateSearch,
 }: {
   filtersData: FiltersDataType<FilterNames, FiltersType>;
-  updateSearch: (filters: Record<string, string>) => void;
+  updateSearch: (filters: Record<string, string>, page?: number) => void;
 }) {
   // The filters currently used.
   const [filters, _setFilters] = useState<Array<FilterInstance<FilterNames, FiltersType>>>(

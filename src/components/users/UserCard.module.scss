@@ -1,0 +1,38 @@
+@import '@/variables.scss';
+
+.user {
+  background: white;
+  border-radius: 5px;
+  padding: 0.5em;
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  gap: 0.5em;
+  user-select: none;
+
+  .avatar {
+    width: 2em;
+    height: 2em;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2em;
+    background: $ung-light-blue;
+    color: $very-light-gray;
+  }
+
+  .info {
+    display: flex;
+    flex-flow: column nowrap;
+    gap: 0.1em;
+    color: $ung-dark-grey;
+
+    .cursus {
+      font-style: italic;
+      opacity: 0.8;
+    }
+  }
+}
