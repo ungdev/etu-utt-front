@@ -4,7 +4,7 @@ import { LoginRequestDto, LoginResponseDto } from '@/api/auth/login';
 import { StatusCodes } from 'http-status-codes';
 import { RegisterRequestDto, RegisterResponseDto } from '@/api/auth/register';
 import { IsLoggedInResponseDto } from '@/api/auth/isLoggedIn';
-import { API, setAuthorizationToken, useAPI } from '@/api/api';
+import { API, setAuthorizationToken } from '@/api/api';
 import { fetchProfile } from '@/api/profile/fetchProfile';
 import { useAppSelector } from '@/lib/hooks';
 import { LocalStorageNames } from '@/global';
@@ -143,7 +143,7 @@ export function setToken(token: string | null, api?: API): AppThunk {
       dispatch(removeMenuItem('common:navbar.myUEs', submenu.name));
     }
     if (!loggedIn) return;
-    const ues = await fetchMyUes(useAPI());
+    const ues = await fetchMyUes(api!);
     if (!ues) return;
     ues.forEach((ue) => {
       dispatch(

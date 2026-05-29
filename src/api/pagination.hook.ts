@@ -2,11 +2,12 @@ import { useState, useRef } from 'react';
 import { Abortable, ResponseFailureReason, useAPI } from './api';
 import { Pagination } from './api.interface';
 
-type PaginationHook<T> = {
+export type PaginationHook<T> = {
   items: (T | null)[];
   total: number;
   updateFilters: (query: Record<string, string>, page?: number) => void;
   fetchNextItems: () => void;
+  invalidateItems: () => void;
 };
 
 /**
@@ -21,6 +22,10 @@ export function usePaginationLoader<T>(path: string): PaginationHook<T> {
   const pageIndex = useRef(1);
 
   const api = useAPI();
+
+  const invalidateItems = () => {
+    setItems([...Array(itemsPerPage.current || 20).fill(null)]);
+  };
 
   const updateItems = (query: Record<string, string>, page?: number) => {
     if (handler.current) handler.current.abort();
@@ -38,11 +43,12 @@ export function usePaginationLoader<T>(path: string): PaginationHook<T> {
         handler.current = undefined;
       })
       .on('fallback', () => (handler.current = undefined))
-      .on(ResponseFailureReason.abort, () => {}); // Hide toast error here as we have aborted the request
+      .on(ResponseFailureReason.aborted, () => {}); // Hide toast error here as we have aborted the request
   };
 
   const fetchNextPage = () => {
     if (handler.current) return;
+    if (items.length >= total) return;
 
     const pendingItemCount = Math.min(itemsPerPage.current, total - items.length);
     setItems((prev) => [...prev, ...Array(pendingItemCount).fill(null)]);
@@ -59,5 +65,11 @@ export function usePaginationLoader<T>(path: string): PaginationHook<T> {
       .on('fallback', () => (handler.current = undefined))
       .on(ResponseFailureReason.timeout, () => {}); // Hide toast error here as we might have aborted the request
   };
-  return { items, total, updateFilters: updateItems, fetchNextItems: fetchNextPage };
+  return {
+    items,
+    total,
+    updateFilters: updateItems,
+    fetchNextItems: fetchNextPage,
+    invalidateItems,
+  };
 }

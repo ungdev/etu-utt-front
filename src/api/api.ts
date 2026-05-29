@@ -11,8 +11,8 @@ import { ApiError } from '@/api/api.interface';
 export const enum ResponseFailureReason {
   not_json,
   timeout,
+  aborted,
   unknown,
-  abort,
 }
 
 /**
@@ -94,6 +94,7 @@ export class ResponseHandler<T, R extends ResponseHandlerExtendsType<T> = { fall
 {
   private readonly handlers = { fallback: () => undefined } as R;
   private readonly promise: Promise<ReturnType<R[keyof R] extends (...args: any) => any ? R[keyof R] : never>>;
+  // public readonly abortController: AbortController;
 
   constructor(
     rawResponse: Promise<APIResponse<T>>,
@@ -167,7 +168,7 @@ export class ResponseHandler<T, R extends ResponseHandlerExtendsType<T> = { fall
    * Fires ResponseError.timeout handler or falls back to failure handler.
    */
   abort() {
-    this.abortController.abort(ResponseFailureReason.abort);
+    this.abortController.abort(ResponseFailureReason.aborted);
   }
 
   async toPromise(): Promise<Awaited<ReturnType<R[keyof R] extends (...args: any) => any ? R[keyof R] : never>>> {
@@ -180,7 +181,7 @@ export class ResponseHandler<T, R extends ResponseHandlerExtendsType<T> = { fall
  * @param rawResponse The raw response from the API.
  */
 function formatResponse<T>(rawResponse: RawResponseType<T>): T {
-  if (typeof rawResponse === 'string' && !isNaN(Date.parse(rawResponse))) {
+  if (typeof rawResponse === 'string' && rawResponse.search(/^\d{4}(?:-\d{2}){2}T(?:\d{2}:){2}\d{2}\.\d{3}Z$/) === 0) {
     return new Date(rawResponse) as T;
   } else if (Array.isArray(rawResponse)) {
     return rawResponse.map(formatResponse) as T;
@@ -201,8 +202,9 @@ function formatResponse<T>(rawResponse: RawResponseType<T>): T {
  * @param timeoutMillis The timeout of the request.
  * @param version The version of the API to use : v1, v2, ...
  * @param isFile If what we are sending/fetching is a file.
+ * @param applicationId Id of the application making the request.
+ * @param abortController AbortController to add to the request.
  */
-
 async function internalRequestAPI<RequestType>(
   method: 'GET',
   route: string,
@@ -279,6 +281,7 @@ async function internalRequestAPI<RequestType, ResponseType>(
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
+    if (error === 'query-update') return { failureReason: ResponseFailureReason.aborted };
     if (error instanceof Error && error.name === 'AbortError') {
       console.error('Request timed out');
       return { failureReason: ResponseFailureReason.timeout };
@@ -289,8 +292,8 @@ async function internalRequestAPI<RequestType, ResponseType>(
       console.error('An error occurred when making a request to the API');
     }
 
-    if (abortController.signal.reason === ResponseFailureReason.abort)
-      return { failureReason: ResponseFailureReason.abort };
+    if (abortController.signal.reason === ResponseFailureReason.aborted)
+      return { failureReason: ResponseFailureReason.aborted };
 
     return { failureReason: ResponseFailureReason.unknown };
   } finally {
@@ -424,7 +427,7 @@ function applyDefaultHandler<T>(handler: ResponseHandler<T>, setNotFound: () => 
     .on('error', () => {
       toast.error('Request resulted in an error');
     })
-    .on(404, setNotFound);
+    .on(404, () => setNotFound());
 }
 
 type DefaultResponseHandlerType<T> = ResponseHandler<

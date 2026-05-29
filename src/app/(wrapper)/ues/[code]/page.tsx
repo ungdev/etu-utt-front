@@ -2,32 +2,119 @@
 
 import styles from './style.module.scss';
 import { useParams } from 'next/navigation';
+import useAnnals from '@/api/annals/fetchAnnals';
+import useAnnalMetadata from '@/api/annals/fetchMetadata';
+import { useAPI } from '@/api/api';
+import { sendComment } from '@/api/comment/sendComment';
 import useUe from '@/api/ue/fetchUe';
-import Comments from '@/app/(wrapper)/ues/[code]/Comments';
+import Comments, { useCommentsCommuniquer } from '@/app/(wrapper)/ues/[code]/Comments';
 import { useAppTranslation } from '@/lib/i18n';
 import { useUERateCriteria } from '@/module/constantData';
 import { UERateCriterion } from '@/api/ueRate/ueRateCriterion.interface';
 import Button from '@/components/UI/Button';
 import useGetRate from '@/api/ueRate/getUERate';
-import doUERate from '@/api/ueRate/doUERate';
 import deleteUERate from '@/api/ueRate/deleteUERate';
+import doUERate from '@/api/ueRate/doUERate';
 import StarRating from '@/components/StarRating';
 import TextArea from '@/components/UI/TextArea';
-import { useState } from 'react';
-import sendComment from '@/api/comment/sendComment';
-import { useAPI } from '@/api/api';
-import useAnnals from '@/api/annals/fetchAnnals';
-import useAnnalMetadata from '@/api/annals/fetchMetadata';
 import ExamList from '@/components/ues/ExamList';
 import ExamSender from '@/components/ues/ExamSender';
+import Link from '@/components/UI/Link';
+import Tooltip from '@/components/UI/Tooltip';
 import Page from '@/components/utilities/Page';
-import { useLoggedIn } from '@/module/session';
+import { useAppSelector } from '@/lib/hooks';
+import { UserType, useLoggedIn } from '@/module/session';
+import { ReactNode, useState } from 'react';
+import { DetailedUE } from '@/api/ue/ue.interface';
 
-export default function UEDetailsPage() {
+function UeWorkTimes({ workTimes }: { workTimes: DetailedUE['ueofs'][number]['workTime'] }): ReactNode {
+  const { t } = useAppTranslation();
+  if (!workTimes) return <div className={styles.worktime}>{t('ues:detailed.noWorkingTimeInfo')}</div>;
+
+  return (
+    <div className={styles.worktime}>
+      {workTimes.cm ? (
+        <div>
+          <div>
+            {workTimes.cm}
+            <span>{t('ues:detailed.worktime.hour')}</span>
+          </div>
+          <Tooltip content={t('ues:detailed.worktime.cm.tooltip')}>
+            <div>{t('ues:detailed.worktime.cm')}</div>
+          </Tooltip>
+        </div>
+      ) : (
+        <></>
+      )}
+      {workTimes.td ? (
+        <div>
+          <div>
+            {workTimes.td}
+            <span>{t('ues:detailed.worktime.hour')}</span>
+          </div>
+          <Tooltip content={t('ues:detailed.worktime.td.tooltip')}>
+            <div>{t('ues:detailed.worktime.td')}</div>
+          </Tooltip>
+        </div>
+      ) : (
+        <></>
+      )}
+      {workTimes.tp ? (
+        <div>
+          <div>
+            {workTimes.tp}
+            <span>{t('ues:detailed.worktime.hour')}</span>
+          </div>
+          <Tooltip content={t('ues:detailed.worktime.tp.tooltip')}>
+            <div>{t('ues:detailed.worktime.tp')}</div>
+          </Tooltip>
+        </div>
+      ) : (
+        <></>
+      )}
+      {workTimes.the ? (
+        <div>
+          <div>
+            {workTimes.the}
+            <span>{t('ues:detailed.worktime.hour')}</span>
+          </div>
+          <Tooltip content={t('ues:detailed.worktime.the.tooltip')}>
+            <div>{t('ues:detailed.worktime.the')}</div>
+          </Tooltip>
+        </div>
+      ) : (
+        <></>
+      )}
+      {workTimes.internship ? (
+        <div>
+          <div>
+            {workTimes.internship}
+            <span>{t('ues:detailed.worktime.hour')}</span>
+          </div>
+          <div>{t('ues:detailed.worktime.internship')}</div>
+        </div>
+      ) : (
+        <></>
+      )}
+      {workTimes.project ? (
+        <div>
+          <div>{Number(workTimes.project)}</div>
+          <div>{t('ues:detailed.worktime.project')}</div>
+        </div>
+      ) : (
+        <></>
+      )}
+    </div>
+  );
+}
+
+export default function UeDetailsPage() {
   const params = useParams<{ code: string }>();
   const { t } = useAppTranslation();
   const logged = useLoggedIn();
+  const type = useAppSelector((state) => state.session.user?.type);
   const [ue, refreshUE] = useUe(params.code);
+  const [ueofIndex, setUeofIndex] = useState(0);
   const criteria = useUERateCriteria();
   const [myRates, setMyRates] = useGetRate(params.code);
   const [writingComment, setWritingComment] = useState<string>('');
@@ -35,8 +122,9 @@ export default function UEDetailsPage() {
   const [annalTypes, annalSemesters] = useAnnalMetadata(params.code);
   const [isAnnalUploaderOpen, setAnnalUploaderOpen] = useState(false);
   const api = useAPI();
+  const commentsCommuniquer = useCommentsCommuniquer();
 
-  if (!ue || !criteria || myRates === undefined) {
+  if (!ue || (logged && !criteria) || myRates === undefined) {
     return false;
   }
 
@@ -61,60 +149,103 @@ export default function UEDetailsPage() {
     refreshUE();
   };
 
+  const clipboardCopy = (text: string) => {
+    navigator.clipboard.writeText(text);
+  };
+
+  const setUeof = (ueof: number | string) => {
+    if (typeof ueof === 'number') setUeofIndex(ueof);
+  };
+
   return (
     <Page className={styles.page}>
-      <h1>{ue.code}</h1>
-      <p>{ue.name}</p>
+      <div className={styles.tabs}>
+        {ue.ueofs.map((ueof, index) => (
+          <div className={styles.tab} data-active={index == ueofIndex} key={ueof.code} onClick={() => setUeof(index)}>
+            {ueof.code}
+          </div>
+        ))}
+      </div>
+      <div className={styles.header}>
+        <div>
+          <h1>{ue.code}</h1>
+          <p>{ue.ueofs[ueofIndex].name}</p>
+        </div>
+        <UeWorkTimes workTimes={ue.ueofs[ueofIndex].workTime} />
+      </div>
       <div className={styles.divider} />
       {!isAnnalUploaderOpen ? (
         <>
           <div className={styles.info}>
-            <div className={styles.generalInfo}>
-              <h2>Informations générales</h2>
-              <p>
-                {t('ues:detailed.description')} : {ue.info.comment}
-                <br />
-                {t('ues:detailed.program')} : {ue.info.program}
-                <br />
-                {t('ues:detailed.objectives')} : {ue.info.objectives}
-                <br />
-                {t('ues:detailed.taughtIn')} : {ue.info.languages}
-                <br />
-                {t('ues:detailed.minors')} : {ue.info.minors}
-                <br />
-                {t('ues:detailed.credits')} :{' '}
-                {ue.credits.map((credits) => `${credits.credits}${credits.category.code}`).join(', ')}
-              </p>
+            <div>{t('ues:detailed.program')}</div>
+            <div>{ue.ueofs[ueofIndex].info.program}</div>
+            <div>{t('ues:detailed.objectives')}</div>
+            <div>{ue.ueofs[ueofIndex].info.objectives}</div>
+            <div>{t('ues:detailed.taughtIn')}</div>
+            <div>{ue.ueofs[ueofIndex].info.language}</div>
+            <div>{t('ues:detailed.minors')}</div>
+            <div className={(!ue.ueofs[ueofIndex].info.minors.length && styles.empty) || ''}>
+              {ue.ueofs[ueofIndex].info.minors.length
+                ? ue.ueofs[ueofIndex].info.minors.join(', ')
+                : t('ues:detailed.minors.none')}
             </div>
-            <div className={styles.workTime}>
-              <h2>{t('ues:detailed.workTime')}</h2>
-              {ue.workTime ? (
-                <>
-                  <p>CM : {ue.workTime.cm}</p>
-                  <p>TD : {ue.workTime.td}</p>
-                  <p>TP : {ue.workTime.tp}</p>
-                  <p>
-                    {t('ues:detailed.workTime.project')} : {ue.workTime.project}
-                  </p>
-                  <p>THE : {ue.workTime.the}</p>
-                </>
-              ) : (
-                t('ues:detailed.noWorkingTimeInfo')
-              )}
+            <div>{t('ues:detailed.credits')}</div>
+            <div>
+              {Array.from(
+                new Set(ue.ueofs[ueofIndex].credits.map((credits) => `${credits.credits} ${credits.category.code}`)),
+              ).join(', ')}
             </div>
-            <div className={styles.takeUEInfo}>
-              <h2>Information pour faire l'UE</h2>
-              {t('ues:detailed.semester')} :{' '}
-              {ue.openSemester.find((semester) => new Date(semester.start).getTime() > Date.now())?.code ??
-                t('ues:detailed.semester.none')}{' '}
-              <br />
-              {t('ues:detailed.inscriptionCode')} : {ue.inscriptionCode} <br />
-              {t('ues:detailed.branchOptions')} : {ue.branchOption.map((branchOption) => branchOption.code).toString()}{' '}
-              <br />
-              {t('ues:detailed.requirements')} :{' '}
-              {ue.info.requirements.length === 0
-                ? t('ues:detailed.requirements.none')
-                : ue.info.requirements.toString()}
+          </div>
+          <div className={styles.takeUEInfo}>
+            <h2>{t('ues:detailed.dfpdata')}</h2>
+            <div className={styles.info}>
+              <div>{t('ues:detailed.semester')}</div>
+              <div>
+                {ue.ueofs[ueofIndex].openSemester
+                  .filter((semester) => new Date(semester.end).getTime() > Date.now())
+                  .map((semester) => semester.code)
+                  .join(', ') || t('ues:detailed.semester.none')}{' '}
+              </div>
+              <div>{t('ues:detailed.siepLink')}</div>
+              <div>
+                <Link
+                  newTab={true}
+                  href={`https://siep.utt.fr/faces/AccesDirectNonAuth.xhtml?ir=942854&io=${ue.ueofs[ueofIndex].siepId}`}>
+                  {ue.ueofs[ueofIndex].code}
+                </Link>
+              </div>
+              <div>{t('ues:detailed.inscriptionCode')}</div>
+              <div className={ue.ueofs[ueofIndex].inscriptionCode ? '' : styles.empty}>
+                {ue.ueofs[ueofIndex].inscriptionCode ? (
+                  <Tooltip content={t('ues:detailed.inscriptionCode.copy')}>
+                    <span
+                      className={styles.clipboardCopy}
+                      onClick={() => clipboardCopy(ue.ueofs[ueofIndex].inscriptionCode)}>
+                      {ue.ueofs[ueofIndex].inscriptionCode}
+                    </span>
+                  </Tooltip>
+                ) : (
+                  t('ues:detailed.inscriptionCode.empty')
+                )}
+              </div>
+              <div>{t('ues:detailed.branchOptions')}</div>
+              <div>
+                {ue.ueofs[ueofIndex].credits
+                  .flatMap((credit) => credit.branchOptions.map((branchOption) => branchOption.code))
+                  .join(', ')}
+              </div>
+              <div>{t('ues:detailed.requirements')}</div>
+              <div>
+                {ue.ueofs[ueofIndex].info.requirements.length === 0
+                  ? t('ues:detailed.requirements.none')
+                  : ue.ueofs[ueofIndex].info.requirements
+                      .map((req) => (
+                        <Link key={req} href={`/ues/${req}`}>
+                          {req}
+                        </Link>
+                      ))
+                      .reduce((prev, curr) => (prev.length ? [...prev, ', ', curr] : [curr]), [] as ReactNode[])}
+              </div>
             </div>
           </div>
           {annals && annalSemesters && annalTypes && (
@@ -125,48 +256,61 @@ export default function UEDetailsPage() {
               annalTypes={annalTypes}
             />
           )}
-          <div className={styles.thoughts}>
-            <h2>Avis des étudiants</h2>
-            <div className={styles.rates}>
-              {Object.entries(ue.starVotes).map(([id, value]) => {
-                const myRate = myRates?.find((rate) => rate.criterionId === id);
-                return (
-                  <div key={id} className={styles.criterion}>
-                    <h3>{criteria.find((criterion): criterion is UERateCriterion => criterion.id === id)?.name}</h3>
-                    <StarRating stars={5} value={value} />
-                    {myRates && (
-                      <>
-                        <StarRating
-                          stars={5}
-                          value={myRate?.value ?? 0}
-                          onClick={(rate) => onRate(id as string, !!myRate, rate)}
-                        />
-                        {myRate && (
-                          <Button className={styles.deleteRate} onClick={() => deleteRate(id as string)}>
-                            Supprimer mon avis
-                          </Button>
-                        )}
-                      </>
-                    )}
+          {logged && (type === UserType.STUDENT || type === UserType.FORMER_STUDENT) && (
+            <div className={styles.thoughts}>
+              <h2>{t('ues:detailed.rates.title')}</h2>
+              <div className={[styles.rates, !criteria && styles.error].filter((c) => c).join(' ')}>
+                {criteria && ue.starVotes
+                  ? Object.entries(ue.starVotes).map(([id, value]) => {
+                      const myRate = myRates?.find((rate) => rate.criterionId === id);
+                      return (
+                        <div key={id} className={styles.criterion}>
+                          <h3>
+                            {criteria.find((criterion): criterion is UERateCriterion => criterion.id === id)?.name}
+                          </h3>
+                          <StarRating stars={5} value={value} />
+                          {myRates && (
+                            <>
+                              <StarRating
+                                stars={5}
+                                value={myRate?.value ?? 0}
+                                onClick={(rate) => onRate(id as string, !!myRate, rate)}
+                              />
+                              {myRate && (
+                                <Button className={styles.deleteRate} onClick={() => deleteRate(id as string)}>
+                                  {t('ues:detailed.rates.delete')}
+                                </Button>
+                              )}
+                            </>
+                          )}
+                        </div>
+                      );
+                    })
+                  : t('ues:detailed.rates.error')}
+              </div>
+              {logged && (type === UserType.STUDENT || type === UserType.FORMER_STUDENT) ? (
+                <>
+                  <div className={styles.writeComment}>
+                    {t('ues:detailed.comments.write')}
+                    <TextArea value={writingComment} onChange={setWritingComment} />
+                    <Button
+                      onClick={() =>
+                        sendComment(api, ue.code, writingComment, false).on('success', (newComment) => {
+                          commentsCommuniquer.newComment = newComment;
+                          commentsCommuniquer.send();
+                          setWritingComment('');
+                        })
+                      }>
+                      {t('ues:detailed.comments.write.send')}
+                    </Button>
                   </div>
-                );
-              })}
+                  <Comments code={params.code} communiquer={commentsCommuniquer} />
+                </>
+              ) : (
+                t('ues:detailed.comments.loginRequired')
+              )}
             </div>
-            {logged ? (
-              <>
-                <div className={styles.writeComment}>
-                  {t('ues:detailed.comments.write')}
-                  <TextArea value={writingComment} onChange={setWritingComment} />
-                  <Button onClick={() => sendComment(api, ue.code, writingComment, false)}>
-                    {t('ues:detailed.comments.write.send')}
-                  </Button>
-                </div>
-                <Comments code={params.code as string} />
-              </>
-            ) : (
-              t('ues:detailed.comments.loginRequired')
-            )}
-          </div>
+          )}
         </>
       ) : (
         annalSemesters &&

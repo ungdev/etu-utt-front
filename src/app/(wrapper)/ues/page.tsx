@@ -1,17 +1,18 @@
 'use client';
 import styles from './style.module.scss';
-import { createInputFilter } from '@/components/filteredSearch/InputFilter';
+import { Branch } from '@/api/branch/branch.interface';
+import { CreditCategory } from '@/api/credit/credit.interface';
 import { useUEs } from '@/api/ue/search';
 import FilteredSearch, { FiltersDataType, GenericFiltersType } from '@/components/filteredSearch/FilteredSearch';
-import Icons from '@/icons';
+import { createInputFilter } from '@/components/filteredSearch/InputFilter';
 import { createSelectFilter, SelectFilter } from '@/components/filteredSearch/SelectFilter';
 import { ResultsList } from '@/components/ResultsList';
+import Tooltip from '@/components/UI/Tooltip';
+import Page from '@/components/utilities/Page';
+import Icons from '@/icons';
 import { useAppTranslation } from '@/lib/i18n';
-import { Branch } from '@/api/branch/branch.interface';
 import { useBranches, useCreditCategories } from '@/module/constantData';
 import { useMemo } from 'react';
-import { CreditCategory } from '@/api/credit/credit.interface';
-import Page from '@/components/utilities/Page';
 
 /**
  * The different filters that exist.
@@ -79,7 +80,13 @@ function useUeFilters(creditCategories: CreditCategory[] | null, branches: Branc
 
 export default function UesPage() {
   const { t } = useAppTranslation();
-  const { items: ues, total: totalUesCount, updateFilters: updateUEs, fetchNextItems } = useUEs();
+  const {
+    items: ues,
+    total: totalUesCount,
+    updateFilters: updateUEs,
+    fetchNextItems,
+    invalidateItems: invalidateItems,
+  } = useUEs();
   const branches = useBranches();
   const creditCategories = useCreditCategories();
   const ueFilters = useUeFilters(creditCategories, branches);
@@ -88,7 +95,11 @@ export default function UesPage() {
     <Page className={styles.page}>
       <h1>{t('ues:browser')}</h1>
       <div className={styles.content}>
-        <FilteredSearch<FilterNames, UEFiltersType> filtersData={ueFilters} updateSearch={updateUEs} />
+        <FilteredSearch<FilterNames, UEFiltersType>
+          filtersData={ueFilters}
+          updateSearch={updateUEs}
+          invalidateItems={invalidateItems}
+        />
         <div className={styles.results}>
           <ResultsList
             data={ues}
@@ -96,8 +107,57 @@ export default function UesPage() {
             baseRedirectUrl={'/ues'}
             onEndReached={fetchNextItems}
             itemFactory={({ item }) => (
-              <div className={!item ? styles.glimmer : ''}>
-                <h2>{item?.code}</h2>
+              <div className={!item ? styles.glimmer : styles.container}>
+                <div className={styles.headerLayout}>
+                  <h2>{item?.code}</h2>
+                  <div className={styles.metaContainer}>
+                    <div className={styles.sideData}>
+                      <div className={styles.credits}>
+                        <span className={styles.label}>{t('ues:overview.credits')}</span>
+                        {item?.credits
+                          ?.sort((a, b) =>
+                            a.category.name > b.category.name ? 1 : a.category.name < b.category.name ? -1 : 0,
+                          )
+                          .map((credit, i) => (
+                            <div key={`${credit.category.code}-${i}`}>
+                              {credit.credits}
+                              <span className={styles.categoryLabel}>
+                                <Tooltip styles="RIGHT" content={credit.category.name}>
+                                  {credit.category.code}
+                                </Tooltip>
+                              </span>
+                            </div>
+                          ))}
+                      </div>
+                      <div className={styles.languages}>
+                        <span className={[styles.taughtIn, styles.label].join(' ')}>{t('ues:overview.taughtIn')}</span>
+                        {item?.info.languages.map((language) => <span key={language}>{language}</span>)}
+                      </div>
+                    </div>
+                    <div className={styles.sideData}>
+                      {item?.info.minors.length ? (
+                        <div className={styles.minors}>
+                          <span className={[styles.label, styles.categoryLabel].join(' ')}>
+                            {t('ues:overview.minors')}
+                          </span>
+                          {item?.info.minors.map((minor) => <span key={minor}>{minor}</span>)}
+                        </div>
+                      ) : (
+                        ''
+                      )}
+                      {item?.info?.requirements?.length ? (
+                        <div className={[styles.requirements, styles.categoryLabel].join(' ')}>
+                          <Tooltip styles="LEFT" content={item?.info?.requirements?.join(', ')}>
+                            {item?.info?.requirements?.length}{' '}
+                            <span className={styles.label}>{t('ues:overview.requirements')}</span>
+                          </Tooltip>
+                        </div>
+                      ) : (
+                        ''
+                      )}
+                    </div>
+                  </div>
+                </div>
                 <p>{item?.name}</p>
               </div>
             )}

@@ -30,12 +30,16 @@ const assoFilters = Object.freeze({
 
 export default function AssoPage() {
   const { t } = useAppTranslation();
-  const [assos, totalAssosCount, updateAssos] = useAssos();
+  const { items: assos, total: totalAssosCount, updateFilters: updateAssos, invalidateItems } = useAssos();
   return (
     <Page className={styles.page}>
       <h1 className={styles.title}>{t('assos:browser')}</h1>
       <div className={styles.content}>
-        <FilteredSearch<FilterNames, AssoFiltersType> filtersData={assoFilters} updateSearch={updateAssos} />
+        <FilteredSearch<FilterNames, AssoFiltersType>
+          filtersData={assoFilters}
+          updateSearch={updateAssos}
+          invalidateItems={invalidateItems}
+        />
         <div className={styles.results}>
           <ResultsList
             data={assos}

@@ -8,6 +8,7 @@ import { Branch } from '@/api/branch/branch.interface';
 import { fetchBranches } from '@/api/branch/fetchBranches';
 import { CreditCategory } from '@/api/credit/credit.interface';
 import { fetchCreditCategories } from '@/api/credit/fetchCreditCategories';
+import { useLoggedIn } from '@/module/session';
 
 interface ConstantDataSlice {
   ueRateCriteria: UERateCriterion[] | null;
@@ -34,18 +35,18 @@ export const constantDataSlice = createSlice({
 const { setCriteria, setBranches, setCreditCategories } = constantDataSlice.actions;
 
 export function useUERateCriteria(): UERateCriterion[] | null {
+  const loggedIn = useLoggedIn();
   const ueRateCriteria = useAppSelector((state) => state.constantData.ueRateCriteria);
   const dispatch = useAppDispatch();
   const api = useAPI();
   useEffect(() => {
-    if (ueRateCriteria === null) {
-      fetchUERateCriteria(api).then((criteria) => {
-        if (criteria) {
-          dispatch(setCriteria(criteria));
-        }
-      });
-    }
-  }, []);
+    if (ueRateCriteria !== null || !loggedIn) return;
+    fetchUERateCriteria(api).then((criteria) => {
+      if (criteria) {
+        dispatch(setCriteria(criteria));
+      }
+    });
+  }, [loggedIn]);
   return ueRateCriteria;
 }
 
@@ -67,9 +68,7 @@ export function useCreditCategories(): CreditCategory[] | null {
   const api = useAPI();
   useEffect(() => {
     if (creditCategories === null) {
-      fetchCreditCategories(api).then(
-        (creditCategories) => creditCategories && dispatch(setCreditCategories(creditCategories)),
-      );
+      fetchCreditCategories(api).then((creditCategories) => dispatch(setCreditCategories(creditCategories)));
     }
   }, []);
   return creditCategories;

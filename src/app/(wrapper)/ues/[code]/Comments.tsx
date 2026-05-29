@@ -1,5 +1,4 @@
 import styles from './Comments.module.scss';
-
 import useComments from '@/api/comment/fetchComments';
 import { TFunction, useAppTranslation } from '@/lib/i18n';
 import Icons from '@/icons';
@@ -7,12 +6,33 @@ import EditableText from '@/components/EditableText';
 import Button from '@/components/UI/Button';
 import { useConnectedUser } from '@/module/session';
 import { Comment } from '@/api/comment/comment.interface';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { editComment } from '@/api/comment/editComment';
 import StarRating from '@/components/StarRating';
 import upvoteComment from '@/api/comment/upvote';
 import { unUpvoteComment } from '@/api/comment/unUpvote';
 import { useAPI } from '@/api/api';
+
+export class CommentsCommuniquer {
+  public updater: boolean = false;
+  public newComment: null | Comment = null;
+  constructor(private _send: () => void) {}
+  public send(): void {
+    this.updater = !this.updater;
+    this._send();
+  }
+  public clear(): void {
+    this.newComment = null;
+  }
+}
+
+export function useCommentsCommuniquer(): CommentsCommuniquer {
+  const [, setUpdater] = useState<boolean>(false);
+  const commentsCommuniquer = useRef<CommentsCommuniquer>(
+    new CommentsCommuniquer(() => setUpdater((updater) => !updater)),
+  );
+  return commentsCommuniquer.current;
+}
 
 function CommentEditorFooter(comment: Comment, onUpdate: (text: string, anonymous: boolean) => void) {
   return function CommentEditorFooter({ text, disable }: { text: string; disable: () => void }) {
@@ -86,11 +106,16 @@ function CommentFooter(
   };
 }
 
-export default function Comments({ code }: { code: string }) {
+export default function Comments({ code, communiquer }: { code: string; communiquer: CommentsCommuniquer }) {
   const { t } = useAppTranslation();
-  const [comments, setComment] = useComments(code);
+  const [comments, addComment, setComment] = useComments(code);
   const user = useConnectedUser()!;
   const api = useAPI();
+  useEffect(() => {
+    if (comments === null || !communiquer.newComment) return;
+    addComment(communiquer.newComment);
+    communiquer.clear();
+  }, [communiquer.updater]);
   if (comments === null) {
     return '';
   }

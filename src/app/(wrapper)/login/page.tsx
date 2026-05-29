@@ -1,16 +1,16 @@
 'use client';
+import styles from './style.module.scss';
 import { useAPI } from '@/api/api';
 import { CasLoginRequestDto, CasLoginResponseDto } from '@/api/auth/casLogin';
 import LoginForm from '@/components/auth/LoginForm';
 import LegalsForm from '@/components/auth/LegalsForm';
 import Page from '@/components/utilities/Page';
 import { useAppDispatch } from '@/lib/hooks';
+import { useEffect, useState } from 'react';
 import { usePageLoaded, useSearchParam } from '@/module/pageSettings';
 import { setToken } from '@/module/session';
 import { etuuttWebApplicationId, authorizationTokenExpiresIn } from '@/utils/environment';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import styles from './style.module.scss';
 
 export default function LoginPage() {
   const { internallyLoaded, markPageLoaded } = usePageLoaded();
@@ -37,6 +37,7 @@ export default function LoginPage() {
       .on('success', (body) => {
         if (body.status === 'no_account') {
           setRegisterToken(body.token);
+          router.replace('/login');
           return;
         }
         if (body.status === 'no_api_key') {
@@ -61,6 +62,9 @@ export default function LoginPage() {
       markPageLoaded();
     }
   }, [internallyLoaded]);
+  if (ticket && !registerToken) {
+    return null;
+  }
   if (registerToken) {
     return (
       <Page

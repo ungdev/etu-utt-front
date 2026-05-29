@@ -3,35 +3,83 @@
 .tooltipContainer {
   position: relative;
   display: inline-block;
+  cursor: help;
 
   & > .tooltip {
     display: none;
     background-color: $ung-dark-grey;
     position: absolute;
-    left: calc(100% + 6px);
-    top: 0.65em;
-    transform: translateY(-50%);
     border-radius: 4px;
     padding: 1px 4px;
     text-transform: uppercase;
     font-size: small;
     font-weight: bold;
     color: $light-gray;
-    z-index: 10;
     white-space: normal;
     overflow-wrap: break-word;
+    text-wrap: nowrap;
+    z-index: 100;
+    pointer-events: none;
+
+    &.left {
+      right: calc(100% + 6px);
+      &::before {
+        right: -6px;
+        top: 50%;
+        transform: translateY(-50%);
+        border-top: 5px solid transparent;
+        border-left: 7px solid $ung-dark-grey;
+        border-bottom: 5px solid transparent;
+      }
+    }
+
+    &.top {
+      bottom: calc(100% + 6px);
+      left: 50%;
+      transform: translateX(-50%);
+      &::before {
+        bottom: -6px;
+        left: 50%;
+        transform: translateX(-50%);
+        border-left: 5px solid transparent;
+        border-top: 7px solid $ung-dark-grey;
+        border-right: 5px solid transparent;
+      }
+    }
+
+    &.right {
+      left: calc(100% + 6px);
+      top: 0.65em;
+      transform: translateY(-50%);
+      &::before {
+        left: -6px;
+        top: 50%;
+        transform: translateY(-50%);
+        border-top: 5px solid transparent;
+        border-right: 7px solid $ung-dark-grey;
+        border-bottom: 5px solid transparent;
+      }
+    }
+
+    &.bottom {
+      bottom: -1.65em;
+      left: 50%;
+      transform: translateX(-50%);
+      &::before {
+        top: -6px;
+        left: 50%;
+        transform: translateX(-50%);
+        border-left: 5px solid transparent;
+        border-bottom: 7px solid $ung-dark-grey;
+        border-right: 5px solid transparent;
+      }
+    }
 
     &::before {
       content: '';
       width: 0;
       height: 0;
-      border-top: 5px solid transparent;
-      border-right: 7px solid $ung-dark-grey;
-      border-bottom: 5px solid transparent;
-      left: -6px;
       position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
     }
 
     &.disabled {

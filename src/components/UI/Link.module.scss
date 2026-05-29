@@ -1,5 +1,12 @@
 @import '@/variables';
 
+.link .icon {
+  display: inline-block;
+  position: absolute;
+  width: 0.8em;
+  vertical-align: super;
+}
+
 .link.noStyle {
   color: inherit;
   text-decoration: none;
