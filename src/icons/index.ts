@@ -25,7 +25,6 @@ import LogoUNG from './LogoUNG';
 import Logout from './Logout';
 import LogoUTT from './LogoUTT';
 import Rotate from './Rotate';
-import Copy from './Copy';
 import Mail from './Mail';
 import Phone from './Phone';
 import LinkExternal from './LinkExternal';

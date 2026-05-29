@@ -122,7 +122,7 @@ export default function UesPage() {
                             <div key={`${credit.category.code}-${i}`}>
                               {credit.credits}
                               <span className={styles.categoryLabel}>
-                                <Tooltip position="below" content={credit.category.name}>
+                                <Tooltip styles="RIGHT" content={credit.category.name}>
                                   {credit.category.code}
                                 </Tooltip>
                               </span>
@@ -147,7 +147,7 @@ export default function UesPage() {
                       )}
                       {item?.info?.requirements?.length ? (
                         <div className={[styles.requirements, styles.categoryLabel].join(' ')}>
-                          <Tooltip position="left" content={item?.info?.requirements?.join(', ')}>
+                          <Tooltip styles="LEFT" content={item?.info?.requirements?.join(', ')}>
                             {item?.info?.requirements?.length}{' '}
                             <span className={styles.label}>{t('ues:overview.requirements')}</span>
                           </Tooltip>

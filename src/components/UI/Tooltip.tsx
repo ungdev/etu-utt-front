@@ -4,11 +4,13 @@ import { c } from '@/utils';
 
 export const TooltipStyle = {
   TOP: cssStyle.top,
+  BOTTOM: cssStyle.bottom,
+  LEFT: cssStyle.left,
+  RIGHT: cssStyle.right,
   SIZE_SMALL: cssStyle.sizeSmall,
   SIZE_MEDIUM: cssStyle.sizeMedium,
   SIZE_LARGE: cssStyle.sizeLarge,
   TEXT_CENTER: cssStyle.textCenter,
-  TEXT_RIGHT: cssStyle.textRight,
   DISABLED: cssStyle.disabled,
 };
 
@@ -21,7 +23,7 @@ export default function Tooltip({
   className?: string | string[];
   content: string;
   children: ReactNode;
-  styles: undefined | keyof typeof TooltipStyle | (keyof typeof TooltipStyle)[];
+  styles?: undefined | keyof typeof TooltipStyle | (keyof typeof TooltipStyle)[];
 }) {
   return (
     <div className={[cssStyle.tooltipContainer, className].flat().join(' ')}>

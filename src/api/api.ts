@@ -94,7 +94,7 @@ export class ResponseHandler<T, R extends ResponseHandlerExtendsType<T> = { fall
 {
   private readonly handlers = { fallback: () => undefined } as R;
   private readonly promise: Promise<ReturnType<R[keyof R] extends (...args: any) => any ? R[keyof R] : never>>;
-  public readonly abortController: AbortController;
+  // public readonly abortController: AbortController;
 
   constructor(
     rawResponse: Promise<APIResponse<T>>,
@@ -168,7 +168,7 @@ export class ResponseHandler<T, R extends ResponseHandlerExtendsType<T> = { fall
    * Fires ResponseError.timeout handler or falls back to failure handler.
    */
   abort() {
-    this.abortController.abort(ResponseFailureReason.abort);
+    this.abortController.abort(ResponseFailureReason.aborted);
   }
 
   async toPromise(): Promise<Awaited<ReturnType<R[keyof R] extends (...args: any) => any ? R[keyof R] : never>>> {
@@ -292,8 +292,8 @@ async function internalRequestAPI<RequestType, ResponseType>(
       console.error('An error occurred when making a request to the API');
     }
 
-    if (abortController.signal.reason === ResponseFailureReason.abort)
-      return { failureReason: ResponseFailureReason.abort };
+    if (abortController.signal.reason === ResponseFailureReason.aborted)
+      return { failureReason: ResponseFailureReason.aborted };
 
     return { failureReason: ResponseFailureReason.unknown };
   } finally {
