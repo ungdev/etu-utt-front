@@ -106,7 +106,7 @@ export default function FilteredSearch<
   invalidateItems,
 }: {
   filtersData: FiltersDataType<FilterNames, FiltersType>;
-  updateSearch: (filters: Record<string, string>) => void;
+  updateSearch: (filters: Record<string, string>, page?: number) => void;
   invalidateItems: () => void;
 }) {
   // The filters currently used.

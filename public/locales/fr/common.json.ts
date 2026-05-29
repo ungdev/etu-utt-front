@@ -34,4 +34,5 @@ export default {
   results: 'résultats',
   '404': 'Page not found',
   '404.description': "La page demandée n'existe pas ou n'est plus disponible.",
+  confirm: 'Confirmer',
 } as const;

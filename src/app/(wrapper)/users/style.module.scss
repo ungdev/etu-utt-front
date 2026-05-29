@@ -38,19 +38,19 @@
           p,
           h2 {
             @extend .glimmer-animated;
-            width: 16ch;
+            width: 8em;
 
             &:nth-child(2) {
-              width: 8ch;
+              width: 4em;
             }
             &:nth-of-type(2) {
-              width: 18ch;
+              width: 9em;
             }
             &:nth-of-type(3) {
-              width: 15ch;
+              width: 7em;
             }
             &:nth-of-type(4) {
-              width: 10ch;
+              width: 5em;
             }
           }
         }

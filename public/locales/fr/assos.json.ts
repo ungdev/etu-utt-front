@@ -2,8 +2,36 @@
 // For more information, check the common.json.ts file
 
 export default {
-  "browser": "UTT Travail",
-  "filter.search": "Recherche dans le guide des assos",
-  "filter.search.title": "Recherche dans le guide des assos"
+  browser: 'UTT Travail',
+  'filter.search': 'Recherche dans le guide des assos',
+  'filter.search.title': 'Recherche dans le guide des assos',
+  'member.list.title': 'Membres',
+  'member.since': 'Depuis ',
+  'member.old.from': 'Entre ',
+  'member.old.to': ' et ',
+  'member.old.display': 'Afficher les anciens',
+  'member.old.hide': 'Masquer les anciens',
+  'member.edit': 'Modifier les membres',
+  'member.edit.stop': 'Fermer',
+  'member.role.add': 'Ajouter un rôle',
+  'member.role.create.title': 'Créer un rôle',
+  'member.role.create.submit': 'Créer',
+  'member.role.create.label': 'Nom du rôle',
+  'member.role.delete.title': 'Supprimer le rôle',
+  'member.role.delete.label':
+    'Êtes-vous sûr de vouloir supprimer ce rôle ? Cela supprimera toutes les adhésions à ce rôle ainsi que les anciens membres.',
+  'member.role.delete.confirm': "J'ai compris",
+  'member.role.delete.submit': 'Supprimer',
+  'member.add.title': 'Ajouter un membre',
+  'member.add.label.user': 'Nouveau membre',
+  'member.add.label.role': 'Rôle',
+  'member.add.label.permissions': 'Permissions',
+  'member.add.label.endAt': "Date de fin d'adhésion",
+  'member.add.submit': 'Ajouter',
+  'member.edit.title': 'Modifier un membre',
+  'member.edit.label.role': 'Rôle',
+  'member.edit.label.permissions': 'Permissions',
+  'member.edit.label.endAt': "Date de fin d'adhésion",
+  'member.edit.submit': 'Modifier',
+  'no.permission.edit.member': 'Permission insuffisante pour modifier les membres',
 } as const;
-

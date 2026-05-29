@@ -1,23 +1,38 @@
-import styles from './Tooltip.module.scss';
+import cssStyle from './Tooltip.module.scss';
 import { ReactNode } from 'react';
+import { c } from '@/utils';
 
-export type TooltipPosition = 'left' | 'above' | 'right' | 'below';
+export const TooltipStyle = {
+  TOP: cssStyle.top,
+  SIZE_SMALL: cssStyle.sizeSmall,
+  SIZE_MEDIUM: cssStyle.sizeMedium,
+  SIZE_LARGE: cssStyle.sizeLarge,
+  TEXT_CENTER: cssStyle.textCenter,
+  TEXT_RIGHT: cssStyle.textRight,
+  DISABLED: cssStyle.disabled,
+};
 
 export default function Tooltip({
   children = false,
   className = '',
   content = '',
-  position = 'right',
+  styles = undefined,
 }: {
   className?: string | string[];
   content: string;
   children: ReactNode;
-  position?: TooltipPosition;
+  styles: undefined | keyof typeof TooltipStyle | (keyof typeof TooltipStyle)[];
 }) {
   return (
-    <div className={[styles.tooltipContainer, className].flat().join(' ')}>
+    <div className={[cssStyle.tooltipContainer, className].flat().join(' ')}>
       {children}
-      <div className={[styles.tooltip, styles[position]].join(' ')}>{content}</div>
+      <div
+        className={c(
+          cssStyle.tooltip,
+          ...(Array.isArray(styles) ? styles.map((style) => TooltipStyle[style]) : [styles && TooltipStyle[styles]]),
+        )}>
+        {content}
+      </div>
     </div>
   );
 }

@@ -65,6 +65,7 @@ export default function ExamList({
                           {annal.type.name}{' '}
                           {(statusIcon !== 'validated' || annal.sender.id === userId) && (
                             <Tooltip
+                              styles={'SIZE_MEDIUM'}
                               content={t(`ues:detailed.annals.entry.status.${statusIcon}`)}
                               className={styles.status}>
                               {getIcon(statusIcon)}

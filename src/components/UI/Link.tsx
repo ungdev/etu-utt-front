@@ -9,19 +9,26 @@ export default function Link({
   href,
   className = '',
   noStyle = false,
-  external = false,
+  newTab = false,
+  disabled = false,
 }: {
   children?: ReactNode;
   href: Url;
   className?: string;
   noStyle?: boolean;
-  external?: boolean;
+  newTab?: boolean;
+  disabled?: boolean;
 }) {
-  return (
+  return disabled ? (
+    <div className={`${styles.link} ${className} ${noStyle ? styles.noStyle : ''}`}>
+      <span>{children}</span>
+    </div>
+  ) : (
     <ReactLink
       href={href}
       className={`${styles.link} ${className} ${noStyle ? styles.noStyle : ''}`}
-      target={external ? '_blank' : ''}>
+      target={newTab ? '_blank' : '_self'}
+      rel={newTab ? 'noopener noreferrer' : undefined}>
       <span>{children}</span>
       {external ? <ExternalLink className={styles.icon} /> : <></>}
     </ReactLink>

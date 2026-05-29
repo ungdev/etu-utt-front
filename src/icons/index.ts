@@ -25,33 +25,58 @@ import LogoUNG from './LogoUNG';
 import Logout from './Logout';
 import LogoUTT from './LogoUTT';
 import Rotate from './Rotate';
+import Copy from './Copy';
+import Mail from './Mail';
+import Phone from './Phone';
+import LinkExternal from './LinkExternal';
+import Crown from './Crown';
+import Add from './Add';
+import Close from './Close';
+import Edit from './Edit';
+import EyeOff from './EyeOff';
+import EyeOn from './EyeOn';
+import Confirm from './Confirm';
+import UserAdd from './UserAdd';
+import UserRemove from './UserRemove';
 
 const Icons = {
+  Add,
   Book,
   Caret,
   CircleCheck,
   CircleWarning,
   Clock,
+  Close,
   Collapse,
   Comment,
+  Confirm,
+  Crown,
+  Edit,
   Enter,
   ExternalLink,
+  EyeOff,
+  EyeOn,
   Home,
   Language,
   LeftArrow,
   LeftChevron,
+  LinkExternal,
   Loader,
   Login,
   LogoEtu,
   LogoUNG,
   LogoUTT,
   Logout,
+  Mail,
   Menu,
+  Phone,
   Star,
   Trash,
   RightChevron,
   Rotate,
   User,
+  UserAdd,
+  UserRemove,
   Users,
   Copy,
 };

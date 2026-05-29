@@ -48,7 +48,7 @@ export default function AssoPage() {
             itemFactory={({ item }) => (
               <div>
                 <h2>{item?.name}</h2>
-                <p>{item?.descriptionShortTranslation}</p>
+                <p>{item?.shortDescription}</p>
               </div>
             )}
             getItemId={(asso) => asso.id}

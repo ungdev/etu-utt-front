@@ -1,0 +1,30 @@
+@import '@/variables.scss';
+
+.userSelector {
+  display: flex;
+  flex-flow: column nowrap;
+  gap: 0.5em;
+
+  .resultPool {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 0.5em;
+    position: relative;
+    min-height: 2em;
+
+    .noResult {
+      display: block;
+      position: absolute;
+      text-align: center;
+      font-style: italic;
+      width: 100%;
+      top: 50%;
+      transform: translateY(-50%);
+      color: $ung-light-grey;
+    }
+
+    & > :not(.noResult) {
+      cursor: pointer;
+    }
+  }
+}
