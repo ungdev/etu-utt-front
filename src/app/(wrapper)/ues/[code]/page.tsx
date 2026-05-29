@@ -25,8 +25,90 @@ import Page from '@/components/utilities/Page';
 import { useAppSelector } from '@/lib/hooks';
 import { UserType, useLoggedIn } from '@/module/session';
 import { ReactNode, useState } from 'react';
+import { DetailedUE } from '@/api/ue/ue.interface';
 
-export default function UEDetailsPage() {
+function UeWorkTimes({ workTimes }: { workTimes: DetailedUE['ueofs'][number]['workTime'] }): ReactNode {
+  const { t } = useAppTranslation();
+  if (!workTimes) return <div className={styles.worktime}>{t('ues:detailed.noWorkingTimeInfo')}</div>;
+
+  return (
+    <div className={styles.worktime}>
+      {workTimes.cm ? (
+        <div>
+          <div>
+            {workTimes.cm}
+            <span>{t('ues:detailed.worktime.hour')}</span>
+          </div>
+          <Tooltip content={t('ues:detailed.worktime.cm.tooltip')}>
+            <div>{t('ues:detailed.worktime.cm')}</div>
+          </Tooltip>
+        </div>
+      ) : (
+        <></>
+      )}
+      {workTimes.td ? (
+        <div>
+          <div>
+            {workTimes.td}
+            <span>{t('ues:detailed.worktime.hour')}</span>
+          </div>
+          <Tooltip content={t('ues:detailed.worktime.td.tooltip')}>
+            <div>{t('ues:detailed.worktime.td')}</div>
+          </Tooltip>
+        </div>
+      ) : (
+        <></>
+      )}
+      {workTimes.tp ? (
+        <div>
+          <div>
+            {workTimes.tp}
+            <span>{t('ues:detailed.worktime.hour')}</span>
+          </div>
+          <Tooltip content={t('ues:detailed.worktime.tp.tooltip')}>
+            <div>{t('ues:detailed.worktime.tp')}</div>
+          </Tooltip>
+        </div>
+      ) : (
+        <></>
+      )}
+      {workTimes.the ? (
+        <div>
+          <div>
+            {workTimes.the}
+            <span>{t('ues:detailed.worktime.hour')}</span>
+          </div>
+          <Tooltip content={t('ues:detailed.worktime.the.tooltip')}>
+            <div>{t('ues:detailed.worktime.the')}</div>
+          </Tooltip>
+        </div>
+      ) : (
+        <></>
+      )}
+      {workTimes.internship ? (
+        <div>
+          <div>
+            {workTimes.internship}
+            <span>{t('ues:detailed.worktime.hour')}</span>
+          </div>
+          <div>{t('ues:detailed.worktime.internship')}</div>
+        </div>
+      ) : (
+        <></>
+      )}
+      {workTimes.project ? (
+        <div>
+          <div>{Number(workTimes.project)}</div>
+          <div>{t('ues:detailed.worktime.project')}</div>
+        </div>
+      ) : (
+        <></>
+      )}
+    </div>
+  );
+}
+
+export default function UeDetailsPage() {
   const params = useParams<{ code: string }>();
   const { t } = useAppTranslation();
   const logged = useLoggedIn();
@@ -89,85 +171,7 @@ export default function UEDetailsPage() {
           <h1>{ue.code}</h1>
           <p>{ue.ueofs[ueofIndex].name}</p>
         </div>
-        <div className={styles.worktime}>
-          {ue.ueofs[ueofIndex].workTime ? (
-            <>
-              {ue.ueofs[ueofIndex].workTime.cm ? (
-                <div>
-                  <div>
-                    {ue.ueofs[ueofIndex].workTime.cm}
-                    <span>{t('ues:detailed.worktime.hour')}</span>
-                  </div>
-                  <Tooltip content={t('ues:detailed.worktime.cm.tooltip')}>
-                    <div>{t('ues:detailed.worktime.cm')}</div>
-                  </Tooltip>
-                </div>
-              ) : (
-                <></>
-              )}
-              {ue.ueofs[ueofIndex].workTime.td ? (
-                <div>
-                  <div>
-                    {ue.ueofs[ueofIndex].workTime.td}
-                    <span>{t('ues:detailed.worktime.hour')}</span>
-                  </div>
-                  <Tooltip content={t('ues:detailed.worktime.td.tooltip')}>
-                    <div>{t('ues:detailed.worktime.td')}</div>
-                  </Tooltip>
-                </div>
-              ) : (
-                <></>
-              )}
-              {ue.ueofs[ueofIndex].workTime.tp ? (
-                <div>
-                  <div>
-                    {ue.ueofs[ueofIndex].workTime.tp}
-                    <span>{t('ues:detailed.worktime.hour')}</span>
-                  </div>
-                  <Tooltip content={t('ues:detailed.worktime.tp.tooltip')}>
-                    <div>{t('ues:detailed.worktime.tp')}</div>
-                  </Tooltip>
-                </div>
-              ) : (
-                <></>
-              )}
-              {ue.ueofs[ueofIndex].workTime.the ? (
-                <div>
-                  <div>
-                    {ue.ueofs[ueofIndex].workTime.the}
-                    <span>{t('ues:detailed.worktime.hour')}</span>
-                  </div>
-                  <Tooltip content={t('ues:detailed.worktime.the.tooltip')}>
-                    <div>{t('ues:detailed.worktime.the')}</div>
-                  </Tooltip>
-                </div>
-              ) : (
-                <></>
-              )}
-              {ue.ueofs[ueofIndex].workTime.internship ? (
-                <div>
-                  <div>
-                    {ue.ueofs[ueofIndex].workTime.internship}
-                    <span>{t('ues:detailed.worktime.hour')}</span>
-                  </div>
-                  <div>{t('ues:detailed.worktime.internship')}</div>
-                </div>
-              ) : (
-                <></>
-              )}
-              {ue.ueofs[ueofIndex].workTime.project ? (
-                <div>
-                  <div>{Number(ue.ueofs[ueofIndex].workTime.project)}</div>
-                  <div>{t('ues:detailed.worktime.project')}</div>
-                </div>
-              ) : (
-                <></>
-              )}
-            </>
-          ) : (
-            t('ues:detailed.noWorkingTimeInfo')
-          )}
-        </div>
+        <UeWorkTimes workTimes={ue.ueofs[ueofIndex].workTime} />
       </div>
       <div className={styles.divider} />
       {!isAnnalUploaderOpen ? (

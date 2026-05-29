@@ -8,7 +8,7 @@ import { Branch } from '@/api/branch/branch.interface';
 import { fetchBranches } from '@/api/branch/fetchBranches';
 import { CreditCategory } from '@/api/credit/credit.interface';
 import { fetchCreditCategories } from '@/api/credit/fetchCreditCategories';
-import { useLoggedIn } from "@/module/session";
+import { useLoggedIn } from '@/module/session';
 
 interface ConstantDataSlice {
   ueRateCriteria: UERateCriterion[] | null;
