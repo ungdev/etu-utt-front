@@ -1,4 +1,4 @@
-import { UserType } from '@/module/user';
+import { UserType } from '@/module/session';
 
 export interface Profile {
   id: string;

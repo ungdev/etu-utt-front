@@ -1,0 +1,196 @@
+@import '@/variables';
+
+.page {
+  margin-top: 2em;
+
+  .header {
+    display: flex;
+    flex-flow: row nowrap;
+    gap: 1em;
+    justify-content: space-between;
+
+    .worktime {
+      display: flex;
+      flex-flow: row nowrap;
+      gap: 0.5rem;
+
+      & > * {
+        width: 4rem;
+        display: flex;
+        flex-flow: column nowrap;
+        justify-content: center;
+        align-items: center;
+        font-weight: bold;
+
+        & > :nth-child(1) {
+          font-size: 2em;
+
+          span {
+            font-size: 0.5em;
+          }
+        }
+
+        & > :nth-child(2) {
+          text-transform: uppercase;
+          color: $ung-light-grey;
+          text-align: center;
+        }
+      }
+
+      .noWorkingTimeInfo {
+        width: auto;
+        font-style: italic;
+        color: $ung-light-grey;
+      }
+    }
+  }
+
+  h1 {
+    color: $ung-light-blue;
+    font-size: 2.5rem;
+    margin-bottom: 3px;
+  }
+
+  > p {
+    color: $ung-dark-grey;
+    font-weight: bold;
+    font-size: 1.2rem;
+  }
+
+  h1 + p {
+    font-size: 1.8rem;
+  }
+
+  .tabs {
+    position: absolute;
+    width: 100%;
+    left: 0;
+    top: 0;
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: stretch;
+    margin: 0 0 2px 0;
+    justify-content: stretch;
+    user-select: none;
+    border-bottom: 2px solid $ung-dark-grey;
+
+    .tab {
+      flex: 1 0 200px;
+      text-align: center;
+      padding: 10px 8px 8px;
+      display: inline-block;
+      position: relative;
+      cursor: pointer;
+      border-bottom: 4px solid $ung-dark-grey;
+      background-color: $ung-light-grey;
+      color: $light-gray;
+
+      &[data-active='true'] {
+        background-color: $ung-light-blue;
+        border-bottom-color: $light-gray;
+        &::before {
+          content: '';
+          position: absolute;
+          bottom: 0;
+          left: 50%;
+          transform: translateX(-50%);
+          border-left: 6px solid transparent;
+          border-bottom: 5px solid $light-gray;
+          border-right: 6px solid transparent;
+        }
+      }
+    }
+  }
+
+  .divider {
+    width: 40%;
+    height: 3px;
+    background-color: $ung-light-grey;
+    margin-top: 10px;
+  }
+
+  .info,
+  .takeUEInfo {
+    padding: 1rem 0;
+    white-space: pre-line;
+  }
+
+  .takeUEInfo .info {
+    grid-template-columns: 20ch 1fr;
+
+    .clipboardCopy {
+      cursor: pointer;
+      display: inline-block;
+    }
+  }
+
+  .info {
+    display: grid;
+    grid-template-columns: 15ch 1fr;
+    gap: 8px;
+
+    .empty {
+      color: $ung-light-grey;
+      font-style: italic;
+    }
+
+    & > :nth-child(2n + 1) {
+      font-weight: bold;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    & > :nth-child(2n) {
+      text-align: justify;
+    }
+  }
+
+  .thoughts {
+    position: relative;
+    padding: 2rem 0;
+
+    & > h2 {
+      margin-bottom: 1rem;
+      color: $ung-light-blue;
+    }
+
+    .rates {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10%;
+      justify-content: center;
+
+      &.error {
+        display: block;
+        font-style: italic;
+        color: $ung-light-grey;
+      }
+
+      .criterion {
+        margin-top: 30px;
+
+        h3 {
+          text-align: center;
+          margin-bottom: 1rem;
+          color: $ung-light-blue;
+        }
+      }
+    }
+  }
+
+  .writeComment {
+    margin-top: 2rem;
+
+    textarea {
+      resize: vertical;
+      width: 100%;
+      margin-top: 0.3rem;
+    }
+
+    button {
+      margin-top: 0.5rem;
+      width: 100%;
+    }
+  }
+}

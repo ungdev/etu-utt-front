@@ -31,6 +31,7 @@ export default {
   'member.add.label.role': 'Rôle',
   'member.add.label.permissions': 'Permissions',
   'member.add.label.endAt': "Date de fin d'adhésion",
+  'member.edit.no-permission': 'Permission insuffisante pour modifier les membres',
   'member.add.submit': 'Ajouter',
   'member.edit.title': 'Modifier un membre',
   'member.edit.label.role': 'Rôle',

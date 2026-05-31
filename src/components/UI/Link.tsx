@@ -2,6 +2,7 @@ import styles from './Link.module.scss';
 import { ReactNode } from 'react';
 import ReactLink from 'next/link';
 import { Url } from 'next/dist/shared/lib/router/router';
+import ExternalLink from '@/icons/ExternalLink';
 
 export default function Link({
   children,
@@ -29,6 +30,7 @@ export default function Link({
       target={newTab ? '_blank' : '_self'}
       rel={newTab ? 'noopener noreferrer' : undefined}>
       <span>{children}</span>
+      {newTab ? <ExternalLink className={styles.icon} /> : <></>}
     </ReactLink>
   );
 }

@@ -2,17 +2,35 @@ import { PropsWithoutRef, useState } from 'react';
 import { Role, Member } from '@/api/assos/member.interface';
 import { useAppTranslation } from '@/lib/i18n';
 import styles from './AssoRole.module.scss';
+import Icons from '@/icons';
 import Button from '../UI/Button';
 import Input from '../UI/Input';
 import Link from '../UI/Link';
 import { IconCheck, IconCrown, IconDelete, IconEdit, IconUserAdd, IconUserCross } from 'obra-icons-react';
+import DisableableButton from '../UI/DisableableButton';
+
+/**
+ * Sorts {@link Member asso members}.
+ * Old members are sorted after current members.
+ * Current members are sorted by start date (earliest last).
+ * Old members are sorted by end date (most recent first).
+ */
+const userSorter = (a: Member, b: Member) => {
+  const aSign = Math.sign(a.endAt.getTime() - Date.now()); // 1 if current, -1 if old (same goes for b below)
+  const oldComparison = Math.sign(b.endAt.getTime() - Date.now()) - aSign; // equals to 0 if both are old or both are current. Otherwise, puts current members first (same behaviour as using `[10, 62, 42].sort()`)
+  return (
+    // Choose sorting criterion depending on whether the "a" member is old or current (the "b" member will be the same due to oldComparison check)
+    // This is a standard comparison, as above. Check how to use {@link Array.sort https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort} if you're not familiar with it.
+    oldComparison || (aSign > 0 ? a.startAt.getTime() - b.startAt.getTime() : b.endAt.getTime() - a.endAt.getTime())
+  );
+};
 
 export function AssoRole({
   role,
   editing = false,
   canEdit,
-  hasPermission,
-  hasMembersPermission,
+  hasEditRolesPermission,
+  hasEditMembersPermission,
   displayOldMembers,
   deleteAssoRole,
   updateAssoRole,
@@ -24,8 +42,8 @@ export function AssoRole({
   role: Role;
   editing?: boolean;
   canEdit: boolean;
-  hasPermission: boolean;
-  hasMembersPermission: boolean;
+  hasEditRolesPermission: boolean;
+  hasEditMembersPermission: boolean;
   displayOldMembers: boolean;
   deleteAssoRole: (id: string) => void;
   updateAssoRole: (id: string, data: Partial<{ name: string; position: number }>) => void;
@@ -34,7 +52,7 @@ export function AssoRole({
   updateAssoMember: (member: Member, fromRoleId: string) => void;
   setCurrentEditingRole: (id: string | null) => void;
 }>) {
-  const [currentEditingRoleValue, setCurrentEditingRoleValue] = useState<string>(role.name);
+  const [currentEditingRoleName, setCurrentEditingRoleName] = useState<string>(role.name);
   const { t } = useAppTranslation();
 
   const userSorter = (a: Member, b: Member) => {
@@ -48,40 +66,45 @@ export function AssoRole({
   return (
     <>
       <h3 className={styles.roleRoot}>
-        {role.isPresident ? (
+        {role.isPresident && (
           <div className={styles.crown}>
             <IconCrown />
           </div>
-        ) : (
-          ''
         )}
         <div className={styles.actionRow}>
           {editing && canEdit ? (
-            <Input value={currentEditingRoleValue} onChange={setCurrentEditingRoleValue} />
+            <Input value={currentEditingRoleName} onChange={setCurrentEditingRoleName} />
           ) : (
             <div>{role.name}</div>
           )}
           {canEdit && (
             <>
-              <Button onClick={() => createAssoMember(role.id)} disabled={!hasMembersPermission}>
+              <DisableableButton
+                onClick={() => createAssoMember(role.id)}
+                disabled={!hasEditMembersPermission}
+                disabledTooltip={t('assos:no.permission.edit.member')}>
                 <IconUserAdd />
-              </Button>
-              <Button onClick={() => deleteAssoRole(role.id)} disabled={!hasPermission || role.isPresident}>
+              </DisableableButton>
+              <DisableableButton
+                onClick={() => deleteAssoRole(role.id)}
+                disabled={!hasEditRolesPermission || role.isPresident}
+                disabledTooltip={t('assos:no.permission.edit.member')}>
                 <IconDelete />
-              </Button>
-              <Button
+              </DisableableButton>
+              <DisableableButton
                 onClick={() => {
                   if (editing) {
-                    updateAssoRole(role.id, { name: currentEditingRoleValue });
+                    updateAssoRole(role.id, { name: currentEditingRoleName });
                     setCurrentEditingRole(null);
                   } else {
                     setCurrentEditingRole(role.id);
-                    setCurrentEditingRoleValue(role.name);
+                    setCurrentEditingRoleName(role.name);
                   }
                 }}
-                disabled={!hasPermission}>
+                disabled={!hasEditRolesPermission}
+                disabledTooltip={t('assos:no.permission.edit.member')}>
                 {editing ? <IconCheck /> : <IconEdit />}
-              </Button>
+              </DisableableButton>
             </>
           )}
         </div>
@@ -122,12 +145,18 @@ export function AssoRole({
                   </div>
                   {!isOld && canEdit && (
                     <>
-                      <Button onClick={() => updateAssoMember(member, role.id)} disabled={!hasMembersPermission}>
+                      <DisableableButton
+                        onClick={() => updateAssoMember(member, role.id)}
+                        disabled={!hasEditMembersPermission}
+                        disabledTooltip={t('assos:no.permission.edit.member')}>
                         <IconEdit />
-                      </Button>
-                      <Button onClick={() => deleteAssoMember(member.id)} disabled={!hasMembersPermission}>
+                      </DisableableButton>
+                      <DisableableButton
+                        onClick={() => deleteAssoMember(member.id)}
+                        disabled={!hasEditMembersPermission}
+                        disabledTooltip={t('assos:no.permission.edit.member')}>
                         <IconUserCross />
-                      </Button>
+                      </DisableableButton>
                     </>
                   )}
                 </div>

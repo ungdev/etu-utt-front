@@ -11,11 +11,10 @@ import CircleCheck from '@/icons/CircleCheck';
 import CircleWarning from '@/icons/CircleWarning';
 import Clock from '@/icons/Clock';
 import Trash from '@/icons/Trash';
-import { UserType } from '@/module/user';
+import { useConnectedUser, UserType } from '@/module/session';
 import Button from '../UI/Button';
 import Tooltip from '../UI/Tooltip';
 import styles from './ExamList.module.scss';
-import { useAppSelector } from '@/lib/hooks';
 import { useAppTranslation } from '@/lib/i18n';
 import { useAPI } from '@/api/api';
 
@@ -32,13 +31,12 @@ export default function ExamList({
   annalTypes,
   annalSemesters,
 }: {
-  annals: Annal[] | null;
+  annals: Annal[];
   setAnnalUploaderOpen: (opened: boolean) => void;
-  annalTypes: AnnalType[] | null;
-  annalSemesters: string[] | null;
+  annalTypes: AnnalType[];
+  annalSemesters: string[];
 }) {
-  const type = useAppSelector((state) => state.user?.type);
-  const userId = useAppSelector((state) => state.user?.id);
+  const { type, id: userId } = useConnectedUser() ?? {};
   const { t } = useAppTranslation();
   const api = useAPI();
 
@@ -47,7 +45,7 @@ export default function ExamList({
       <div className={styles.exams}>
         <h2>{t('ues:detailed.annals.title')}</h2>
         <div className={styles.list}>
-          {annals?.length
+          {annals.length
             ? Object.entries(Object.groupBy(annals, (annal) => annal.semesterId)).map(([semester, annals]) => (
                 <div className={styles.semester} key={semester}>
                   <h3>{semester}</h3>
@@ -67,6 +65,7 @@ export default function ExamList({
                           {annal.type.name}{' '}
                           {(statusIcon !== 'validated' || annal.sender.id === userId) && (
                             <Tooltip
+                              styles={'SIZE_MEDIUM'}
                               content={t(`ues:detailed.annals.entry.status.${statusIcon}`)}
                               className={styles.status}>
                               {getIcon(statusIcon)}
@@ -85,7 +84,7 @@ export default function ExamList({
         </div>
         <Button
           className={styles.sendButton}
-          disabled={!annalTypes?.length || !annalSemesters?.length}
+          disabled={!annalTypes.length || !annalSemesters.length}
           onClick={() => setAnnalUploaderOpen(true)}>
           {t('ues:detailed.annals.send')}
         </Button>

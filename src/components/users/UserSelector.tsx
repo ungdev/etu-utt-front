@@ -7,7 +7,7 @@ import styles from './UserSelector.module.scss';
 import { UserCard } from './UserCard';
 
 export default function UserSelector({
-  updateInterval = 1000,
+  updateInterval = 500,
   onSelect,
 }: PropsWithoutRef<{ updateInterval?: number; onSelect?: (user: User) => void }>) {
   const { t } = useAppTranslation();
@@ -19,22 +19,8 @@ export default function UserSelector({
   const [lastUpdate, setLastUpdate] = useState<number>(0);
 
   useEffect(() => {
-    if (Date.now() - lastUpdate >= updateInterval) {
-      updateFilters({ q: searchString });
-      setLastUpdate(Date.now());
-    } else {
-      if (timeoutId >= 0) clearTimeout(timeoutId);
-      setTimeoutId(
-        window.setTimeout(
-          () => {
-            updateFilters({ q: searchString });
-            setLastUpdate(Date.now());
-            setTimeoutId(-1);
-          },
-          updateInterval - (Date.now() - lastUpdate),
-        ),
-      );
-    }
+    const tId = setTimeout(() => updateFilters({ q: searchString }), updateInterval);
+    return () => clearTimeout(tId);
   }, [searchString]);
 
   const select = (user: User) => {
@@ -44,16 +30,10 @@ export default function UserSelector({
 
   return (
     <div className={styles.userSelector}>
-      <Input
-        value={searchString}
-        onChange={(value) => setSearchString(value)}
-        placeholder={t('users:selector.ui.placeholder')}
-      />
+      <Input value={searchString} onChange={setSearchString} placeholder={t('users:selector.ui.placeholder')} />
       <div className={styles.resultPool}>
         {!items.length && <div className={styles.noResult}>{t('users:selector.ui.noResult')}</div>}
-        {items.map(
-          (user: User | null) => user && <UserCard key={user.id} user={user} onSelect={(user) => select(user)} />,
-        )}
+        {items.map((user: User | null) => user && <UserCard key={user.id} user={user} onSelect={select} />)}
       </div>
     </div>
   );

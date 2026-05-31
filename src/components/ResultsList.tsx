@@ -36,7 +36,7 @@ export function ResultsList<T extends object>({
   const visibilityTrigger = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (onEndReached && data[data.length - 1]) {
+    if (onEndReached && data[data.length - 1] && totalResults > data.length) {
       const intersectionObserver = new IntersectionObserver(
         ([entry]) => {
           if (entry.isIntersecting) {

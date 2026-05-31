@@ -8,11 +8,12 @@ import Link from 'next/link';
 import { type NotParameteredTranslationKey, useAppTranslation } from '@/lib/i18n';
 import Icons from '@/icons';
 import { IconArrowLeft, IconLanguage, IconLogIn, IconLogOut, IconMenu } from 'obra-icons-react';
-import { isLoggedIn, logout } from '@/module/session';
+import { isLoggedIn, logout, useConnectedUser } from '@/module/session';
 import Button from './UI/Button';
 import { usePageSettings } from '@/module/pageSettings';
 import { usePathname, useRouter } from 'next/navigation';
 import { LocalStorageNames } from '@/global';
+import { isDevEnv } from '@/utils/environment';
 
 /**
  * The type defining all possible properties for a menu item
@@ -74,7 +75,7 @@ export default function Navbar() {
   const menuItems = useAppSelector(getMenu);
   const collapsed = useCollapsed();
   const loggedIn = useAppSelector(isLoggedIn);
-  const user = useAppSelector((state) => state.user);
+  const user = useConnectedUser();
   const dispatch = useAppDispatch();
   const { navbarAdditionalComponent: Additional } = usePageSettings();
 
@@ -233,7 +234,7 @@ export default function Navbar() {
             </Link>
             <div className={`${styles.buttons}`}>
               <Button onClick={() => router.push('/login')}>Connexion</Button>
-              <Button onClick={() => router.push('/register')}>Inscription</Button>
+              {isDevEnv() && <Button onClick={() => router.push('/register')}>Inscription</Button>}
             </div>
           </div>
         )}

@@ -1,16 +1,17 @@
 'use client';
 
-import { FC, useEffect, useRef, ReactNode } from 'react';
+import { FC, useEffect, ReactNode } from 'react';
 import { useAppDispatch } from '@/lib/hooks';
-import { defaultPageSettings, initPageSettings, updatePageSettings } from '@/module/pageSettings';
+import { defaultPageSettings, initPageSettings, updatePageSettings, PagePermission } from '@/module/pageSettings';
 
 export type PageProps = {
   hasNavbar?: boolean;
   navbarAdditionalComponent?: FC<Record<string, never>> | null;
-  permissions?: string;
+  permissions?: PagePermission[];
   needsLoading?: boolean;
   className?: string;
   id?: string;
+  noWrapperPadding?: boolean;
 };
 
 export default function Page({
@@ -21,10 +22,10 @@ export default function Page({
   className,
   id,
   children,
+  noWrapperPadding = false,
 }: PageProps & {
   children: ReactNode;
 }) {
-  const firstLoad = useRef(true);
   const dispatch = useAppDispatch();
   useEffect(
     () => () => {
@@ -33,16 +34,16 @@ export default function Page({
     [],
   );
   useEffect(() => {
-    firstLoad.current = false;
     dispatch(
       updatePageSettings({
         navbarAdditionalComponent,
         hasNavbar,
         permissions,
-        needsLoading: needsLoading,
+        needsLoading,
+        noWrapperPadding,
       }),
     );
-  }, [hasNavbar, needsLoading]);
+  }, [hasNavbar, needsLoading, noWrapperPadding]);
   return (
     <div id={id} className={className}>
       {children}

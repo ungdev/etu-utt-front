@@ -1,0 +1,78 @@
+@import '@/variables';
+@import '@/components/glimmer';
+
+.searchUserPage {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  .content {
+    display: flex;
+    gap: 30px;
+    margin-top: 5vh;
+    flex-grow: 1;
+    min-height: 0;
+
+    > * {
+      background-color: white;
+      border-radius: 15px;
+      border: #e7e7e7 solid 1px;
+      padding: 1rem;
+      overflow-y: scroll;
+    }
+
+    .results {
+      flex-grow: 1;
+      height: 100%;
+
+      .user {
+        display: flex;
+        gap: 1rem;
+        padding: 5px;
+
+        &.glimmer {
+          img {
+            background-color: $ung-light-grey;
+            opacity: 0.2;
+          }
+          p,
+          h2 {
+            @extend .glimmer-animated;
+            width: 8em;
+
+            &:nth-child(2) {
+              width: 4em;
+            }
+            &:nth-of-type(2) {
+              width: 9em;
+            }
+            &:nth-of-type(3) {
+              width: 7em;
+            }
+            &:nth-of-type(4) {
+              width: 5em;
+            }
+          }
+        }
+
+        img {
+          width: 80px;
+          height: 80px;
+          border-radius: 100%;
+        }
+
+        .userInfo {
+          h2 {
+            font-weight: bold;
+            font-size: 1.3rem;
+            margin-bottom: 0.2rem;
+
+            .nickname {
+              color: $ung-dark-grey;
+            }
+          }
+        }
+      }
+    }
+  }
+}

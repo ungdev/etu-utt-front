@@ -2,13 +2,16 @@ import { useEffect, useState } from 'react';
 import { useAPI } from '@/api/api';
 import { Asso } from '@/api/assos/asso.interface';
 
-export function useAsso(assoId: string): [Asso, (asso: Asso) => void] {
-  const [asso, setAsso] = useState<Asso | null>(null);
+export function useAsso(assoId: string): [Asso | null | undefined, (asso: Asso) => void] {
+  const [asso, setAsso] = useState<Asso | null | undefined>(undefined);
   const api = useAPI();
   useEffect(() => {
-    api.get<Asso>(`/assos/${assoId}`).on('success', (body) => {
-      setAsso(body);
-    });
+    api
+      .get<Asso>(`/assos/${assoId}`)
+      .on('success', (body) => {
+        setAsso(body);
+      })
+      .on('fallback', () => setAsso(null));
   }, []);
-  return [asso!, setAsso];
+  return [asso, setAsso];
 }

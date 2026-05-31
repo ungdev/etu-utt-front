@@ -23,7 +23,7 @@ export function UserCard({ user, onSelect }: { user: User; onSelect?: (user: Use
             t('users:selector.ui.noName')
           )}
         </div>
-        <div>
+        <div className={styles.cursus}>
           {user?.branch || user?.semester ? (
             <>
               {user?.branch} {user?.semester}

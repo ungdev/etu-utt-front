@@ -7,6 +7,6 @@ export interface SendCommentRequestDto {
   isAnonymous: boolean;
 }
 
-export default async function sendComment(api: API, ueCode: string, body: string, isAnonymous: boolean) {
+export function sendComment(api: API, ueCode: string, body: string, isAnonymous: boolean) {
   return api.post<SendCommentRequestDto, Comment>(`/ue/comments`, { ueCode, body, isAnonymous });
 }

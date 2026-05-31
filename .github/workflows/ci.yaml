@@ -24,8 +24,9 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm lint
 
-  deploy-dev:
-    if: ${{ github.event_name != 'pull_request' && (github.ref == 'refs/heads/dev') }}
+  deploy:
+    if: ${{ github.event_name != 'pull_request' && (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/master') }}
+    environment: ${{ github.ref == 'refs/heads/dev' && 'development' || 'production' }}
     runs-on: self-hosted
     needs:
       - lint
@@ -45,39 +46,17 @@ jobs:
         with:
           push: true
           build-args: |
-            NODE_ENV=production
-            NEXT_PUBLIC_API_URL=https://etu.dev.uttnetgroup.fr/api
-            NEXT_PUBLIC_CAS_SERVICE_URL=https://etu.utt.fr/login
-            NEXT_PUBLIC_API_VERSION=v1
-            NEXT_PUBLIC_API_REQUEST_TIMEOUT=5000
+            NEXT_PUBLIC_API_URL=${{ vars.API_URL }}
+            NEXT_PUBLIC_CAS_SERVICE_URL=${{ vars.CAS_SERVICE_URL }}
+            NEXT_PUBLIC_ETUUTT_WEB_APPLICATION_ID=${{ vars.ETUUTT_WEB_APPLICATION_ID }}
+            NEXT_PUBLIC_ASSOCIATION_NAME=${{ vars.ASSOCIATION_NAME }}
+            NEXT_PUBLIC_ASSOCIATION_RNA=${{ vars.ASSOCIATION_RNA }}
+            NEXT_PUBLIC_ASSOCIATION_RCS=${{ vars.ASSOCIATION_RCS }}
+            NEXT_PUBLIC_ASSOCIATION_ADDRESS=${{ vars.ASSOCIATION_ADDRESS }}
+            NEXT_PUBLIC_ASSOCIATION_PHONE=${{ vars.ASSOCIATION_PHONE }}
+            NEXT_PUBLIC_ASSOCIATION_EMAIL=${{ vars.ASSOCIATION_EMAIL }}
+            NEXT_PUBLIC_DPO_EMAIL=${{ vars.DPO_EMAIL }}
+            NEXT_PUBLIC_DPO_NAME=${{ vars.DPO_NAME }}
+            NEXT_PUBLIC_PUBLICATION_DIRECTOR=${{ vars.PUBLICATION_DIRECTOR }}
           tags: |
-            ${{ secrets.REGISTRY_URL }}/etuutt/front:dev
-
-  deploy-prod:
-    if: ${{ github.event_name != 'pull_request' && (github.ref == 'refs/heads/master') }}
-    runs-on: self-hosted
-    needs:
-      - lint
-    steps:
-      - uses: actions/checkout@v4
-      - name: Install docker
-        uses: docker/setup-buildx-action@v3
-      - name: Login to registry
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ secrets.REGISTRY_URL }}
-          username: ${{ secrets.REGISTRY_USERNAME }}
-          password: ${{ secrets.REGISTRY_TOKEN }}
-      - run: cp .env.dist .env.prod
-      - name: Build and push
-        uses: docker/build-push-action@v6
-        with:
-          push: true
-          build-args: |
-            NODE_ENV=production
-            NEXT_PUBLIC_API_URL=https://etu.utt.fr/api
-            NEXT_PUBLIC_CAS_SERVICE_URL=https://etu.utt.fr/login
-            NEXT_PUBLIC_API_VERSION=v1
-            NEXT_PUBLIC_API_REQUEST_TIMEOUT=5000
-          tags: |
-            ${{ secrets.REGISTRY_URL }}/etuutt/front:prod
+            ${{ secrets.REGISTRY_URL }}/etuutt/front:${{ github.ref == 'refs/heads/dev' && 'dev' || 'prod' }}
