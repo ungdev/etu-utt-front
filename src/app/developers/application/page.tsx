@@ -11,7 +11,7 @@ import createApplication from '@/api/auth/applications/createApplication';
 import { useAPI } from '@/api/api';
 import { updateApplicationToken } from '@/api/auth/applications/updateToken';
 import Icons from '@/icons';
-import { useConnectedUser } from '@/module/user';
+import { useConnectedUser } from '@/module/session';
 import Page from '@/components/utilities/Page';
 
 export default function ApplicationsPage() {

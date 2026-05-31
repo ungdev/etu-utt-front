@@ -109,7 +109,10 @@ export default function AssoDetailPage() {
     } else {
       const updatePayload: AssoUpdateRequest = {};
       if (asso?.name !== assoEdit.name) updatePayload.name = assoEdit.name;
-      if (asso?.description !== assoEdit.description?.fr && $makeJson(asso?.description) !== assoEdit.description?.fr)
+      if (
+        asso?.description !== assoEdit.description?.fr &&
+        $makeJson(asso?.description ?? '') !== assoEdit.description?.fr
+      )
         updatePayload.description = assoEdit.description;
       if (asso?.website !== assoEdit.website) updatePayload.website = assoEdit.website;
       if (asso?.mail !== assoEdit.mail) updatePayload.mail = assoEdit.mail;

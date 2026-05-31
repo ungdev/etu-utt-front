@@ -29,7 +29,7 @@ export function ImageMedia({
       return;
     }
     api
-      .get(worldSrc.slice(computeApiURL('').length), { isFile: true, forceCache: true })
+      .getFile(worldSrc.slice(computeApiURL('').length), { forceCache: true })
       .toPromise()
       .then((blob) => setSrc(URL.createObjectURL(blob!)));
     return () => {

@@ -30,11 +30,12 @@ export function ColorTextPlugin() {
               .getNodes()
               .map((node) => ($isTextNode(node) ? $createColorTextNodeFromTextNode(node, color) : node));
             const lastIndex = colorNodes.length - 1;
+            const lastColorNode = colorNodes[lastIndex];
             // Order is important here, we must start by the last one in case it is also the first one.
-            if ($isColorTextNode(colorNodes[lastIndex]))
-              colorNodes[lastIndex] = colorNodes[lastIndex].spliceText(
+            if ($isColorTextNode(lastColorNode))
+              colorNodes[lastIndex] = lastColorNode.spliceText(
                 selection.isBackward() ? selection.anchor.offset : selection.focus.offset,
-                colorNodes[lastIndex].getTextContent().length,
+                lastColorNode.getTextContent().length,
                 '',
               );
             if ($isColorTextNode(colorNodes[0]))

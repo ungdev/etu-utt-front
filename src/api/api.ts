@@ -215,7 +215,7 @@ async function internalRequestAPI<RequestType>(
   route: string,
   body: RequestType | null,
   timeoutMillis: number,
-  version: number,
+  version: string,
   isFile: true,
   applicationId: string,
   forceCache: boolean,
@@ -226,7 +226,7 @@ async function internalRequestAPI<RequestType, ResponseType>(
   route: string,
   body: RequestType | null,
   timeoutMillis: number,
-  version: number,
+  version: string,
   isFile: boolean,
   applicationId: string,
   forceCache: boolean,
@@ -237,7 +237,7 @@ async function internalRequestAPI<RequestType, ResponseType>(
   route: string,
   body: RequestType | null,
   timeoutMillis: number,
-  version: number,
+  version: string,
   isFile: boolean,
   applicationId: string,
   forceCache: boolean,
@@ -319,13 +319,13 @@ function requestAPI<RequestType>(
   method: 'GET',
   route: string,
   body: RequestType | null,
-  params: { timeoutMillis?: number; version?: number; isFile: true; applicationId?: string; forceCache?: boolean },
+  params: { timeoutMillis?: number; version?: string; isFile: true; applicationId?: string; forceCache?: boolean },
 ): ResponseHandler<Blob>;
 function requestAPI<RequestType, ResponseType>(
   method: string,
   route: string,
   body: RequestType | null,
-  params: { timeoutMillis?: number; version?: number; isFile?: boolean; applicationId?: string; forceCache?: boolean },
+  params: { timeoutMillis?: number; version?: string; isFile?: boolean; applicationId?: string; forceCache?: boolean },
 ): ResponseHandler<ResponseType>;
 function requestAPI<RequestType, ResponseType>(
   method: string,
@@ -337,7 +337,7 @@ function requestAPI<RequestType, ResponseType>(
     isFile = false,
     applicationId = etuuttWebApplicationId,
     forceCache = false,
-  }: { timeoutMillis?: number; version?: number; isFile?: boolean; applicationId?: string; forceCache?: boolean } = {},
+  }: { timeoutMillis?: number; version?: string; isFile?: boolean; applicationId?: string; forceCache?: boolean } = {},
 ): ResponseHandler<ResponseType> {
   const abortController = new AbortController();
   return new ResponseHandler(
@@ -364,7 +364,7 @@ export function useAPI(): API {
       applyDefaultHandler(requestAPI<never, Blob>('GET', route, null, { ...options, isFile: true }), setNotFound),
     get: <ResponseType = never>(
       route: string,
-      options: { timeoutMillis?: number; version?: string; forceCache?: boolean, applicationId?: string } = {},
+      options: { timeoutMillis?: number; version?: string; forceCache?: boolean; applicationId?: string } = {},
     ) =>
       applyDefaultHandler(
         requestAPI<never, ResponseType>('GET', route, null, { ...options, isFile: false }),
@@ -397,24 +397,24 @@ export interface API {
   ): DefaultResponseHandlerType<Blob>;
   get<ResponseType = never>(
     route: string,
-    options?: { timeoutMillis?: number; version?: string; applicationId?: string; isFile?: boolean; forceCache?: boolean },
+    options?: { timeoutMillis?: number; version?: string; applicationId?: string; forceCache?: boolean },
   ): DefaultResponseHandlerType<ResponseType>;
   post<RequestType, ResponseType = never>(
     route: string,
     body?: RequestType,
-    options?: { version?: number; isFile?: boolean; applicationId?: string },
+    options?: { version?: string; isFile?: boolean; applicationId?: string },
   ): DefaultResponseHandlerType<ResponseType>;
   put<RequestType, ResponseType = never>(
     route: string,
     body?: RequestType,
-    options?: { version?: number; isFile?: boolean },
+    options?: { version?: string; isFile?: boolean },
   ): DefaultResponseHandlerType<ResponseType>;
   patch: <RequestType, ResponseType = never>(
     route: string,
     body?: RequestType,
-    options?: { version?: number; isFile?: boolean },
+    options?: { version?: string; isFile?: boolean },
   ) => DefaultResponseHandlerType<ResponseType>;
-  delete<ResponseType = never>(route: string, options?: { version?: number }): DefaultResponseHandlerType<ResponseType>;
+  delete<ResponseType = never>(route: string, options?: { version?: string }): DefaultResponseHandlerType<ResponseType>;
 }
 
 /**

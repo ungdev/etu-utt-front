@@ -55,14 +55,6 @@ export function AssoRole({
   const [currentEditingRoleName, setCurrentEditingRoleName] = useState<string>(role.name);
   const { t } = useAppTranslation();
 
-  const userSorter = (a: Member, b: Member) => {
-    const aSign = Math.sign(a.endAt.getTime() - Date.now());
-    const oldComparison = Math.sign(b.endAt.getTime() - Date.now()) - aSign;
-    return (
-      oldComparison || (aSign > 0 ? a.startAt.getTime() - b.startAt.getTime() : b.endAt.getTime() - a.endAt.getTime())
-    );
-  };
-
   return (
     <>
       <h3 className={styles.roleRoot}>
@@ -82,13 +74,13 @@ export function AssoRole({
               <DisableableButton
                 onClick={() => createAssoMember(role.id)}
                 disabled={!hasEditMembersPermission}
-                disabledTooltip={t('assos:no.permission.edit.member')}>
+                disabledTooltip={t('assos:member.edit.no-permission')}>
                 <IconUserAdd />
               </DisableableButton>
               <DisableableButton
                 onClick={() => deleteAssoRole(role.id)}
                 disabled={!hasEditRolesPermission || role.isPresident}
-                disabledTooltip={t('assos:no.permission.edit.member')}>
+                disabledTooltip={t('assos:member.edit.no-permission')}>
                 <IconDelete />
               </DisableableButton>
               <DisableableButton
@@ -102,7 +94,7 @@ export function AssoRole({
                   }
                 }}
                 disabled={!hasEditRolesPermission}
-                disabledTooltip={t('assos:no.permission.edit.member')}>
+                disabledTooltip={t('assos:member.edit.no-permission')}>
                 {editing ? <IconCheck /> : <IconEdit />}
               </DisableableButton>
             </>
@@ -148,13 +140,13 @@ export function AssoRole({
                       <DisableableButton
                         onClick={() => updateAssoMember(member, role.id)}
                         disabled={!hasEditMembersPermission}
-                        disabledTooltip={t('assos:no.permission.edit.member')}>
+                        disabledTooltip={t('assos:member.edit.no-permission')}>
                         <IconEdit />
                       </DisableableButton>
                       <DisableableButton
                         onClick={() => deleteAssoMember(member.id)}
                         disabled={!hasEditMembersPermission}
-                        disabledTooltip={t('assos:no.permission.edit.member')}>
+                        disabledTooltip={t('assos:member.edit.no-permission')}>
                         <IconUserCross />
                       </DisableableButton>
                     </>
