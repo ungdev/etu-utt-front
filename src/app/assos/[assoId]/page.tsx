@@ -80,19 +80,31 @@ export default function AssoDetailPage() {
   const api = useAPI();
 
   useEffect(() => {
-    const permissions = new Set(
-      members
-        .map((role) =>
-          role.members.filter((member) => member.userId === user?.id).flatMap((member) => member.permissions),
-        )
-        .flat(),
-    );
+    if (!user) return;
+    const permissions = new Set<string>();
+    for (const role of members) {
+      if (role.isPresident) {
+        if (role.members.find((member) => member.userId === user.id)) {
+          permissions.add('manage_infos');
+          permissions.add('manage_roles');
+          permissions.add('manage_members');
+          break;
+        }
+      } else {
+        const member = role.members.find((member) => member.userId === user.id);
+        if (member) {
+          member.permissions.forEach(permissions.add);
+        }
+      }
+    }
     setPermissions(permissions);
   }, [members, user]);
 
   useEffect(() => {
-    if (asso?.description) stateRef.current?.(asso.description);
+    if (asso?.description && stateRef.current) stateRef.current(asso.description);
   }, [asso]);
+
+  console.log(members);
 
   // Asso edition zone
 
@@ -316,7 +328,7 @@ export default function AssoDetailPage() {
         )}
         <Avatar
           className={styles.logo}
-          localSrc={assoEdit.logo ? `/media/image/${assoEdit.logo}.webp` : asso?.logo}
+          localSrc={assoEdit.logo ? assoEdit.logo : asso?.logo}
           name={asso?.name}
           editable={editInfosMode}
           isPublic={true}

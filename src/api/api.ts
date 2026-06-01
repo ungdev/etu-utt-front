@@ -5,7 +5,7 @@ import { toast } from 'react-toastify';
 import { ApiError } from '@/api/api.interface';
 
 export const computeApiURL = (path: string, version = apiVersion) =>
-  `${apiUrl.slice(-1) === '/' ? apiUrl.slice(0, -1) : apiUrl}/v${version}/${
+  `${apiUrl.slice(-1) === '/' ? apiUrl.slice(0, -1) : apiUrl}/${version}/${
     path.slice(0, 1) === '/' ? path.slice(1) : path
   }`;
 
@@ -254,6 +254,11 @@ async function internalRequestAPI<RequestType, ResponseType>(
     abortController.abort();
   }, timeoutMillis);
 
+  // if (route.includes('/media/image//media/image')) {
+  console.log(route)
+    console.log(new Error().stack);
+  // }
+
   try {
     // Make the request
     const response = await fetch(computeApiURL(route, version), {
@@ -340,6 +345,7 @@ function requestAPI<RequestType, ResponseType>(
   }: { timeoutMillis?: number; version?: string; isFile?: boolean; applicationId?: string; forceCache?: boolean } = {},
 ): ResponseHandler<ResponseType> {
   const abortController = new AbortController();
+  console.log(route)
   return new ResponseHandler(
     internalRequestAPI(method, route, body, timeoutMillis, version, isFile, applicationId, forceCache, abortController),
     abortController,

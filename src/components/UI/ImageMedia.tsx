@@ -28,8 +28,12 @@ export function ImageMedia({
       setSrc(worldSrc);
       return;
     }
+    console.log("imagemedia")
+    console.log(worldSrc)
+    console.log(worldSrc.slice(computeApiURL('').length));
     api
       .getFile(worldSrc.slice(computeApiURL('').length), { forceCache: true })
+      .on('success', (blob) => setSrc(URL.createObjectURL(blob!)))
       .toPromise()
       .then((blob) => setSrc(URL.createObjectURL(blob!)));
     return () => {
