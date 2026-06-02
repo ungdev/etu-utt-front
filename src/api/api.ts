@@ -254,11 +254,6 @@ async function internalRequestAPI<RequestType, ResponseType>(
     abortController.abort();
   }, timeoutMillis);
 
-  // if (route.includes('/media/image//media/image')) {
-  console.log(route)
-    console.log(new Error().stack);
-  // }
-
   try {
     // Make the request
     const response = await fetch(computeApiURL(route, version), {
@@ -345,7 +340,6 @@ function requestAPI<RequestType, ResponseType>(
   }: { timeoutMillis?: number; version?: string; isFile?: boolean; applicationId?: string; forceCache?: boolean } = {},
 ): ResponseHandler<ResponseType> {
   const abortController = new AbortController();
-  console.log(route)
   return new ResponseHandler(
     internalRequestAPI(method, route, body, timeoutMillis, version, isFile, applicationId, forceCache, abortController),
     abortController,
