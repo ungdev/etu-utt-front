@@ -8,8 +8,8 @@ import {
   EditorConfig,
   NodeKey,
   SerializedLexicalNode,
-  Spread
-} from "lexical";
+  Spread,
+} from 'lexical';
 import { ImageMedia } from '../ImageMedia';
 import styles from '../LexicalTextEditor.module.scss';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';

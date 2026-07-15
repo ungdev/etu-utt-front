@@ -1,11 +1,11 @@
 import { PropsWithoutRef } from 'react';
 import styles from './Avatar.module.scss';
 import { buildApiUrl, useAPI } from '@/api/api';
-import { PartialUploadResponse } from './LexicalPlugins/ImageDropPlugin';
 import { useAppTranslation } from '@/lib/i18n';
 import { IconEdit } from 'obra-icons-react';
 import { ImageMedia } from './ImageMedia';
-import { c } from "@/utils";
+import { c } from '@/utils';
+import { uploadPublicImage } from '@/api/media/uploadImage';
 
 type AvatarProps = PropsWithoutRef<{
   localSrc?: string;
@@ -21,14 +21,7 @@ export default function Avatar({ localSrc, name, editable, className, onChange, 
   const { t } = useAppTranslation();
 
   const uploadFile = async (file: File) => {
-    const formData = new FormData();
-    formData.append('file', file);
-    const uploadResponse = await api
-      .post<
-        FormData,
-        PartialUploadResponse
-      >(`/media/image?public=${isPublic}&preset=AVATAR`, formData, { isFile: true })
-      .toPromise();
+    const uploadResponse = await uploadPublicImage(api, file, { public_: isPublic, preset: 'AVATAR' });
     if (uploadResponse?.id && onChange) onChange(uploadResponse.id);
   };
 
