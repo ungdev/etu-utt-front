@@ -14,10 +14,7 @@ import { useAPI } from '@/api/api';
 import { sendCommentReply } from '@/api/commentReply/sendCommentReply';
 import Link from '@/components/UI/Link';
 import Page from '@/components/utilities/Page';
-import Clock from '@/icons/Clock';
-import Comment from '@/icons/Comment';
-import Enter from '@/icons/Enter';
-import User from '@/icons/User';
+import { IconClock4Alt, IconComment, IconEnter, IconUser } from 'obra-icons-react';
 import { useParams } from 'next/navigation';
 
 function CommentEditorFooter(originalComment: string, onUpdate: (text: string) => void, t: TFunction) {
@@ -67,18 +64,18 @@ export default function CommentDetailsPage() {
       <div className={styles.meta}>
         {!comment.isAnonymous && (
           <div>
-            <User />
+            <IconUser />
             <Link href={`/users/${comment.author.id}`} noStyle>
               {comment.author.firstName} {comment.author.lastName}
             </Link>
           </div>
         )}
         <div>
-          <Comment />
+          <IconComment />
           {t('ues:detailed.comments.semester', { semester: comment.semester.code })}
         </div>
         <div>
-          <Clock />
+          <IconClock4Alt />
           <div>
             <div>{t('ues:detailed.comments.writtenDate', { date: comment.createdAt.toLocaleDateString() })}</div>
             {comment.updatedAt && (
@@ -92,7 +89,7 @@ export default function CommentDetailsPage() {
         {comment.answers.map((answer, i) => (
           <div key={answer.id} className={styles.comment}>
             <div className={styles.sideIcon}>
-              <Enter className={styles.answerIcon} />
+              <IconEnter className={styles.answerIcon} />
             </div>
             <div>
               <p className={styles.author}>

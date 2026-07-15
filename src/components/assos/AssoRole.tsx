@@ -2,8 +2,6 @@ import { PropsWithoutRef, useState } from 'react';
 import { Role, Member } from '@/api/assos/member.interface';
 import { useAppTranslation } from '@/lib/i18n';
 import styles from './AssoRole.module.scss';
-import Icons from '@/icons';
-import Button from '../UI/Button';
 import Input from '../UI/Input';
 import Link from '../UI/Link';
 import { IconCheck, IconCrown, IconDelete, IconEdit, IconUserAdd, IconUserCross } from 'obra-icons-react';

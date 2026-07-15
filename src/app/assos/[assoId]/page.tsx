@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from 'react';
 import {
-  IconAdd,
   IconCall,
   IconCheck,
   IconClose,
@@ -17,12 +16,10 @@ import styles from './style.module.scss';
 import { useAsso } from '@/api/assos/fetchAsso.hook';
 import Page from '@/components/utilities/Page';
 import { useMembers } from '@/api/assos/fetchAssoMembers.hook';
-import Icons from '@/icons';
 import Link from '@/components/UI/Link';
 import { useAppTranslation } from '@/lib/i18n';
 import Button from '@/components/UI/Button';
 import { useConnectedUser } from '@/module/session';
-import { useAppSelector } from '@/lib/hooks';
 import { deleteRole } from '@/api/assos/deleteRole';
 import { useAPI } from '@/api/api';
 import { VerticalSortDnd } from '@/components/UI/VerticalSortDnd';
@@ -101,10 +98,8 @@ export default function AssoDetailPage() {
   }, [members, user]);
 
   useEffect(() => {
-    if (asso?.description && stateRef.current) stateRef.current(asso.description);
+    if (asso?.description) stateRef.current(asso.description);
   }, [asso]);
-
-  console.log(members);
 
   // Asso edition zone
 
@@ -355,6 +350,7 @@ export default function AssoDetailPage() {
               />
             ) : (
               <>
+                {/* Loader */}
                 <div></div>
                 <div></div>
                 <div></div>
@@ -382,7 +378,7 @@ export default function AssoDetailPage() {
                 <Link
                   href={asso?.website ? asso?.website.replace(/^(?:https?:\/\/)?/, 'https://') : '#'}
                   noStyle
-                  newTab>
+                  external>
                   <IconExternalLink />
                   <div>{asso?.website?.replace(/^https?:\/\/(?:www\.)?/, '')}</div>
                 </Link>

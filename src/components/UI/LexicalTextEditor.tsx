@@ -223,16 +223,6 @@ function LexicalTextEditor({
 export default LexicalTextEditor;
 
 /**
- * Registers a new feature bundle for the Lexical Text Editor. A bundle is a set of nodes and plugins
- * that can be used in the Editor.
- * @param name the name used to access to your bundle when intializing the {@link LexicalTextEditor}
- * @param bundle the feature bundle containing nodes and plugins
- */
-export function $registerBundle(name: string, bundle: RTEFeatureBundle) {
-  if (!(name in EDITOR_BUNDLES)) EDITOR_BUNDLES[name] = bundle;
-}
-
-/**
  * Use this function to ensure `str` can be used in a {@link LexicalTextEditor}
  * (either in the `initialState` prop or through the `setStateRef` hook)
  */

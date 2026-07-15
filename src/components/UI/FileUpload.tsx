@@ -1,4 +1,4 @@
-import Rotate from '@/icons/Rotate';
+import Icons from '@/icons';
 import styles from './FileUpload.module.scss';
 import { MutableRefObject, useEffect, useState } from 'react';
 
@@ -71,7 +71,7 @@ export default function FileUpload({
         <div className={styles.toolbar}>
           {supportsPictureRotation && (
             <div className={styles.action} onClick={() => setRotation((rotation + 1) % 4)}>
-              <Rotate />
+              <Icons.Rotate />
             </div>
           )}
         </div>

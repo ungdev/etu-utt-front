@@ -1,10 +1,11 @@
 import { PropsWithoutRef } from 'react';
 import styles from './Avatar.module.scss';
-import { computeApiURL, useAPI } from '@/api/api';
+import { buildApiUrl, useAPI } from '@/api/api';
 import { PartialUploadResponse } from './LexicalPlugins/ImageDropPlugin';
 import { useAppTranslation } from '@/lib/i18n';
 import { IconEdit } from 'obra-icons-react';
 import { ImageMedia } from './ImageMedia';
+import { c } from "@/utils";
 
 type AvatarProps = PropsWithoutRef<{
   localSrc?: string;
@@ -26,13 +27,13 @@ export default function Avatar({ localSrc, name, editable, className, onChange, 
       .post<
         FormData,
         PartialUploadResponse
-      >(`/media/image?public=${!!isPublic}&preset=AVATAR`, formData, { isFile: true })
+      >(`/media/image?public=${isPublic}&preset=AVATAR`, formData, { isFile: true })
       .toPromise();
     if (uploadResponse?.id && onChange) onChange(uploadResponse.id);
   };
 
   return (
-    <div className={[styles.avatar, className].filter((c) => c).join(' ')}>
+    <div className={c(styles.avatar, className)}>
       {editable && (
         <>
           <label className={styles.avatarEdit}>
@@ -47,7 +48,7 @@ export default function Avatar({ localSrc, name, editable, className, onChange, 
         </>
       )}
       {name?.charAt(0) || '?'}
-      {localSrc && <ImageMedia src={computeApiURL(localSrc)} displayWhileLoading={false} />}
+      {localSrc && <ImageMedia src={buildApiUrl(localSrc)} displayWhileLoading={false} />}
     </div>
   );
 }

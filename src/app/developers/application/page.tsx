@@ -1,16 +1,14 @@
 'use client';
 
 import styles from './style.module.scss';
-import { IconCopy } from 'obra-icons-react';
+import { IconCopy, IconDelete } from 'obra-icons-react';
 import useApplications from '@/api/auth/applications/fetchApplications';
-import Trash from '@/icons/Trash';
 import Input from '@/components/UI/Input';
 import { useState } from 'react';
 import Button from '@/components/UI/Button';
 import createApplication from '@/api/auth/applications/createApplication';
 import { useAPI } from '@/api/api';
 import { updateApplicationToken } from '@/api/auth/applications/updateToken';
-import Icons from '@/icons';
 import { useConnectedUser } from '@/module/session';
 import Page from '@/components/utilities/Page';
 
@@ -43,7 +41,7 @@ export default function ApplicationsPage() {
               Générer un nouveau token
             </Button>
             <Button className={styles.trash} disabled>
-              <Trash className={styles.icon} />
+              <IconDelete className={styles.icon} />
             </Button>
           </div>
         ))}

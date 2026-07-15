@@ -209,7 +209,7 @@ export default function UeDetailsPage() {
               <div>{t('ues:detailed.siepLink')}</div>
               <div>
                 <Link
-                  newTab={true}
+                  external={true}
                   href={`https://siep.utt.fr/faces/AccesDirectNonAuth.xhtml?ir=942854&io=${ue.ueofs[ueofIndex].siepId}`}>
                   {ue.ueofs[ueofIndex].code}
                 </Link>

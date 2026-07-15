@@ -1,4 +1,4 @@
-import { computeApiURL, useAPI } from '@/api/api';
+import { buildApiUrl, useAPI } from '@/api/api';
 import { type MouseEventHandler, PropsWithoutRef, useEffect, useState } from 'react';
 
 export type ImageMediaProps = PropsWithoutRef<{
@@ -24,15 +24,12 @@ export function ImageMedia({
   const api = useAPI();
 
   useEffect(() => {
-    if (!worldSrc.startsWith(computeApiURL('/media/image/'))) {
+    if (!worldSrc.startsWith(buildApiUrl('/media/image/'))) {
       setSrc(worldSrc);
       return;
     }
-    console.log("imagemedia")
-    console.log(worldSrc)
-    console.log(worldSrc.slice(computeApiURL('').length));
     api
-      .getFile(worldSrc.slice(computeApiURL('').length), { forceCache: true })
+      .getFile(worldSrc.slice(buildApiUrl('').length), { forceCache: true })
       .on('success', (blob) => setSrc(URL.createObjectURL(blob!)))
       .toPromise()
       .then((blob) => setSrc(URL.createObjectURL(blob!)));

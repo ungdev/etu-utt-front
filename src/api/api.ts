@@ -4,7 +4,7 @@ import { useNotFound } from '@/module/pageSettings';
 import { toast } from 'react-toastify';
 import { ApiError } from '@/api/api.interface';
 
-export const computeApiURL = (path: string, version = apiVersion) =>
+export const buildApiUrl = (path: string, version = apiVersion) =>
   `${apiUrl.slice(-1) === '/' ? apiUrl.slice(0, -1) : apiUrl}/${version}/${
     path.slice(0, 1) === '/' ? path.slice(1) : path
   }`;
@@ -256,7 +256,7 @@ async function internalRequestAPI<RequestType, ResponseType>(
 
   try {
     // Make the request
-    const response = await fetch(computeApiURL(route, version), {
+    const response = await fetch(buildApiUrl(route, version), {
       method,
       headers,
       body: (method === 'GET' || method === 'DELETE' ? undefined : isFile ? body : JSON.stringify(body)) as

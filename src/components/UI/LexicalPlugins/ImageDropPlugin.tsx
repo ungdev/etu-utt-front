@@ -14,28 +14,19 @@ import {
 import { useEffect, useState } from 'react';
 import { ImageNode } from './ImageNode';
 import { INSERT_IMAGE_COMMAND } from './ImagePlugin';
-import { API, computeApiURL, useAPI } from '@/api/api';
+import { API, buildApiUrl, useAPI } from '@/api/api';
 import { useAppTranslation } from '@/lib/i18n';
 import styles from '../LexicalTextEditor.module.scss';
+import { uploadPublicImage } from '@/api/media/uploadImage';
 
 export const DRAGLEAVE_COMMAND = createCommand<DragEvent>('DRAGLEAVE_COMMAND');
 
-export interface PartialUploadResponse {
-  id: string;
-  width: number;
-  height: number;
-}
-
 export async function uploadFile(file: File, api: API, editor: LexicalEditor) {
-  const formData = new FormData();
-  formData.append('file', file);
-  const uploadResponse = await api
-    .post<FormData, PartialUploadResponse>(`/media/image?public=true`, formData, { isFile: true })
-    .toPromise();
+  const uploadResponse = await uploadPublicImage(api, file);
   editor.update(() => {
     $addUpdateTag(SKIP_SELECTION_FOCUS_TAG);
     editor.dispatchCommand(INSERT_IMAGE_COMMAND, {
-      src: computeApiURL(`/media/image/${uploadResponse!.id}.webp`),
+      src: buildApiUrl(`/media/image/${uploadResponse!.id}.webp`),
       width: uploadResponse!.width,
       height: uploadResponse!.height,
     });

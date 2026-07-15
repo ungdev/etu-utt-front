@@ -2,7 +2,7 @@ import styles from './WidgetRenderer.module.scss';
 import { useEffect, useMemo, useRef } from 'react';
 import { isClientSide } from '@/utils/environment';
 import { BoundingBox, collidesWith, gridSize, WidgetInstance, WIDGETS } from '@/module/homepage';
-import Menu from '@/icons/Menu';
+import { IconMenu } from 'obra-icons-react';
 import Button from '@/components/UI/Button';
 
 const GAP_SIZE = 15;
@@ -243,7 +243,7 @@ export default function WidgetRenderer({
           {modifyingLayout && (
             <div className={styles.removeButton} ref={removeButtonRef}>
               <Button onClick={remove} noStyle={true}>
-                <Menu />
+                <IconMenu />
               </Button>
             </div>
           )}

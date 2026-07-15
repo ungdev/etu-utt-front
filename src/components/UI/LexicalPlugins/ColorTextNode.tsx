@@ -1,6 +1,7 @@
 import {
   $getState,
   $setState,
+  BaseStaticNodeConfig,
   createState,
   EditorConfig,
   NodeKey,
@@ -20,12 +21,11 @@ const colorState = createState('color', {
 });
 
 export class ColorTextNode extends TextNode {
-  static getType() {
-    return 'color-text';
-  }
-
-  static clone(node: ColorTextNode) {
-    return new ColorTextNode(node.__text, node.__key);
+  $config(): BaseStaticNodeConfig {
+    return this.config('color-text', {
+      extends: TextNode,
+      stateConfigs: [{ flat: true, stateConfig: colorState }],
+    });
   }
 
   setColor(color?: ColorType) {

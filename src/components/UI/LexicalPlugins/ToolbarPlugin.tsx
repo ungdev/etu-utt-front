@@ -7,7 +7,6 @@ import {
   $getSelection,
   $isElementNode,
   $isRangeSelection,
-  $isRootOrShadowRoot,
   CAN_REDO_COMMAND,
   CAN_UNDO_COMMAND,
   COMMAND_PRIORITY_LOW,
@@ -74,6 +73,7 @@ import type { InitialConfigType } from '@lexical/react/LexicalComposer';
 import { ColorTextNode } from './ColorTextNode';
 import { CodeNode } from '@lexical/code';
 import { ImageNode } from './ImageNode';
+import { $findTopLevelElement } from '@/components/UI/LexicalPlugins/utils';
 
 function Divider() {
   return <div className={styles.divider} />;
@@ -113,18 +113,6 @@ export function ToolbarPlugin({ enabledNodes }: { enabledNodes: InitialConfigTyp
   const [isFilePaletteOpen, setIsFilePaletteOpen] = useState(false);
   const { t } = useAppTranslation();
   const api = useAPI();
-
-  function $findTopLevelElement(node: LexicalNode) {
-    let topLevelElement =
-      node.getKey() === 'root'
-        ? node
-        : $findMatchingParent(node, (e) => {
-            const parent = e.getParent();
-            return parent !== null && $isRootOrShadowRoot(parent);
-          });
-    if (topLevelElement === null) topLevelElement = node.getTopLevelElementOrThrow();
-    return topLevelElement;
-  }
 
   function getSelectedNode(selection: RangeSelection): TextNode | ElementNode {
     const anchorNode = selection.anchor.getNode();
@@ -175,7 +163,7 @@ export function ToolbarPlugin({ enabledNodes }: { enabledNodes: InitialConfigTyp
         )!;
       }
       setLink(link);
-      if ($findMatchingParent(node, $isTableNode)) type === 'table';
+      if ($findMatchingParent(node, $isTableNode)) type = 'table';
 
       setBlockType(type);
       setAlign(

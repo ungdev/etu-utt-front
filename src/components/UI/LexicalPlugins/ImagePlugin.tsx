@@ -4,6 +4,7 @@ import {
   $createParagraphNode,
   $createRangeSelection,
   $getSelection,
+  $getState,
   $insertNodes,
   $isNodeSelection,
   $isRootOrShadowRoot,
@@ -19,7 +20,15 @@ import {
   TextNode,
 } from 'lexical';
 import { useEffect } from 'react';
-import { $createImageNode, $isImageNode, ImageNode } from './ImageNode';
+import {
+  $createImageNode,
+  $isImageNode,
+  altTextState,
+  heightState,
+  ImageNode,
+  srcState,
+  widthState,
+} from './ImageNode';
 
 export const INSERT_IMAGE_COMMAND = createCommand<{
   src: string;
@@ -88,10 +97,10 @@ function onDragStart(event: DragEvent) {
     'application/x-lexical-drag',
     JSON.stringify({
       data: {
-        altText: node.__altText,
-        height: node.__height,
-        width: node.__width,
-        src: node.__src,
+        altText: $getState(node, altTextState),
+        height: $getState(node, heightState),
+        width: $getState(node, widthState),
+        src: $getState(node, srcState),
         key: node.getKey(),
       },
       type: ImageNode.getType(),
@@ -140,7 +149,7 @@ function getDragImageData(event: DragEvent) {
   return data;
 }
 
-function canDropImage(event: DragEvent, editor: LexicalEditor) {
+function canDropImage(event: DragEvent, editor: LexicalEditor): boolean {
   const target = event.target;
   return !!(
     target &&

@@ -1,5 +1,15 @@
 import { useLexicalNodeSelection } from '@lexical/react/useLexicalNodeSelection';
-import { DecoratorNode, EditorConfig, NodeKey, SerializedLexicalNode, Spread } from 'lexical';
+import {
+  $getState,
+  $setState,
+  BaseStaticNodeConfig,
+  createState,
+  DecoratorNode,
+  EditorConfig,
+  NodeKey,
+  SerializedLexicalNode,
+  Spread
+} from "lexical";
 import { ImageMedia } from '../ImageMedia';
 import styles from '../LexicalTextEditor.module.scss';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
@@ -14,26 +24,53 @@ type SerializedImageNode = Spread<
   SerializedLexicalNode
 >;
 
+export const srcState = createState('src', {
+  parse: (value) => (typeof value === 'string' ? value : ''),
+});
+
+export const altTextState = createState('altText', {
+  parse: (value) => (typeof value === 'string' ? value : ''),
+});
+
+export const widthState = createState('width', {
+  parse: (value) => (value === 'inherit' || typeof value === 'number' ? value : 'inherit'),
+});
+
+export const heightState = createState('height', {
+  parse: (value) => (value === 'inherit' || typeof value === 'number' ? value : 'inherit'),
+});
+
 export class ImageNode extends DecoratorNode<JSX.Element> {
-  __src: string;
-  __altText: string;
-  __width: number | 'inherit';
-  __height: number | 'inherit';
-
-  static getType() {
-    return 'image';
+  $config(): BaseStaticNodeConfig {
+    return this.config('image', {
+      extends: DecoratorNode,
+      stateConfigs: [
+        { flat: true, stateConfig: srcState },
+        { flat: true, stateConfig: altTextState },
+        { flat: true, stateConfig: widthState },
+        { flat: true, stateConfig: heightState },
+      ],
+    });
   }
 
-  static clone(node: ImageNode) {
-    return new ImageNode(node.__src, node.__altText, node.__width, node.__height, node.__key);
+  setSrc(src: string) {
+    $setState(this, srcState, src);
+    return this;
   }
 
-  constructor(src: string, altText?: string, width?: number | 'inherit', height?: number | 'inherit', key?: NodeKey) {
-    super(key);
-    this.__src = src;
-    this.__altText = altText || '';
-    this.__width = width || 'inherit';
-    this.__height = height || 'inherit';
+  setAltText(altText: string) {
+    $setState(this, altTextState, altText);
+    return this;
+  }
+
+  setWidth(width: number | 'inherit') {
+    $setState(this, widthState, width);
+    return this;
+  }
+
+  setHeight(height: number | 'inherit') {
+    $setState(this, heightState, height);
+    return this;
   }
 
   createDOM(config: EditorConfig) {
@@ -51,10 +88,10 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
       return (
         <ImageMedia
           className={isSelected && editor._editable ? styles.selected : ''}
-          src={image.__src}
-          width={image.__width}
-          height={image.__height}
-          altText={image.__altText}
+          src={$getState(image, srcState)}
+          width={$getState(image, widthState)}
+          height={$getState(image, heightState)}
+          altText={$getState(image, altTextState)}
           onClick={(event) => {
             if (!editor._editable) {
               setSelected(false);
@@ -87,22 +124,22 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
   exportJSON(): SerializedImageNode {
     return {
       ...super.exportJSON(),
-      src: this.__src,
-      altText: this.__altText,
-      width: this.__width,
-      height: this.__height,
+      src: $getState(this, srcState),
+      altText: $getState(this, altTextState),
+      width: $getState(this, widthState),
+      height: $getState(this, heightState),
     };
   }
 }
 
 export function $createImageNode(
   src: string,
-  altText?: string,
-  width?: number | 'inherit',
-  height?: number | 'inherit',
+  altText: string = '',
+  width: number | 'inherit' = 'inherit',
+  height: number | 'inherit' = 'inherit',
   nodeKey?: NodeKey,
 ): ImageNode {
-  return new ImageNode(src, altText, width, height, nodeKey);
+  return new ImageNode(nodeKey).setSrc(src).setAltText(altText).setWidth(width).setHeight(height);
 }
 
 export function $isImageNode(node: unknown): node is ImageNode {

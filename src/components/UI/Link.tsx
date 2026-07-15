@@ -2,21 +2,21 @@ import styles from './Link.module.scss';
 import { ReactNode } from 'react';
 import ReactLink from 'next/link';
 import { Url } from 'next/dist/shared/lib/router/router';
-import ExternalLink from '@/icons/ExternalLink';
+import { IconExternalLink } from 'obra-icons-react';
 
 export default function Link({
   children,
   href,
   className = '',
   noStyle = false,
-  newTab = false,
+  external = false,
   disabled = false,
 }: {
   children?: ReactNode;
   href: Url;
   className?: string;
   noStyle?: boolean;
-  newTab?: boolean;
+  external?: boolean;
   disabled?: boolean;
 }) {
   return disabled ? (
@@ -27,10 +27,10 @@ export default function Link({
     <ReactLink
       href={href}
       className={`${styles.link} ${className} ${noStyle ? styles.noStyle : ''}`}
-      target={newTab ? '_blank' : '_self'}
-      rel={newTab ? 'noopener noreferrer' : undefined}>
+      target={external ? '_blank' : '_self'}
+      rel={external ? 'noopener noreferrer' : undefined}>
       <span>{children}</span>
-      {newTab ? <ExternalLink className={styles.icon} /> : <></>}
+      {external ? <IconExternalLink className={styles.icon} /> : <></>}
     </ReactLink>
   );
 }
