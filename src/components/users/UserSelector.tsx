@@ -13,6 +13,7 @@ export default function UserSelector({
   const { t } = useAppTranslation();
 
   const { items, updateFilters } = useUsers();
+
   const [searchString, setSearchString] = useState<string>('');
 
   useEffect(() => {

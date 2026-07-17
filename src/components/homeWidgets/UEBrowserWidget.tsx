@@ -3,7 +3,7 @@ import Input from '@/components/UI/Input';
 import { useState } from 'react';
 import { WidgetLayout } from '@/components/homeWidgets/WidgetLayout';
 import { useRouter } from 'next/navigation';
-import Icons from '@/icons';
+import { IconBook } from 'obra-icons-react';
 
 export default function UEBrowserWidget() {
   const { t } = useAppTranslation();
@@ -14,7 +14,7 @@ export default function UEBrowserWidget() {
       <Input
         value={search}
         onChange={setSearch}
-        icon={Icons.Book}
+        icon={IconBook}
         placeholder={t('homepage:ueBrowser.searchBar.placeholder')}
         onEnter={() => router.push(`/ues?q=${search}`)}
       />

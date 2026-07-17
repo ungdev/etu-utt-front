@@ -32,3 +32,25 @@ export interface Asso {
     };
   };
 }
+
+export interface AssoUpdateRequest {
+  name?: string;
+  description?: {
+    fr?: string;
+    en?: string;
+    de?: string;
+    es?: string;
+    zh?: string;
+  };
+  descriptionShort?: {
+    fr?: string;
+    en?: string;
+    de?: string;
+    es?: string;
+    zh?: string;
+  };
+  mail?: string;
+  phoneNumber?: string;
+  website?: string;
+  logo?: string;
+}

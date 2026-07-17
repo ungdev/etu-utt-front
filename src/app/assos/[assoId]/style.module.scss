@@ -3,63 +3,81 @@
 
 .headerCard {
   background: white;
-  padding: 1.5em;
+  padding: 3ch;
   display: flex;
   flex-flow: row nowrap;
-  gap: 1em;
-  border-radius: 0.5em;
+  position: relative;
+  gap: 2ch;
+  border-radius: 1ch;
 
-  & > img {
-    width: 6em;
-    height: 6em;
-    border-radius: 50%;
-    object-fit: cover;
-    display: flex;
-    text-align: center;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    flex-shrink: 0;
+  & > .edit {
+    position: absolute;
+    right: 3ch;
+    top: 3ch;
+    padding: 4px 8px !important;
+    border-radius: calc(1em + 4px) !important;
+
+    svg {
+      margin-right: 0.5ch;
+    }
+  }
+
+  & > .logo {
+    width: 125px;
+    height: 125px;
+    background: rgba($color: $ung-light-grey, $alpha: 0.2);
+    border: 2px solid rgba($color: $ung-light-grey, $alpha: 0.2);
+    color: $ung-dark-grey;
+    font-size: 6ch;
   }
 
   .details {
     display: flex;
     flex-flow: column nowrap;
-    gap: 1em;
+    gap: 2ch;
     justify-content: space-between;
 
     h1:empty,
-    div:empty {
+    & > div > :empty,
+    .actionRow div:empty {
       @extend .glimmer-animated;
-      width: 8em;
+      width: 16ch;
       height: 0.8em;
       margin-top: 0.2em;
       margin-bottom: 0.2em;
 
       &:nth-child(2) {
-        width: 24em;
+        width: 48ch;
+      }
+
+      &:nth-child(3) {
+        width: 36ch;
+      }
+
+      &:nth-child(4) {
+        width: 62ch;
       }
     }
 
     .actionRow {
       display: flex;
       flex-flow: row wrap;
-      gap: 1.5em;
+      gap: 3ch;
 
       svg + div {
         display: inline-block;
         vertical-align: super;
-        margin-left: 0.25em;
+        margin-left: 0.5ch;
       }
 
       :nth-child(1) div:empty {
-        width: 6em;
+        width: 12ch;
       }
       :nth-child(2) div:empty {
-        width: 9em;
+        width: 18ch;
       }
       :nth-child(3) div:empty {
-        width: 5em;
+        width: 10ch;
       }
     }
   }
@@ -71,12 +89,12 @@
 
 .membersCard {
   background: white;
-  margin-top: 1.5em;
-  padding: calc(1.5em - 2px);
+  margin-top: 3ch;
+  padding: calc(3ch - 2px);
   display: flex;
   flex-flow: column nowrap;
-  gap: 0.5em;
-  border-radius: 0.5em;
+  gap: 1ch;
+  border-radius: 1ch;
   border: 2px solid transparent;
 
   &.editMode {
@@ -103,7 +121,7 @@
     .actionRow {
       display: flex;
       flex-flow: row wrap;
-      gap: 0.5em;
+      gap: 1ch;
       align-items: center;
     }
 
@@ -111,11 +129,15 @@
       font-size: 0.8em;
       padding: 4px 8px;
       border-radius: calc(0.5em + 4px);
+
+      svg {
+        margin-right: 0.5ch;
+      }
     }
   }
 
   > div {
-    padding: 0.5em 10px;
+    padding: 1ch 10px;
   }
 
   :has(> :not(path):nth-child(2):empty) {

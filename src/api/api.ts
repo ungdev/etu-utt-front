@@ -4,6 +4,11 @@ import { useNotFound } from '@/module/pageSettings';
 import { toast } from 'react-toastify';
 import { ApiError } from '@/api/api.interface';
 
+export const buildApiUrl = (path: string, version = apiVersion) =>
+  `${apiUrl.slice(-1) === '/' ? apiUrl.slice(0, -1) : apiUrl}/${version}/${
+    path.slice(0, 1) === '/' ? path.slice(1) : path
+  }`;
+
 /**
  * The type of error that can be produced while making a request to the API.
  * Note that these errors are not errors that the API can return, but rather errors that can happen while making a request / interpreting the result.
@@ -94,7 +99,6 @@ export class ResponseHandler<T, R extends ResponseHandlerExtendsType<T> = { fall
 {
   private readonly handlers = { fallback: () => undefined } as R;
   private readonly promise: Promise<ReturnType<R[keyof R] extends (...args: any) => any ? R[keyof R] : never>>;
-  // public readonly abortController: AbortController;
 
   constructor(
     rawResponse: Promise<APIResponse<T>>,
@@ -203,6 +207,7 @@ function formatResponse<T>(rawResponse: RawResponseType<T>): T {
  * @param version The version of the API to use : v1, v2, ...
  * @param isFile If what we are sending/fetching is a file.
  * @param applicationId Id of the application making the request.
+ * @param forceCache If true, the result of the request is cached. Otherwise, it won't.
  * @param abortController AbortController to add to the request.
  */
 async function internalRequestAPI<RequestType>(
@@ -213,6 +218,7 @@ async function internalRequestAPI<RequestType>(
   version: string,
   isFile: true,
   applicationId: string,
+  forceCache: boolean,
   abortController: AbortController,
 ): Promise<APIResponse<Blob>>;
 async function internalRequestAPI<RequestType, ResponseType>(
@@ -223,6 +229,7 @@ async function internalRequestAPI<RequestType, ResponseType>(
   version: string,
   isFile: boolean,
   applicationId: string,
+  forceCache: boolean,
   abortController: AbortController,
 ): Promise<APIResponse<ResponseType>>;
 async function internalRequestAPI<RequestType, ResponseType>(
@@ -233,6 +240,7 @@ async function internalRequestAPI<RequestType, ResponseType>(
   version: string,
   isFile: boolean,
   applicationId: string,
+  forceCache: boolean,
   abortController: AbortController,
 ): Promise<APIResponse<ResponseType | Blob>> {
   // Generate headers
@@ -248,21 +256,16 @@ async function internalRequestAPI<RequestType, ResponseType>(
 
   try {
     // Make the request
-    const response = await fetch(
-      `${apiUrl.slice(-1) === '/' ? apiUrl.slice(0, -1) : apiUrl}/${version}/${
-        route.slice(0, 1) === '/' ? route.slice(1) : route
-      }`,
-      {
-        method,
-        headers,
-        body: (method === 'GET' || method === 'DELETE' ? undefined : isFile ? body : JSON.stringify(body)) as
-          | BodyInit
-          | null
-          | undefined,
-        cache: 'no-cache',
-        signal: abortController.signal,
-      },
-    );
+    const response = await fetch(buildApiUrl(route, version), {
+      method,
+      headers,
+      body: (method === 'GET' || method === 'DELETE' ? undefined : isFile ? body : JSON.stringify(body)) as
+        | BodyInit
+        | null
+        | undefined,
+      cache: forceCache ? 'force-cache' : 'no-cache',
+      signal: abortController.signal,
+    });
 
     if (response.status === StatusCodes.NO_CONTENT) {
       return { code: response.status, body: null as ResponseType };
@@ -316,13 +319,13 @@ function requestAPI<RequestType>(
   method: 'GET',
   route: string,
   body: RequestType | null,
-  params: { timeoutMillis?: number; version?: string; isFile: true; applicationId?: string },
+  params: { timeoutMillis?: number; version?: string; isFile: true; applicationId?: string; forceCache?: boolean },
 ): ResponseHandler<Blob>;
 function requestAPI<RequestType, ResponseType>(
   method: string,
   route: string,
   body: RequestType | null,
-  params: { timeoutMillis?: number; version?: string; isFile?: boolean; applicationId?: string },
+  params: { timeoutMillis?: number; version?: string; isFile?: boolean; applicationId?: string; forceCache?: boolean },
 ): ResponseHandler<ResponseType>;
 function requestAPI<RequestType, ResponseType>(
   method: string,
@@ -333,11 +336,12 @@ function requestAPI<RequestType, ResponseType>(
     version = apiVersion,
     isFile = false,
     applicationId = etuuttWebApplicationId,
-  }: { timeoutMillis?: number; version?: string; isFile?: boolean; applicationId?: string } = {},
+    forceCache = false,
+  }: { timeoutMillis?: number; version?: string; isFile?: boolean; applicationId?: string; forceCache?: boolean } = {},
 ): ResponseHandler<ResponseType> {
   const abortController = new AbortController();
   return new ResponseHandler(
-    internalRequestAPI(method, route, body, timeoutMillis, version, isFile, applicationId, abortController),
+    internalRequestAPI(method, route, body, timeoutMillis, version, isFile, applicationId, forceCache, abortController),
     abortController,
   );
 }
@@ -360,7 +364,7 @@ export function useAPI(): API {
       applyDefaultHandler(requestAPI<never, Blob>('GET', route, null, { ...options, isFile: true }), setNotFound),
     get: <ResponseType = never>(
       route: string,
-      options: { timeoutMillis?: number; version?: string; applicationId?: string } = {},
+      options: { timeoutMillis?: number; version?: string; forceCache?: boolean; applicationId?: string } = {},
     ) =>
       applyDefaultHandler(
         requestAPI<never, ResponseType>('GET', route, null, { ...options, isFile: false }),
@@ -389,11 +393,11 @@ export function useAPI(): API {
 export interface API {
   getFile(
     route: string,
-    options?: { timeoutMillis?: number; version?: string; applicationId?: string },
+    options?: { timeoutMillis?: number; version?: string; applicationId?: string; forceCache?: boolean },
   ): DefaultResponseHandlerType<Blob>;
   get<ResponseType = never>(
     route: string,
-    options?: { timeoutMillis?: number; version?: string; applicationId?: string },
+    options?: { timeoutMillis?: number; version?: string; applicationId?: string; forceCache?: boolean },
   ): DefaultResponseHandlerType<ResponseType>;
   post<RequestType, ResponseType = never>(
     route: string,

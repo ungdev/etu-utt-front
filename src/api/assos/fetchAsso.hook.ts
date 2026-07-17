@@ -11,7 +11,7 @@ export function useAsso(assoId: string): [Asso | null | undefined, (asso: Asso) 
       .on('success', (body) => {
         setAsso(body);
       })
-      .on('error', () => setAsso(null));
+      .on('fallback', () => setAsso(null));
   }, []);
   return [asso, setAsso];
 }

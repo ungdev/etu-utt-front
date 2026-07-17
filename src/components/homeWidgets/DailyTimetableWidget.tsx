@@ -5,7 +5,7 @@ import { /*GetDailyTimetableResponseDto,*/ TimetableEvent } from '@/api/users/ge
 // import { useAPI } from '@/api/api';
 import { format } from 'date-fns';
 import * as locale from 'date-fns/locale';
-import Icons from '@/icons';
+import { IconChevronLeft, IconChevronRight } from 'obra-icons-react';
 import Button from '@/components/UI/Button';
 import { WidgetLayout } from '@/components/homeWidgets/WidgetLayout';
 import { useAppTranslation } from '@/lib/i18n';
@@ -86,13 +86,13 @@ export default function DailyTimetableWidget() {
       subtitle={t('homepage:dailyTimetable.subtitle')}>
       <div className={styles.chooseDay}>
         <Button noStyle onClick={() => setSelectedDate(new Date(selectedDate.getTime() - DAY_LENGTH))}>
-          <Icons.LeftChevron />
+          <IconChevronLeft />
         </Button>
         {format(selectedDate, `cccc d MMMM${selectedDate.getFullYear() === new Date().getFullYear() ? '' : ' yyyy'}`, {
           locale: locale.fr,
         })}
         <Button noStyle onClick={() => setSelectedDate(new Date(selectedDate.getTime() + DAY_LENGTH))}>
-          <Icons.RightChevron />
+          <IconChevronRight />
         </Button>
       </div>
       <div className={styles.timetable}>

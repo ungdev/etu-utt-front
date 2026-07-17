@@ -2,7 +2,7 @@ import styles from './ResultsList.module.scss';
 import { useRouter } from 'next/navigation';
 import { FC, useEffect, useRef } from 'react';
 import { useAppTranslation } from '@/lib/i18n';
-import Loader from '@/icons/Loader';
+import Icons from '@/icons';
 
 export function ResultsList<T extends object>({
   data,
@@ -72,7 +72,7 @@ export function ResultsList<T extends object>({
       </div>
       {loading && (
         <div className={styles.loader}>
-          <Loader />
+          <Icons.Loader />
           {t('common:loading')}
         </div>
       )}

@@ -1,7 +1,7 @@
 import { PropsWithoutRef, ReactNode, useEffect, useState } from 'react';
 import { User } from '@/api/users/user.interface';
 import { useAppTranslation } from '@/lib/i18n';
-import Icons from '@/icons';
+import { IconAdd, IconClose } from 'obra-icons-react';
 import { UserCard } from '../users/UserCard';
 import UserSelector from '../users/UserSelector';
 import Input from './Input';
@@ -148,7 +148,7 @@ export function ModalForm<T extends DataModalKeys>({ fields, window, onSubmit, o
         <div className={styles.title}>
           {window.title}
           <div className={styles.close} onClick={handleClose}>
-            <Icons.Close />
+            <IconClose />
           </div>
         </div>
         <div className={styles.container}>
@@ -223,7 +223,7 @@ function StringFormPart<T extends DataModalKeys>({
                 [fieldKey]: state === optionValue ? '' : optionValue,
               })
             }>
-            {state === optionValue ? <Icons.Close /> : <Icons.Add />}
+            {state === optionValue ? <IconClose /> : <IconAdd />}
             {optionLabel}
           </Button>
         );
@@ -270,7 +270,7 @@ function UserFormPart<T extends DataModalKeys>({
     <>
       <UserCard user={state} />
       <Button className={styles.resetUser} onClick={() => setStates({ ...states, [fieldKey]: undefined })}>
-        <Icons.Close />
+        <IconClose />
         {t('users:modal.form.change')}
       </Button>
     </>
@@ -309,7 +309,7 @@ function StringListFormPart<T extends DataModalKeys>({
                   : [...state, optionValue],
               })
             }>
-            {state.includes(optionValue) ? <Icons.Close /> : <Icons.Add />}
+            {state.includes(optionValue) ? <IconClose /> : <IconAdd />}
             {optionLabel}
           </Button>
         );

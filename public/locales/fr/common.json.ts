@@ -32,7 +32,10 @@ export default {
   'navbar.userBrowser': 'Trombinoscope',
   or: 'Ou',
   results: 'résultats',
+  confirm: 'Confirmer',
   '404': 'Page not found',
   '404.description': "La page demandée n'existe pas ou n'est plus disponible.",
-  confirm: 'Confirmer',
+  'rte.dnd.drop': "Déposez le fichier pour l'importer",
+  'rte.toolbar.uploadImage': "Cliquez pour sélectionner l'image",
+  'ui.profilepicture.upload': 'Télécharger une image',
 } as const;

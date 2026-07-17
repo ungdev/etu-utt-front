@@ -1,12 +1,21 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import {
+  IconCall,
+  IconCheck,
+  IconClose,
+  IconEdit,
+  IconEmail,
+  IconExternalLink,
+  IconEye,
+  IconEyeOff,
+} from 'obra-icons-react';
 import { useParams } from 'next/navigation';
 import styles from './style.module.scss';
 import { useAsso } from '@/api/assos/fetchAsso.hook';
 import Page from '@/components/utilities/Page';
 import { useMembers } from '@/api/assos/fetchAssoMembers.hook';
-import Icons from '@/icons';
 import Link from '@/components/UI/Link';
 import { useAppTranslation } from '@/lib/i18n';
 import Button from '@/components/UI/Button';
@@ -22,6 +31,11 @@ import { User } from '@/api/users/user.interface';
 import { DataModalSchema, ModalStates, ModalForm, WindowOptions } from '@/components/UI/ModalForm';
 import { AssoRole } from '@/components/assos/AssoRole';
 import { c } from '@/utils';
+import LexicalTextEditor, { $makeJson } from '@/components/UI/LexicalTextEditor';
+import Input from '@/components/UI/Input';
+import Avatar from '@/components/UI/Avatar';
+import { AssoUpdateRequest } from '@/api/assos/asso.interface';
+import { updateAsso } from '@/api/assos/updateAsso';
 
 type CreateAssoRoleModalFields = { name: 'string' };
 type DeleteAssoRoleModalFields = { confirmation: 'string' };
@@ -46,30 +60,81 @@ type ExtraModalData =
 export default function AssoDetailPage() {
   const params = useParams<{ assoId: string }>();
   const user = useConnectedUser();
-  const [asso] = useAsso(params.assoId);
+  const [asso, setAsso] = useAsso(params.assoId);
   const [members, setMembers] = useMembers(params.assoId);
   const [permissions, setPermissions] = useState(new Set<string>());
   const [displayOldMembers, setDisplayOldMembers] = useState(false);
+  const [editInfosMode, setEditInfosMode] = useState(false);
   const [editMembersMode, setEditMembersMode] = useState(false);
   const [currentEditingRole, setCurrentEditingRole] = useState<string | null>(null);
   const { t } = useAppTranslation();
-
   const [modalForm, setModalForm] = useState<DataModalSchema<AssoDetailModalFields> | null>(null);
   const [modalFormWindow, setModalFormWindow] = useState<WindowOptions | null>(null);
   const [extraModalData, setExtraModalData] = useState<ExtraModalData | null>(null);
+  const [assoEdit, setAssoEdit] = useState<AssoUpdateRequest>({});
+  const stateRef = useRef<(state: string) => void>(() => {});
 
   const api = useAPI();
 
   useEffect(() => {
-    const permissions = new Set(
-      members
-        .map((role) =>
-          role.members.filter((member) => member.userId === user?.id).flatMap((member) => member.permissions),
-        )
-        .flat(),
-    );
+    if (!user) return;
+    const permissions = new Set<string>();
+    for (const role of members) {
+      if (role.isPresident) {
+        if (role.members.find((member) => member.userId === user.id)) {
+          permissions.add('manage_infos');
+          permissions.add('manage_roles');
+          permissions.add('manage_members');
+          break;
+        }
+      } else {
+        const member = role.members.find((member) => member.userId === user.id);
+        if (member) {
+          member.permissions.forEach(permissions.add);
+        }
+      }
+    }
     setPermissions(permissions);
   }, [members, user]);
+
+  useEffect(() => {
+    if (asso?.description) stateRef.current(asso.description);
+  }, [asso]);
+
+  // Asso edition zone
+
+  const toggleAssoInfoEdition = () => {
+    if (!editInfosMode) {
+      setAssoEdit({
+        name: asso?.name,
+        description: { fr: asso?.description },
+        website: asso?.website,
+        mail: asso?.mail,
+        phoneNumber: asso?.phoneNumber,
+        logo: asso?.logo,
+      });
+    } else {
+      const updatePayload: AssoUpdateRequest = {};
+      if (asso?.name !== assoEdit.name) updatePayload.name = assoEdit.name;
+      if (
+        asso?.description !== assoEdit.description?.fr &&
+        $makeJson(asso?.description ?? '') !== assoEdit.description?.fr
+      )
+        updatePayload.description = assoEdit.description;
+      if (asso?.website !== assoEdit.website) updatePayload.website = assoEdit.website;
+      if (asso?.mail !== assoEdit.mail) updatePayload.mail = assoEdit.mail;
+      if (asso?.phoneNumber !== assoEdit.phoneNumber) updatePayload.phoneNumber = assoEdit.phoneNumber;
+      if (assoEdit.logo && asso?.logo !== `/image/media/${assoEdit.logo}.webp`) updatePayload.logo = assoEdit.logo;
+      if (Object.keys(updatePayload).length > 0)
+        updateAsso(api, asso!.id, updatePayload).then((asso) => asso && setAsso(asso));
+      setAssoEdit({});
+    }
+    setEditInfosMode(!editInfosMode);
+  };
+
+  const updateAssoEdit = (update: AssoUpdateRequest) => {
+    setAssoEdit({ ...assoEdit, ...update });
+  };
 
   const updateAssoRole = async (roleId: string, data: Partial<{ name: string; position: number }>) => {
     const role = members.find((r) => r.id === roleId);
@@ -89,6 +154,8 @@ export default function AssoDetailPage() {
         }),
       );
   };
+
+  // Asso role & members zone
 
   const deleteAssoRole = async (roleId: string) => {
     const deletedRole = await deleteRole(api, asso!.id, roleId).toPromise();
@@ -248,34 +315,92 @@ export default function AssoDetailPage() {
   return (
     <Page className={styles.page}>
       <div className={c(styles.headerCard, !asso && styles.glimmer)}>
-        <img src={asso?.logo} alt={`Logo ${asso?.name}`} />
+        {permissions.has('manage_infos') && (
+          <Button onClick={toggleAssoInfoEdition} className={styles.edit}>
+            {editInfosMode ? <IconCheck /> : <IconEdit />}
+            {editInfosMode ? t('assos:infos.edit.save') : t('assos:infos.edit')}
+          </Button>
+        )}
+        <Avatar
+          className={styles.logo}
+          localSrc={assoEdit.logo ? assoEdit.logo : asso?.logo}
+          name={asso?.name}
+          editable={editInfosMode}
+          isPublic={true}
+          onChange={(mediaId) => updateAssoEdit({ logo: mediaId })}
+        />
         <div className={styles.details}>
           <div>
-            <h1>{asso?.name}</h1>
-            <div>{asso?.description}</div>
+            <h1>
+              {editInfosMode ? (
+                <Input value={assoEdit.name} onChange={(name) => updateAssoEdit({ name })} />
+              ) : (
+                asso?.name
+              )}
+            </h1>
+            {asso ? (
+              <LexicalTextEditor
+                bundle="@etuutt/full"
+                placeholder={t('assos:infos.edit.description.placeholder')}
+                emptyText={t('assos:infos.description.empty')}
+                initialState={$makeJson(asso.description)}
+                onChange={(state) => updateAssoEdit({ description: { fr: state } })}
+                setStateRef={stateRef}
+                disabled={!editInfosMode}
+              />
+            ) : (
+              <>
+                {/* Loader */}
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+              </>
+            )}
           </div>
           <div className={styles.actionRow}>
-            <Link href={asso?.website ? asso?.website.replace(/^(?:https?:\/\/)?/, 'https://') : '#'} noStyle newTab>
-              <Icons.LinkExternal />
-              <div>{asso?.website?.replace(/^https?:\/\/(?:www\.)?/, '')}</div>
-            </Link>
-            <Link href={asso?.mail ? asso?.mail.replace(/^(?:mailto:)?/, 'mailto:') : '#'} noStyle>
-              <Icons.Mail />
-              <div>{asso?.mail}</div>
-            </Link>
-            <Link
-              href={
-                asso?.phoneNumber
-                  ? `${asso?.phoneNumber}`
-                      .replace(/^0/, '+33')
-                      .replace(/(?!^\+)\D/g, '')
-                      .replace(/^(?:tel:)?/, 'tel:')
-                  : '#'
-              }
-              noStyle>
-              <Icons.Phone />
-              <div>{asso?.phoneNumber}</div>
-            </Link>
+            {editInfosMode ? (
+              <>
+                <Input
+                  value={assoEdit.website}
+                  icon={IconExternalLink}
+                  onChange={(website) => updateAssoEdit({ website })}
+                />
+                <Input value={assoEdit.mail} icon={IconEmail} onChange={(mail) => updateAssoEdit({ mail })} />
+                <Input
+                  value={assoEdit.phoneNumber}
+                  icon={IconCall}
+                  onChange={(phoneNumber) => updateAssoEdit({ phoneNumber })}
+                />
+              </>
+            ) : (
+              <>
+                <Link
+                  href={asso?.website ? asso?.website.replace(/^(?:https?:\/\/)?/, 'https://') : '#'}
+                  noStyle
+                  external>
+                  <IconExternalLink />
+                  <div>{asso?.website?.replace(/^https?:\/\/(?:www\.)?/, '')}</div>
+                </Link>
+                <Link href={asso?.mail ? asso?.mail.replace(/^(?:mailto:)?/, 'mailto:') : '#'} noStyle>
+                  <IconEmail />
+                  <div>{asso?.mail}</div>
+                </Link>
+                <Link
+                  href={
+                    asso?.phoneNumber
+                      ? `${asso?.phoneNumber}`
+                          .replace(/^0/, '+33')
+                          .replace(/(?!^\+)\D/g, '')
+                          .replace(/^(?:tel:)?/, 'tel:')
+                      : '#'
+                  }
+                  noStyle>
+                  <IconCall />
+                  <div>{asso?.phoneNumber}</div>
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -286,19 +411,18 @@ export default function AssoDetailPage() {
             <div className={styles.actionRow}>
               {permissions.has('manage_roles') && editMembersMode && (
                 <Button onClick={openModalForRoleCreation} className={styles.toggleOldMembers}>
-                  <Icons.Add />
                   {t('assos:member.role.add')}
                 </Button>
               )}
               {!!permissions.size && (
                 <Button onClick={() => setEditMembersMode(!editMembersMode)} className={styles.toggleOldMembers}>
-                  {editMembersMode ? <Icons.Close /> : <Icons.Edit />}
+                  {editMembersMode ? <IconClose /> : <IconEdit />}
                   {editMembersMode ? t('assos:member.edit.stop') : t('assos:member.edit')}
                 </Button>
               )}
               {!editMembersMode && (
                 <Button onClick={() => setDisplayOldMembers(!displayOldMembers)} className={styles.toggleOldMembers}>
-                  {displayOldMembers ? <Icons.EyeOff /> : <Icons.EyeOn />}
+                  {displayOldMembers ? <IconEyeOff /> : <IconEye />}
                   {displayOldMembers ? t('assos:member.old.hide') : t('assos:member.old.display')}
                 </Button>
               )}

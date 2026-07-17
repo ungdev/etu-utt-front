@@ -4,12 +4,12 @@ import { Branch } from '@/api/branch/branch.interface';
 import { CreditCategory } from '@/api/credit/credit.interface';
 import { useUEs } from '@/api/ue/search';
 import FilteredSearch, { FiltersDataType, GenericFiltersType } from '@/components/filteredSearch/FilteredSearch';
+import { IconBook } from 'obra-icons-react';
 import { createInputFilter } from '@/components/filteredSearch/InputFilter';
 import { createSelectFilter, SelectFilter } from '@/components/filteredSearch/SelectFilter';
 import { ResultsList } from '@/components/ResultsList';
 import Tooltip from '@/components/UI/Tooltip';
 import Page from '@/components/utilities/Page';
-import Icons from '@/icons';
 import { useAppTranslation } from '@/lib/i18n';
 import { useBranches, useCreditCategories } from '@/module/constantData';
 import { useMemo } from 'react';
@@ -34,7 +34,7 @@ function useUeFilters(creditCategories: CreditCategory[] | null, branches: Branc
   return useMemo(() => {
     return Object.freeze({
       name: {
-        component: createInputFilter('ues:filter.search', 'ues:filter.search.title', Icons.Book),
+        component: createInputFilter('ues:filter.search', 'ues:filter.search.title', IconBook),
         parameterName: 'q',
         updateDelayed: true,
       }, // This one does not need a name as it will never be displayed
