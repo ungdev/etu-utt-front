@@ -21,7 +21,7 @@ import { useAppTranslation } from '@/lib/i18n';
 import Button from '@/components/UI/Button';
 import { useConnectedUser } from '@/module/session';
 import { deleteRole } from '@/api/assos/deleteRole';
-import { computeApiURL, useAPI } from '@/api/api';
+import { buildApiUrl, useAPI } from '@/api/api';
 import { VerticalSortDnd } from '@/components/UI/VerticalSortDnd';
 import { updateRole } from '@/api/assos/updateRole';
 import { Member } from '@/api/assos/member.interface';
@@ -105,7 +105,15 @@ export default function AssoDetailPage() {
   }, [members, user]);
 
   useEffect(() => {
-    if (asso?.description) stateRef.current(asso.description);
+    if (asso?.description) {
+      let useAssoRawDescription = true;
+      try {
+        JSON.parse(asso.description);
+      } catch {
+        useAssoRawDescription = false;
+      }
+      stateRef.current?.(useAssoRawDescription ? asso.description : $makeJson(asso.description));
+    }
   }, [asso]);
 
   // Asso edition zone
@@ -356,8 +364,8 @@ export default function AssoDetailPage() {
                 disabled={!editInfosMode}
                 uploadPlaceholderText={t('common:rte.toolbar.uploadImage')}
                 dropPlaceholder={t('common:rte.dnd.drop')}
-                extractMetaData={(uploadResponse: PartialUploadResponse | null) => ({
-                  src: computeApiURL(`/media/image/${uploadResponse!.id}.webp`),
+                extractMetaData={(uploadResponse?: PartialUploadResponse) => ({
+                  src: buildApiUrl(`/media/image/${uploadResponse!.id}.webp`),
                   width: uploadResponse!.width,
                   height: uploadResponse!.height,
                 })}
