@@ -6,6 +6,7 @@ import { IconEdit } from 'obra-icons-react';
 import { ImageMedia } from './ImageMedia';
 import { c } from '@/utils';
 import { uploadPublicImage } from '@/api/media/uploadImage';
+import type { PartialUploadResponse } from '@/app/assos/[assoId]/page';
 
 type AvatarProps = PropsWithoutRef<{
   localSrc?: string;
