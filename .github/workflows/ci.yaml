@@ -10,7 +10,7 @@ jobs:
     runs-on: sia-autoscale-runners
     strategy:
       matrix:
-        node-version: [18]
+        node-version: [22]
     steps:
       - uses: actions/checkout@v3
       - uses: pnpm/action-setup@v4
