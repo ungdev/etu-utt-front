@@ -7,7 +7,7 @@ on:
 
 jobs:
   lint:
-    runs-on: self-hosted
+    runs-on: sia-autoscale-runners
     strategy:
       matrix:
         node-version: [18]
