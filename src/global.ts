@@ -1,4 +1,4 @@
-import './global.d';
+import './global';
 
 String.prototype.latinize = function () {
   return this.normalize('NFD').replace(/[\u0300-\u036f]/g, '');

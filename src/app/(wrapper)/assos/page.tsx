@@ -7,6 +7,7 @@ import { ResultsList } from '@/components/ResultsList';
 import { useAppTranslation } from '@/lib/i18n';
 import { useAssos } from '@/api/assos/searchAssos.hook';
 import Page from '@/components/utilities/Page';
+import Link from '@/components/UI/Link';
 
 /**
  * The different filters that exist.
@@ -33,7 +34,10 @@ export default function AssoPage() {
   const { items: assos, total: totalAssosCount, updateFilters: updateAssos, invalidateItems } = useAssos();
   return (
     <Page className={styles.page}>
-      <h1 className={styles.title}>{t('assos:browser')}</h1>
+      <div className={styles.header}>
+        <h1 className={styles.title}>{t('assos:browser')}</h1>
+        <Link href="/assos/access">{t('assos:access.entry')}</Link>
+      </div>
       <div className={styles.content}>
         <FilteredSearch<FilterNames, AssoFiltersType>
           filtersData={assoFilters}
