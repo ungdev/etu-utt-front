@@ -58,14 +58,5 @@
     "eslint-plugin-react": "^7.37.5",
     "sass": "^1.105.1",
     "typescript": "^6.0.3"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "sharp"
-    ],
-    "overrides": {
-      "@types/react": "19.2.2",
-      "@types/react-dom": "19.2.2"
-    }
   }
 }
