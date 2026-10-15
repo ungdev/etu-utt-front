@@ -13,24 +13,26 @@ jobs:
     strategy:
       matrix:
         node-version: [22]
-        pnpm-version: [10]
+        pnpm-version: [11]
+    permissions:
+      packages: read
     steps:
-      - uses: actions/checkout@v5
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
+      - uses: actions/checkout@v7
+      - name: Install NodeJS
+        uses: pnpm/setup@v3
         with:
-          version: ${{ matrix.pnpm-version }}
-      - name: Use Node.js
-        uses: actions/setup-node@v6
-        with:
-          package-manager-cache: false
-          node-version: ${{ matrix.node-version }}
-          cache: 'pnpm'
-      - name: Logging to registry
-        run: pnpm config set "//npm.pkg.github.com/:_authToken" $NODE_AUTH_TOKEN
+          runtime: node@${{ matrix.node-version }}
+          require-lockfile: true
+          version: ^${{ matrix.pnpm-version }}
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - run: pnpm install --frozen-lockfile
+          pnpm_config__auth: |
+            {
+              "https://npm.pkg.github.com": {
+                "@ungdev": {
+                  "authToken": ${{ secrets.GITHUB_TOKEN }}
+                }
+              }
+            }
       - run: pnpm lint
 
   build:
@@ -38,24 +40,26 @@ jobs:
     strategy:
       matrix:
         node-version: [22]
-        pnpm-version: [10]
+        pnpm-version: [11]
+    permissions:
+      packages: read
     steps:
-      - uses: actions/checkout@v5
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
+      - uses: actions/checkout@v7
+      - name: Install NodeJS
+        uses: pnpm/setup@v3
         with:
-          version: ${{ matrix.pnpm-version }}
-      - name: Use Node.js
-        uses: actions/setup-node@v6
-        with:
-          package-manager-cache: false
-          node-version: ${{ matrix.node-version }}
-          cache: 'pnpm'
-      - name: Logging to registry
-        run: pnpm config set "//npm.pkg.github.com/:_authToken" $NODE_AUTH_TOKEN
+          runtime: node@${{ matrix.node-version }}
+          require-lockfile: true
+          version: ^${{ matrix.pnpm-version }}
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - run: pnpm install --frozen-lockfile
+          pnpm_config__auth: |
+            {
+              "https://npm.pkg.github.com": {
+                "@ungdev": {
+                  "authToken": ${{ secrets.GITHUB_TOKEN }}
+                }
+              }
+            }
       - run: pnpm build
 
   deploy:
