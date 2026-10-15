@@ -9,7 +9,7 @@ on:
 
 jobs:
   lint:
-    runs-on: self-hosted
+    runs-on: sia-static-runners
     strategy:
       matrix:
         node-version: [22]
@@ -38,7 +38,7 @@ jobs:
       - run: pnpm lint
 
   build:
-    runs-on: self-hosted
+    runs-on: sia-static-runners
     strategy:
       matrix:
         node-version: [22]
@@ -69,7 +69,7 @@ jobs:
   deploy:
     if: ${{ github.event_name != 'pull_request' && (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/master') }}
     environment: ${{ github.ref == 'refs/heads/dev' && 'development' || 'production' }}
-    runs-on: self-hosted
+    runs-on: sia-static-runners
     needs:
       - lint
       - build
