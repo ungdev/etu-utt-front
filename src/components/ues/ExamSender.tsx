@@ -25,7 +25,7 @@ export default function ExamSender({
   const [annalType, setAnnalType] = useState<string>();
   const [annalSemester, setAnnalSemester] = useState<string>();
   const [isAnnalSendButtonDisabled, setAnnalSendButtonDisabled] = useState(false);
-  const fileRef = useRef<File>();
+  const fileRef = useRef<File | undefined>(undefined);
   const api = useAPI();
 
   useEffect(() => {

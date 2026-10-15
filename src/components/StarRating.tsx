@@ -1,6 +1,6 @@
+import { IconFavorite } from 'obra-icons-react';
 import styles from './StarRating.module.scss';
 import { CSSProperties } from 'react';
-import { IconFavorite } from 'obra-icons-react';
 
 export default function StarRating({
   stars,

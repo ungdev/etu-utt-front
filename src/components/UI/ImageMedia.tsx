@@ -32,7 +32,7 @@ export function ImageMedia({
       .getFile(worldSrc.slice(buildApiUrl('').length), { forceCache: true })
       .on('success', (blob) => setSrc(URL.createObjectURL(blob!)))
       .toPromise()
-      .then((blob) => setSrc(URL.createObjectURL(blob!)));
+      .then((blob) => blob && setSrc(URL.createObjectURL(blob)));
     return () => {
       if (src.startsWith('blob:')) URL.revokeObjectURL(src);
     };
