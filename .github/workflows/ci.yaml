@@ -18,6 +18,8 @@ jobs:
       packages: read
     steps:
       - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
       - name: Install NodeJS
         uses: pnpm/setup@v3
         with:
@@ -29,7 +31,7 @@ jobs:
             {
               "https://npm.pkg.github.com": {
                 "@ungdev": {
-                  "authToken": ${{ secrets.GITHUB_TOKEN }}
+                  "authToken": "${{ secrets.GITHUB_TOKEN }}"
                 }
               }
             }
@@ -45,6 +47,8 @@ jobs:
       packages: read
     steps:
       - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
       - name: Install NodeJS
         uses: pnpm/setup@v3
         with:
@@ -56,7 +60,7 @@ jobs:
             {
               "https://npm.pkg.github.com": {
                 "@ungdev": {
-                  "authToken": ${{ secrets.GITHUB_TOKEN }}
+                  "authToken": "${{ secrets.GITHUB_TOKEN }}"
                 }
               }
             }
