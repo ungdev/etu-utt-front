@@ -22,8 +22,9 @@ export default function AssoAccessPage() {
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
   const [info, setInfo] = useState<AssoAccessInfo | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [requested, setRequested] = useState(false);
+  const [infoError, setInfoError] = useState(false);
+  const [actionLoading, setActionLoading] = useState(false);
+  const [requestSent, setRequestSent] = useState(false);
 
   useEffect(() => {
     if (internallyLoaded) markPageLoaded();
@@ -31,50 +32,47 @@ export default function AssoAccessPage() {
 
   useEffect(() => {
     if (!token) return;
-    setLoading(true);
+    setInfoError(false);
     getAssoAccessInfo(api, token)
       .on('success', (body) => {
         setInfo(body);
         setName(body.name ?? '');
-        setLoading(false);
       })
       .on('error', (_code, error) => {
+        setInfoError(true);
         toast.error(error ?? t('assos:access.error'));
-        setLoading(false);
       })
-      .on('failure', () => {
-        setLoading(false);
-      })
+      .on('failure', () => setInfoError(true))
       .on(404, (error) => {
+        setInfoError(true);
         toast.error(error ?? t('assos:access.error'));
-        setLoading(false);
       });
   }, [token]);
 
   const submitRequest = () => {
     if (!email.trim()) return;
-    setLoading(true);
+    setActionLoading(true);
     requestAssoAccess(api, email)
       .on('success', () => {
-        setRequested(true);
-        setLoading(false);
+        setRequestSent(true);
+        setActionLoading(false);
       })
       .on('error', (_code, error) => {
         toast.error(error ?? t('assos:access.error'));
-        setLoading(false);
+        setActionLoading(false);
       })
       .on('failure', () => {
-        setLoading(false);
+        setActionLoading(false);
       })
       .on(404, (error) => {
         toast.error(error ?? t('assos:access.error'));
-        setLoading(false);
+        setActionLoading(false);
       });
   };
 
   const confirm = () => {
     if (!token || (info?.action === 'CREATE' && !name.trim())) return;
-    setLoading(true);
+    setActionLoading(true);
     confirmAssoAccess(api, {
       token,
       ...(info?.action === 'CREATE' ? { name: name.trim() } : {}),
@@ -84,14 +82,14 @@ export default function AssoAccessPage() {
       })
       .on('error', (_code, error) => {
         toast.error(error ?? t('assos:access.error'));
-        setLoading(false);
+        setActionLoading(false);
       })
       .on('failure', () => {
-        setLoading(false);
+        setActionLoading(false);
       })
       .on(404, (error) => {
         toast.error(error ?? t('assos:access.error'));
-        setLoading(false);
+        setActionLoading(false);
       });
   };
 
@@ -102,38 +100,41 @@ export default function AssoAccessPage() {
           {token ? (
             <>
               <h1>{t('assos:access.confirm.title')}</h1>
-              {loading && !info ? (
-                <p>{t('assos:access.loading')}</p>
-              ) : (
-                info && (
-                  <>
-                    <p>{t(`assos:access.confirm.${info.action.toLowerCase()}`)}</p>
-                    <p className={styles.email}>
-                      {t('assos:access.email')}: <strong>{info.email}</strong>
+              {!info && !infoError && <p>{t('assos:access.loading')}</p>}
+              {infoError && (
+                <>
+                  <p>{t('assos:access.error')}</p>
+                  <Link href="/assos">{t('assos:access.back')}</Link>
+                </>
+              )}
+              {info && !infoError && (
+                <>
+                  <p>{t(`assos:access.confirm.${info.action.toLowerCase()}`)}</p>
+                  <p className={styles.email}>
+                    {t('assos:access.email')}: <strong>{info.email}</strong>
+                  </p>
+                  {info.action === 'CREATE' ? (
+                    <>
+                      <Input
+                        autoFocus
+                        value={name}
+                        onChange={setName}
+                        onEnter={confirm}
+                        placeholder={t('assos:access.name')}
+                      />
+                    </>
+                  ) : (
+                    <p className={styles.name}>
+                      {t('assos:access.name')}: <strong>{info.name}</strong>
                     </p>
-                    {info.action === 'CREATE' ? (
-                      <>
-                        <Input
-                          autoFocus
-                          value={name}
-                          onChange={setName}
-                          onEnter={confirm}
-                          placeholder={t('assos:access.name')}
-                        />
-                      </>
-                    ) : (
-                      <p className={styles.name}>
-                        {t('assos:access.name')}: <strong>{info.name}</strong>
-                      </p>
-                    )}
-                    <Button onClick={confirm} disabled={loading || (info.action === 'CREATE' && !name.trim())}>
-                      {t('assos:access.confirm.button')}
-                    </Button>
-                  </>
-                )
+                  )}
+                  <Button onClick={confirm} disabled={actionLoading || (info.action === 'CREATE' && !name.trim())}>
+                    {t('assos:access.confirm.button')}
+                  </Button>
+                </>
               )}
             </>
-          ) : requested ? (
+          ) : requestSent ? (
             <>
               <h1>{t('assos:access.request.sent.title')}</h1>
               <p>{t('assos:access.request.sent.text', { email })}</p>
@@ -151,8 +152,13 @@ export default function AssoAccessPage() {
                 onEnter={submitRequest}
                 placeholder={t('assos:access.email')}
               />
-              <p>{t('assos:access.request.missing')}</p>
-              <Button onClick={submitRequest} disabled={loading || !email.trim()}>
+              <p>
+                {t('assos:access.request.missing') + ' '}
+                <Link href={`mailto:"+${process.env.NEXT_PUBLIC_ASSOCIATION_EMAIL}`}>
+                  {t('assos:access.request.missing.link')}
+                </Link>
+              </p>
+              <Button onClick={submitRequest} disabled={actionLoading || !email.trim()}>
                 {t('assos:access.request.button')}
               </Button>
             </>
