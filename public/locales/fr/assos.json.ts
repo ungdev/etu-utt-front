@@ -13,7 +13,7 @@ export default {
   'access.back': 'Retour au guide des associations',
   'access.request.title': 'Créer ou revendiquer une association',
   'access.request.label': 'Saisissez l’adresse email @utt.fr de l’association pour recevoir un lien de validation.',
-  'access.request.missing': "Si vous ne disposez pas d'adresse email @utt.fr, ou que vous n'y avez pas accès, veuillez",
+  'access.request.missing': "Si vous ne disposez pas d'adresse email @utt.fr, ou que vous n'y avez pas accès,",
   'access.request.missing.link': "contacter l'association UTT Net Group (ung@utt.fr).",
   'access.request.button': 'Recevoir un lien',
   'access.request.sent.title': 'Lien envoyé',
