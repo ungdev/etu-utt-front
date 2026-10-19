@@ -15,7 +15,6 @@ export interface AssoAccessInfo {
   action: AssoAccessAction;
   email: string;
   name: string | null;
-  description: Record<string, string> | null;
 }
 
 export interface AssoAccessConfirmRequest {
