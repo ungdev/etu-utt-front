@@ -110,11 +110,12 @@ export default function AssoAccessPage() {
               {info && !infoError && (
                 <>
                   <p>{t(`assos:access.confirm.${info.action.toLowerCase()}`)}</p>
-                  <p className={styles.email}>
+                  <p>
                     {t('assos:access.email')}: <strong>{info.email}</strong>
                   </p>
                   {info.action === 'CREATE' ? (
-                    <>
+                    <div>
+                      <p className={styles.nameInputLabel}>{t('assos:access.name')}:</p>
                       <Input
                         autoFocus
                         value={name}
@@ -122,9 +123,9 @@ export default function AssoAccessPage() {
                         onEnter={confirm}
                         placeholder={t('assos:access.name')}
                       />
-                    </>
+                    </div>
                   ) : (
-                    <p className={styles.name}>
+                    <p>
                       {t('assos:access.name')}: <strong>{info.name}</strong>
                     </p>
                   )}
