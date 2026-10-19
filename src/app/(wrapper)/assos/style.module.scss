@@ -11,6 +11,13 @@
     font-weight: 900;
   }
 
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
   .content {
     display: flex;
     gap: 30px;
@@ -21,7 +28,7 @@
     > * {
       background-color: white;
       border-radius: 15px;
-      border: #E7E7E7 solid 1px;
+      border: #e7e7e7 solid 1px;
       padding: 1rem;
       overflow-y: scroll;
     }

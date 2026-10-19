@@ -1,0 +1,38 @@
+@import '@/variables';
+
+.page {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  height: 100%;
+  padding-top: 10vh;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  width: min(100%, 45rem);
+  padding: 2rem;
+  background: white;
+  border: 1px solid #e7e7e7;
+  border-radius: 15px;
+
+  h1 {
+    margin: 0;
+    color: $ung-dark-grey;
+    font-size: 1.5rem;
+  }
+
+  p {
+    margin: 0;
+  }
+
+  button {
+    align-self: flex-start;
+  }
+
+  .nameInputLabel {
+    margin-bottom: 0.5rem;
+  }
+}

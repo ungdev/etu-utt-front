@@ -7,14 +7,16 @@ import {
   usePagePermissions,
   usePageSettings,
 } from '@/module/pageSettings';
+import { useSessionInitialized } from '@/module/session';
 
 export default function Redirecter() {
   const pageSettings = usePageSettings();
   const router = useRouter();
   const permissions = usePagePermissions();
   const loaded = usePageLoaded();
+  const sessionInitialized = useSessionInitialized();
 
-  if (!loaded) {
+  if (!loaded || !sessionInitialized) {
     return null;
   }
 

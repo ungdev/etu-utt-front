@@ -28,6 +28,7 @@ type LoggedInUser = Profile;
 
 interface SessionSlice {
   logged: boolean;
+  initialized: boolean;
   token: string | null;
   user: LoggedInUser | null;
   permissions: Permissions;
@@ -35,6 +36,7 @@ interface SessionSlice {
 
 const initialState = {
   logged: false,
+  initialized: false,
   token: null,
   permissions: { apiPermissions: [], userPermissions: [] },
   user: null,
@@ -50,14 +52,18 @@ export const sessionSlice = createSlice({
       reducer: (_state, action: PayloadAction<{ user: LoggedInUser; permissions: Permissions; token: string }>) => ({
         ...action.payload,
         logged: true,
+        initialized: true,
       }),
     },
-    logout: () => initialState,
+    logout: () => ({ ...initialState, initialized: true }),
+    initialized: (state) => {
+      state.initialized = true;
+    },
   },
   initialState,
 });
 
-const { login: loginReducer, logout: logoutReducer } = sessionSlice.actions;
+const { login: loginReducer, logout: logoutReducer, initialized: initializedReducer } = sessionSlice.actions;
 
 export const login =
   (api: API, login: string, application?: string): AppThunk<Promise<LoginResponseDto | undefined>> =>
@@ -106,14 +112,18 @@ export const autoLogin =
   async (dispatch) => {
     const token = localStorage.getItem(LocalStorageNames.TOKEN);
     if (!token) {
+      dispatch(initializedReducer());
       return;
     }
     setAuthorizationToken(token);
-    api.get<IsLoggedInResponseDto>('/auth/signin').on('success', async (body) => {
-      if (body.valid) {
-        dispatch(setToken(token, api));
-      }
-    });
+    api
+      .get<IsLoggedInResponseDto>('/auth/signin')
+      .on('success', async (body) => {
+        if (body.valid) await dispatch(setToken(token, api));
+        dispatch(initializedReducer());
+      })
+      .on('error', () => dispatch(initializedReducer()))
+      .on('failure', () => dispatch(initializedReducer()));
   };
 
 export function setToken(token: null): AppThunk;
@@ -160,5 +170,6 @@ export function setToken(token: string | null, api?: API): AppThunk {
 export const useConnectedUser = () => useAppSelector((state) => state.session.user);
 export const usePermissions = () => useAppSelector((state) => state.session.permissions);
 export const useLoggedIn = () => useAppSelector((state) => state.session.logged);
+export const useSessionInitialized = () => useAppSelector((state) => state.session.initialized);
 
 export default sessionSlice.reducer;

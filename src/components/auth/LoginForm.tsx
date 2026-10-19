@@ -47,7 +47,7 @@ export default function LoginForm({ application }: { application: string | undef
         <span className={styles.bluePart}>{connectionText.slice((connectionText.length * 2) / 3)}</span>
       </div>
       <a
-        href={`https://cas.utt.fr/cas/login?${new URLSearchParams({
+        href={`${process.env.NEXT_PUBLIC_CAS_URL}/login?${new URLSearchParams({
           service: getCasServiceUrl(application),
         }).toString()}`}
         className={styles.cas}>
