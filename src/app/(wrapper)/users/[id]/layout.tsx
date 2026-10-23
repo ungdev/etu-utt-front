@@ -6,13 +6,14 @@ import styles from './layout.module.scss';
 import defaultAvatar from '../../../../../public/images/default-avatar.jpg';
 import { apiUrl } from '@/utils/environment';
 import { NotParameteredTranslationKey, useAppTranslation } from '@/lib/i18n';
+import { ReactNode } from 'react';
 
 const tabsInfo = [
   { path: '/', name: 'users:generalInfo.tabName' },
   { path: '/assos', name: 'users:assos.tabName' },
 ] as Array<{ path: string; name: NotParameteredTranslationKey }>;
 
-export default function UserDetailsLayout({ children }: { children: React.ReactNode }) {
+export default function UserDetailsLayout({ children }: { children: ReactNode }) {
   const { id: userId } = useParams<{ id: string }>();
   const pathname = usePathname().match(/\/users\/[\w-]+(\/\w+)?/)?.[1] ?? '/';
   const user = useUser(userId);

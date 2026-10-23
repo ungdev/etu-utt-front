@@ -11,6 +11,9 @@ import 'react-toastify/dist/ReactToastify.css';
 export default function Wrapper({ children }: { children: ReactNode }) {
   const { hasNavbar, noWrapperPadding } = usePageSettings();
   const { loaded } = usePageLoaded();
+
+  const contents = <div className={`${styles.page} ${noWrapperPadding ? styles.noPadding : ''}`}>{children}</div>;
+
   return (
     <>
       <ToastContainer
@@ -28,9 +31,8 @@ export default function Wrapper({ children }: { children: ReactNode }) {
         transition={Zoom}
       />
       <GoTo />
-      {hasNavbar && <Navbar />}
       {!loaded && <Loader />}
-      <div className={`${styles.page} ${noWrapperPadding ? styles.noPadding : ''}`}>{children}</div>
+      {hasNavbar ? <Navbar>{contents}</Navbar> : contents}
     </>
   );
 }

@@ -6,7 +6,7 @@ import LoginForm from '@/components/auth/LoginForm';
 import LegalsForm from '@/components/auth/LegalsForm';
 import Page from '@/components/utilities/Page';
 import { useAppDispatch } from '@/lib/hooks';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { usePageLoaded, useSearchParam } from '@/module/pageSettings';
 import { setToken } from '@/module/session';
 import { etuuttWebApplicationId, authorizationTokenExpiresIn } from '@/utils/environment';
@@ -19,7 +19,7 @@ export default function LoginPage() {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const [registerToken, setRegisterToken] = useState<string | null>(null);
-  const [validatedToken, setValidatedToken] = useState(false);
+  const validatedToken = useRef(false);
   const api = useAPI();
   useEffect(() => {
     if (application == etuuttWebApplicationId) {
@@ -27,44 +27,46 @@ export default function LoginPage() {
     }
   }, []);
   useEffect(() => {
-    if (!ticket || validatedToken) return;
-    setValidatedToken(true);
-    api
-      .post<CasLoginRequestDto, CasLoginResponseDto>('auth/signin', {
-        ticket: ticket,
-        tokenExpiresIn: authorizationTokenExpiresIn(),
-      })
-      .on('success', (body) => {
-        if (body.status === 'no_account') {
-          setRegisterToken(body.token);
-          router.replace('/login');
-          return;
-        }
-        if (body.status === 'no_api_key') {
-          router.push(
-            `/login/external/create?${new URLSearchParams({
-              token: body.token,
-              application: application ?? etuuttWebApplicationId,
-            }).toString()}`,
-          );
-          return;
-        }
-        if (body.token === null) {
-          window.location.assign(body.redirectUrl);
-          return;
-        }
-        dispatch(setToken(body.token, api));
-        router.push('/');
-      });
-  }, [ticket]);
-  useEffect(() => {
     if ((!ticket || registerToken) && internallyLoaded) {
       markPageLoaded();
     }
   }, [internallyLoaded]);
-  if (ticket && !registerToken) {
-    return null;
-  }
+
+  useEffect(() => {
+    if (ticket && !validatedToken.current) {
+      validatedToken.current = true;
+      api
+        .post<CasLoginRequestDto, CasLoginResponseDto>('auth/signin', {
+          ticket: ticket,
+          tokenExpiresIn: authorizationTokenExpiresIn(),
+        })
+        .on('success', (body) => {
+          if (body.status === 'no_account') {
+            setRegisterToken(body.token);
+            router.replace('/login');
+            return;
+          }
+          if (body.status === 'no_api_key') {
+            router.push(
+              `/login/external/create?${new URLSearchParams({
+                token: body.token,
+                application: application ?? etuuttWebApplicationId,
+              }).toString()}`,
+            );
+            return;
+          }
+          if (body.token === null) {
+            window.location.assign(body.redirectUrl);
+            return;
+          }
+          dispatch(setToken(body.token, api));
+          router.push('/');
+        });
+    }
+  }, [ticket]);
+
+  if (ticket && !registerToken) return null;
+
   if (registerToken) {
     return (
       <Page

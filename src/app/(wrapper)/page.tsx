@@ -4,13 +4,14 @@ import styles from './style.module.scss';
 import WidgetRenderer from '@/components/homeWidgets/WidgetRenderer';
 import { usePageLoaded } from '@/module/pageSettings';
 import Button from '@/components/UI/Button';
-import { useStateWithReference } from '@/utils/hooks';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import { addWidget, modifyBB, removeWidget, WIDGETS } from '@/module/homepage';
 import { useEffect, useMemo, useState } from 'react';
 import { isClientSide } from '@/utils/environment';
 import Page from '@/components/utilities/Page';
 import { useAppTranslation } from '@/lib/i18n';
+import { createPortal } from 'react-dom';
+import { useNavbarPortal } from '@/components/Navbar';
 
 function AdditionalNavbarComponent({
   modifyingLayout,
@@ -47,17 +48,8 @@ function AdditionalNavbarComponent({
 export default function HomePage() {
   const { markPageLoaded } = usePageLoaded();
   const [isSmallScreen, setIsSmallScreen] = useState(false);
-  const [modifyingLayout, setModifyingLayout, modifyingLayoutRef] = useStateWithReference(false);
-  const navbarAdditionalComponent = isSmallScreen
-    ? null
-    : () => (
-        <AdditionalNavbarComponent
-          modifyingLayout={modifyingLayoutRef.current}
-          onModify={() => setModifyingLayout(true)}
-          onDone={() => setModifyingLayout(false)}
-          onAdd={(widget) => dispatch(addWidget(widget))}
-        />
-      );
+  const [modifyingLayout, setModifyingLayout] = useState(false);
+  const navbar = useNavbarPortal();
   const resizeObserver = useMemo(
     () =>
       isClientSide()
@@ -68,7 +60,7 @@ export default function HomePage() {
             });
           })
         : null,
-    [isClientSide()],
+    [],
   );
   const widgets = useAppSelector((state) => state.homepage);
   const dispatch = useAppDispatch();
@@ -77,8 +69,9 @@ export default function HomePage() {
     resizeObserver.observe(document.body);
     return () => resizeObserver.disconnect();
   }, [resizeObserver]);
+
   return (
-    <Page needsLoading={true} navbarAdditionalComponent={navbarAdditionalComponent} className={styles.page}>
+    <Page needsLoading={true} className={styles.page}>
       {!isSmallScreen
         ? widgets.map((widget, i) => {
             return (
@@ -99,6 +92,18 @@ export default function HomePage() {
             const Widget = WIDGETS[widget.widget].component;
             return <Widget key={widget.id} />;
           })}
+      {navbar &&
+        createPortal(
+          !isSmallScreen && (
+            <AdditionalNavbarComponent
+              modifyingLayout={modifyingLayout}
+              onModify={() => setModifyingLayout(true)}
+              onDone={() => setModifyingLayout(false)}
+              onAdd={(widget) => dispatch(addWidget(widget))}
+            />
+          ),
+          navbar,
+        )}
     </Page>
   );
 }

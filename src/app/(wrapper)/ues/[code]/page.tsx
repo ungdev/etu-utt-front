@@ -27,6 +27,10 @@ import { UserType, useLoggedIn } from '@/module/session';
 import { ReactNode, useState } from 'react';
 import { DetailedUE } from '@/api/ue/ue.interface';
 
+function getCurrentTime() {
+  return Date.now();
+}
+
 function UeWorkTimes({ workTimes }: { workTimes: DetailedUE['ueofs'][number]['workTime'] }): ReactNode {
   const { t } = useAppTranslation();
   if (!workTimes) return <div className={styles.worktime}>{t('ues:detailed.noWorkingTimeInfo')}</div>;
@@ -202,7 +206,7 @@ export default function UeDetailsPage() {
               <div>{t('ues:detailed.semester')}</div>
               <div>
                 {ue.ueofs[ueofIndex].openSemester
-                  .filter((semester) => new Date(semester.end).getTime() > Date.now())
+                  .filter((semester) => new Date(semester.end).getTime() > getCurrentTime())
                   .map((semester) => semester.code)
                   .join(', ') || t('ues:detailed.semester.none')}{' '}
               </div>
@@ -296,8 +300,8 @@ export default function UeDetailsPage() {
                     <Button
                       onClick={() =>
                         sendComment(api, ue.code, writingComment, false).on('success', (newComment) => {
-                          commentsCommuniquer.newComment = newComment;
-                          commentsCommuniquer.send();
+                          commentsCommuniquer.current.newComment = newComment;
+                          commentsCommuniquer.current.send();
                           setWritingComment('');
                         })
                       }>

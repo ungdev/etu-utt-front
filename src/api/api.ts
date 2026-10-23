@@ -94,9 +94,10 @@ export interface Abortable {
  *     .toPromise();
  * }
  */
-export class ResponseHandler<T, R extends ResponseHandlerExtendsType<T> = { fallback: HandlerNoParam<undefined> }>
-  implements Abortable
-{
+export class ResponseHandler<
+  T,
+  R extends ResponseHandlerExtendsType<T> = { fallback: HandlerNoParam<undefined> },
+> implements Abortable {
   private readonly handlers = { fallback: () => undefined } as R;
   private readonly promise: Promise<ReturnType<R[keyof R] extends (...args: any) => any ? R[keyof R] : never>>;
 

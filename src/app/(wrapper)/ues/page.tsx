@@ -52,10 +52,10 @@ function useUeFilters(creditCategories: CreditCategory[] | null, branches: Branc
         updateDelayed: false,
       },
       branchOption: {
-        component: ({ onUpdate, forcedValue, branch }) => (
+        component: ({ onUpdate, value, branch }) => (
           <SelectFilter
             onUpdate={onUpdate}
-            forcedValue={forcedValue}
+            value={value}
             choices={
               branches?.find((b) => b.code === branch)?.branchOptions?.map((branchOption) => branchOption.code) ?? []
             }
@@ -131,7 +131,9 @@ export default function UesPage() {
                       </div>
                       <div className={styles.languages}>
                         <span className={[styles.taughtIn, styles.label].join(' ')}>{t('ues:overview.taughtIn')}</span>
-                        {item?.info.languages.map((language) => <span key={language}>{language}</span>)}
+                        {item?.info.languages.map((language) => (
+                          <span key={language}>{language}</span>
+                        ))}
                       </div>
                     </div>
                     <div className={styles.sideData}>
@@ -140,7 +142,9 @@ export default function UesPage() {
                           <span className={[styles.label, styles.categoryLabel].join(' ')}>
                             {t('ues:overview.minors')}
                           </span>
-                          {item?.info.minors.map((minor) => <span key={minor}>{minor}</span>)}
+                          {item?.info.minors.map((minor) => (
+                            <span key={minor}>{minor}</span>
+                          ))}
                         </div>
                       ) : (
                         ''

@@ -69,7 +69,6 @@ export default function AssoDetailPage() {
   const user = useConnectedUser();
   const [asso, setAsso] = useAsso(params.assoId);
   const [members, setMembers] = useMembers(params.assoId);
-  const [permissions, setPermissions] = useState(new Set<string>());
   const [displayOldMembers, setDisplayOldMembers] = useState(false);
   const [editInfosMode, setEditInfosMode] = useState(false);
   const [editMembersMode, setEditMembersMode] = useState(false);
@@ -83,9 +82,8 @@ export default function AssoDetailPage() {
 
   const api = useAPI();
 
-  useEffect(() => {
-    if (!user) return;
-    const permissions = new Set<string>();
+  const permissions = new Set<string>();
+  if (user)
     for (const role of members) {
       if (role.isPresident) {
         if (role.members.find((member) => member.userId === user.id)) {
@@ -96,13 +94,9 @@ export default function AssoDetailPage() {
         }
       } else {
         const member = role.members.find((member) => member.userId === user.id);
-        if (member) {
-          member.permissions.forEach(permissions.add);
-        }
+        if (member) member.permissions.forEach(permissions.add);
       }
     }
-    setPermissions(permissions);
-  }, [members, user]);
 
   useEffect(() => {
     if (asso?.description) {

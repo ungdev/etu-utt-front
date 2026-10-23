@@ -1,5 +1,5 @@
 import { createAnnal } from '@/api/annals/createAnnal';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import styles from './ExamSender.module.scss';
 import { useAppTranslation } from '@/lib/i18n';
 import FileUpload from '../UI/FileUpload';
@@ -28,10 +28,8 @@ export default function ExamSender({
   const fileRef = useRef<File | undefined>(undefined);
   const api = useAPI();
 
-  useEffect(() => {
-    if (annalTypes?.length) setAnnalType(annalTypes[0].id);
-    if (annalSemesters?.length) setAnnalSemester(annalSemesters[0]);
-  }, [annalTypes, annalSemesters]);
+  if (annalTypes?.length) setAnnalType(annalTypes[0].id);
+  if (annalSemesters?.length) setAnnalSemester(annalSemesters[0]);
 
   const onSendExam = async () => {
     if (!fileRef.current || !annalSemester || !annalType) return;
