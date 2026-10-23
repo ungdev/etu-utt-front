@@ -1,5 +1,5 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import { FC, useState } from 'react';
+import { useState } from 'react';
 import { notFound } from 'next/navigation';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import { useConnectedUser } from '@/module/session';
@@ -7,7 +7,6 @@ import { useConnectedUser } from '@/module/session';
 interface PageSettingsSlice {
   permissions: PagePermission[];
   hasNavbar: boolean;
-  navbarAdditionalComponent: FC<Record<string, never>> | null;
   searchParams: Record<string, string>;
   pageComponentReady: boolean;
   internalLoading: {
@@ -33,7 +32,6 @@ type PageSettings = Omit<PageSettingsSlice, InternalPageSettingsKeys>;
 export const defaultPageSettings = {
   permissions: [],
   hasNavbar: true,
-  navbarAdditionalComponent: null,
 } as PageSettings;
 
 export const getInitialState = () =>

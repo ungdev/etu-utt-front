@@ -1,6 +1,6 @@
 import { MenuItem } from '@/components/Navbar';
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import { AppThunk, RootState } from 'src/lib/store';
+import { AppThunk, RootState } from '@/lib/store';
 import { LocalStorageNames } from '@/global';
 import { useAppSelector } from '@/lib/hooks';
 import { IconBook, IconChevronRight, IconHome, IconUser, IconUsers } from 'obra-icons-react';

@@ -1,37 +1,37 @@
 import styles from './Comments.module.scss';
-import useComments from '@/api/comment/fetchComments';
+import useComments, { AddComment, UpdateComment } from '@/api/comment/fetchComments';
 import { TFunction, useAppTranslation } from '@/lib/i18n';
 import { IconChevronRight } from 'obra-icons-react';
 import EditableText from '@/components/EditableText';
 import Button from '@/components/UI/Button';
 import { useConnectedUser } from '@/module/session';
 import { Comment } from '@/api/comment/comment.interface';
-import { useEffect, useRef, useState } from 'react';
+import { createContext, ReactNode, useContext, useState } from 'react';
 import { editComment } from '@/api/comment/editComment';
 import StarRating from '@/components/StarRating';
 import upvoteComment from '@/api/comment/upvote';
 import { unUpvoteComment } from '@/api/comment/unUpvote';
 import { useAPI } from '@/api/api';
 
-export class CommentsCommuniquer {
-  public updater: boolean = false;
-  public newComment: null | Comment = null;
-  constructor(private _send: () => void) {}
-  public send(): void {
-    this.updater = !this.updater;
-    this._send();
-  }
-  public clear(): void {
-    this.newComment = null;
-  }
+interface CommentContext {
+  comments: Comment[] | null;
+  setComment: UpdateComment;
+  addComment: AddComment;
+  ue: string;
 }
 
-export function useCommentsCommuniquer(): CommentsCommuniquer {
-  const [, setUpdater] = useState<boolean>(false);
-  const commentsCommuniquer = useRef<CommentsCommuniquer>(
-    new CommentsCommuniquer(() => setUpdater((updater) => !updater)),
-  );
-  return commentsCommuniquer.current;
+const CommentsContext = createContext<CommentContext>({
+  comments: [],
+  setComment: () => {},
+  addComment: () => {},
+  ue: '',
+});
+export const useCommentsContext = () => useContext(CommentsContext);
+
+export function CommentsSection(props: { children?: ReactNode; code: string }) {
+  const [comments, addComment, setComment] = useComments(props.code);
+  const context = { comments, setComment, addComment, ue: props.code };
+  return <CommentsContext.Provider value={context}>{props.children}</CommentsContext.Provider>;
 }
 
 function CommentEditorFooter(comment: Comment, onUpdate: (text: string, anonymous: boolean) => void) {
@@ -58,67 +58,66 @@ function CommentEditorFooter(comment: Comment, onUpdate: (text: string, anonymou
   };
 }
 
-function CommentFooter(
-  code: string,
-  comment: Comment,
-  isMyComment: boolean,
-  t: TFunction,
-  updateComment: (updatedComment: Comment) => void,
-) {
-  return function CommentFooter() {
-    const api = useAPI();
-    return (
-      <div className={styles.commentFooter}>
-        <div className={styles.upvotes}>
-          <StarRating
-            stars={1}
-            value={comment.upvoted ? 1 : 0}
-            onClick={
-              isMyComment
-                ? undefined
-                : async () => {
-                    // Upvote or un-upvote the comment. If it returns false, it means the request failed (for example, it was already upvoted / un-upvoted)
-                    // If that's the case, we don't update the number of upvotes.
-                    if (
-                      (!comment.upvoted && !(await upvoteComment(api, comment.id).toPromise())) ||
-                      (comment.upvoted && !(await unUpvoteComment(api, comment.id).toPromise()))
-                    ) {
-                      return;
-                    }
-                    updateComment({
-                      ...comment,
-                      upvotes: comment.upvotes + (comment.upvoted ? -1 : 1),
-                      upvoted: !comment.upvoted,
-                    });
+function CommentFooter({
+  code,
+  comment,
+  isMyComment,
+  t,
+  updateComment,
+}: {
+  code: string;
+  comment: Comment;
+  isMyComment: boolean;
+  t: TFunction;
+  updateComment: (updatedComment: Comment) => void;
+}) {
+  const api = useAPI();
+  return (
+    <div className={styles.commentFooter}>
+      <div className={styles.upvotes}>
+        <StarRating
+          stars={1}
+          value={comment.upvoted ? 1 : 0}
+          onClick={
+            isMyComment
+              ? undefined
+              : async () => {
+                  // Upvote or un-upvote the comment. If it returns false, it means the request failed (for example, it was already upvoted / un-upvoted)
+                  // If that's the case, we don't update the number of upvotes.
+                  if (
+                    (!comment.upvoted && !(await upvoteComment(api, comment.id).toPromise())) ||
+                    (comment.upvoted && !(await unUpvoteComment(api, comment.id).toPromise()))
+                  ) {
+                    return;
                   }
-            }
-          />
-          <p>{t('ues:detailed.comments.upvotes', { count: comment.upvotes.toString() })}</p>
-        </div>
-        <a className={styles.gotoConversation} href={`/ues/${code}/comments/${comment.id}`}>
-          {comment.answers.length === 0
-            ? t('ues:detailed.comments.conversation.see.empty')
-            : t('ues:detailed.comments.conversation.see', { responseCount: comment.answers.length.toString() })}
-          <IconChevronRight />
-        </a>
+                  updateComment({
+                    ...comment,
+                    upvotes: comment.upvotes + (comment.upvoted ? -1 : 1),
+                    upvoted: !comment.upvoted,
+                  });
+                }
+          }
+        />
+        <p>{t('ues:detailed.comments.upvotes', { count: comment.upvotes.toString() })}</p>
       </div>
-    );
-  };
+      <a className={styles.gotoConversation} href={`/ues/${code}/comments/${comment.id}`}>
+        {comment.answers.length === 0
+          ? t('ues:detailed.comments.conversation.see.empty')
+          : t('ues:detailed.comments.conversation.see', { responseCount: comment.answers.length.toString() })}
+        <IconChevronRight />
+      </a>
+    </div>
+  );
 }
 
-export default function Comments({ code, communiquer }: { code: string; communiquer: CommentsCommuniquer }) {
+export default function Comments() {
   const { t } = useAppTranslation();
-  const [comments, addComment, setComment] = useComments(code);
+  const { setComment, comments, ue } = useCommentsContext();
   const user = useConnectedUser()!;
   const api = useAPI();
-  useEffect(() => {
-    if (comments === null || !communiquer.newComment) return;
-    addComment(communiquer.newComment);
-    communiquer.clear();
-  }, [communiquer.updater]);
-  if (comments === null) {
-    return '';
-  }
+
+  if (comments === null) return '';
+
   return (
     <div className={styles.comments}>
       {comments?.map((comment, i) => (
@@ -146,11 +145,15 @@ export default function Comments({ code, communiquer }: { code: string; communiq
               const updatedComment = await editComment(api, comment.id, text, anonymous).toPromise();
               if (!updatedComment) return;
               setComment(i, updatedComment);
-            })}
-            NormalViewFooter={CommentFooter(code, comment, comment.author?.id === user.id, t, (updatedComment) =>
-              setComment(i, updatedComment),
-            )}
-          />
+            })}>
+            <CommentFooter
+              code={ue}
+              comment={comment}
+              isMyComment={comment.author?.id === user.id}
+              t={t}
+              updateComment={(updatedComment) => setComment(i, updatedComment)}
+            />
+          </EditableText>
         </div>
       ))}
     </div>

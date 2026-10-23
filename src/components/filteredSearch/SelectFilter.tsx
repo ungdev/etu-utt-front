@@ -1,12 +1,12 @@
 import styles from './SelectFilter.module.scss';
-import { FC, useEffect, useRef, useState } from 'react';
+import { FC, useDeferredValue, useEffect, useState } from 'react';
 import { NotParameteredTranslationKey, useAppTranslation } from '@/lib/i18n';
 import { BaseFilterProps } from '@/components/filteredSearch/FilteredSearch';
 import Select from '@/components/UI/Select';
 
 export function SelectFilter<Choices extends string>({
   onUpdate,
-  forcedValue,
+  value,
   choices,
   title,
   humanReadableMapping,
@@ -15,16 +15,17 @@ export function SelectFilter<Choices extends string>({
   title: NotParameteredTranslationKey;
   humanReadableMapping?: Record<Choices, NotParameteredTranslationKey>;
 }) {
-  const [value, setValue] = useState<Choices | 'all'>('all');
+  const [display, setValue] = useState<Choices | 'all'>('all');
   const { t } = useAppTranslation();
-  const forcedValueRef = useRef<string | null>(null);
-  if (forcedValue !== forcedValueRef.current && forcedValue !== null) {
-    forcedValueRef.current = forcedValue;
-    setValue(([...choices, 'all'].includes(forcedValue) ? forcedValue : 'all') as Choices | 'all');
-  }
+  const deferredValue = useDeferredValue(value);
+
+  if (value !== deferredValue && value !== null)
+    setValue(([...choices, 'all'].includes(value) ? value : 'all') as Choices | 'all');
+
   useEffect(() => {
-    onUpdate(value === 'all' ? null : value, value === 'all' ? null : value);
-  }, [value]);
+    onUpdate(display === 'all' ? null : display, display === 'all' ? null : display);
+  }, [display]);
+
   return (
     <div className={styles.filter}>
       <h3 className={styles.title}>{t(title)}</h3>
@@ -37,7 +38,7 @@ export function SelectFilter<Choices extends string>({
           })),
         ]}
         onSelect={setValue}
-        value={value}
+        value={display}
       />
     </div>
   );

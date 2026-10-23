@@ -2,7 +2,7 @@
 
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import styles from './Navbar.module.scss';
-import { ForwardRefExoticComponent, useState } from 'react';
+import { createContext, ForwardRefExoticComponent, ReactNode, useContext, useState } from 'react';
 import { getMenu, setCollapsed, useCollapsed } from '@/module/navbar';
 import Link from 'next/link';
 import { type NotParameteredTranslationKey, useAppTranslation } from '@/lib/i18n';
@@ -10,10 +10,12 @@ import Icons from '@/icons';
 import { IconArrowLeft, IconLanguage, IconLogIn, IconLogOut, IconMenu } from 'obra-icons-react';
 import { isLoggedIn, logout, useConnectedUser } from '@/module/session';
 import Button from './UI/Button';
-import { usePageSettings } from '@/module/pageSettings';
 import { usePathname, useRouter } from 'next/navigation';
 import { LocalStorageNames } from '@/global';
 import { isDevEnv } from '@/utils/environment';
+
+const NavbarContext = createContext<HTMLElement | null>(null);
+export const useNavbarPortal = () => useContext(NavbarContext);
 
 /**
  * The type defining all possible properties for a menu item
@@ -62,7 +64,7 @@ export type MenuItem<
  * At the point, the navbar officially only supports 2 depth levels. Other levels are possible but may
  * not work as intended, especially when talking about displaying submenus contents.
  */
-export default function Navbar() {
+export default function Navbar(props: { children: ReactNode }) {
   // The selected menu name. This names includes the one of all of its ancestors, separated with commas.
   // For example the name "Menu2,Menu4" matches "Menu4" in the following hierarchy (> means a closed menu, - means an open menu):
   // > Menu1
@@ -77,7 +79,7 @@ export default function Navbar() {
   const loggedIn = useAppSelector(isLoggedIn);
   const user = useConnectedUser();
   const dispatch = useAppDispatch();
-  const { navbarAdditionalComponent: Additional } = usePageSettings();
+  const [additionalElements, setAdditionalElements] = useState<HTMLElement | null>(null);
 
   const { t, i18n } = useAppTranslation();
   const [language, setLanguage] = useState(i18n.language);
@@ -149,107 +151,106 @@ export default function Navbar() {
 
   // Based on : https://codepen.io/guled10/pen/zYqVqed
   return (
-    <div className={`${styles.navigation} ${collapsed ? styles.collapsed : ''}`}>
-      {/* LOGO ETUUTT */}
-      <div className={styles.navigationHeader}>
-        <Link href="/" className={`${styles.navigationLogo}`}>
-          <Icons.LogoEtu />
-          <span>EtuUTT</span>
-        </Link>
-        <div className={styles.rightIcon} onClick={toggleCollapsed}>
-          <IconArrowLeft />
+    <NavbarContext.Provider value={additionalElements}>
+      <div className={`${styles.navigation} ${collapsed ? styles.collapsed : ''}`}>
+        {/* LOGO ETUUTT */}
+        <div className={styles.navigationHeader}>
+          <Link href="/" className={`${styles.navigationLogo}`}>
+            <Icons.LogoEtu />
+            <span>EtuUTT</span>
+          </Link>
+          <div className={styles.rightIcon} onClick={toggleCollapsed}>
+            <IconArrowLeft />
+          </div>
+
+          <div className={styles.uncollapseButton} onClick={toggleCollapsed}>
+            <IconMenu />
+          </div>
         </div>
+        {/* NAVIGATION */}
+        <nav role="navigation">
+          <ul>
+            {menuItems.items.slice(0, menuItems.seperator).map((item) => inflateButton(item))}
+            {menuItems.items.slice(menuItems.seperator).map((item) => inflateButton(item))}
+            {!!additionalElements?.childElementCount && <div className={styles.separator} />}
+            <div id="navbar-portal" ref={setAdditionalElements} />
+          </ul>
+        </nav>
 
-        <div className={styles.uncollapseButton} onClick={toggleCollapsed}>
-          <IconMenu />
-        </div>
-      </div>
-      {/* NAVIGATION */}
-      <nav role="navigation">
-        <ul>
-          {menuItems.items.slice(0, menuItems.seperator).map((item) => inflateButton(item))}
-          {menuItems.items.slice(menuItems.seperator).map((item) => inflateButton(item))}
-          {Additional && (
-            <>
-              <div className={styles.separator} />
-              <Additional />
-            </>
-          )}
-        </ul>
-      </nav>
+        <div className={styles.bottom}>
+          {/* ACCOUNT */}
+          {loggedIn && (
+            <a href="#" className={styles.profile}>
+              <img src="https://picsum.photos/seed/45/200/200" alt="Profile picture" />
+              <div className={styles.infos}>
+                <p className={styles.name}>
+                  {user?.firstName} {user?.lastName}
+                </p>
+                <p className={styles.role}>Étudiant</p>
+              </div>
+              <div className={styles.actions}>
+                <div className={styles.language} onClick={() => setLanguageSelectorOpen(!languageSelectorOpen)}>
+                  <IconLanguage />
 
-      <div className={styles.bottom}>
-        {/* ACCOUNT */}
-        {loggedIn && (
-          <a href="#" className={styles.profile}>
-            <img src="https://picsum.photos/seed/45/200/200" alt="Profile picture" />
-            <div className={styles.infos}>
-              <p className={styles.name}>
-                {user?.firstName} {user?.lastName}
-              </p>
-              <p className={styles.role}>Étudiant</p>
-            </div>
-            <div className={styles.actions}>
-              <div className={styles.language} onClick={() => setLanguageSelectorOpen(!languageSelectorOpen)}>
-                <IconLanguage />
-
-                <div className={`${styles.languageSelector} ${languageSelectorOpen ? styles.open : ''}`}>
-                  <div>
-                    <input
-                      type="radio"
-                      id="fr"
-                      name="language"
-                      value="fr"
-                      checked={language === 'fr'}
-                      onChange={() => changeLanguage('fr')}
-                    />
-                    <label htmlFor="fr">Français</label>
-                  </div>
-                  <div>
-                    <input
-                      type="radio"
-                      id="en"
-                      name="language"
-                      value="en"
-                      checked={language === 'en'}
-                      onChange={() => changeLanguage('en')}
-                    />
-                    <label htmlFor="en">English</label>
+                  <div className={`${styles.languageSelector} ${languageSelectorOpen ? styles.open : ''}`}>
+                    <div>
+                      <input
+                        type="radio"
+                        id="fr"
+                        name="language"
+                        value="fr"
+                        checked={language === 'fr'}
+                        onChange={() => changeLanguage('fr')}
+                      />
+                      <label htmlFor="fr">Français</label>
+                    </div>
+                    <div>
+                      <input
+                        type="radio"
+                        id="en"
+                        name="language"
+                        value="en"
+                        checked={language === 'en'}
+                        onChange={() => changeLanguage('en')}
+                      />
+                      <label htmlFor="en">English</label>
+                    </div>
                   </div>
                 </div>
+                <div onClick={logoutUser}>
+                  <IconLogOut />
+                </div>
               </div>
-              <div onClick={logoutUser}>
-                <IconLogOut />
+            </a>
+          )}
+
+          {/* NOT LOGGED IN */}
+          {!loggedIn && (
+            <div className={styles.guest}>
+              <Link className={styles.navigationLink} href={'/login'}>
+                <IconLogIn />
+                <span>Connexion</span>
+              </Link>
+              <div className={`${styles.buttons}`}>
+                <Button onClick={() => router.push('/login')}>Connexion</Button>
+                {isDevEnv() && <Button onClick={() => router.push('/register')}>Inscription</Button>}
               </div>
             </div>
-          </a>
-        )}
+          )}
+        </div>
 
-        {/* NOT LOGGED IN */}
-        {!loggedIn && (
-          <div className={styles.guest}>
-            <Link className={styles.navigationLink} href={'/login'}>
-              <IconLogIn />
-              <span>Connexion</span>
-            </Link>
-            <div className={`${styles.buttons}`}>
-              <Button onClick={() => router.push('/login')}>Connexion</Button>
-              {isDevEnv() && <Button onClick={() => router.push('/register')}>Inscription</Button>}
+        {!collapsed && (
+          <div className={styles.randomLinks}>
+            <Link href={'/developers'}>Espace développeur</Link>
+            <div className={styles.legalStuff}>
+              <Link className={styles.legal} href={'/legal'}>
+                Mentions légales
+              </Link>
             </div>
           </div>
         )}
       </div>
-
-      {!collapsed && (
-        <div className={styles.randomLinks}>
-          <Link href={'/developers'}>Espace développeur</Link>
-          <div className={styles.legalStuff}>
-            <Link className={styles.legal} href={'/legal'}>
-              Mentions légales
-            </Link>
-          </div>
-        </div>
-      )}
-    </div>
+      {props.children}
+    </NavbarContext.Provider>
   );
 }

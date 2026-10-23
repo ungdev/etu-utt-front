@@ -1,5 +1,5 @@
 import styles from './EditableText.module.scss';
-import { JSXElementConstructor, useEffect, useState } from 'react';
+import { JSXElementConstructor, ReactNode, useState } from 'react';
 import TextArea from '@/components/UI/TextArea';
 import FocusableDiv from '@/components/FocusableDiv';
 
@@ -9,21 +9,17 @@ export default function EditableText({
   className = '',
   textClassName = '',
   enabled = true,
-  NormalViewFooter = () => false,
+  children,
 }: {
   text: string;
   EditingFooter: JSXElementConstructor<{ text: string; disable: () => void }>;
   className?: string;
   textClassName?: string;
   enabled?: boolean;
-  NormalViewFooter?: JSXElementConstructor<Record<string, never>>;
+  children?: ReactNode;
 }) {
   const [selected, setSelected] = useState<boolean>(false);
   const [value, setValue] = useState<string>(text);
-
-  useEffect(() => {
-    setValue(text);
-  }, [text]);
 
   if (!selected) {
     return (
@@ -31,7 +27,7 @@ export default function EditableText({
         <p className={textClassName} onClick={() => (enabled ? setSelected(true) : undefined)}>
           {text}
         </p>
-        <NormalViewFooter />
+        {children}
       </div>
     );
   }

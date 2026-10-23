@@ -20,6 +20,7 @@ ARG NEXT_PUBLIC_DPO_NAME
 ARG NEXT_PUBLIC_PUBLICATION_DIRECTOR
 ARG NEXT_PUBLIC_LAST_TERMS_UPDATE='02/04/2024'
 ARG NEXT_PUBLIC_LAST_PRIVACY_POLICY_UPDATE='02/04/2024'
+ARG NODE_AUTH_TOKEN=
 
 # Runtime variables
 ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
@@ -49,7 +50,7 @@ RUN apk add --upgrade --no-cache vips-dev build-base
 
 COPY --chown=node:node package.json pnpm-lock.yaml ./
 
-RUN npm i -g pnpm@10 && pnpm install --frozen-lockfile --prod=false --ignore-scripts=false
+RUN npm i -g pnpm@10 && pnpm config set "//npm.pkg.github.com/:_authToken" ${NODE_AUTH_TOKEN} && pnpm install --frozen-lockfile --prod=false --ignore-scripts=false
 
 COPY --chown=node:node . .
 

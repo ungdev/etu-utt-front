@@ -3,8 +3,8 @@ import { Pagination } from '@/api/api.interface';
 import { Comment } from '@/api/comment/comment.interface';
 import { useAPI } from '@/api/api';
 
-type AddComment = (comment: Comment) => void;
-type UpdateComment = (index: number, comment: Comment) => void;
+export type AddComment = (comment: Comment) => void;
+export type UpdateComment = (index: number, comment: Comment) => void;
 
 export default function useComments(code: string): [Comment[] | null, AddComment, UpdateComment] {
   const [comments, setComments] = useState<Comment[] | null>(null);
