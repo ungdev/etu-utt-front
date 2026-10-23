@@ -1,7 +1,7 @@
 'use client';
 
 import styles from './GoTo.module.scss';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import Input from '@/components/UI/Input';
 import { NotParameteredTranslationKey, useAppTranslation } from '@/lib/i18n';
 import Link from '@/components/UI/Link';
@@ -40,10 +40,9 @@ export default function GoTo() {
   const router = useRouter();
   const [visible, setVisible] = useState(false);
   const [search, setSearch] = useState('');
-  const [translatedSearchEntries, setTranslatedSearchEntries] = useState<TranslatedSearchEntry[]>([]);
-  const [results, setResults] = useState<number[]>([]);
   const [selectedResultIndex, setSelectedResultIndex] = useState<number>(0);
   const inputRef = useRef<HTMLInputElement>(null);
+
   useEffect(() => {
     const listener = (e: KeyboardEvent) => {
       if (e.key === 'k' && e.ctrlKey) {
@@ -56,31 +55,36 @@ export default function GoTo() {
     document.addEventListener('keydown', listener);
     return () => document.removeEventListener('keydown', listener);
   }, []);
-  useEffect(() => {
-    setTranslatedSearchEntries(
+
+  const translatedSearchEntries = useMemo(
+    () =>
       searchEntries.map((entry) => ({
         ...entry,
         keywords: [...entry.keywordTranslationKeys, entry.name]
           .map((key) => t(key).toLowerCase().latinize().split(/\s+/))
           .flat(),
       })),
-    );
-  }, [i18n.language]);
-  useEffect(() => {
+    [i18n.language],
+  );
+
+  const results = useMemo(() => {
     const searchKeywords = search.toLowerCase().latinize().split(/\s+/);
-    const newResults = translatedSearchEntries
-      .map<[TranslatedSearchEntry, number]>((entry, i) => [entry, i])
-      // Only keep results where, for each keyword searched, there is at least one keyword in the entry that contains it
-      .filter(([entry]) => searchKeywords.every((keyword) => entry.keywords.some((k) => k.includes(keyword))))
-      .map(([, i]) => i);
-    setResults(newResults);
-    const newSelectedResultIndex = newResults.indexOf(results[selectedResultIndex]);
-    setSelectedResultIndex(newSelectedResultIndex === -1 ? 0 : newSelectedResultIndex);
+    return (
+      translatedSearchEntries
+        .map<[TranslatedSearchEntry, number]>((entry, i) => [entry, i])
+        // Only keep results where, for each keyword searched, there is at least one keyword in the entry that contains it
+        .filter(([entry]) => searchKeywords.every((keyword) => entry.keywords.some((k) => k.includes(keyword))))
+        .map(([, i]) => i)
+    );
   }, [search, translatedSearchEntries]);
+
   useEffect(() => {
     if (!visible || !inputRef.current) return;
     inputRef.current.focus();
-  }, [visible, inputRef.current]);
+  }, [visible]);
+
+  const includesSelection = results.includes(selectedResultIndex);
+
   return (
     <div
       className={`${styles.goTo} ${visible ? '' : styles.hidden}`}
@@ -93,12 +97,17 @@ export default function GoTo() {
         value={search}
         onArrowPressed={(direction) =>
           direction === 'up'
-            ? setSelectedResultIndex((selectedResultIndex - 1 + results.length) % results.length)
-            : setSelectedResultIndex((selectedResultIndex + 1) % results.length)
+            ? setSelectedResultIndex(
+                results[(results.indexOf(selectedResultIndex) - 1 + results.length) % results.length],
+              )
+            : setSelectedResultIndex(results[(results.indexOf(selectedResultIndex) + 1) % results.length])
         }
         onEnter={() => {
           if (!results.length) return;
-          router.push(translatedSearchEntries[results[selectedResultIndex]].url);
+          router.push(
+            (includesSelection ? translatedSearchEntries[selectedResultIndex] : translatedSearchEntries[results[0]])
+              .url,
+          );
           setVisible(false);
         }}
         ref={inputRef}
@@ -108,7 +117,7 @@ export default function GoTo() {
           <Link
             key={entryIndex}
             href={translatedSearchEntries[entryIndex].url}
-            className={`${styles.result} ${i === selectedResultIndex ? styles.selected : ''}`}
+            className={`${styles.result} ${(includesSelection ? entryIndex === selectedResultIndex : !i) ? styles.selected : ''}`}
             noStyle>
             {t(translatedSearchEntries[entryIndex].name)}
           </Link>

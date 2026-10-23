@@ -1,6 +1,6 @@
 'use client';
 import styles from './DailyTimetableWidget.module.scss';
-import { useEffect, useState } from 'react';
+import { useDeferredValue, useState } from 'react';
 import { /*GetDailyTimetableResponseDto,*/ TimetableEvent } from '@/api/users/getDailyTimetable';
 // import { useAPI } from '@/api/api';
 import { format } from 'date-fns';
@@ -11,6 +11,13 @@ import { WidgetLayout } from '@/components/homeWidgets/WidgetLayout';
 import { useAppTranslation } from '@/lib/i18n';
 
 const DAY_LENGTH = 24 * 3_600_000;
+const getCurrentDate = () => {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth();
+  const date = now.getDate();
+  return new Date(year, month, date);
+};
 
 /**
  * Renders a one-day timetable.
@@ -18,38 +25,11 @@ const DAY_LENGTH = 24 * 3_600_000;
  */
 export default function DailyTimetableWidget() {
   const [timetable, setTimetable] = useState([] as TimetableEvent[]);
-  const [selectedDate, setSelectedDate] = useState(new Date(0));
+  const [selectedDate, setSelectedDate] = useState(getCurrentDate());
+  const deferredDate = useDeferredValue(selectedDate);
   const [columnsCount, setColumnsCount] = useState(0);
   // const api = useAPI();
   const { t } = useAppTranslation();
-
-  useEffect(() => {
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = now.getMonth();
-    const date = now.getDate();
-    setSelectedDate(new Date(year, month, date));
-  }, []);
-
-  /**
-   * Called when the selected date is changed.
-   * Fetches the timetable of the user for the selected date, and update the state.
-   */
-  useEffect(() => {
-    if (selectedDate.getTime() === 0) return;
-    /*api
-      .get<GetDailyTimetableResponseDto>(
-        `/timetable/current/daily/${selectedDate.getDate()}/${selectedDate.getMonth() + 1}/${selectedDate.getFullYear()}`,
-      )
-      .on('success', (body) => {
-        const columnsCount = formatTimetable(body);
-        setTimetable(body);
-        setColumnsCount(columnsCount);
-      });*/
-    const columnsCount = formatTimetable([]);
-    setTimetable([]);
-    setColumnsCount(columnsCount);
-  }, [selectedDate]);
 
   /**
    * Clamps every event of the timetable in the current day, and assign a column number to each event.
@@ -78,6 +58,26 @@ export default function DailyTimetableWidget() {
     }
     return columnsFreeFrom.length;
   };
+
+  /**
+   * Called when the selected date is changed.
+   * Fetches the timetable of the user for the selected date, and update the state.
+   */
+  if (deferredDate != selectedDate) {
+    if (selectedDate.getTime() === 0) return;
+    /*api
+      .get<GetDailyTimetableResponseDto>(
+        `/timetable/current/daily/${selectedDate.getDate()}/${selectedDate.getMonth() + 1}/${selectedDate.getFullYear()}`,
+      )
+      .on('success', (body) => {
+        const columnsCount = formatTimetable(body);
+        setTimetable(body);
+        setColumnsCount(columnsCount);
+      });*/
+    const columnsCount = formatTimetable([]);
+    setTimetable([]);
+    setColumnsCount(columnsCount);
+  }
 
   return (
     <WidgetLayout
