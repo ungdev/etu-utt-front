@@ -7,7 +7,7 @@ import useAnnalMetadata from '@/api/annals/fetchMetadata';
 import { useAPI } from '@/api/api';
 import { sendComment } from '@/api/comment/sendComment';
 import useUe from '@/api/ue/fetchUe';
-import Comments, { useCommentsCommuniquer } from '@/app/(wrapper)/ues/[code]/Comments';
+import Comments, { CommentsSection, useCommentsContext } from '@/app/(wrapper)/ues/[code]/Comments';
 import { useAppTranslation } from '@/lib/i18n';
 import { useUERateCriteria } from '@/module/constantData';
 import { UERateCriterion } from '@/api/ueRate/ueRateCriterion.interface';
@@ -112,6 +112,28 @@ function UeWorkTimes({ workTimes }: { workTimes: DetailedUE['ueofs'][number]['wo
   );
 }
 
+function CommentEditor() {
+  const { t } = useAppTranslation();
+  const api = useAPI();
+  const [writingComment, setWritingComment] = useState<string>('');
+  const { ue, addComment } = useCommentsContext();
+
+  return (
+    <div className={styles.writeComment}>
+      {t('ues:detailed.comments.write')}
+      <TextArea value={writingComment} onChange={setWritingComment} />
+      <Button
+        onClick={() =>
+          sendComment(api, ue, writingComment, false).on('success', (newComment) => {
+            addComment(newComment);
+            setWritingComment('');
+          })
+        }>
+        {t('ues:detailed.comments.write.send')}
+      </Button>
+    </div>
+  );
+}
 export default function UeDetailsPage() {
   const params = useParams<{ code: string }>();
   const { t } = useAppTranslation();
@@ -121,12 +143,10 @@ export default function UeDetailsPage() {
   const [ueofIndex, setUeofIndex] = useState(0);
   const criteria = useUERateCriteria();
   const [myRates, setMyRates] = useGetRate(params.code);
-  const [writingComment, setWritingComment] = useState<string>('');
   const [annals, , addAnnal] = useAnnals(params.code);
   const [annalTypes, annalSemesters] = useAnnalMetadata(params.code);
   const [isAnnalUploaderOpen, setAnnalUploaderOpen] = useState(false);
   const api = useAPI();
-  const commentsCommuniquer = useCommentsCommuniquer();
 
   if (!ue || (logged && !criteria) || myRates === undefined) {
     return false;
@@ -260,61 +280,46 @@ export default function UeDetailsPage() {
               annalTypes={annalTypes}
             />
           )}
-          {logged && (type === UserType.STUDENT || type === UserType.FORMER_STUDENT) && (
-            <div className={styles.thoughts}>
-              <h2>{t('ues:detailed.rates.title')}</h2>
-              <div className={[styles.rates, !criteria && styles.error].filter((c) => c).join(' ')}>
-                {criteria && ue.starVotes
-                  ? Object.entries(ue.starVotes).map(([id, value]) => {
-                      const myRate = myRates?.find((rate) => rate.criterionId === id);
-                      return (
-                        <div key={id} className={styles.criterion}>
-                          <h3>
-                            {criteria.find((criterion): criterion is UERateCriterion => criterion.id === id)?.name}
-                          </h3>
-                          <StarRating stars={5} value={value} />
-                          {myRates && (
-                            <>
-                              <StarRating
-                                stars={5}
-                                value={myRate?.value ?? 0}
-                                onClick={(rate) => onRate(id as string, !!myRate, rate)}
-                              />
-                              {myRate && (
-                                <Button className={styles.deleteRate} onClick={() => deleteRate(id as string)}>
-                                  {t('ues:detailed.rates.delete')}
-                                </Button>
-                              )}
-                            </>
-                          )}
-                        </div>
-                      );
-                    })
-                  : t('ues:detailed.rates.error')}
-              </div>
-              {logged && (type === UserType.STUDENT || type === UserType.FORMER_STUDENT) ? (
-                <>
-                  <div className={styles.writeComment}>
-                    {t('ues:detailed.comments.write')}
-                    <TextArea value={writingComment} onChange={setWritingComment} />
-                    <Button
-                      onClick={() =>
-                        sendComment(api, ue.code, writingComment, false).on('success', (newComment) => {
-                          commentsCommuniquer.current.newComment = newComment;
-                          commentsCommuniquer.current.send();
-                          setWritingComment('');
-                        })
-                      }>
-                      {t('ues:detailed.comments.write.send')}
-                    </Button>
-                  </div>
-                  <Comments code={params.code} communiquer={commentsCommuniquer} />
-                </>
-              ) : (
-                t('ues:detailed.comments.loginRequired')
-              )}
-            </div>
-          )}
+          <div className={styles.thoughts}>
+            <h2>{t('ues:detailed.rates.title')}</h2>
+            {logged && (type === UserType.STUDENT || type === UserType.FORMER_STUDENT) ? (
+              <CommentsSection code={params.code}>
+                <div className={[styles.rates, !criteria && styles.error].filter((c) => c).join(' ')}>
+                  {criteria && ue.starVotes
+                    ? Object.entries(ue.starVotes).map(([id, value]) => {
+                        const myRate = myRates?.find((rate) => rate.criterionId === id);
+                        return (
+                          <div key={id} className={styles.criterion}>
+                            <h3>
+                              {criteria.find((criterion): criterion is UERateCriterion => criterion.id === id)?.name}
+                            </h3>
+                            <StarRating stars={5} value={value} />
+                            {myRates && (
+                              <>
+                                <StarRating
+                                  stars={5}
+                                  value={myRate?.value ?? 0}
+                                  onClick={(rate) => onRate(id as string, !!myRate, rate)}
+                                />
+                                {myRate && (
+                                  <Button className={styles.deleteRate} onClick={() => deleteRate(id as string)}>
+                                    {t('ues:detailed.rates.delete')}
+                                  </Button>
+                                )}
+                              </>
+                            )}
+                          </div>
+                        );
+                      })
+                    : t('ues:detailed.rates.error')}
+                </div>
+                <CommentEditor />
+                <Comments />
+              </CommentsSection>
+            ) : (
+              t('ues:detailed.comments.loginRequired')
+            )}
+          </div>
         </>
       ) : (
         annalSemesters &&

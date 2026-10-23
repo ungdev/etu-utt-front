@@ -1,37 +1,37 @@
 import styles from './Comments.module.scss';
-import useComments from '@/api/comment/fetchComments';
+import useComments, { AddComment, UpdateComment } from '@/api/comment/fetchComments';
 import { TFunction, useAppTranslation } from '@/lib/i18n';
 import { IconChevronRight } from 'obra-icons-react';
 import EditableText from '@/components/EditableText';
 import Button from '@/components/UI/Button';
 import { useConnectedUser } from '@/module/session';
 import { Comment } from '@/api/comment/comment.interface';
-import { RefObject, useEffect, useRef, useState } from 'react';
+import { createContext, ReactNode, useContext, useState } from 'react';
 import { editComment } from '@/api/comment/editComment';
 import StarRating from '@/components/StarRating';
 import upvoteComment from '@/api/comment/upvote';
 import { unUpvoteComment } from '@/api/comment/unUpvote';
 import { useAPI } from '@/api/api';
 
-export class CommentsCommuniquer {
-  public updater: boolean = false;
-  public newComment: null | Comment = null;
-  constructor(private _send: () => void) {}
-  public send(): void {
-    this.updater = !this.updater;
-    this._send();
-  }
-  public clear(): void {
-    this.newComment = null;
-  }
+interface CommentContext {
+  comments: Comment[] | null;
+  setComment: UpdateComment;
+  addComment: AddComment;
+  ue: string;
 }
 
-export function useCommentsCommuniquer(): RefObject<CommentsCommuniquer> {
-  const [, setUpdater] = useState<boolean>(false);
-  const commentsCommuniquer = useRef<CommentsCommuniquer>(
-    new CommentsCommuniquer(() => setUpdater((updater) => !updater)),
-  );
-  return commentsCommuniquer;
+const CommentsContext = createContext<CommentContext>({
+  comments: [],
+  setComment: () => {},
+  addComment: () => {},
+  ue: '',
+});
+export const useCommentsContext = () => useContext(CommentsContext);
+
+export function CommentsSection(props: { children?: ReactNode; code: string }) {
+  const [comments, addComment, setComment] = useComments(props.code);
+  const context = { comments, setComment, addComment, ue: props.code };
+  return <CommentsContext.Provider value={context}>{props.children}</CommentsContext.Provider>;
 }
 
 function CommentEditorFooter(comment: Comment, onUpdate: (text: string, anonymous: boolean) => void) {
@@ -110,19 +110,14 @@ function CommentFooter({
   );
 }
 
-export default function Comments({ code, communiquer }: { code: string; communiquer: RefObject<CommentsCommuniquer> }) {
+export default function Comments() {
   const { t } = useAppTranslation();
-  const [comments, addComment, setComment] = useComments(code);
+  const { setComment, comments, ue } = useCommentsContext();
   const user = useConnectedUser()!;
   const api = useAPI();
-  useEffect(() => {
-    if (comments === null || !communiquer.current.newComment) return;
-    addComment(communiquer.current.newComment);
-    communiquer.current.clear();
-  }, [communiquer.current.updater]);
-  if (comments === null) {
-    return '';
-  }
+
+  if (comments === null) return '';
+
   return (
     <div className={styles.comments}>
       {comments?.map((comment, i) => (
@@ -152,7 +147,7 @@ export default function Comments({ code, communiquer }: { code: string; communiq
               setComment(i, updatedComment);
             })}>
             <CommentFooter
-              code={code}
+              code={ue}
               comment={comment}
               isMyComment={comment.author?.id === user.id}
               t={t}
