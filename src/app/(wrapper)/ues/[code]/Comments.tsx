@@ -31,7 +31,7 @@ export const useCommentsContext = () => useContext(CommentsContext);
 export function CommentsSection(props: { children?: ReactNode; code: string }) {
   const [comments, addComment, setComment] = useComments(props.code);
   const context = { comments, setComment, addComment, ue: props.code };
-  return <CommentsContext.Provider value={context}>{props.children}</CommentsContext.Provider>;
+  return <CommentsContext value={context}>{props.children}</CommentsContext>;
 }
 
 function CommentEditorFooter(comment: Comment, onUpdate: (text: string, anonymous: boolean) => void) {

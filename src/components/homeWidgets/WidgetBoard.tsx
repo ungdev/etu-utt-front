@@ -1,15 +1,15 @@
 import { isClientSide } from '@/utils/environment';
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
-import WidgetRenderer from './WidgetRenderer';
-import DailyTimetableWidget from './DailyTimetableWidget';
-import UEBrowserWidget from './UEBrowserWidget';
-import UserBrowserWidget from './UserBrowserWidget';
-import TodaysBirthdaysWidget from './TodaysBirthdaysWidget';
+import WidgetRenderer from '@/components/homeWidgets/WidgetRenderer';
+import DailyTimetableWidget from '@/components/homeWidgets/DailyTimetableWidget';
+import UEBrowserWidget from '@/components/homeWidgets/UEBrowserWidget';
+import UserBrowserWidget from '@/components/homeWidgets/UserBrowserWidget';
+import TodaysBirthdaysWidget from '@/components/homeWidgets/TodaysBirthdaysWidget';
 import { usePageLoaded } from '@/module/pageSettings';
-import { useNavbarPortal } from '../Navbar';
 import { createPortal } from 'react-dom';
-import Button from '../UI/Button';
+import Button from '@/components/UI/Button';
 import { useAppTranslation } from '@/lib/i18n';
+import { useNavbarPortal } from '@/components/utilities/Wrapper';
 
 export type BoundingBox = { x: number; y: number; width: number; height: number };
 export type WidgetInstance = BoundingBox & { widget: keyof typeof WIDGETS; id: number };
@@ -147,7 +147,7 @@ export default function WidgetBoard() {
   }, [resizeObserver]);
 
   return (
-    <WidgetBoardContext.Provider value={widgets}>
+    <WidgetBoardContext value={widgets}>
       {!isSmallScreen
         ? widgets.map((widget, i) => {
             return (
@@ -177,6 +177,6 @@ export default function WidgetBoard() {
           ),
           navbar,
         )}
-    </WidgetBoardContext.Provider>
+    </WidgetBoardContext>
   );
 }
