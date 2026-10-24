@@ -79,6 +79,7 @@ export default function AssoDetailPage() {
   const [extraModalData, setExtraModalData] = useState<ExtraModalData | null>(null);
   const [assoEdit, setAssoEdit] = useState<AssoUpdateRequest>({});
   const stateRef = useRef<(state: string) => void>(() => {});
+  const getStateRef = useRef<() => string>(() => asso?.description!);
 
   const api = useAPI();
 
@@ -125,11 +126,9 @@ export default function AssoDetailPage() {
     } else {
       const updatePayload: AssoUpdateRequest = {};
       if (asso?.name !== assoEdit.name) updatePayload.name = assoEdit.name;
-      if (
-        asso?.description !== assoEdit.description?.fr &&
-        $makeJson(asso?.description ?? '') !== assoEdit.description?.fr
-      )
-        updatePayload.description = assoEdit.description;
+      const description = getStateRef.current();
+      if (asso?.description !== description && $makeJson(asso?.description ?? '') !== description)
+        updatePayload.description = { fr: description };
       if (asso?.website !== assoEdit.website) updatePayload.website = assoEdit.website;
       if (asso?.mail !== assoEdit.mail) updatePayload.mail = assoEdit.mail;
       if (asso?.phoneNumber !== assoEdit.phoneNumber) updatePayload.phoneNumber = assoEdit.phoneNumber;
@@ -353,7 +352,7 @@ export default function AssoDetailPage() {
                 placeholder={t('assos:infos.edit.description.placeholder')}
                 emptyText={t('assos:infos.description.empty')}
                 initialState={$makeJson(asso.description)}
-                onChange={(state) => updateAssoEdit({ description: { fr: state } })}
+                getState={getStateRef}
                 setStateRef={stateRef}
                 disabled={!editInfosMode}
                 uploadPlaceholderText={t('common:rte.toolbar.uploadImage')}
