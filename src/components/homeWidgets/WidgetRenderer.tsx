@@ -249,5 +249,5 @@ export default function WidgetRenderer({
     </div>
   );
   // (01/04/2024) Pfiouf, that was a long one !
-  // (25/10/2024) Updating it to match react recent standards was also a tough one :/
+  // (25/10/2026) Updating it to match react recent standards was also a tough one :/
 }
