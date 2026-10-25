@@ -12,23 +12,21 @@ export default function FocusableDiv({
   autoFocus?: boolean;
 }) {
   const ref = useRef<HTMLDivElement>(null);
-  const onFocusLostWrapper = useRef<() => void>(onFocusLost);
-  onFocusLostWrapper.current = onFocusLost;
   const focused = useRef<boolean>(autoFocus);
+
   useEffect(() => {
     const clickListener = (event: MouseEvent): void => {
       if (!event?.target) return;
       const isFocus = ref.current!.contains(event.target as Node);
       if (isFocus !== focused.current) {
         focused.current = isFocus;
-        if (!isFocus) {
-          onFocusLostWrapper.current();
-        }
+        if (!isFocus) onFocusLost();
       }
     };
     document.addEventListener('click', clickListener);
     return () => document.removeEventListener('click', clickListener);
-  }, []);
+  }, [onFocusLost]);
+
   return (
     <div ref={ref} className={className}>
       {children}

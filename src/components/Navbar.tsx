@@ -2,18 +2,18 @@
 
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import styles from './Navbar.module.scss';
-import { ForwardRefExoticComponent, useState } from 'react';
+import { ForwardRefExoticComponent, RefAttributes, useState } from 'react';
 import { getMenu, setCollapsed, useCollapsed } from '@/module/navbar';
 import Link from 'next/link';
 import { type NotParameteredTranslationKey, useAppTranslation } from '@/lib/i18n';
 import Icons from '@/icons';
 import { IconArrowLeft, IconLanguage, IconLogIn, IconLogOut, IconMenu } from 'obra-icons-react';
 import { isLoggedIn, logout, useConnectedUser } from '@/module/session';
-import Button from './UI/Button';
-import { usePageSettings } from '@/module/pageSettings';
+import Button from '@/components/UI/Button';
 import { usePathname, useRouter } from 'next/navigation';
 import { LocalStorageNames } from '@/global';
 import { isDevEnv } from '@/utils/environment';
+import { useNavbarPortal } from '@/components/utilities/Wrapper';
 
 /**
  * The type defining all possible properties for a menu item
@@ -62,7 +62,7 @@ export type MenuItem<
  * At the point, the navbar officially only supports 2 depth levels. Other levels are possible but may
  * not work as intended, especially when talking about displaying submenus contents.
  */
-export default function Navbar() {
+export default function Navbar({ ref }: RefAttributes<HTMLDivElement>) {
   // The selected menu name. This names includes the one of all of its ancestors, separated with commas.
   // For example the name "Menu2,Menu4" matches "Menu4" in the following hierarchy (> means a closed menu, - means an open menu):
   // > Menu1
@@ -77,7 +77,7 @@ export default function Navbar() {
   const loggedIn = useAppSelector(isLoggedIn);
   const user = useConnectedUser();
   const dispatch = useAppDispatch();
-  const { navbarAdditionalComponent: Additional } = usePageSettings();
+  const navbar = useNavbarPortal();
 
   const { t, i18n } = useAppTranslation();
   const [language, setLanguage] = useState(i18n.language);
@@ -169,12 +169,8 @@ export default function Navbar() {
         <ul>
           {menuItems.items.slice(0, menuItems.seperator).map((item) => inflateButton(item))}
           {menuItems.items.slice(menuItems.seperator).map((item) => inflateButton(item))}
-          {Additional && (
-            <>
-              <div className={styles.separator} />
-              <Additional />
-            </>
-          )}
+          {!!navbar?.childElementCount && <div className={styles.separator} />}
+          <div ref={ref} />
         </ul>
       </nav>
 

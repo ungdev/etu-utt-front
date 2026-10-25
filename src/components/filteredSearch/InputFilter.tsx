@@ -1,12 +1,12 @@
 import styles from './InputFilter.module.scss';
-import { FC, useEffect, useRef, useState } from 'react';
+import { FC, useDeferredValue, useEffect, useState } from 'react';
 import Input from '@/components/UI/Input';
 import { NotParameteredTranslationKey, useAppTranslation } from '@/lib/i18n';
 import { BaseFilterProps } from '@/components/filteredSearch/FilteredSearch';
 
 export function InputFilter({
   onUpdate,
-  forcedValue,
+  value,
   placeholder,
   icon: Icon,
   title,
@@ -17,11 +17,9 @@ export function InputFilter({
 }) {
   const [search, setSearch] = useState<string>('');
   const { t } = useAppTranslation();
-  const forcedValueRef = useRef<string | null>(null);
-  if (forcedValue !== forcedValueRef.current && forcedValue !== null) {
-    forcedValueRef.current = forcedValue;
-    setSearch(forcedValue);
-  }
+  const lazyValue = useDeferredValue(value);
+  if (lazyValue !== value && value) setSearch(value);
+
   useEffect(() => {
     onUpdate(search === '' ? null : search, search === '' ? null : search);
   }, [search]);
@@ -46,9 +44,7 @@ export function createInputFilter(
   title: NotParameteredTranslationKey,
   icon?: FC,
 ): FC<BaseFilterProps<string>> {
-  return function CustomInputFilter({ onUpdate, forcedValue }: BaseFilterProps<string>) {
-    return (
-      <InputFilter onUpdate={onUpdate} forcedValue={forcedValue} placeholder={placeholder} icon={icon} title={title} />
-    );
+  return function CustomInputFilter({ onUpdate, value }: BaseFilterProps<string>) {
+    return <InputFilter onUpdate={onUpdate} value={value} placeholder={placeholder} icon={icon} title={title} />;
   };
 }

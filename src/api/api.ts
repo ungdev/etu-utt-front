@@ -94,9 +94,10 @@ export interface Abortable {
  *     .toPromise();
  * }
  */
-export class ResponseHandler<T, R extends ResponseHandlerExtendsType<T> = { fallback: HandlerNoParam<undefined> }>
-  implements Abortable
-{
+export class ResponseHandler<
+  T,
+  R extends ResponseHandlerExtendsType<T> = { fallback: HandlerNoParam<undefined> },
+> implements Abortable {
   private readonly handlers = { fallback: () => undefined } as R;
   private readonly promise: Promise<ReturnType<R[keyof R] extends (...args: any) => any ? R[keyof R] : never>>;
 
@@ -277,7 +278,7 @@ async function internalRequestAPI<RequestType, ResponseType>(
     try {
       const res: RawResponseType<ResponseType> = await response.json();
       return { code: response.status, body: formatResponse(res) as ResponseType };
-    } catch (error) {
+    } catch {
       // BROOO, who makes APIs that return headers with Content-Type: application/json without a json body :(
       // (Ok, in theory none, but it's better to be safe than sorry)
       return { failureReason: ResponseFailureReason.not_json };

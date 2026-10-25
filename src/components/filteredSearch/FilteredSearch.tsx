@@ -1,5 +1,5 @@
 import styles from './FilteredSearch.module.scss';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAppTranslation } from '@/lib/i18n';
 import { useAppSelector } from '@/lib/hooks';
 
@@ -27,7 +27,7 @@ type DependencyProps<
 
 export type BaseFilterProps<Value extends string> = {
   onUpdate: (value: Value | null, search: string | null) => void;
-  forcedValue: string | null;
+  value: string | null;
 };
 
 /**
@@ -91,12 +91,6 @@ type NonNullFilterInstance<
   >;
 };
 
-enum FilterUpdateType {
-  NoUpdate,
-  Delay,
-  Instant,
-}
-
 export default function FilteredSearch<
   FilterNames extends string,
   FiltersType extends GenericFiltersType<FilterNames>,
@@ -115,11 +109,69 @@ export default function FilteredSearch<
       .filter(([, filter]) => !('dependsOn' in filter) || filter.dependsOn.length === 0)
       .map(([filterName]) => ({ filter: filterName, value: null, search: null, forcedValue: null })),
   );
-  // When the filters were last updated. Used to avoid updating the search too often.
-  const [lastUpdate] = useState<{ value: number }>({ value: Date.now() });
   const { t } = useAppTranslation();
   const searchParams = useAppSelector((state) => state.pageSettings.searchParams);
-  const updateType = useRef(FilterUpdateType.NoUpdate);
+  const [delayed, setDelayed] = useState(false);
+
+  const callUpdateSearch = () => {
+    updateSearch(
+      Object.fromEntries(
+        filters
+          .filter((filter): filter is NonNullFilterInstance<FilterNames, FiltersType> => filter.search !== null)
+          .map((filter) => [filtersData[filter.filter].parameterName, filter.search]),
+      ),
+    );
+  };
+
+  const setFilters = (filters: Parameters<typeof _setFilters>[0], shouldBeDelayed: boolean) => {
+    setDelayed(shouldBeDelayed);
+    _setFilters(filters);
+  };
+
+  const deleteDependentFilters = (filterName: FilterNames) => {
+    filters
+      .filter((filter) =>
+        ({ dependsOn: [], ...filtersData[filter.filter] }).dependsOn.some((dependsOn) => dependsOn === filterName),
+      )
+      .map((filter) => {
+        deleteDependentFilters(filter.filter);
+        setFilters((filters) => filters.filter((f) => f.filter !== filter.filter), false);
+      });
+  };
+
+  const createDependentFilters = (filterName: FilterNames) => {
+    Object.entries(filtersData)
+      .filter(([, filter]) => ({ dependsOn: [], ...filter }).dependsOn.some((dependsOn) => dependsOn === filterName))
+      .map(([filterName]) => addFilter(filterName));
+  };
+
+  const addFilter = (name: FilterNames, forcedValue?: string) => {
+    setFilters(
+      (filters) => [...filters, { filter: name, value: null, search: null, forcedValue: forcedValue ?? null }],
+      false,
+    );
+  };
+
+  const updateFilter = <T extends FilterNames>(
+    filterIndex: number,
+    { value, search, forcedValue }: Partial<Omit<FilterInstance<FilterNames, FiltersType, T>, 'filter'>>,
+  ) => {
+    const newFilters = [...filters];
+    const oldValue = newFilters[filterIndex].value;
+    if (value !== undefined) newFilters[filterIndex].value = value;
+    if (search !== undefined) newFilters[filterIndex].search = search;
+    if (forcedValue !== undefined) newFilters[filterIndex].forcedValue = forcedValue;
+    if (filtersData[newFilters[filterIndex].filter].updateDelayed) {
+      setFilters(newFilters, true);
+    } else {
+      setFilters(newFilters, false);
+    }
+    if (value === null) {
+      deleteDependentFilters(newFilters[filterIndex].filter);
+    } else if (oldValue === null) {
+      createDependentFilters(newFilters[filterIndex].filter);
+    }
+  };
 
   // Update the value of filters when the URL parameters.
   useEffect(() => {
@@ -137,86 +189,14 @@ export default function FilteredSearch<
     });
   }, [searchParams]);
 
-  // When filters are modified, update the search after 1/3 second.
   useEffect(() => {
-    const now = Date.now();
     invalidateItems();
-    switch (updateType.current) {
-      case FilterUpdateType.Instant:
-        lastUpdate.value = now;
-        callUpdateSearch();
-        break;
-      case FilterUpdateType.Delay:
-        lastUpdate.value = now;
-        setTimeout(() => {
-          if (lastUpdate.value === now) {
-            callUpdateSearch();
-          }
-        }, 333);
-        break;
+    if (delayed) {
+      const timer = setTimeout(() => callUpdateSearch(), 333);
+      return () => clearTimeout(timer);
     }
-    updateType.current = FilterUpdateType.NoUpdate;
-  }, [filters]);
-
-  const callUpdateSearch = () => {
-    updateSearch(
-      Object.fromEntries(
-        filters
-          .filter((filter): filter is NonNullFilterInstance<FilterNames, FiltersType> => filter.search !== null)
-          .map((filter) => [filtersData[filter.filter].parameterName, filter.search]),
-      ),
-    );
-  };
-
-  const setFilters = (filters: Parameters<typeof _setFilters>[0], updateTypeValue: FilterUpdateType) => {
-    _setFilters(filters);
-    updateType.current = Math.max(updateTypeValue, updateType.current);
-  };
-
-  const deleteDependentFilters = (filterName: FilterNames) => {
-    filters
-      .filter((filter) =>
-        ({ dependsOn: [], ...filtersData[filter.filter] }).dependsOn.some((dependsOn) => dependsOn === filterName),
-      )
-      .map((filter) => {
-        deleteDependentFilters(filter.filter);
-        setFilters((filters) => filters.filter((f) => f.filter !== filter.filter), FilterUpdateType.Instant);
-      });
-  };
-
-  const createDependentFilters = (filterName: FilterNames) => {
-    Object.entries(filtersData)
-      .filter(([, filter]) => ({ dependsOn: [], ...filter }).dependsOn.some((dependsOn) => dependsOn === filterName))
-      .map(([filterName]) => addFilter(filterName));
-  };
-
-  const addFilter = (name: FilterNames, forcedValue?: string) => {
-    setFilters(
-      (filters) => [...filters, { filter: name, value: null, search: null, forcedValue: forcedValue ?? null }],
-      FilterUpdateType.Instant,
-    );
-  };
-
-  const updateFilter = <T extends FilterNames>(
-    filterIndex: number,
-    { value, search, forcedValue }: Partial<Omit<FilterInstance<FilterNames, FiltersType, T>, 'filter'>>,
-  ) => {
-    const newFilters = [...filters];
-    const oldValue = newFilters[filterIndex].value;
-    if (value !== undefined) newFilters[filterIndex].value = value;
-    if (search !== undefined) newFilters[filterIndex].search = search;
-    if (forcedValue !== undefined) newFilters[filterIndex].forcedValue = forcedValue;
-    if (filtersData[newFilters[filterIndex].filter].updateDelayed) {
-      setFilters(newFilters, FilterUpdateType.Delay);
-    } else {
-      setFilters(newFilters, FilterUpdateType.Instant);
-    }
-    if (value === null) {
-      deleteDependentFilters(newFilters[filterIndex].filter);
-    } else if (oldValue === null) {
-      createDependentFilters(newFilters[filterIndex].filter);
-    }
-  };
+    callUpdateSearch();
+  }, [filters, delayed]);
 
   return (
     <div className={styles.filtersBar}>
@@ -232,7 +212,7 @@ export default function FilteredSearch<
           <div key={filter.filter} className={styles.filter}>
             <Filter
               onUpdate={(value, search) => updateFilter(i, { value, search })}
-              forcedValue={filter.forcedValue}
+              value={filter.forcedValue}
               {...(otherProps as DependencyProps<FilterNames, FiltersType, typeof filter.filter>)}
             />
           </div>

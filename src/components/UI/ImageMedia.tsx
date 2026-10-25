@@ -23,26 +23,28 @@ export function ImageMedia({
   const [src, setSrc] = useState('');
   const api = useAPI();
 
+  const isWorld = !worldSrc.startsWith(buildApiUrl('/media/image/'));
+
   useEffect(() => {
-    if (!worldSrc.startsWith(buildApiUrl('/media/image/'))) {
-      setSrc(worldSrc);
-      return;
+    if (!isWorld) {
+      let blobUrl: string;
+      let cancelled = false;
+      const req = api
+        .getFile(worldSrc.slice(buildApiUrl('').length), { forceCache: true })
+        .on('success', (blob) => !cancelled && setSrc((blobUrl = URL.createObjectURL(blob))));
+      return () => {
+        cancelled = true;
+        if (blobUrl) URL.revokeObjectURL(blobUrl);
+        else req.abort();
+      };
     }
-    api
-      .getFile(worldSrc.slice(buildApiUrl('').length), { forceCache: true })
-      .on('success', (blob) => setSrc(URL.createObjectURL(blob!)))
-      .toPromise()
-      .then((blob) => setSrc(URL.createObjectURL(blob!)));
-    return () => {
-      if (src.startsWith('blob:')) URL.revokeObjectURL(src);
-    };
   }, [worldSrc]);
 
   return (
-    (src || displayWhileLoading) && (
+    (src || displayWhileLoading || isWorld) && (
       <img
         className={className}
-        src={src || undefined}
+        src={isWorld ? src || undefined : worldSrc}
         width={Number.isInteger(width) ? width : undefined}
         height={Number.isInteger(height) ? height : undefined}
         alt={altText}

@@ -1,11 +1,9 @@
-/* eslint-disable import/named */
 import {
   ComponentType,
   Dispatch,
   PointerEvent,
   PropsWithChildren,
   PropsWithoutRef,
-  PropsWithRef,
   SetStateAction,
   useState,
 } from 'react';
@@ -43,12 +41,13 @@ class ClickPreservingPointerSensor extends PointerSensor {
 function SortableItem(props: PropsWithChildren<{ id: string }>) {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: props.id });
 
-  if (transform) {
-    transform.scaleX = 1;
-    transform.scaleY = 1;
+  const localTransform = transform ? { ...transform } : null;
+  if (localTransform) {
+    localTransform.scaleX = 1;
+    localTransform.scaleY = 1;
   }
   const style = {
-    transform: CSS.Transform.toString(transform),
+    transform: CSS.Transform.toString(localTransform),
     transition,
   };
 
@@ -71,7 +70,7 @@ export const VerticalSortDnd = <T extends { id: string }>({
   onItemMoved = () => {},
 }: PropsWithoutRef<{
   disabled?: boolean;
-  inflater: ComponentType<PropsWithRef<{ item: T }>>;
+  inflater: ComponentType<{ item: T }>;
   items: T[];
   setItems: Dispatch<SetStateAction<T[]>>;
   onItemMoved?: (id: string, newIndex: number, oldIndex: number) => void;

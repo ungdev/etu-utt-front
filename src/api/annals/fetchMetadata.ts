@@ -6,21 +6,18 @@ import { useLoggedIn } from '@/module/session';
 export default function useAnnalMetadata(
   code: string,
 ): [types: AnnalType[] | null | undefined, semesters: string[] | null | undefined] {
-  const [availableTypes, setAvailableTypes] = useState<AnnalType[] | null | undefined>(undefined);
-  const [availableSemesters, setAvailableSemesters] = useState<string[] | null | undefined>(undefined);
   const api = useAPI();
   const logged = useLoggedIn();
+  const [availableTypes, setAvailableTypes] = useState<AnnalType[] | null | undefined>(logged ? undefined : null);
+  const [availableSemesters, setAvailableSemesters] = useState<string[] | null | undefined>(logged ? undefined : null);
 
   useEffect(() => {
-    if (logged && (!availableTypes || !availableSemesters)) {
+    if (logged && (!availableTypes || !availableSemesters))
       api.get<AnnalMetadata>(`/ue/annals/metadata?ueCode=${code}`).on('success', (metadata) => {
         setAvailableTypes(metadata.types);
         setAvailableSemesters(metadata.semesters);
       });
-    } else if (!logged) {
-      setAvailableTypes(null);
-      setAvailableSemesters(null);
-    }
-  }, []);
+  }, [code, logged]);
+
   return [availableTypes, availableSemesters];
 }

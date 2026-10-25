@@ -21,7 +21,7 @@ import { useAppTranslation } from '@/lib/i18n';
 import Button from '@/components/UI/Button';
 import { useConnectedUser } from '@/module/session';
 import { deleteRole } from '@/api/assos/deleteRole';
-import { useAPI } from '@/api/api';
+import { buildApiUrl, useAPI } from '@/api/api';
 import { VerticalSortDnd } from '@/components/UI/VerticalSortDnd';
 import { updateRole } from '@/api/assos/updateRole';
 import { Member } from '@/api/assos/member.interface';
@@ -31,11 +31,12 @@ import { User } from '@/api/users/user.interface';
 import { DataModalSchema, ModalStates, ModalForm, WindowOptions } from '@/components/UI/ModalForm';
 import { AssoRole } from '@/components/assos/AssoRole';
 import { c } from '@/utils';
-import LexicalTextEditor, { $makeJson } from '@/components/UI/LexicalTextEditor';
 import Input from '@/components/UI/Input';
 import Avatar from '@/components/UI/Avatar';
 import { AssoUpdateRequest } from '@/api/assos/asso.interface';
 import { updateAsso } from '@/api/assos/updateAsso';
+import { RichTurboEditor, $makeJson } from '@ungdev/rich-turbo-editor';
+import { ImageMedia } from '@/components/UI/ImageMedia';
 
 type CreateAssoRoleModalFields = { name: 'string' };
 type DeleteAssoRoleModalFields = { confirmation: 'string' };
@@ -57,12 +58,17 @@ type ExtraModalData =
   | CreateAssoMemberModalData
   | UpdateAssoMemberModalData;
 
+export interface PartialUploadResponse {
+  id: string;
+  width: number;
+  height: number;
+}
+
 export default function AssoDetailPage() {
   const params = useParams<{ assoId: string }>();
   const user = useConnectedUser();
   const [asso, setAsso] = useAsso(params.assoId);
   const [members, setMembers] = useMembers(params.assoId);
-  const [permissions, setPermissions] = useState(new Set<string>());
   const [displayOldMembers, setDisplayOldMembers] = useState(false);
   const [editInfosMode, setEditInfosMode] = useState(false);
   const [editMembersMode, setEditMembersMode] = useState(false);
@@ -73,12 +79,12 @@ export default function AssoDetailPage() {
   const [extraModalData, setExtraModalData] = useState<ExtraModalData | null>(null);
   const [assoEdit, setAssoEdit] = useState<AssoUpdateRequest>({});
   const stateRef = useRef<(state: string) => void>(() => {});
+  const getStateRef = useRef<() => string>(() => asso?.description!);
 
   const api = useAPI();
 
-  useEffect(() => {
-    if (!user) return;
-    const permissions = new Set<string>();
+  const permissions = new Set<string>();
+  if (user)
     for (const role of members) {
       if (role.isPresident) {
         if (role.members.find((member) => member.userId === user.id)) {
@@ -89,16 +95,20 @@ export default function AssoDetailPage() {
         }
       } else {
         const member = role.members.find((member) => member.userId === user.id);
-        if (member) {
-          member.permissions.forEach(permissions.add);
-        }
+        if (member) member.permissions.forEach(permissions.add);
       }
     }
-    setPermissions(permissions);
-  }, [members, user]);
 
   useEffect(() => {
-    if (asso?.description) stateRef.current(asso.description);
+    if (asso?.description) {
+      let useAssoRawDescription = true;
+      try {
+        JSON.parse(asso.description);
+      } catch {
+        useAssoRawDescription = false;
+      }
+      stateRef.current?.(useAssoRawDescription ? asso.description : $makeJson(asso.description));
+    }
   }, [asso]);
 
   // Asso edition zone
@@ -116,11 +126,9 @@ export default function AssoDetailPage() {
     } else {
       const updatePayload: AssoUpdateRequest = {};
       if (asso?.name !== assoEdit.name) updatePayload.name = assoEdit.name;
-      if (
-        asso?.description !== assoEdit.description?.fr &&
-        $makeJson(asso?.description ?? '') !== assoEdit.description?.fr
-      )
-        updatePayload.description = assoEdit.description;
+      const description = getStateRef.current();
+      if (asso?.description !== description && $makeJson(asso?.description ?? '') !== description)
+        updatePayload.description = { fr: description };
       if (asso?.website !== assoEdit.website) updatePayload.website = assoEdit.website;
       if (asso?.mail !== assoEdit.mail) updatePayload.mail = assoEdit.mail;
       if (asso?.phoneNumber !== assoEdit.phoneNumber) updatePayload.phoneNumber = assoEdit.phoneNumber;
@@ -339,14 +347,30 @@ export default function AssoDetailPage() {
               )}
             </h1>
             {asso ? (
-              <LexicalTextEditor
-                bundle="@etuutt/full"
+              <RichTurboEditor
+                bundle="@rte/full"
                 placeholder={t('assos:infos.edit.description.placeholder')}
                 emptyText={t('assos:infos.description.empty')}
                 initialState={$makeJson(asso.description)}
-                onChange={(state) => updateAssoEdit({ description: { fr: state } })}
+                getState={getStateRef}
                 setStateRef={stateRef}
                 disabled={!editInfosMode}
+                uploadPlaceholderText={t('common:rte.toolbar.uploadImage')}
+                dropPlaceholder={t('common:rte.dnd.drop')}
+                extractMetaData={(uploadResponse?: PartialUploadResponse) => ({
+                  src: buildApiUrl(`/media/image/${uploadResponse!.id}.webp`),
+                  width: uploadResponse!.width,
+                  height: uploadResponse!.height,
+                })}
+                uploadfileMethod={async (file) => {
+                  const formData = new FormData();
+                  formData.append('file', file);
+                  return api
+                    .post<FormData, PartialUploadResponse>(`/media/image?public=true`, formData, { isFile: true })
+                    .toPromise();
+                }}
+                InputComponent={Input}
+                UploadedImageComponent={ImageMedia}
               />
             ) : (
               <>

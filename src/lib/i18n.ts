@@ -4,7 +4,7 @@ import i18n, { type CustomTypeOptions, type FlatNamespace } from 'i18next';
 import { initReactI18next, useTranslation } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import resourcesToBackend from 'i18next-resources-to-backend';
-import './i18n.d';
+import type {} from './i18n.d';
 import { useLocalStorageVariable } from '@/utils/hooks';
 import { LocalStorageNames } from '@/global';
 
