@@ -248,6 +248,6 @@ export default function WidgetRenderer({
       <div ref={fakeElementRef} className={styles.fakeElement} />
     </div>
   );
-  // Pfiouf, that was a long one !
-  // Updating it to match react recent standards was also a tough one :/
+  // (01/04/2024) Pfiouf, that was a long one !
+  // (25/10/2024) Updating it to match react recent standards was also a tough one :/
 }
