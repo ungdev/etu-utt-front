@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useEffectEvent, useRef } from 'react';
+import { ReactNode, useEffect, useRef } from 'react';
 
 export default function FocusableDiv({
   className = '',
@@ -12,7 +12,6 @@ export default function FocusableDiv({
   autoFocus?: boolean;
 }) {
   const ref = useRef<HTMLDivElement>(null);
-  const onFocusLostWrapper = useEffectEvent(onFocusLost);
   const focused = useRef<boolean>(autoFocus);
 
   useEffect(() => {
@@ -21,12 +20,12 @@ export default function FocusableDiv({
       const isFocus = ref.current!.contains(event.target as Node);
       if (isFocus !== focused.current) {
         focused.current = isFocus;
-        if (!isFocus) onFocusLostWrapper();
+        if (!isFocus) onFocusLost();
       }
     };
     document.addEventListener('click', clickListener);
     return () => document.removeEventListener('click', clickListener);
-  }, []);
+  }, [onFocusLost]);
 
   return (
     <div ref={ref} className={className}>

@@ -26,10 +26,7 @@ import { useAppSelector } from '@/lib/hooks';
 import { UserType, useLoggedIn } from '@/module/session';
 import { ReactNode, useState } from 'react';
 import { DetailedUE } from '@/api/ue/ue.interface';
-
-function getCurrentTime() {
-  return Date.now();
-}
+import { Time } from '@/utils';
 
 function UeWorkTimes({ workTimes }: { workTimes: DetailedUE['ueofs'][number]['workTime'] }): ReactNode {
   const { t } = useAppTranslation();
@@ -226,7 +223,7 @@ export default function UeDetailsPage() {
               <div>{t('ues:detailed.semester')}</div>
               <div>
                 {ue.ueofs[ueofIndex].openSemester
-                  .filter((semester) => new Date(semester.end).getTime() > getCurrentTime())
+                  .filter((semester) => new Date(semester.end).getTime() > Time.getCurrent())
                   .map((semester) => semester.code)
                   .join(', ') || t('ues:detailed.semester.none')}{' '}
               </div>

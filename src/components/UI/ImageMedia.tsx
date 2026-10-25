@@ -23,20 +23,23 @@ export function ImageMedia({
   const [src, setSrc] = useState('');
   const api = useAPI();
 
+  const isWorld = !worldSrc.startsWith(buildApiUrl('/media/image/'));
+
   useEffect(() => {
-    if (worldSrc.startsWith(buildApiUrl('/media/image/'))) {
-      api
+    if (!isWorld) {
+      let blobUrl: string;
+      let cancelled = false;
+      const req = api
         .getFile(worldSrc.slice(buildApiUrl('').length), { forceCache: true })
-        .on('success', (blob) => setSrc(URL.createObjectURL(blob!)))
-        .toPromise()
-        .then((blob) => blob && setSrc(URL.createObjectURL(blob)));
+        .on('success', (blob) => !cancelled && setSrc((blobUrl = URL.createObjectURL(blob))));
       return () => {
-        if (src.startsWith('blob:')) URL.revokeObjectURL(src);
+        cancelled = true;
+        if (blobUrl) URL.revokeObjectURL(blobUrl);
+        else req.abort();
       };
     }
   }, [worldSrc]);
 
-  const isWorld = !worldSrc.startsWith(buildApiUrl('/media/image/'));
   return (
     (src || displayWhileLoading || isWorld) && (
       <img

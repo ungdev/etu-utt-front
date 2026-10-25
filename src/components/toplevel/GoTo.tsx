@@ -84,6 +84,7 @@ export default function GoTo() {
   }, [visible]);
 
   const includesSelection = results.includes(selectedResultIndex);
+  const displayedIndex = includesSelection ? selectedResultIndex : results[0];
 
   return (
     <div
@@ -104,10 +105,7 @@ export default function GoTo() {
         }
         onEnter={() => {
           if (!results.length) return;
-          router.push(
-            (includesSelection ? translatedSearchEntries[selectedResultIndex] : translatedSearchEntries[results[0]])
-              .url,
-          );
+          router.push(translatedSearchEntries[displayedIndex].url);
           setVisible(false);
         }}
         ref={inputRef}
@@ -117,7 +115,7 @@ export default function GoTo() {
           <Link
             key={entryIndex}
             href={translatedSearchEntries[entryIndex].url}
-            className={`${styles.result} ${(includesSelection ? entryIndex === selectedResultIndex : !i) ? styles.selected : ''}`}
+            className={`${styles.result} ${entryIndex === displayedIndex ? styles.selected : ''}`}
             noStyle>
             {t(translatedSearchEntries[entryIndex].name)}
           </Link>

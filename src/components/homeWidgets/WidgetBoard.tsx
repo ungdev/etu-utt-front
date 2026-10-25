@@ -59,9 +59,9 @@ const addWidget = (
         if (state.every((widget) => !collidesWith(bb, widget))) {
           const index = state.findIndex((widget) => widget.y > y || (widget.y === y && widget.x > x));
           if (index === -1) {
-            return [...state, { id: Math.random(), widget, ...bb }];
+            return [...state, { id: generateId(), widget, ...bb }];
           }
-          return [...state.slice(0, index), { id: Math.random(), widget, ...bb }, ...state.slice(index)];
+          return [...state.slice(0, index), { id: generateId(), widget, ...bb }, ...state.slice(index)];
         }
       }
     }

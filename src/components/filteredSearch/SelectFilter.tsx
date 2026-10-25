@@ -15,12 +15,12 @@ export function SelectFilter<Choices extends string>({
   title: NotParameteredTranslationKey;
   humanReadableMapping?: Record<Choices, NotParameteredTranslationKey>;
 }) {
-  const [display, setValue] = useState<Choices | 'all'>('all');
+  const [display, setDisplay] = useState<Choices | 'all'>('all');
   const { t } = useAppTranslation();
   const deferredValue = useDeferredValue(value);
 
   if (value !== deferredValue && value !== null)
-    setValue(([...choices, 'all'].includes(value) ? value : 'all') as Choices | 'all');
+    setDisplay(([...choices, 'all'].includes(value) ? value : 'all') as Choices | 'all');
 
   useEffect(() => {
     onUpdate(display === 'all' ? null : display, display === 'all' ? null : display);
@@ -37,7 +37,7 @@ export function SelectFilter<Choices extends string>({
             name: humanReadableMapping ? t(humanReadableMapping[choice]) : choice,
           })),
         ]}
-        onSelect={setValue}
+        onSelect={setDisplay}
         value={display}
       />
     </div>

@@ -9,15 +9,9 @@ import { IconChevronLeft, IconChevronRight } from 'obra-icons-react';
 import Button from '@/components/UI/Button';
 import { WidgetLayout } from '@/components/homeWidgets/WidgetLayout';
 import { useAppTranslation } from '@/lib/i18n';
+import { Time } from '@/utils';
 
 const DAY_LENGTH = 24 * 3_600_000;
-const getCurrentDate = () => {
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = now.getMonth();
-  const date = now.getDate();
-  return new Date(year, month, date);
-};
 
 /**
  * Renders a one-day timetable.
@@ -25,7 +19,7 @@ const getCurrentDate = () => {
  */
 export default function DailyTimetableWidget() {
   const [timetable, setTimetable] = useState([] as TimetableEvent[]);
-  const [selectedDate, setSelectedDate] = useState(getCurrentDate());
+  const [selectedDate, setSelectedDate] = useState(Time.getDate());
   const deferredDate = useDeferredValue(selectedDate);
   const [columnsCount, setColumnsCount] = useState(0);
   // const api = useAPI();

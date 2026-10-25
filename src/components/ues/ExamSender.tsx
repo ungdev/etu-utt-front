@@ -28,8 +28,8 @@ export default function ExamSender({
   const fileRef = useRef<File | undefined>(undefined);
   const api = useAPI();
 
-  if (annalTypes?.length) setAnnalType(annalTypes[0].id);
-  if (annalSemesters?.length) setAnnalSemester(annalSemesters[0]);
+  if (annalTypes?.[0]?.id !== annalType) setAnnalType(annalTypes[0].id);
+  if (annalSemesters?.[0] !== annalSemester) setAnnalSemester(annalSemesters[0]);
 
   const onSendExam = async () => {
     if (!fileRef.current || !annalSemester || !annalType) return;

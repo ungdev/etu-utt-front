@@ -1,5 +1,5 @@
 import styles from './WidgetRenderer.module.scss';
-import { useEffect, useEffectEvent, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { isClientSide } from '@/utils/environment';
 import { IconMenu } from 'obra-icons-react';
 import Button from '@/components/UI/Button';
@@ -28,8 +28,14 @@ export default function WidgetRenderer({
   const removeButtonRef = useRef<HTMLDivElement>(null); // The button to remove the widget
   // Data about the fake element, it will be used to snap the widget to the grid
   const fakeElement = useRef<BoundingBox | null>(null);
+  // Used to let the observer know if the resizing is due to the user or if it is caused by the snapping of the element / the page being resized
+  // It's always false, except when user is pressing the mouse button on the resizer
   const isUserResizing = useRef(false);
+  // We need something faster than a useState to avoid a double call of the second useEffect, so we need to put it in a ref (as it is instantaneous)
+  // This variable contains information the relative position of the mouse to the dragged element when starting the drag.
+  // If there is currently no dragging, it is null.
   const draggingInfo = useRef<{ x: number; y: number } | null>(null);
+  // The size in pixels of the homepage (the page minus the navbar)
   const homepageSize = useRef<{ width: number; height: number } | null>(null);
 
   // Positions an element at a certain position in the grid
@@ -55,7 +61,7 @@ export default function WidgetRenderer({
   };
 
   // Creates a new fake element, from the widget's position and size.
-  const createFakeElement = useEffectEvent(() => {
+  const createFakeElement = () => {
     fakeElement.current = {
       x: widget.x,
       y: widget.y,
@@ -63,10 +69,10 @@ export default function WidgetRenderer({
       height: widget.height,
     };
     updateFakeElement();
-  });
+  };
 
   // Modifies certain data of the fake element. Does a lot of checks to verify the new bounding box is valid. If not, it will try to adjust its position.
-  const modifyFakeElement = useEffectEvent((bb: Partial<BoundingBox>) => {
+  const modifyFakeElement = (bb: Partial<BoundingBox>) => {
     if (!fakeElement.current) return;
     const newFakeElement = { ...fakeElement.current, ...bb };
     // Check the minimum and maximum size of the widget
@@ -104,7 +110,7 @@ export default function WidgetRenderer({
     // Now, there are no more problems with the new bounding box. We can update the fake element.
     fakeElement.current = newFakeElement;
     updateFakeElement();
-  });
+  };
 
   // Snaps the widget to the grid. The new position of the widget is given by the position of the fake element.
   const snap = () => {
@@ -119,7 +125,7 @@ export default function WidgetRenderer({
   // Define an observer that will look for 2 things : widget resizing and page resizing.
   // When the page is resized, we need to update the widget's absolute position and size and the homepage size
   // When the widget is resized, we need to update the fake element's size and position
-  const observerFunction = useEffectEvent<ResizeObserverCallback>((mutations) => {
+  const observerFunction: ResizeObserverCallback = (mutations) => {
     if (!resizerRef.current) return; // It can happen as the destructor of the useEffect that uses the observer takes time to be called.
     // If the parent is resized, update the homepage size and the widget's position / size accordingly.
     if (mutations[0].target === resizerRef.current.parentElement!.parentElement) {
@@ -147,7 +153,7 @@ export default function WidgetRenderer({
         height: Math.round((widgetBB.height / homepageSize.current!.height) * gridSize[1]),
       });
     }
-  });
+  };
 
   // This useEffect is in charge of connecting and disconnecting the observer.
   useEffect(() => {
@@ -242,4 +248,6 @@ export default function WidgetRenderer({
       <div ref={fakeElementRef} className={styles.fakeElement} />
     </div>
   );
+  // Pfiouf, that was a long one !
+  // Updating it to match react recent standards was also a tough one :/
 }

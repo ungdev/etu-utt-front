@@ -33,36 +33,36 @@ export default function LoginPage() {
   }, [internallyLoaded]);
 
   useEffect(() => {
-    if (ticket && !validatedToken.current) {
-      validatedToken.current = true;
-      api
-        .post<CasLoginRequestDto, CasLoginResponseDto>('auth/signin', {
-          ticket: ticket,
-          tokenExpiresIn: authorizationTokenExpiresIn(),
-        })
-        .on('success', (body) => {
-          if (body.status === 'no_account') {
-            setRegisterToken(body.token);
-            router.replace('/login');
-            return;
-          }
-          if (body.status === 'no_api_key') {
-            router.push(
-              `/login/external/create?${new URLSearchParams({
-                token: body.token,
-                application: application ?? etuuttWebApplicationId,
-              }).toString()}`,
-            );
-            return;
-          }
-          if (body.token === null) {
-            window.location.assign(body.redirectUrl);
-            return;
-          }
-          dispatch(setToken(body.token, api));
-          router.push('/');
-        });
-    }
+    if (!ticket || validatedToken.current) return;
+
+    validatedToken.current = true;
+    api
+      .post<CasLoginRequestDto, CasLoginResponseDto>('auth/signin', {
+        ticket: ticket,
+        tokenExpiresIn: authorizationTokenExpiresIn(),
+      })
+      .on('success', (body) => {
+        if (body.status === 'no_account') {
+          setRegisterToken(body.token);
+          router.replace('/login');
+          return;
+        }
+        if (body.status === 'no_api_key') {
+          router.push(
+            `/login/external/create?${new URLSearchParams({
+              token: body.token,
+              application: application ?? etuuttWebApplicationId,
+            }).toString()}`,
+          );
+          return;
+        }
+        if (body.token === null) {
+          window.location.assign(body.redirectUrl);
+          return;
+        }
+        dispatch(setToken(body.token, api));
+        router.push('/');
+      });
   }, [ticket]);
 
   if (ticket && !registerToken) return null;

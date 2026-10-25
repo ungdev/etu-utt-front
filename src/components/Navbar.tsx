@@ -170,7 +170,7 @@ export default function Navbar({ ref }: RefAttributes<HTMLDivElement>) {
           {menuItems.items.slice(0, menuItems.seperator).map((item) => inflateButton(item))}
           {menuItems.items.slice(menuItems.seperator).map((item) => inflateButton(item))}
           {!!navbar?.childElementCount && <div className={styles.separator} />}
-          <div id="navbar-portal" ref={ref} />
+          <div ref={ref} />
         </ul>
       </nav>
 
