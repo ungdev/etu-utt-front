@@ -1,5 +1,5 @@
 import styles from './WidgetLayout.module.scss';
-import { ReactNode, useEffect, useEffectEvent, useRef } from 'react';
+import { ReactNode, useEffect, useRef } from 'react';
 import { isClientSide } from '@/utils/environment';
 
 export function WidgetLayout({
@@ -19,7 +19,7 @@ export function WidgetLayout({
   const rootRef = useRef<HTMLDivElement>(null);
   const resizableRef = useRef<HTMLDivElement>(null);
   const currentScale = useRef<number>(1);
-  const observerFunction = useEffectEvent(() => {
+  const observerFunction = () => {
     if (!rootRef.current || !resizableRef.current) {
       return;
     }
@@ -29,7 +29,7 @@ export function WidgetLayout({
     resizableRef.current.style.width = `${(rootRef.current.clientWidth - 20) / scaleY}px`;
     resizableRef.current.style.height = `${(rootRef.current.clientHeight - 30) / scaleX}px`;
     resizableRef.current.style.scale = `${currentScale.current}`;
-  });
+  };
 
   useEffect(() => {
     if (!rootRef.current || !isClientSide()) return;
