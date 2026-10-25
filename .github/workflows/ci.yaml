@@ -75,6 +75,8 @@ jobs:
     needs:
       - lint
       - build
+    permissions:
+      packages: read
     steps:
       - uses: actions/checkout@v7
         with:
